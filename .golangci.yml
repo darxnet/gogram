@@ -1,0 +1,41 @@
+version: "2"
+
+linters:
+  default: all
+  settings:
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - experimental
+        - opinionated
+        - performance
+        - style
+      disabled-checks:
+        - whyNoLint
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment
+  disable:
+    - containedctx
+    - cyclop
+    - depguard
+    - err113 # maybe
+    - exhaustruct
+    - forcetypeassert
+    - funcorder
+    - funlen
+    - gochecknoglobals
+    - goconst # maybe
+    - godox
+    - mnd
+    - nlreturn
+    - noctx
+    - noinlineerr
+    - nonamedreturns
+    - revive # maybe
+    - tagliatelle
+    - varnamelen
+    - wrapcheck
+    - wsl
+    - wsl_v5

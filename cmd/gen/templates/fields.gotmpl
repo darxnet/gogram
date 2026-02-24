@@ -1,0 +1,4 @@
+{{- range . }}
+    {{- .Desc }}
+    {{ toTitle .Name }} {{ toType .Type .IsRequired }} `json:"{{ .Name }}{{ if not .IsRequired }},omitempty{{ end }}"`
+{{ end }}
