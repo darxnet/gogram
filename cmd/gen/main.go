@@ -1,11 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
+	"slices"
+	"strings"
 	"time"
 )
 
@@ -21,8 +24,42 @@ type Field struct {
 	Discriminator string // unique value for subtypes
 }
 
-func (field Field) IsChatIDString() bool {
-	return toTitle(field.Name) == "ChatID" && toType(field.Type, field.IsRequired) == "string"
+func (field Field) AutoFillCode(types map[string]Type) string {
+	if field.Name == "chat_id" {
+		if toType(field.Type, field.IsRequired) == "string" {
+			return "ctx.Chat().Identifier()"
+		}
+
+		return "ctx.Chat().ID"
+	}
+
+	before, _, found := strings.Cut(field.Name, "_id")
+	if !found {
+		return ""
+	}
+
+	if !slices.ContainsFunc(types["Update"].Fields, func(f Field) bool { return f.Name == before }) {
+		if field.Name == "callback_query_id" {
+			return types["Update"].Fields[13].Name
+		}
+		return ""
+	}
+
+	if !slices.ContainsFunc(types[toTitle(before)].Fields, func(f Field) bool { return f.Name == "id" }) {
+		return ""
+	}
+
+	return fmt.Sprintf(`func(ctx *Context) string {
+                if ctx.update == nil {
+                    return ""
+                }
+
+                if ctx.update.%[1]s == nil {
+                    return ""
+                }
+
+                return ctx.update.%[1]s.ID
+            }(ctx)`, toTitle(before))
 }
 
 type Type struct {

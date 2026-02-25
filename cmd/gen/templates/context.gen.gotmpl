@@ -48,9 +48,9 @@ func (ctx *Context) User() *User {
     return nil
 }
 
-func (ctx *Context) ChatID() string {
+func (ctx *Context) Chat() *Chat {
     if ctx.update == nil {
-        return ""
+        return nil
     }
 
     switch {
@@ -58,16 +58,16 @@ func (ctx *Context) ChatID() string {
         {{- $name := toTitle .Name }}
         {{- $typ := toType .Type true }}
         {{- range (index $root.Types $typ).Fields }}
-            {{- if toType .Type .IsRequired | eq "Chat" }}
+            {{- if toType .Type true | eq "Chat" }}
                 case ctx.update.{{ $name }} != nil:
-                    return ctx.update.{{ $name }}.{{ toTitle .Name }}.Identifier()
+                    return {{ if .IsRequired }}&{{ end}}ctx.update.{{ $name }}.{{ toTitle .Name }}
                 {{- break }}
             {{- end }}
         {{- end }}
     {{- end }}
     }
 
-    return ""
+    return nil
 }
 
 func (ctx *Context) Message() *Message {
@@ -108,11 +108,8 @@ func (ctx *Context) Payload() string {
     {{ $option := print $method "Option" }}
 func (ctx *Context) {{ $method }}(
     {{- range .Params }}
-        {{- if .IsChatIDString }}
-            {{ continue }}
-        {{- end }}
-        {{- if toTitle .Name | eq "CallbackQueryID" }}
-            {{ continue }}
+        {{- if .AutoFillCode $root.Types }}
+            {{- continue }}
         {{- end }}
         {{- if .IsRequired }}
             {{ toTitle .Name | toLowerFirst }} {{ toType .Type .IsRequired }},
@@ -122,36 +119,15 @@ func (ctx *Context) {{ $method }}(
 ) error {
     params := &{{ $params }}{
         {{- range .Params }}
-            {{- if .IsChatIDString }}
-                {{ continue }}
-            {{- end }}
-            {{- if toTitle .Name | eq "CallbackQueryID" }}
-                {{ continue }}
+            {{- if $code := .AutoFillCode $root.Types }}
+                {{ toTitle .Name }}: {{ $code }},
+                {{- continue }}
             {{- end }}
             {{- if .IsRequired  }}
                 {{ toTitle .Name }}: {{ toTitle .Name | toLowerFirst }},
             {{- end }}
         {{- end }}
     }
-
-    {{- range .Params }}
-        {{ if .IsChatIDString }}
-            params.ChatID = ctx.ChatID()
-        {{- end }}
-        {{ if toTitle .Name | eq "CallbackQueryID" }}
-            params.CallbackQueryID = func(ctx *Context) string {
-               	if ctx.update == nil {
-              		return ""
-               	}
-
-               	if ctx.update.CallbackQuery == nil {
-              		return ""
-               	}
-
-               	return ctx.update.CallbackQuery.ID
-            }(ctx)
-        {{- end }}
-    {{- end }}
 
     params.Option(opts...)
 
