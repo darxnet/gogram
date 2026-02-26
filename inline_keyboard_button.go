@@ -32,6 +32,11 @@ func (b *InlineKeyboardButton) WithPayload(payload string) InlineKeyboardButton 
 	return v
 }
 
+func (b *InlineKeyboardButton) SetText(text string) *InlineKeyboardButton {
+	b.Text = text
+	return b
+}
+
 type InlineKeyboardRow = []InlineKeyboardButton
 
 type InlineKeyboard = []InlineKeyboardRow
