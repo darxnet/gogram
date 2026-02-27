@@ -1,0 +1,54 @@
+name: Go generate
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  go-gen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 'stable'
+          cache: true
+
+      - run: go mod download
+
+      - run: go generate ./...
+
+      - name: Check for changes
+        id: git-check
+        run: |
+          git add .
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Pull Request
+        id: cpr
+        if: steps.git-check.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: update generated code"
+          branch: create-pull-request/go-generate
+          title: "chore: update generated code"
+          body: This is an automated PR triggered by `go generate`
+          labels: go-generate
+
+      - name: Enable Pull Request Automerge
+        if: ${{ steps.cpr.outputs.pull-request-number }}
+        run: gh pr merge --auto --merge "$PR_URL"
+        env:
+          PR_URL: ${{ steps.cpr.outputs.pull-request-url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
