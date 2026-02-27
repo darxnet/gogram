@@ -224,7 +224,7 @@ func (c *Client) SetRouter(r *Router) {
 	c.router = r
 }
 
-func (c *Client) Do(req *http.Request) (*http.Response, error) {
+func (c *Client) do(req *http.Request) (*http.Response, error) {
 	err := c.rateLimiter.Wait(req.Context())
 	if err != nil {
 		return nil, err
@@ -249,7 +249,7 @@ func (c *Client) Raw(method string, reader io.Reader, contentType ...string) (js
 		req.Header.Set("Content-Type", "application/json")
 	}
 
-	resp, err := c.Do(req)
+	resp, err := c.do(req)
 	if err != nil {
 		return nil, err
 	}

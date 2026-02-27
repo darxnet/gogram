@@ -25,7 +25,7 @@ func (w jsonWrapper[T]) Scan(src any) error {
 	case []byte:
 		buf = v
 	case string:
-		buf = ConvertStringToBytes(v)
+		buf = []byte(v)
 	default:
 		return fmt.Errorf("unexpected type: %T", src)
 	}

@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"slices"
 	"strings"
 	"time"
@@ -126,7 +125,7 @@ func retrievePageRC() io.ReadCloser {
 	const timeout = 5 * time.Second
 
 	if localPath := os.Getenv("GOGRAM_HTML"); localPath != "" {
-		f, err := os.Open(filepath.Clean(localPath))
+		f, err := os.Open(localPath) //nolint:gosec // G703
 		if err != nil {
 			log.Fatalln("failed to open html:", err)
 		}
