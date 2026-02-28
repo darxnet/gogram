@@ -36,7 +36,10 @@ type Router struct {
 // NewRouter creates a new Router.
 func NewRouter() *Router {
 	r := new(Router)
-	r.RouterGroup = &RouterGroup{router: r}
+	r.RouterGroup = &RouterGroup{
+		router: r,
+		filter: func(*Context) bool { return true },
+	}
 
 	return r
 }
@@ -136,7 +139,7 @@ func (rg *RouterGroup) Use(funcs ...MiddlewareFunc) {
 // Group creates a new router group with the provided filters.
 func (rg *RouterGroup) Group(filters ...Filter) *RouterGroup {
 	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
+		if rg.filter != nil && !rg.filter(ctx) {
 			return false
 		}
 

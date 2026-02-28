@@ -4465,7 +4465,9 @@ type EditMessageChecklistParams struct {
 	// A JSON-serialized object for the new checklist
 	Checklist InputChecklist `json:"checklist"`
 
-	// A JSON-serialized object for the new inline keyboard for the message
+	// A JSON-serialized object for the new [inline keyboard] for the message
+	//
+	// [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 }
 
@@ -4530,7 +4532,9 @@ func WithEditMessageChecklistChecklist(value InputChecklist) EditMessageChecklis
 
 // WithEditMessageChecklistReplyMarkup sets the ReplyMarkup field.
 //
-// A JSON-serialized object for the new inline keyboard for the message
+// A JSON-serialized object for the new [inline keyboard] for the message
+//
+// [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 func WithEditMessageChecklistReplyMarkup(value *InlineKeyboardMarkup) EditMessageChecklistOption {
 	return func(params *EditMessageChecklistParams) EditMessageChecklistOption {
 		previous := params.ReplyMarkup
@@ -12099,7 +12103,9 @@ type SendChecklistParams struct {
 	// A JSON-serialized object for description of the message to reply to
 	ReplyParameters *ReplyParameters `json:"reply_parameters,omitempty"`
 
-	// A JSON-serialized object for an inline keyboard
+	// A JSON-serialized object for an [inline keyboard]
+	//
+	// [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 }
 
@@ -12201,7 +12207,9 @@ func WithSendChecklistReplyParameters(value *ReplyParameters) SendChecklistOptio
 
 // WithSendChecklistReplyMarkup sets the ReplyMarkup field.
 //
-// A JSON-serialized object for an inline keyboard
+// A JSON-serialized object for an [inline keyboard]
+//
+// [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 func WithSendChecklistReplyMarkup(value *InlineKeyboardMarkup) SendChecklistOption {
 	return func(params *SendChecklistParams) SendChecklistOption {
 		previous := params.ReplyMarkup

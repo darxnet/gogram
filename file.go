@@ -6,12 +6,28 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 )
+
+func buildFileLink(client *Client, filePath string) string {
+	client.locker.RLock()
+	host := client.options.host
+	token := client.token
+	test := client.options.test
+	client.locker.RUnlock()
+
+	link := "https://" + host + "/file/bot" + token + "/"
+	if test {
+		link += "test/"
+	}
+
+	return link + strings.TrimPrefix(filePath, "/")
+}
 
 // ReceiveFileReader returns a reader for the file content from Telegram servers.
 // The caller is responsible for closing the reader.
 func ReceiveFileReader(client *Client, file *File) (io.ReadCloser, error) {
-	link := fmt.Sprintf("https://api.telegram.org/file/bot%s/%s", client.Token(), file.FilePath)
+	link := buildFileLink(client, file.FilePath)
 
 	req, err := http.NewRequest(http.MethodGet, link, http.NoBody)
 	if err != nil {

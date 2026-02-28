@@ -202,6 +202,9 @@ func genErrorBadRequest(description string) error {
 	case ErrBadRequestChatNotFound.Error():
 		return ErrBadRequestChatNotFound
 
+	case ErrBadRequestFileMustBeNonEmpty.Error():
+		return ErrBadRequestFileMustBeNonEmpty
+
 	default:
 		return nil
 	}

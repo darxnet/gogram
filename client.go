@@ -51,6 +51,10 @@ func WithRPS(rps int) ClientOption {
 		defer c.locker.Unlock()
 
 		previous := c.options.rps
+		if rps <= 0 {
+			rps = defaultRPS
+		}
+
 		c.options.rps = rps
 
 		c.rateLimiter.SetLimit(rate.Every(time.Second / time.Duration(rps)))
@@ -97,6 +101,9 @@ func WithHTTPClient(client *http.Client) ClientOption {
 		defer c.locker.Unlock()
 
 		previous := c.httpClient
+		if client == nil {
+			client = &http.Client{Timeout: c.options.timeout}
+		}
 		c.httpClient = client
 
 		return WithHTTPClient(previous)

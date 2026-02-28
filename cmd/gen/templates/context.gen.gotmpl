@@ -59,11 +59,16 @@ func (ctx *Context) Chat() *Chat {
     {{- range .Types.Update.Fields }}
         {{- $name := toTitle .Name }}
         {{- $typ := toType .Type true }}
-        {{- range (index $root.Types $typ).Fields }}
-            {{- if toType .Type true | eq "Chat" }}
-                case ctx.update.{{ $name }} != nil:
-                    return {{ if .IsRequired }}&{{ end}}ctx.update.{{ $name }}.{{ toTitle .Name }}
-                {{- break }}
+        {{- if eq $typ "Message" }}
+            case ctx.update.{{ $name }} != nil:
+                return &ctx.update.{{ $name }}.Chat
+        {{- else }}
+            {{- range (index $root.Types $typ).Fields }}
+                {{- if toType .Type true | eq "Chat" }}
+                    case ctx.update.{{ $name }} != nil:
+                        return {{ if .IsRequired }}&{{ end}}ctx.update.{{ $name }}.{{ toTitle .Name }}
+                    {{- break }}
+                {{- end }}
             {{- end }}
         {{- end }}
     {{- end }}
@@ -169,7 +174,7 @@ func (ctx *Context) {{ $method }}(
             {{- end }}
             {{- if $inputMediasName }}
                 for i := range params.{{ $inputMediasName }} {
-                    defaultParseModeToInputMedia(&media[i], defaultParseMode)
+                    defaultParseModeToInputMedia(&params.{{ $inputMediasName }}[i], defaultParseMode)
 		        }
             {{- end }}
         }

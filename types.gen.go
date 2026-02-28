@@ -3649,7 +3649,9 @@ type InlineQueryResultDocument struct {
 	Description string `json:"description,omitempty"`
 
 	// Optional.
-	// Inline keyboard attached to the message
+	// [Inline keyboard] attached to the message
+	//
+	// [Inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 
 	// Optional.
@@ -6227,8 +6229,10 @@ type Message struct {
 	WebAppData *WebAppData `json:"web_app_data,omitempty"`
 
 	// Optional.
-	// Inline keyboard attached to the message.
+	// [Inline keyboard] attached to the message.
 	// login_url buttons are represented as ordinary url buttons.
+	//
+	// [Inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 }
 

@@ -105,17 +105,17 @@ func (ctx *Context) Chat() *Chat {
 
 	switch {
 	case ctx.update.Message != nil:
-		return ctx.update.Message.SenderChat
+		return &ctx.update.Message.Chat
 	case ctx.update.EditedMessage != nil:
-		return ctx.update.EditedMessage.SenderChat
+		return &ctx.update.EditedMessage.Chat
 	case ctx.update.ChannelPost != nil:
-		return ctx.update.ChannelPost.SenderChat
+		return &ctx.update.ChannelPost.Chat
 	case ctx.update.EditedChannelPost != nil:
-		return ctx.update.EditedChannelPost.SenderChat
+		return &ctx.update.EditedChannelPost.Chat
 	case ctx.update.BusinessMessage != nil:
-		return ctx.update.BusinessMessage.SenderChat
+		return &ctx.update.BusinessMessage.Chat
 	case ctx.update.EditedBusinessMessage != nil:
-		return ctx.update.EditedBusinessMessage.SenderChat
+		return &ctx.update.EditedBusinessMessage.Chat
 	case ctx.update.DeletedBusinessMessages != nil:
 		return &ctx.update.DeletedBusinessMessages.Chat
 	case ctx.update.MessageReaction != nil:
@@ -3005,7 +3005,7 @@ func (ctx *Context) SendMediaGroup(
 
 	if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
 		for i := range params.Media {
-			defaultParseModeToInputMedia(&media[i], defaultParseMode)
+			defaultParseModeToInputMedia(&params.Media[i], defaultParseMode)
 		}
 	}
 
