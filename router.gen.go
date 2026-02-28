@@ -32,6 +32,7 @@ const (
 	handleOnCount
 )
 
+// HandleOnMessage registers a handler for updates containing Message.
 func (rg *RouterGroup) HandleOnMessage(handler func(*Context, *Message) error, filters ...Filter) {
 	combined := func(ctx *Context) bool {
 		if !rg.filter(ctx) {
@@ -53,6 +54,7 @@ func (rg *RouterGroup) HandleOnMessage(handler func(*Context, *Message) error, f
 	})
 }
 
+// HandleOnEditedMessage registers a handler for updates containing EditedMessage.
 func (rg *RouterGroup) HandleOnEditedMessage(handler func(*Context, *Message) error, filters ...Filter) {
 	combined := func(ctx *Context) bool {
 		if !rg.filter(ctx) {
@@ -74,6 +76,7 @@ func (rg *RouterGroup) HandleOnEditedMessage(handler func(*Context, *Message) er
 	})
 }
 
+// HandleOnChannelPost registers a handler for updates containing ChannelPost.
 func (rg *RouterGroup) HandleOnChannelPost(handler func(*Context, *Message) error, filters ...Filter) {
 	combined := func(ctx *Context) bool {
 		if !rg.filter(ctx) {
@@ -95,6 +98,7 @@ func (rg *RouterGroup) HandleOnChannelPost(handler func(*Context, *Message) erro
 	})
 }
 
+// HandleOnEditedChannelPost registers a handler for updates containing EditedChannelPost.
 func (rg *RouterGroup) HandleOnEditedChannelPost(handler func(*Context, *Message) error, filters ...Filter) {
 	combined := func(ctx *Context) bool {
 		if !rg.filter(ctx) {
@@ -116,6 +120,7 @@ func (rg *RouterGroup) HandleOnEditedChannelPost(handler func(*Context, *Message
 	})
 }
 
+// HandleOnBusinessConnection registers a handler for updates containing BusinessConnection.
 func (rg *RouterGroup) HandleOnBusinessConnection(handler func(*Context, *BusinessConnection) error, filters ...Filter) {
 	combined := func(ctx *Context) bool {
 		if !rg.filter(ctx) {
@@ -137,6 +142,7 @@ func (rg *RouterGroup) HandleOnBusinessConnection(handler func(*Context, *Busine
 	})
 }
 
+// HandleOnBusinessMessage registers a handler for updates containing BusinessMessage.
 func (rg *RouterGroup) HandleOnBusinessMessage(handler func(*Context, *Message) error, filters ...Filter) {
 	combined := func(ctx *Context) bool {
 		if !rg.filter(ctx) {
@@ -158,6 +164,7 @@ func (rg *RouterGroup) HandleOnBusinessMessage(handler func(*Context, *Message) 
 	})
 }
 
+// HandleOnEditedBusinessMessage registers a handler for updates containing EditedBusinessMessage.
 func (rg *RouterGroup) HandleOnEditedBusinessMessage(handler func(*Context, *Message) error, filters ...Filter) {
 	combined := func(ctx *Context) bool {
 		if !rg.filter(ctx) {
@@ -179,6 +186,7 @@ func (rg *RouterGroup) HandleOnEditedBusinessMessage(handler func(*Context, *Mes
 	})
 }
 
+// HandleOnDeletedBusinessMessages registers a handler for updates containing DeletedBusinessMessages.
 func (rg *RouterGroup) HandleOnDeletedBusinessMessages(handler func(*Context, *BusinessMessagesDeleted) error, filters ...Filter) {
 	combined := func(ctx *Context) bool {
 		if !rg.filter(ctx) {
@@ -200,6 +208,7 @@ func (rg *RouterGroup) HandleOnDeletedBusinessMessages(handler func(*Context, *B
 	})
 }
 
+// HandleOnMessageReaction registers a handler for updates containing MessageReaction.
 func (rg *RouterGroup) HandleOnMessageReaction(handler func(*Context, *MessageReactionUpdated) error, filters ...Filter) {
 	combined := func(ctx *Context) bool {
 		if !rg.filter(ctx) {
@@ -221,6 +230,7 @@ func (rg *RouterGroup) HandleOnMessageReaction(handler func(*Context, *MessageRe
 	})
 }
 
+// HandleOnMessageReactionCount registers a handler for updates containing MessageReactionCount.
 func (rg *RouterGroup) HandleOnMessageReactionCount(handler func(*Context, *MessageReactionCountUpdated) error, filters ...Filter) {
 	combined := func(ctx *Context) bool {
 		if !rg.filter(ctx) {
@@ -242,6 +252,7 @@ func (rg *RouterGroup) HandleOnMessageReactionCount(handler func(*Context, *Mess
 	})
 }
 
+// HandleOnInlineQuery registers a handler for updates containing InlineQuery.
 func (rg *RouterGroup) HandleOnInlineQuery(handler func(*Context, *InlineQuery) error, filters ...Filter) {
 	combined := func(ctx *Context) bool {
 		if !rg.filter(ctx) {
@@ -263,6 +274,7 @@ func (rg *RouterGroup) HandleOnInlineQuery(handler func(*Context, *InlineQuery) 
 	})
 }
 
+// HandleOnChosenInlineResult registers a handler for updates containing ChosenInlineResult.
 func (rg *RouterGroup) HandleOnChosenInlineResult(handler func(*Context, *ChosenInlineResult) error, filters ...Filter) {
 	combined := func(ctx *Context) bool {
 		if !rg.filter(ctx) {
@@ -284,6 +296,7 @@ func (rg *RouterGroup) HandleOnChosenInlineResult(handler func(*Context, *Chosen
 	})
 }
 
+// HandleOnCallbackQuery registers a handler for updates containing CallbackQuery.
 func (rg *RouterGroup) HandleOnCallbackQuery(handler func(*Context, *CallbackQuery) error, filters ...Filter) {
 	combined := func(ctx *Context) bool {
 		if !rg.filter(ctx) {
@@ -305,6 +318,7 @@ func (rg *RouterGroup) HandleOnCallbackQuery(handler func(*Context, *CallbackQue
 	})
 }
 
+// HandleOnShippingQuery registers a handler for updates containing ShippingQuery.
 func (rg *RouterGroup) HandleOnShippingQuery(handler func(*Context, *ShippingQuery) error, filters ...Filter) {
 	combined := func(ctx *Context) bool {
 		if !rg.filter(ctx) {
@@ -326,6 +340,7 @@ func (rg *RouterGroup) HandleOnShippingQuery(handler func(*Context, *ShippingQue
 	})
 }
 
+// HandleOnPreCheckoutQuery registers a handler for updates containing PreCheckoutQuery.
 func (rg *RouterGroup) HandleOnPreCheckoutQuery(handler func(*Context, *PreCheckoutQuery) error, filters ...Filter) {
 	combined := func(ctx *Context) bool {
 		if !rg.filter(ctx) {
@@ -347,6 +362,7 @@ func (rg *RouterGroup) HandleOnPreCheckoutQuery(handler func(*Context, *PreCheck
 	})
 }
 
+// HandleOnPurchasedPaidMedia registers a handler for updates containing PurchasedPaidMedia.
 func (rg *RouterGroup) HandleOnPurchasedPaidMedia(handler func(*Context, *PaidMediaPurchased) error, filters ...Filter) {
 	combined := func(ctx *Context) bool {
 		if !rg.filter(ctx) {
@@ -368,6 +384,7 @@ func (rg *RouterGroup) HandleOnPurchasedPaidMedia(handler func(*Context, *PaidMe
 	})
 }
 
+// HandleOnPoll registers a handler for updates containing Poll.
 func (rg *RouterGroup) HandleOnPoll(handler func(*Context, *Poll) error, filters ...Filter) {
 	combined := func(ctx *Context) bool {
 		if !rg.filter(ctx) {
@@ -389,6 +406,7 @@ func (rg *RouterGroup) HandleOnPoll(handler func(*Context, *Poll) error, filters
 	})
 }
 
+// HandleOnPollAnswer registers a handler for updates containing PollAnswer.
 func (rg *RouterGroup) HandleOnPollAnswer(handler func(*Context, *PollAnswer) error, filters ...Filter) {
 	combined := func(ctx *Context) bool {
 		if !rg.filter(ctx) {
@@ -410,6 +428,7 @@ func (rg *RouterGroup) HandleOnPollAnswer(handler func(*Context, *PollAnswer) er
 	})
 }
 
+// HandleOnMyChatMember registers a handler for updates containing MyChatMember.
 func (rg *RouterGroup) HandleOnMyChatMember(handler func(*Context, *ChatMemberUpdated) error, filters ...Filter) {
 	combined := func(ctx *Context) bool {
 		if !rg.filter(ctx) {
@@ -431,6 +450,7 @@ func (rg *RouterGroup) HandleOnMyChatMember(handler func(*Context, *ChatMemberUp
 	})
 }
 
+// HandleOnChatMember registers a handler for updates containing ChatMember.
 func (rg *RouterGroup) HandleOnChatMember(handler func(*Context, *ChatMemberUpdated) error, filters ...Filter) {
 	combined := func(ctx *Context) bool {
 		if !rg.filter(ctx) {
@@ -452,6 +472,7 @@ func (rg *RouterGroup) HandleOnChatMember(handler func(*Context, *ChatMemberUpda
 	})
 }
 
+// HandleOnChatJoinRequest registers a handler for updates containing ChatJoinRequest.
 func (rg *RouterGroup) HandleOnChatJoinRequest(handler func(*Context, *ChatJoinRequest) error, filters ...Filter) {
 	combined := func(ctx *Context) bool {
 		if !rg.filter(ctx) {
@@ -473,6 +494,7 @@ func (rg *RouterGroup) HandleOnChatJoinRequest(handler func(*Context, *ChatJoinR
 	})
 }
 
+// HandleOnChatBoost registers a handler for updates containing ChatBoost.
 func (rg *RouterGroup) HandleOnChatBoost(handler func(*Context, *ChatBoostUpdated) error, filters ...Filter) {
 	combined := func(ctx *Context) bool {
 		if !rg.filter(ctx) {
@@ -494,6 +516,7 @@ func (rg *RouterGroup) HandleOnChatBoost(handler func(*Context, *ChatBoostUpdate
 	})
 }
 
+// HandleOnRemovedChatBoost registers a handler for updates containing RemovedChatBoost.
 func (rg *RouterGroup) HandleOnRemovedChatBoost(handler func(*Context, *ChatBoostRemoved) error, filters ...Filter) {
 	combined := func(ctx *Context) bool {
 		if !rg.filter(ctx) {

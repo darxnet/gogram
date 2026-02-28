@@ -2,7 +2,8 @@ package gogram
 
 import "strings"
 
-// WithArgs return copy of button with CallbackData looks like 'callback_data args[0] args[1] ... args[N-1] args[N]'.
+// WithArgs returns a copy of the button with CallbackData appended with arguments.
+// Format: 'callback_data args[0] args[1] ... args[N-1] args[N]'.
 func (b *InlineKeyboardButton) WithArgs(args ...string) InlineKeyboardButton {
 	v := *b
 
@@ -17,7 +18,8 @@ func (b *InlineKeyboardButton) WithArgs(args ...string) InlineKeyboardButton {
 	return v
 }
 
-// WithPayload return copy of button with CallbackData looks like 'callback_data payload'.
+// WithPayload returns a copy of the button with CallbackData appended with a payload.
+// Format: 'callback_data payload'.
 func (b *InlineKeyboardButton) WithPayload(payload string) InlineKeyboardButton {
 	v := *b
 
@@ -32,11 +34,14 @@ func (b *InlineKeyboardButton) WithPayload(payload string) InlineKeyboardButton 
 	return v
 }
 
+// SetText sets the text of the button.
 func (b *InlineKeyboardButton) SetText(text string) *InlineKeyboardButton {
 	b.Text = text
 	return b
 }
 
+// InlineKeyboardRow represents a row of inline keyboard buttons.
 type InlineKeyboardRow = []InlineKeyboardButton
 
+// InlineKeyboard represents an inline keyboard markup.
 type InlineKeyboard = []InlineKeyboardRow

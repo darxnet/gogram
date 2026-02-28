@@ -22,6 +22,7 @@ import (
 
     {{ if .Subtypes }}
         {{- $hasDiscriminator := false }}
+        // MarshalJSON marshals the currently set subtype of {{ .Name }}.
         func (r *{{ .Name }}) MarshalJSON() ([]byte, error) {
             {{- range .Subtypes }}
                 {{- $subtype := index $root . }}
@@ -39,6 +40,7 @@ import (
         }
 
         {{ if and $hasDiscriminator (ne .Name "InlineQueryResult") }}
+            // UnmarshalJSON unmarshals JSON into the matching {{ .Name }} subtype.
             func (r *{{ .Name }}) UnmarshalJSON(data []byte) error {
                 type T struct {
                     {{- range .Subtypes }}
@@ -76,6 +78,7 @@ import (
     {{ end }}
 {{ end }}
 
+// ReplyMarkup contains one of Telegram reply markup types.
 type ReplyMarkup struct {
     *InlineKeyboardMarkup
     *ReplyKeyboardMarkup

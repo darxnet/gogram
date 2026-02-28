@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 )
 
+// ReceiveFileReader returns a reader for the file content from Telegram servers.
+// The caller is responsible for closing the reader.
 func ReceiveFileReader(client *Client, file *File) (io.ReadCloser, error) {
 	link := fmt.Sprintf("https://api.telegram.org/file/bot%s/%s", client.Token(), file.FilePath)
 
@@ -23,12 +25,15 @@ func ReceiveFileReader(client *Client, file *File) (io.ReadCloser, error) {
 
 	if resp.StatusCode != http.StatusOK {
 		_ = resp.Body.Close()
-		return nil, fmt.Errorf("gogram: failed to download file: %s", resp.Status)
+		err := NewError(resp.StatusCode, resp.Status)
+		return nil, fmt.Errorf("gogram: failed to download file: %w", err)
 	}
 
 	return resp.Body, nil
 }
 
+// ReceiveFileReaderByFileID resolves the file path by fileID and returns a reader for the content.
+// The caller is responsible for closing the reader.
 func ReceiveFileReaderByFileID(client *Client, fileID string) (io.ReadCloser, error) {
 	file, err := client.GetFile(&GetFileParams{FileID: fileID})
 	if err != nil {
@@ -38,6 +43,7 @@ func ReceiveFileReaderByFileID(client *Client, fileID string) (io.ReadCloser, er
 	return ReceiveFileReader(client, file)
 }
 
+// DownloadFile downloads a file from Telegram servers to the specified local path.
 func DownloadFile(client *Client, file *File, path string) error {
 	const perm = 0o640
 
@@ -61,6 +67,7 @@ func DownloadFile(client *Client, file *File, path string) error {
 	return nil
 }
 
+// DownloadByFileID resolves the file path by fileID and downloads the file to the specified local path.
 func DownloadByFileID(client *Client, fileID, filePath string) error {
 	file, err := client.GetFile(&GetFileParams{FileID: fileID})
 	if err != nil {

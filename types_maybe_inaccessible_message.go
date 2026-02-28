@@ -2,6 +2,8 @@ package gogram
 
 import "encoding/json"
 
+// UnmarshalJSON implements the json.Unmarshaler interface.
+// It attempts to unmarshal the JSON into a Message or InaccessibleMessage.
 func (r *MaybeInaccessibleMessage) UnmarshalJSON(bs []byte) error {
 	v := new(Message)
 
@@ -22,6 +24,7 @@ func (r *MaybeInaccessibleMessage) UnmarshalJSON(bs []byte) error {
 	return nil
 }
 
+// MessageID returns the message ID of the underlying message.
 func (r *MaybeInaccessibleMessage) MessageID() int64 {
 	if r.Message != nil {
 		return r.Message.MessageID
@@ -30,6 +33,7 @@ func (r *MaybeInaccessibleMessage) MessageID() int64 {
 	return r.InaccessibleMessage.MessageID
 }
 
+// Chat returns the chat of the underlying message.
 func (r *MaybeInaccessibleMessage) Chat() *Chat {
 	if r.Message != nil {
 		return &r.Message.Chat

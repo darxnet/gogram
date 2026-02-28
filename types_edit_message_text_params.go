@@ -1,5 +1,6 @@
 package gogram
 
+// WithEditMessageTextInlineKeyboard sets the inline keyboard for the message to be edited.
 func WithEditMessageTextInlineKeyboard(keyboard [][]InlineKeyboardButton) EditMessageTextOption {
 	return func(params *EditMessageTextParams) EditMessageTextOption {
 		if params.ReplyMarkup == nil {
@@ -13,6 +14,8 @@ func WithEditMessageTextInlineKeyboard(keyboard [][]InlineKeyboardButton) EditMe
 	}
 }
 
+// WithEditMessageTextInlineButtons sets the inline keyboard
+// with a single column of buttons for the message to be edited.
 func WithEditMessageTextInlineButtons(buttons ...InlineKeyboardButton) EditMessageTextOption {
 	return func(params *EditMessageTextParams) EditMessageTextOption {
 		keyboard := make(InlineKeyboard, 0, len(buttons))

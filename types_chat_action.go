@@ -1,15 +1,27 @@
 package gogram
 
+// Chat actions that can be sent using sendChatAction.
 const (
-	ChatActionTyping          = "typing"            // for text messages
-	ChatActionUploadPhoto     = "upload_photo"      // for photos
-	ChatActionRecordVideo     = "record_video"      // for videos
-	ChatActionUploadVideo     = "upload_video"      // for videos
-	ChatActionRecordVoice     = "record_voice"      // for voice notes
-	ChatActionUploadVoice     = "upload_voice"      // for voice notes
-	ChatActionUploadDocument  = "upload_document"   // for general files
-	ChatActionChooseSticker   = "choose_sticker"    // for stickers
-	ChatActionFindLocation    = "find_location"     // for location data
-	ChatActionRecordVideoNote = "record_video_note" // for video notes.
-	ChatActionUploadVideoNote = "upload_video_note" // for video notes.
+	// ChatActionTyping for text messages.
+	ChatActionTyping = "typing"
+	// ChatActionUploadPhoto for photos.
+	ChatActionUploadPhoto = "upload_photo"
+	// ChatActionRecordVideo for videos.
+	ChatActionRecordVideo = "record_video"
+	// ChatActionUploadVideo for videos.
+	ChatActionUploadVideo = "upload_video"
+	// ChatActionRecordVoice for voice notes.
+	ChatActionRecordVoice = "record_voice"
+	// ChatActionUploadVoice for voice notes.
+	ChatActionUploadVoice = "upload_voice"
+	// ChatActionUploadDocument for general files.
+	ChatActionUploadDocument = "upload_document"
+	// ChatActionChooseSticker for stickers.
+	ChatActionChooseSticker = "choose_sticker"
+	// ChatActionFindLocation for location data.
+	ChatActionFindLocation = "find_location"
+	// ChatActionRecordVideoNote for video notes.
+	ChatActionRecordVideoNote = "record_video_note"
+	// ChatActionUploadVideoNote for video notes.
+	ChatActionUploadVideoNote = "upload_video_note"
 )

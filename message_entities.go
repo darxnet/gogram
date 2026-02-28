@@ -1,23 +1,43 @@
 package gogram
 
+// Message entity types.
 const (
-	MessageEntityMention              = "mention"               // @username
-	MessageEntityHashtag              = "hashtag"               // #hashtag or #hashtag@chatusername
-	MessageEntityCashtag              = "cashtag"               // $USD or $USD@chatusername
-	MessageEntityBotCommand           = "bot_command"           // /start@jobs_bot
-	MessageEntityBotURL               = "url"                   // https://telegram.org
-	MessageEntityEmail                = "email"                 // do-not-reply@telegram.org
-	MessageEntityPhoneNumber          = "phone_number"          // +1-212-555-0123
-	MessageEntityBold                 = "bold"                  // bold text
-	MessageEntityItalic               = "italic"                // italic text
-	MessageEntityUnderline            = "underline"             // underlined text
-	MessageEntityStrikethrough        = "strikethrough"         // strikethrough text
-	MessageEntitySpoiler              = "spoiler"               // spoiler message
-	MessageEntityBlockquote           = "blockquote"            // block quotation
-	MessageEntityExpandableBlockquote = "expandable_blockquote" // collapsed-by-default block quotation
-	MessageEntityCode                 = "code"                  // monowidth string
-	MessageEntityPre                  = "pre"                   // mmonowidth block
-	MessageEntityTextLink             = "text_link"             // for clickable text URLs
-	MessageEntityTextMention          = "text_mention"          // for users [without usernames]
-	MessageEntityCustomEmoji          = "custom_emoji"          // for inline custom emoji stickers
+	// MessageEntityMention represents a mention of a user (e.g., @username).
+	MessageEntityMention = "mention"
+	// MessageEntityHashtag represents a hashtag (e.g., #hashtag).
+	MessageEntityHashtag = "hashtag"
+	// MessageEntityCashtag represents a cashtag (e.g., $USD).
+	MessageEntityCashtag = "cashtag"
+	// MessageEntityBotCommand represents a bot command (e.g., /start).
+	MessageEntityBotCommand = "bot_command"
+	// MessageEntityBotURL represents a URL (e.g., https://telegram.org).
+	MessageEntityBotURL = "url"
+	// MessageEntityEmail represents an email address (e.g., do-not-reply@telegram.org).
+	MessageEntityEmail = "email"
+	// MessageEntityPhoneNumber represents a phone number (e.g., +1-212-555-0123).
+	MessageEntityPhoneNumber = "phone_number"
+	// MessageEntityBold represents bold text.
+	MessageEntityBold = "bold"
+	// MessageEntityItalic represents italic text.
+	MessageEntityItalic = "italic"
+	// MessageEntityUnderline represents underlined text.
+	MessageEntityUnderline = "underline"
+	// MessageEntityStrikethrough represents strikethrough text.
+	MessageEntityStrikethrough = "strikethrough"
+	// MessageEntitySpoiler represents spoiler message.
+	MessageEntitySpoiler = "spoiler"
+	// MessageEntityBlockquote represents a block quotation.
+	MessageEntityBlockquote = "blockquote"
+	// MessageEntityExpandableBlockquote represents a collapsed-by-default block quotation.
+	MessageEntityExpandableBlockquote = "expandable_blockquote"
+	// MessageEntityCode represents a monowidth string.
+	MessageEntityCode = "code"
+	// MessageEntityPre represents a monowidth block.
+	MessageEntityPre = "pre"
+	// MessageEntityTextLink represents a clickable text URL.
+	MessageEntityTextLink = "text_link"
+	// MessageEntityTextMention represents a mention of a user without a username.
+	MessageEntityTextMention = "text_mention"
+	// MessageEntityCustomEmoji represents an inline custom emoji sticker.
+	MessageEntityCustomEmoji = "custom_emoji"
 )

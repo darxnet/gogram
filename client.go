@@ -26,8 +26,10 @@ const (
 	defaultUpdates = 100
 )
 
+// ClientOption is a function that configures a Client.
 type ClientOption func(client *Client) ClientOption
 
+// WithHost sets the host for the Client.
 func WithHost(host string) ClientOption {
 	return func(c *Client) ClientOption {
 		c.locker.Lock()
@@ -42,6 +44,7 @@ func WithHost(host string) ClientOption {
 	}
 }
 
+// WithRPS sets the requests per second limit for the Client.
 func WithRPS(rps int) ClientOption {
 	return func(c *Client) ClientOption {
 		c.locker.Lock()
@@ -57,6 +60,7 @@ func WithRPS(rps int) ClientOption {
 	}
 }
 
+// WithTimeout sets the HTTP client timeout for the Client.
 func WithTimeout(timeout time.Duration) ClientOption {
 	return func(c *Client) ClientOption {
 		c.locker.Lock()
@@ -71,6 +75,7 @@ func WithTimeout(timeout time.Duration) ClientOption {
 	}
 }
 
+// WithTest sets the test mode for the Client.
 func WithTest(test bool) ClientOption {
 	return func(c *Client) ClientOption {
 		c.locker.Lock()
@@ -85,6 +90,7 @@ func WithTest(test bool) ClientOption {
 	}
 }
 
+// WithHTTPClient sets the custom HTTP client for the Client.
 func WithHTTPClient(client *http.Client) ClientOption {
 	return func(c *Client) ClientOption {
 		c.locker.Lock()
@@ -97,6 +103,7 @@ func WithHTTPClient(client *http.Client) ClientOption {
 	}
 }
 
+// WithDefaultParseMode sets the default parse mode for the Client.
 func WithDefaultParseMode(parseMode string) ClientOption {
 	return func(c *Client) ClientOption {
 		c.locker.Lock()
@@ -123,11 +130,11 @@ type clientOption struct {
 	test    bool
 }
 
-// Client
+// Client is a Telegram Bot API client.
 //
-// https://core.telegram.org/bots/api
-//
-// https://core.telegram.org/bots/webapps
+// References:
+//   - https://core.telegram.org/bots/api
+//   - https://core.telegram.org/bots/webapps
 type Client struct {
 	id      int64
 	token   string
@@ -160,6 +167,8 @@ func (c *Client) buildLinkPrefix(test bool, host, token string) {
 	}
 }
 
+// Option applies one or more ClientOption values and returns
+// the last rollback option produced by the applied options.
 func (c *Client) Option(opts ...ClientOption) (previous ClientOption) {
 	for _, opt := range opts {
 		previous = opt(c)
@@ -167,14 +176,25 @@ func (c *Client) Option(opts ...ClientOption) (previous ClientOption) {
 	return previous
 }
 
+// Client errors returned by constructors and runtime operations.
+var (
+	// ErrNoToken indicates that an empty bot token was provided.
+	ErrNoToken = errors.New("gogram: no token provided")
+	// ErrInvalidToken indicates that the provided bot token is malformed.
+	ErrInvalidToken = errors.New("gogram: invalid token provided")
+	// ErrAlreadyStarted indicates that Start was called for an already running client.
+	ErrAlreadyStarted = errors.New("gogram: already started")
+)
+
+// NewClient creates a new Client with the provided token and options.
 func NewClient(token string, opts ...ClientOption) (*Client, error) {
 	if token == "" {
-		return nil, errors.New("gogram: no token provided")
+		return nil, ErrNoToken
 	}
 
 	botID, err := strconv.ParseInt(strings.SplitN(token, ":", 2)[0], 10, 64)
 	if err != nil {
-		return nil, errors.New("gogram: invalid token provided")
+		return nil, ErrInvalidToken
 	}
 
 	c := new(Client)
@@ -200,26 +220,32 @@ func NewClient(token string, opts ...ClientOption) (*Client, error) {
 	return c, nil
 }
 
+// ID returns the bot's ID.
 func (c *Client) ID() int64 {
 	return c.id
 }
 
+// Token returns the bot's token.
 func (c *Client) Token() string {
 	return c.token
 }
 
+// LocalAddr returns the local network address used by the client.
 func (c *Client) LocalAddr() net.Addr {
 	return c.localAddr
 }
 
+// RemoteAddr returns the remote network address used by the client.
 func (c *Client) RemoteAddr() net.Addr {
 	return c.remoteAddr
 }
 
+// Router returns the client's router.
 func (c *Client) Router() *Router {
 	return c.router
 }
 
+// SetRouter sets the client's router.
 func (c *Client) SetRouter(r *Router) {
 	c.router = r
 }
@@ -232,9 +258,11 @@ func (c *Client) do(req *http.Request) (*http.Response, error) {
 
 	req = req.WithContext(httptrace.WithClientTrace(req.Context(), c.httpTrace))
 
+	//nolint:gosec // G704: client can send request to user-defined hosts
 	return c.httpClient.Do(req)
 }
 
+// Raw sends a raw request to the Telegram Bot API.
 func (c *Client) Raw(method string, reader io.Reader, contentType ...string) (json.RawMessage, error) {
 	link := c.linkPrefix + method
 
@@ -287,12 +315,13 @@ func (c *Client) Raw(method string, reader io.Reader, contentType ...string) (js
 	return v.Result, nil
 }
 
+// Start starts the client and listens for updates.
 func (c *Client) Start(ctx context.Context, params *GetUpdatesParams) error {
 	c.locker.Lock()
 
 	if c.started {
 		c.locker.Unlock()
-		return errors.New("gogram: already started")
+		return ErrAlreadyStarted
 	}
 
 	c.updates = make(chan *Update, defaultUpdates)
@@ -375,6 +404,7 @@ func (c *Client) Start(ctx context.Context, params *GetUpdatesParams) error {
 	return ctx.Err()
 }
 
+// Stop stops the client.
 func (c *Client) Stop() {
 	c.locker.Lock()
 

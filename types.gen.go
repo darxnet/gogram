@@ -152,6 +152,7 @@ type BackgroundFill struct {
 	*BackgroundFillFreeformGradient
 }
 
+// MarshalJSON marshals the currently set subtype of BackgroundFill.
 func (r *BackgroundFill) MarshalJSON() ([]byte, error) {
 	if r.BackgroundFillSolid != nil {
 		r.BackgroundFillSolid.Type = "solid"
@@ -171,6 +172,7 @@ func (r *BackgroundFill) MarshalJSON() ([]byte, error) {
 	return nil, nil
 }
 
+// UnmarshalJSON unmarshals JSON into the matching BackgroundFill subtype.
 func (r *BackgroundFill) UnmarshalJSON(data []byte) error {
 	type T struct {
 		Discriminator string `json:"type"`
@@ -262,6 +264,7 @@ type BackgroundType struct {
 	*BackgroundTypeChatTheme
 }
 
+// MarshalJSON marshals the currently set subtype of BackgroundType.
 func (r *BackgroundType) MarshalJSON() ([]byte, error) {
 	if r.BackgroundTypeFill != nil {
 		r.BackgroundTypeFill.Type = "fill"
@@ -286,6 +289,7 @@ func (r *BackgroundType) MarshalJSON() ([]byte, error) {
 	return nil, nil
 }
 
+// UnmarshalJSON unmarshals JSON into the matching BackgroundType subtype.
 func (r *BackgroundType) UnmarshalJSON(data []byte) error {
 	type T struct {
 		Discriminator string `json:"type"`
@@ -454,6 +458,7 @@ type BotCommandScope struct {
 	*BotCommandScopeChatMember
 }
 
+// MarshalJSON marshals the currently set subtype of BotCommandScope.
 func (r *BotCommandScope) MarshalJSON() ([]byte, error) {
 	if r.BotCommandScopeDefault != nil {
 		r.BotCommandScopeDefault.Type = "default"
@@ -493,6 +498,7 @@ func (r *BotCommandScope) MarshalJSON() ([]byte, error) {
 	return nil, nil
 }
 
+// UnmarshalJSON unmarshals JSON into the matching BotCommandScope subtype.
 func (r *BotCommandScope) UnmarshalJSON(data []byte) error {
 	type T struct {
 		Discriminator string `json:"type"`
@@ -1016,6 +1022,7 @@ type ChatBoostSource struct {
 	*ChatBoostSourceGiveaway
 }
 
+// MarshalJSON marshals the currently set subtype of ChatBoostSource.
 func (r *ChatBoostSource) MarshalJSON() ([]byte, error) {
 	if r.ChatBoostSourcePremium != nil {
 		r.ChatBoostSourcePremium.Source = "premium"
@@ -1035,6 +1042,7 @@ func (r *ChatBoostSource) MarshalJSON() ([]byte, error) {
 	return nil, nil
 }
 
+// UnmarshalJSON unmarshals JSON into the matching ChatBoostSource subtype.
 func (r *ChatBoostSource) UnmarshalJSON(data []byte) error {
 	type T struct {
 		Discriminator string `json:"source"`
@@ -1464,6 +1472,7 @@ type ChatMember struct {
 	*ChatMemberBanned
 }
 
+// MarshalJSON marshals the currently set subtype of ChatMember.
 func (r *ChatMember) MarshalJSON() ([]byte, error) {
 	if r.ChatMemberOwner != nil {
 		r.ChatMemberOwner.Status = "creator"
@@ -1498,6 +1507,7 @@ func (r *ChatMember) MarshalJSON() ([]byte, error) {
 	return nil, nil
 }
 
+// UnmarshalJSON unmarshals JSON into the matching ChatMember subtype.
 func (r *ChatMember) UnmarshalJSON(data []byte) error {
 	type T struct {
 		Discriminator string `json:"status"`
@@ -2984,6 +2994,7 @@ type InlineQueryResult struct {
 	*InlineQueryResultVoice
 }
 
+// MarshalJSON marshals the currently set subtype of InlineQueryResult.
 func (r *InlineQueryResult) MarshalJSON() ([]byte, error) {
 	if r.InlineQueryResultCachedAudio != nil {
 		r.InlineQueryResultCachedAudio.Type = "audio"
@@ -3638,9 +3649,7 @@ type InlineQueryResultDocument struct {
 	Description string `json:"description,omitempty"`
 
 	// Optional.
-	// [Inline keyboard] attached to the message
-	//
-	// [Inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
+	// Inline keyboard attached to the message
 	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 
 	// Optional.
@@ -4429,6 +4438,7 @@ type InputMedia struct {
 	*InputMediaVideo
 }
 
+// MarshalJSON marshals the currently set subtype of InputMedia.
 func (r *InputMedia) MarshalJSON() ([]byte, error) {
 	if r.InputMediaAnimation != nil {
 		r.InputMediaAnimation.Type = "animation"
@@ -4458,6 +4468,7 @@ func (r *InputMedia) MarshalJSON() ([]byte, error) {
 	return nil, nil
 }
 
+// UnmarshalJSON unmarshals JSON into the matching InputMedia subtype.
 func (r *InputMedia) UnmarshalJSON(data []byte) error {
 	type T struct {
 		Discriminator string `json:"type"`
@@ -4795,6 +4806,7 @@ type InputMessageContent struct {
 	*InputInvoiceMessageContent
 }
 
+// MarshalJSON marshals the currently set subtype of InputMessageContent.
 func (r *InputMessageContent) MarshalJSON() ([]byte, error) {
 	if r.InputTextMessageContent != nil {
 		return json.Marshal(r.InputTextMessageContent)
@@ -4837,6 +4849,7 @@ type InputPaidMedia struct {
 	*InputPaidMediaVideo
 }
 
+// MarshalJSON marshals the currently set subtype of InputPaidMedia.
 func (r *InputPaidMedia) MarshalJSON() ([]byte, error) {
 	if r.InputPaidMediaPhoto != nil {
 		r.InputPaidMediaPhoto.Type = "photo"
@@ -4851,6 +4864,7 @@ func (r *InputPaidMedia) MarshalJSON() ([]byte, error) {
 	return nil, nil
 }
 
+// UnmarshalJSON unmarshals JSON into the matching InputPaidMedia subtype.
 func (r *InputPaidMedia) UnmarshalJSON(data []byte) error {
 	type T struct {
 		Discriminator string `json:"type"`
@@ -4982,6 +4996,7 @@ type InputProfilePhoto struct {
 	*InputProfilePhotoAnimated
 }
 
+// MarshalJSON marshals the currently set subtype of InputProfilePhoto.
 func (r *InputProfilePhoto) MarshalJSON() ([]byte, error) {
 	if r.InputProfilePhotoStatic != nil {
 		r.InputProfilePhotoStatic.Type = "static"
@@ -4996,6 +5011,7 @@ func (r *InputProfilePhoto) MarshalJSON() ([]byte, error) {
 	return nil, nil
 }
 
+// UnmarshalJSON unmarshals JSON into the matching InputProfilePhoto subtype.
 func (r *InputProfilePhoto) UnmarshalJSON(data []byte) error {
 	type T struct {
 		Discriminator string `json:"type"`
@@ -5101,6 +5117,7 @@ type InputStoryContent struct {
 	*InputStoryContentVideo
 }
 
+// MarshalJSON marshals the currently set subtype of InputStoryContent.
 func (r *InputStoryContent) MarshalJSON() ([]byte, error) {
 	if r.InputStoryContentPhoto != nil {
 		r.InputStoryContentPhoto.Type = "photo"
@@ -5115,6 +5132,7 @@ func (r *InputStoryContent) MarshalJSON() ([]byte, error) {
 	return nil, nil
 }
 
+// UnmarshalJSON unmarshals JSON into the matching InputStoryContent subtype.
 func (r *InputStoryContent) UnmarshalJSON(data []byte) error {
 	type T struct {
 		Discriminator string `json:"type"`
@@ -5620,6 +5638,7 @@ type MaybeInaccessibleMessage struct {
 	*InaccessibleMessage
 }
 
+// MarshalJSON marshals the currently set subtype of MaybeInaccessibleMessage.
 func (r *MaybeInaccessibleMessage) MarshalJSON() ([]byte, error) {
 	if r.Message != nil {
 		return json.Marshal(r.Message)
@@ -5658,6 +5677,7 @@ type MenuButton struct {
 	*MenuButtonDefault
 }
 
+// MarshalJSON marshals the currently set subtype of MenuButton.
 func (r *MenuButton) MarshalJSON() ([]byte, error) {
 	if r.MenuButtonCommands != nil {
 		r.MenuButtonCommands.Type = "commands"
@@ -5677,6 +5697,7 @@ func (r *MenuButton) MarshalJSON() ([]byte, error) {
 	return nil, nil
 }
 
+// UnmarshalJSON unmarshals JSON into the matching MenuButton subtype.
 func (r *MenuButton) UnmarshalJSON(data []byte) error {
 	type T struct {
 		Discriminator string `json:"type"`
@@ -6206,10 +6227,8 @@ type Message struct {
 	WebAppData *WebAppData `json:"web_app_data,omitempty"`
 
 	// Optional.
-	// [Inline keyboard] attached to the message.
+	// Inline keyboard attached to the message.
 	// login_url buttons are represented as ordinary url buttons.
-	//
-	// [Inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 	ReplyMarkup *InlineKeyboardMarkup `json:"reply_markup,omitempty"`
 }
 
@@ -6298,6 +6317,7 @@ type MessageOrigin struct {
 	*MessageOriginChannel
 }
 
+// MarshalJSON marshals the currently set subtype of MessageOrigin.
 func (r *MessageOrigin) MarshalJSON() ([]byte, error) {
 	if r.MessageOriginUser != nil {
 		r.MessageOriginUser.Type = "user"
@@ -6322,6 +6342,7 @@ func (r *MessageOrigin) MarshalJSON() ([]byte, error) {
 	return nil, nil
 }
 
+// UnmarshalJSON unmarshals JSON into the matching MessageOrigin subtype.
 func (r *MessageOrigin) UnmarshalJSON(data []byte) error {
 	type T struct {
 		Discriminator string `json:"type"`
@@ -6502,6 +6523,7 @@ type OwnedGift struct {
 	*OwnedGiftUnique
 }
 
+// MarshalJSON marshals the currently set subtype of OwnedGift.
 func (r *OwnedGift) MarshalJSON() ([]byte, error) {
 	if r.OwnedGiftRegular != nil {
 		r.OwnedGiftRegular.Type = "regular"
@@ -6516,6 +6538,7 @@ func (r *OwnedGift) MarshalJSON() ([]byte, error) {
 	return nil, nil
 }
 
+// UnmarshalJSON unmarshals JSON into the matching OwnedGift subtype.
 func (r *OwnedGift) UnmarshalJSON(data []byte) error {
 	type T struct {
 		Discriminator string `json:"type"`
@@ -6681,6 +6704,7 @@ type PaidMedia struct {
 	*PaidMediaVideo
 }
 
+// MarshalJSON marshals the currently set subtype of PaidMedia.
 func (r *PaidMedia) MarshalJSON() ([]byte, error) {
 	if r.PaidMediaPreview != nil {
 		r.PaidMediaPreview.Type = "preview"
@@ -6700,6 +6724,7 @@ func (r *PaidMedia) MarshalJSON() ([]byte, error) {
 	return nil, nil
 }
 
+// UnmarshalJSON unmarshals JSON into the matching PaidMedia subtype.
 func (r *PaidMedia) UnmarshalJSON(data []byte) error {
 	type T struct {
 		Discriminator string `json:"type"`
@@ -6855,6 +6880,7 @@ type PassportElementError struct {
 	*PassportElementErrorUnspecified
 }
 
+// MarshalJSON marshals the currently set subtype of PassportElementError.
 func (r *PassportElementError) MarshalJSON() ([]byte, error) {
 	if r.PassportElementErrorDataField != nil {
 		r.PassportElementErrorDataField.Source = "data"
@@ -6904,6 +6930,7 @@ func (r *PassportElementError) MarshalJSON() ([]byte, error) {
 	return nil, nil
 }
 
+// UnmarshalJSON unmarshals JSON into the matching PassportElementError subtype.
 func (r *PassportElementError) UnmarshalJSON(data []byte) error {
 	type T struct {
 		Discriminator string `json:"source"`
@@ -7343,6 +7370,7 @@ type ReactionType struct {
 	*ReactionTypePaid
 }
 
+// MarshalJSON marshals the currently set subtype of ReactionType.
 func (r *ReactionType) MarshalJSON() ([]byte, error) {
 	if r.ReactionTypeEmoji != nil {
 		r.ReactionTypeEmoji.Type = "emoji"
@@ -7362,6 +7390,7 @@ func (r *ReactionType) MarshalJSON() ([]byte, error) {
 	return nil, nil
 }
 
+// UnmarshalJSON unmarshals JSON into the matching ReactionType subtype.
 func (r *ReactionType) UnmarshalJSON(data []byte) error {
 	type T struct {
 		Discriminator string `json:"type"`
@@ -7598,6 +7627,7 @@ type RevenueWithdrawalState struct {
 	*RevenueWithdrawalStateFailed
 }
 
+// MarshalJSON marshals the currently set subtype of RevenueWithdrawalState.
 func (r *RevenueWithdrawalState) MarshalJSON() ([]byte, error) {
 	if r.RevenueWithdrawalStatePending != nil {
 		r.RevenueWithdrawalStatePending.Type = "pending"
@@ -7617,6 +7647,7 @@ func (r *RevenueWithdrawalState) MarshalJSON() ([]byte, error) {
 	return nil, nil
 }
 
+// UnmarshalJSON unmarshals JSON into the matching RevenueWithdrawalState subtype.
 func (r *RevenueWithdrawalState) UnmarshalJSON(data []byte) error {
 	type T struct {
 		Discriminator string `json:"type"`
@@ -7984,6 +8015,7 @@ type StoryAreaType struct {
 	*StoryAreaTypeUniqueGift
 }
 
+// MarshalJSON marshals the currently set subtype of StoryAreaType.
 func (r *StoryAreaType) MarshalJSON() ([]byte, error) {
 	if r.StoryAreaTypeLocation != nil {
 		r.StoryAreaTypeLocation.Type = "location"
@@ -8013,6 +8045,7 @@ func (r *StoryAreaType) MarshalJSON() ([]byte, error) {
 	return nil, nil
 }
 
+// UnmarshalJSON unmarshals JSON into the matching StoryAreaType subtype.
 func (r *StoryAreaType) UnmarshalJSON(data []byte) error {
 	type T struct {
 		Discriminator string `json:"type"`
@@ -8400,6 +8433,7 @@ type TransactionPartner struct {
 	*TransactionPartnerOther
 }
 
+// MarshalJSON marshals the currently set subtype of TransactionPartner.
 func (r *TransactionPartner) MarshalJSON() ([]byte, error) {
 	if r.TransactionPartnerUser != nil {
 		r.TransactionPartnerUser.Type = "user"
@@ -8439,6 +8473,7 @@ func (r *TransactionPartner) MarshalJSON() ([]byte, error) {
 	return nil, nil
 }
 
+// UnmarshalJSON unmarshals JSON into the matching TransactionPartner subtype.
 func (r *TransactionPartner) UnmarshalJSON(data []byte) error {
 	type T struct {
 		Discriminator string `json:"type"`
@@ -9327,6 +9362,7 @@ type WriteAccessAllowed struct {
 	FromAttachmentMenu bool `json:"from_attachment_menu,omitempty"`
 }
 
+// ReplyMarkup contains one of Telegram reply markup types.
 type ReplyMarkup struct {
 	*InlineKeyboardMarkup
 	*ReplyKeyboardMarkup

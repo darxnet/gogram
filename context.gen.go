@@ -49,6 +49,7 @@ func (ctx *Context) findHandlerOn() handleOn {
 	return 0
 }
 
+// User returns a user associated with the current update.
 func (ctx *Context) User() *User {
 	if ctx.update == nil {
 		return nil
@@ -96,6 +97,7 @@ func (ctx *Context) User() *User {
 	return nil
 }
 
+// Chat returns a chat associated with the current update.
 func (ctx *Context) Chat() *Chat {
 	if ctx.update == nil {
 		return nil
@@ -137,6 +139,7 @@ func (ctx *Context) Chat() *Chat {
 	return nil
 }
 
+// Message returns the message associated with the current update, if any.
 func (ctx *Context) Message() *Message {
 	if ctx.update == nil {
 		return nil
@@ -160,6 +163,7 @@ func (ctx *Context) Message() *Message {
 	return nil
 }
 
+// Text returns Message().Text or an empty string when no message is present.
 func (ctx *Context) Text() string {
 	m := ctx.Message()
 	if m == nil {
@@ -169,10 +173,17 @@ func (ctx *Context) Text() string {
 	return m.Text
 }
 
+// Payload returns the substring of Text() after the first space.
 func (ctx *Context) Payload() string {
 	return ExtractPayload(ctx.Text())
 }
 
+// AddStickerToSet calls Client.AddStickerToSet with context-derived defaults.
+//
+// Use this method to add a new sticker to a set created by the bot.
+// Emoji sticker sets can have up to 200 stickers.
+// Other sticker sets can have up to 120 stickers.
+// Returns True on success.
 func (ctx *Context) AddStickerToSet(
 	userID int64,
 	name string,
@@ -192,6 +203,13 @@ func (ctx *Context) AddStickerToSet(
 	return err
 }
 
+// AnswerCallbackQuery calls Client.AnswerCallbackQuery with context-derived defaults.
+//
+// Use this method to send answers to callback queries sent from [inline keyboards].
+// The answer will be displayed to the user as a notification at the top of the chat screen or as an alert.
+// On success, True is returned.
+//
+// [inline keyboards]: https://core.telegram.org/bots/features#inline-keyboards
 func (ctx *Context) AnswerCallbackQuery(
 	opts ...AnswerCallbackQueryOption,
 ) error {
@@ -216,6 +234,11 @@ func (ctx *Context) AnswerCallbackQuery(
 	return err
 }
 
+// AnswerInlineQuery calls Client.AnswerInlineQuery with context-derived defaults.
+//
+// Use this method to send answers to an inline query.
+// On success, True is returned.
+// No more than 50 results per query are allowed.
 func (ctx *Context) AnswerInlineQuery(
 	results []InlineQueryResult,
 	opts ...AnswerInlineQueryOption,
@@ -242,6 +265,14 @@ func (ctx *Context) AnswerInlineQuery(
 	return err
 }
 
+// AnswerPreCheckoutQuery calls Client.AnswerPreCheckoutQuery with context-derived defaults.
+//
+// Once the user has confirmed their payment and shipping details, the Bot API sends the final confirmation in the form of an [Update] with the field pre_checkout_query.
+// Use this method to respond to such pre-checkout queries.
+// On success, True is returned.
+// Note: The Bot API must receive an answer within 10 seconds after the pre-checkout query was sent.
+//
+// [Update]: https://core.telegram.org/bots/api#update
 func (ctx *Context) AnswerPreCheckoutQuery(
 	ok bool,
 	opts ...AnswerPreCheckoutQueryOption,
@@ -268,6 +299,13 @@ func (ctx *Context) AnswerPreCheckoutQuery(
 	return err
 }
 
+// AnswerShippingQuery calls Client.AnswerShippingQuery with context-derived defaults.
+//
+// If you sent an invoice requesting a shipping address and the parameter is_flexible was specified, the Bot API will send an [Update] with a shipping_query field to the bot.
+// Use this method to reply to shipping queries.
+// On success, True is returned.
+//
+// [Update]: https://core.telegram.org/bots/api#update
 func (ctx *Context) AnswerShippingQuery(
 	ok bool,
 	opts ...AnswerShippingQueryOption,
@@ -294,6 +332,13 @@ func (ctx *Context) AnswerShippingQuery(
 	return err
 }
 
+// AnswerWebAppQuery calls Client.AnswerWebAppQuery with context-derived defaults.
+//
+// Use this method to set the result of an interaction with a [Web App] and send a corresponding message on behalf of the user to the chat from which the query originated.
+// On success, a [SentWebAppMessage] object is returned.
+//
+// [Web App]: https://core.telegram.org/bots/webapps
+// [SentWebAppMessage]: https://core.telegram.org/bots/api#sentwebappmessage
 func (ctx *Context) AnswerWebAppQuery(
 	webAppQueryID string,
 	result InlineQueryResult,
@@ -311,6 +356,11 @@ func (ctx *Context) AnswerWebAppQuery(
 	return err
 }
 
+// ApproveChatJoinRequest calls Client.ApproveChatJoinRequest with context-derived defaults.
+//
+// Use this method to approve a chat join request.
+// The bot must be an administrator in the chat for this to work and must have the can_invite_users administrator right.
+// Returns True on success.
 func (ctx *Context) ApproveChatJoinRequest(
 	userID int64,
 	opts ...ApproveChatJoinRequestOption,
@@ -327,6 +377,11 @@ func (ctx *Context) ApproveChatJoinRequest(
 	return err
 }
 
+// ApproveSuggestedPost calls Client.ApproveSuggestedPost with context-derived defaults.
+//
+// Use this method to approve a suggested post in a direct messages chat.
+// The bot must have the 'can_post_messages' administrator right in the corresponding channel chat.
+// Returns True on success.
 func (ctx *Context) ApproveSuggestedPost(
 	messageID int64,
 	opts ...ApproveSuggestedPostOption,
@@ -343,6 +398,14 @@ func (ctx *Context) ApproveSuggestedPost(
 	return err
 }
 
+// BanChatMember calls Client.BanChatMember with context-derived defaults.
+//
+// Use this method to ban a user in a group, a supergroup or a channel.
+// In the case of supergroups and channels, the user will not be able to return to the chat on their own using invite links, etc., unless [unbanned] first.
+// The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
+// Returns True on success.
+//
+// [unbanned]: https://core.telegram.org/bots/api#unbanchatmember
 func (ctx *Context) BanChatMember(
 	userID int64,
 	opts ...BanChatMemberOption,
@@ -359,6 +422,14 @@ func (ctx *Context) BanChatMember(
 	return err
 }
 
+// BanChatSenderChat calls Client.BanChatSenderChat with context-derived defaults.
+//
+// Use this method to ban a channel chat in a supergroup or a channel.
+// Until the chat is [unbanned], the owner of the banned chat won't be able to send messages on behalf of any of their channels.
+// The bot must be an administrator in the supergroup or channel for this to work and must have the appropriate administrator rights.
+// Returns True on success.
+//
+// [unbanned]: https://core.telegram.org/bots/api#unbanchatsenderchat
 func (ctx *Context) BanChatSenderChat(
 	senderChatID int64,
 	opts ...BanChatSenderChatOption,
@@ -375,6 +446,13 @@ func (ctx *Context) BanChatSenderChat(
 	return err
 }
 
+// Close calls Client.Close with context-derived defaults.
+//
+// Use this method to close the bot instance before moving it from one local server to another.
+// You need to delete the webhook before calling this method to ensure that the bot isn't launched again after server restart.
+// The method will return error 429 in the first 10 minutes after the bot is launched.
+// Returns True on success.
+// Requires no parameters.
 func (ctx *Context) Close(
 	opts ...CloseOption,
 ) error {
@@ -387,6 +465,11 @@ func (ctx *Context) Close(
 	return err
 }
 
+// CloseForumTopic calls Client.CloseForumTopic with context-derived defaults.
+//
+// Use this method to close an open topic in a forum supergroup chat.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights, unless it is the creator of the topic.
+// Returns True on success.
 func (ctx *Context) CloseForumTopic(
 	messageThreadID int64,
 	opts ...CloseForumTopicOption,
@@ -403,6 +486,11 @@ func (ctx *Context) CloseForumTopic(
 	return err
 }
 
+// CloseGeneralForumTopic calls Client.CloseGeneralForumTopic with context-derived defaults.
+//
+// Use this method to close an open 'General' topic in a forum supergroup chat.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights.
+// Returns True on success.
 func (ctx *Context) CloseGeneralForumTopic(
 	opts ...CloseGeneralForumTopicOption,
 ) error {
@@ -417,6 +505,11 @@ func (ctx *Context) CloseGeneralForumTopic(
 	return err
 }
 
+// ConvertGiftToStars calls Client.ConvertGiftToStars with context-derived defaults.
+//
+// Converts a given regular gift to Telegram Stars.
+// Requires the can_convert_gifts_to_stars business bot right.
+// Returns True on success.
 func (ctx *Context) ConvertGiftToStars(
 	ownedGiftID string,
 	opts ...ConvertGiftToStarsOption,
@@ -443,6 +536,17 @@ func (ctx *Context) ConvertGiftToStars(
 	return err
 }
 
+// CopyMessage calls Client.CopyMessage with context-derived defaults.
+//
+// Use this method to copy messages of any kind.
+// Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied.
+// A quiz [poll] can be copied only if the value of the field correct_option_id is known to the bot.
+// The method is analogous to the method [forwardMessage], but the copied message doesn't have a link to the original message.
+// Returns the [MessageId] of the sent message on success.
+//
+// [poll]: https://core.telegram.org/bots/api#poll
+// [forwardMessage]: https://core.telegram.org/bots/api#forwardmessage
+// [MessageId]: https://core.telegram.org/bots/api#messageid
 func (ctx *Context) CopyMessage(
 	fromChatID string,
 	messageID int64,
@@ -467,6 +571,19 @@ func (ctx *Context) CopyMessage(
 	return err
 }
 
+// CopyMessages calls Client.CopyMessages with context-derived defaults.
+//
+// Use this method to copy messages of any kind.
+// If some of the specified messages can't be found or copied, they are skipped.
+// Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied.
+// A quiz [poll] can be copied only if the value of the field correct_option_id is known to the bot.
+// The method is analogous to the method [forwardMessages], but the copied messages don't have a link to the original message.
+// Album grouping is kept for copied messages.
+// On success, an array of [MessageId] of the sent messages is returned.
+//
+// [poll]: https://core.telegram.org/bots/api#poll
+// [forwardMessages]: https://core.telegram.org/bots/api#forwardmessages
+// [MessageId]: https://core.telegram.org/bots/api#messageid
 func (ctx *Context) CopyMessages(
 	fromChatID string,
 	messageIDs []int64,
@@ -485,6 +602,15 @@ func (ctx *Context) CopyMessages(
 	return err
 }
 
+// CreateChatInviteLink calls Client.CreateChatInviteLink with context-derived defaults.
+//
+// Use this method to create an additional invite link for a chat.
+// The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
+// The link can be revoked using the method [revokeChatInviteLink].
+// Returns the new invite link as [ChatInviteLink] object.
+//
+// [revokeChatInviteLink]: https://core.telegram.org/bots/api#revokechatinvitelink
+// [ChatInviteLink]: https://core.telegram.org/bots/api#chatinvitelink
 func (ctx *Context) CreateChatInviteLink(
 	opts ...CreateChatInviteLinkOption,
 ) error {
@@ -499,6 +625,17 @@ func (ctx *Context) CreateChatInviteLink(
 	return err
 }
 
+// CreateChatSubscriptionInviteLink calls Client.CreateChatSubscriptionInviteLink with context-derived defaults.
+//
+// Use this method to create a [subscription invite link] for a channel chat.
+// The bot must have the can_invite_users administrator rights.
+// The link can be edited using the method [editChatSubscriptionInviteLink] or revoked using the method [revokeChatInviteLink].
+// Returns the new invite link as a [ChatInviteLink] object.
+//
+// [subscription invite link]: https://telegram.org/blog/superchannels-star-reactions-subscriptions#star-subscriptions
+// [editChatSubscriptionInviteLink]: https://core.telegram.org/bots/api#editchatsubscriptioninvitelink
+// [revokeChatInviteLink]: https://core.telegram.org/bots/api#revokechatinvitelink
+// [ChatInviteLink]: https://core.telegram.org/bots/api#chatinvitelink
 func (ctx *Context) CreateChatSubscriptionInviteLink(
 	subscriptionPeriod int64,
 	subscriptionPrice int64,
@@ -517,6 +654,13 @@ func (ctx *Context) CreateChatSubscriptionInviteLink(
 	return err
 }
 
+// CreateForumTopic calls Client.CreateForumTopic with context-derived defaults.
+//
+// Use this method to create a topic in a forum supergroup chat or a private chat with a user.
+// In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator right.
+// Returns information about the created topic as a [ForumTopic] object.
+//
+// [ForumTopic]: https://core.telegram.org/bots/api#forumtopic
 func (ctx *Context) CreateForumTopic(
 	name string,
 	opts ...CreateForumTopicOption,
@@ -533,6 +677,10 @@ func (ctx *Context) CreateForumTopic(
 	return err
 }
 
+// CreateInvoiceLink calls Client.CreateInvoiceLink with context-derived defaults.
+//
+// Use this method to create a link for an invoice.
+// Returns the created invoice link as String on success.
 func (ctx *Context) CreateInvoiceLink(
 	title string,
 	description string,
@@ -567,6 +715,11 @@ func (ctx *Context) CreateInvoiceLink(
 	return err
 }
 
+// CreateNewStickerSet calls Client.CreateNewStickerSet with context-derived defaults.
+//
+// Use this method to create a new sticker set owned by a user.
+// The bot will be able to edit the sticker set thus created.
+// Returns True on success.
 func (ctx *Context) CreateNewStickerSet(
 	userID int64,
 	name string,
@@ -588,6 +741,11 @@ func (ctx *Context) CreateNewStickerSet(
 	return err
 }
 
+// DeclineChatJoinRequest calls Client.DeclineChatJoinRequest with context-derived defaults.
+//
+// Use this method to decline a chat join request.
+// The bot must be an administrator in the chat for this to work and must have the can_invite_users administrator right.
+// Returns True on success.
 func (ctx *Context) DeclineChatJoinRequest(
 	userID int64,
 	opts ...DeclineChatJoinRequestOption,
@@ -604,6 +762,11 @@ func (ctx *Context) DeclineChatJoinRequest(
 	return err
 }
 
+// DeclineSuggestedPost calls Client.DeclineSuggestedPost with context-derived defaults.
+//
+// Use this method to decline a suggested post in a direct messages chat.
+// The bot must have the 'can_manage_direct_messages' administrator right in the corresponding channel chat.
+// Returns True on success.
 func (ctx *Context) DeclineSuggestedPost(
 	messageID int64,
 	opts ...DeclineSuggestedPostOption,
@@ -620,6 +783,11 @@ func (ctx *Context) DeclineSuggestedPost(
 	return err
 }
 
+// DeleteBusinessMessages calls Client.DeleteBusinessMessages with context-derived defaults.
+//
+// Delete messages on behalf of a business account.
+// Requires the can_delete_sent_messages business bot right to delete messages sent by the bot itself, or the can_delete_all_messages business bot right to delete any message.
+// Returns True on success.
 func (ctx *Context) DeleteBusinessMessages(
 	messageIDs []int64,
 	opts ...DeleteBusinessMessagesOption,
@@ -646,6 +814,12 @@ func (ctx *Context) DeleteBusinessMessages(
 	return err
 }
 
+// DeleteChatPhoto calls Client.DeleteChatPhoto with context-derived defaults.
+//
+// Use this method to delete a chat photo.
+// Photos can't be changed for private chats.
+// The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
+// Returns True on success.
 func (ctx *Context) DeleteChatPhoto(
 	opts ...DeleteChatPhotoOption,
 ) error {
@@ -660,6 +834,14 @@ func (ctx *Context) DeleteChatPhoto(
 	return err
 }
 
+// DeleteChatStickerSet calls Client.DeleteChatStickerSet with context-derived defaults.
+//
+// Use this method to delete a group sticker set from a supergroup.
+// The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
+// Use the field can_set_sticker_set optionally returned in [getChat] requests to check if the bot can use this method.
+// Returns True on success.
+//
+// [getChat]: https://core.telegram.org/bots/api#getchat
 func (ctx *Context) DeleteChatStickerSet(
 	opts ...DeleteChatStickerSetOption,
 ) error {
@@ -674,6 +856,11 @@ func (ctx *Context) DeleteChatStickerSet(
 	return err
 }
 
+// DeleteForumTopic calls Client.DeleteForumTopic with context-derived defaults.
+//
+// Use this method to delete a forum topic along with all its messages in a forum supergroup chat or a private chat with a user.
+// In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_delete_messages administrator rights.
+// Returns True on success.
 func (ctx *Context) DeleteForumTopic(
 	messageThreadID int64,
 	opts ...DeleteForumTopicOption,
@@ -690,6 +877,19 @@ func (ctx *Context) DeleteForumTopic(
 	return err
 }
 
+// DeleteMessage calls Client.DeleteMessage with context-derived defaults.
+//
+// Use this method to delete a message, including service messages, with the following limitations:
+// - A message can only be deleted if it was sent less than 48 hours ago.
+// - Service messages about a supergroup, channel, or forum topic creation can't be deleted.
+// - A dice message in a private chat can only be deleted if it was sent more than 24 hours ago.
+// - Bots can delete outgoing messages in private chats, groups, and supergroups.
+// - Bots can delete incoming messages in private chats.
+// - Bots granted can_post_messages permissions can delete outgoing messages in channels.
+// - If the bot is an administrator of a group, it can delete any message there.
+// - If the bot has can_delete_messages administrator right in a supergroup or a channel, it can delete any message there.
+// - If the bot has can_manage_direct_messages administrator right in a channel, it can delete any message in the corresponding direct messages chat.
+// Returns True on success.
 func (ctx *Context) DeleteMessage(
 	messageID int64,
 	opts ...DeleteMessageOption,
@@ -706,6 +906,11 @@ func (ctx *Context) DeleteMessage(
 	return err
 }
 
+// DeleteMessages calls Client.DeleteMessages with context-derived defaults.
+//
+// Use this method to delete multiple messages simultaneously.
+// If some of the specified messages can't be found, they are skipped.
+// Returns True on success.
 func (ctx *Context) DeleteMessages(
 	messageIDs []int64,
 	opts ...DeleteMessagesOption,
@@ -722,6 +927,13 @@ func (ctx *Context) DeleteMessages(
 	return err
 }
 
+// DeleteMyCommands calls Client.DeleteMyCommands with context-derived defaults.
+//
+// Use this method to delete the list of the bot's commands for the given scope and user language.
+// After deletion, [higher level commands] will be shown to affected users.
+// Returns True on success.
+//
+// [higher level commands]: https://core.telegram.org/bots/api#determining-list-of-commands
 func (ctx *Context) DeleteMyCommands(
 	opts ...DeleteMyCommandsOption,
 ) error {
@@ -734,6 +946,10 @@ func (ctx *Context) DeleteMyCommands(
 	return err
 }
 
+// DeleteStickerFromSet calls Client.DeleteStickerFromSet with context-derived defaults.
+//
+// Use this method to delete a sticker from a set created by the bot.
+// Returns True on success.
 func (ctx *Context) DeleteStickerFromSet(
 	sticker string,
 	opts ...DeleteStickerFromSetOption,
@@ -749,6 +965,10 @@ func (ctx *Context) DeleteStickerFromSet(
 	return err
 }
 
+// DeleteStickerSet calls Client.DeleteStickerSet with context-derived defaults.
+//
+// Use this method to delete a sticker set that was created by the bot.
+// Returns True on success.
 func (ctx *Context) DeleteStickerSet(
 	name string,
 	opts ...DeleteStickerSetOption,
@@ -764,6 +984,11 @@ func (ctx *Context) DeleteStickerSet(
 	return err
 }
 
+// DeleteStory calls Client.DeleteStory with context-derived defaults.
+//
+// Deletes a story previously posted by the bot on behalf of a managed business account.
+// Requires the can_manage_stories business bot right.
+// Returns True on success.
 func (ctx *Context) DeleteStory(
 	storyID int64,
 	opts ...DeleteStoryOption,
@@ -790,6 +1015,12 @@ func (ctx *Context) DeleteStory(
 	return err
 }
 
+// DeleteWebhook calls Client.DeleteWebhook with context-derived defaults.
+//
+// Use this method to remove webhook integration if you decide to switch back to [getUpdates].
+// Returns True on success.
+//
+// [getUpdates]: https://core.telegram.org/bots/api#getupdates
 func (ctx *Context) DeleteWebhook(
 	opts ...DeleteWebhookOption,
 ) error {
@@ -802,6 +1033,13 @@ func (ctx *Context) DeleteWebhook(
 	return err
 }
 
+// EditChatInviteLink calls Client.EditChatInviteLink with context-derived defaults.
+//
+// Use this method to edit a non-primary invite link created by the bot.
+// The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
+// Returns the edited invite link as a [ChatInviteLink] object.
+//
+// [ChatInviteLink]: https://core.telegram.org/bots/api#chatinvitelink
 func (ctx *Context) EditChatInviteLink(
 	inviteLink string,
 	opts ...EditChatInviteLinkOption,
@@ -818,6 +1056,13 @@ func (ctx *Context) EditChatInviteLink(
 	return err
 }
 
+// EditChatSubscriptionInviteLink calls Client.EditChatSubscriptionInviteLink with context-derived defaults.
+//
+// Use this method to edit a subscription invite link created by the bot.
+// The bot must have the can_invite_users administrator rights.
+// Returns the edited invite link as a [ChatInviteLink] object.
+//
+// [ChatInviteLink]: https://core.telegram.org/bots/api#chatinvitelink
 func (ctx *Context) EditChatSubscriptionInviteLink(
 	inviteLink string,
 	opts ...EditChatSubscriptionInviteLinkOption,
@@ -834,6 +1079,11 @@ func (ctx *Context) EditChatSubscriptionInviteLink(
 	return err
 }
 
+// EditForumTopic calls Client.EditForumTopic with context-derived defaults.
+//
+// Use this method to edit name and icon of a topic in a forum supergroup chat or a private chat with a user.
+// In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights, unless it is the creator of the topic.
+// Returns True on success.
 func (ctx *Context) EditForumTopic(
 	messageThreadID int64,
 	opts ...EditForumTopicOption,
@@ -850,6 +1100,11 @@ func (ctx *Context) EditForumTopic(
 	return err
 }
 
+// EditGeneralForumTopic calls Client.EditGeneralForumTopic with context-derived defaults.
+//
+// Use this method to edit the name of the 'General' topic in a forum supergroup chat.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights.
+// Returns True on success.
 func (ctx *Context) EditGeneralForumTopic(
 	name string,
 	opts ...EditGeneralForumTopicOption,
@@ -866,6 +1121,13 @@ func (ctx *Context) EditGeneralForumTopic(
 	return err
 }
 
+// EditMessageCaption calls Client.EditMessageCaption with context-derived defaults.
+//
+// Use this method to edit captions of messages.
+// On success, if the edited message is not an inline message, the edited [Message] is returned, otherwise True is returned.
+// Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within 48 hours from the time they were sent.
+//
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) EditMessageCaption(
 	opts ...EditMessageCaptionOption,
 ) error {
@@ -897,6 +1159,12 @@ func (ctx *Context) EditMessageCaption(
 	return err
 }
 
+// EditMessageChecklist calls Client.EditMessageChecklist with context-derived defaults.
+//
+// Use this method to edit a checklist on behalf of a connected business account.
+// On success, the edited [Message] is returned.
+//
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) EditMessageChecklist(
 	messageID int64,
 	checklist InputChecklist,
@@ -926,6 +1194,14 @@ func (ctx *Context) EditMessageChecklist(
 	return err
 }
 
+// EditMessageLiveLocation calls Client.EditMessageLiveLocation with context-derived defaults.
+//
+// Use this method to edit live location messages.
+// A location can be edited until its live_period expires or editing is explicitly disabled by a call to [stopMessageLiveLocation].
+// On success, if the edited message is not an inline message, the edited [Message] is returned, otherwise True is returned.
+//
+// [stopMessageLiveLocation]: https://core.telegram.org/bots/api#stopmessagelivelocation
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) EditMessageLiveLocation(
 	latitude float64,
 	longitude float64,
@@ -955,6 +1231,15 @@ func (ctx *Context) EditMessageLiveLocation(
 	return err
 }
 
+// EditMessageMedia calls Client.EditMessageMedia with context-derived defaults.
+//
+// Use this method to edit animation, audio, document, photo, or video messages, or to add media to text messages.
+// If a message is part of a message album, then it can be edited only to an audio for audio albums, only to a document for document albums and to a photo or a video otherwise.
+// When an inline message is edited, a new file can't be uploaded; use a previously uploaded file via its file_id or specify a URL.
+// On success, if the edited message is not an inline message, the edited [Message] is returned, otherwise True is returned.
+// Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within 48 hours from the time they were sent.
+//
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) EditMessageMedia(
 	media InputMedia,
 	opts ...EditMessageMediaOption,
@@ -986,6 +1271,13 @@ func (ctx *Context) EditMessageMedia(
 	return err
 }
 
+// EditMessageReplyMarkup calls Client.EditMessageReplyMarkup with context-derived defaults.
+//
+// Use this method to edit only the reply markup of messages.
+// On success, if the edited message is not an inline message, the edited [Message] is returned, otherwise True is returned.
+// Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within 48 hours from the time they were sent.
+//
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) EditMessageReplyMarkup(
 	opts ...EditMessageReplyMarkupOption,
 ) error {
@@ -1011,6 +1303,14 @@ func (ctx *Context) EditMessageReplyMarkup(
 	return err
 }
 
+// EditMessageText calls Client.EditMessageText with context-derived defaults.
+//
+// Use this method to edit text and [game] messages.
+// On success, if the edited message is not an inline message, the edited [Message] is returned, otherwise True is returned.
+// Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within 48 hours from the time they were sent.
+//
+// [game]: https://core.telegram.org/bots/api#games
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) EditMessageText(
 	text string,
 	opts ...EditMessageTextOption,
@@ -1044,6 +1344,13 @@ func (ctx *Context) EditMessageText(
 	return err
 }
 
+// EditStory calls Client.EditStory with context-derived defaults.
+//
+// Edits a story previously posted by the bot on behalf of a managed business account.
+// Requires the can_manage_stories business bot right.
+// Returns [Story] on success.
+//
+// [Story]: https://core.telegram.org/bots/api#story
 func (ctx *Context) EditStory(
 	storyID int64,
 	content InputStoryContent,
@@ -1078,6 +1385,10 @@ func (ctx *Context) EditStory(
 	return err
 }
 
+// EditUserStarSubscription calls Client.EditUserStarSubscription with context-derived defaults.
+//
+// Allows the bot to cancel or re-enable extension of a subscription paid in Telegram Stars.
+// Returns True on success.
 func (ctx *Context) EditUserStarSubscription(
 	userID int64,
 	telegramPaymentChargeID string,
@@ -1097,6 +1408,11 @@ func (ctx *Context) EditUserStarSubscription(
 	return err
 }
 
+// ExportChatInviteLink calls Client.ExportChatInviteLink with context-derived defaults.
+//
+// Use this method to generate a new primary invite link for a chat; any previously generated primary link is revoked.
+// The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
+// Returns the new invite link as String on success.
 func (ctx *Context) ExportChatInviteLink(
 	opts ...ExportChatInviteLinkOption,
 ) error {
@@ -1111,6 +1427,13 @@ func (ctx *Context) ExportChatInviteLink(
 	return err
 }
 
+// ForwardMessage calls Client.ForwardMessage with context-derived defaults.
+//
+// Use this method to forward messages of any kind.
+// Service messages and messages with protected content can't be forwarded.
+// On success, the sent [Message] is returned.
+//
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) ForwardMessage(
 	fromChatID string,
 	messageID int64,
@@ -1129,6 +1452,15 @@ func (ctx *Context) ForwardMessage(
 	return err
 }
 
+// ForwardMessages calls Client.ForwardMessages with context-derived defaults.
+//
+// Use this method to forward multiple messages of any kind.
+// If some of the specified messages can't be found or forwarded, they are skipped.
+// Service messages and messages with protected content can't be forwarded.
+// Album grouping is kept for forwarded messages.
+// On success, an array of [MessageId] of the sent messages is returned.
+//
+// [MessageId]: https://core.telegram.org/bots/api#messageid
 func (ctx *Context) ForwardMessages(
 	fromChatID string,
 	messageIDs []int64,
@@ -1147,6 +1479,13 @@ func (ctx *Context) ForwardMessages(
 	return err
 }
 
+// GetAvailableGifts calls Client.GetAvailableGifts with context-derived defaults.
+//
+// Returns the list of gifts that can be sent by the bot to users and channel chats.
+// Requires no parameters.
+// Returns a [Gifts] object.
+//
+// [Gifts]: https://core.telegram.org/bots/api#gifts
 func (ctx *Context) GetAvailableGifts(
 	opts ...GetAvailableGiftsOption,
 ) error {
@@ -1159,6 +1498,13 @@ func (ctx *Context) GetAvailableGifts(
 	return err
 }
 
+// GetBusinessAccountGifts calls Client.GetBusinessAccountGifts with context-derived defaults.
+//
+// Returns the gifts received and owned by a managed business account.
+// Requires the can_view_gifts_and_stars business bot right.
+// Returns [OwnedGifts] on success.
+//
+// [OwnedGifts]: https://core.telegram.org/bots/api#ownedgifts
 func (ctx *Context) GetBusinessAccountGifts(
 	opts ...GetBusinessAccountGiftsOption,
 ) error {
@@ -1183,6 +1529,13 @@ func (ctx *Context) GetBusinessAccountGifts(
 	return err
 }
 
+// GetBusinessAccountStarBalance calls Client.GetBusinessAccountStarBalance with context-derived defaults.
+//
+// Returns the amount of Telegram Stars owned by a managed business account.
+// Requires the can_view_gifts_and_stars business bot right.
+// Returns [StarAmount] on success.
+//
+// [StarAmount]: https://core.telegram.org/bots/api#staramount
 func (ctx *Context) GetBusinessAccountStarBalance(
 	opts ...GetBusinessAccountStarBalanceOption,
 ) error {
@@ -1207,6 +1560,12 @@ func (ctx *Context) GetBusinessAccountStarBalance(
 	return err
 }
 
+// GetBusinessConnection calls Client.GetBusinessConnection with context-derived defaults.
+//
+// Use this method to get information about the connection of the bot with a business account.
+// Returns a [BusinessConnection] object on success.
+//
+// [BusinessConnection]: https://core.telegram.org/bots/api#businessconnection
 func (ctx *Context) GetBusinessConnection(
 	opts ...GetBusinessConnectionOption,
 ) error {
@@ -1231,6 +1590,12 @@ func (ctx *Context) GetBusinessConnection(
 	return err
 }
 
+// GetChat calls Client.GetChat with context-derived defaults.
+//
+// Use this method to get up-to-date information about the chat.
+// Returns a [ChatFullInfo] object on success.
+//
+// [ChatFullInfo]: https://core.telegram.org/bots/api#chatfullinfo
 func (ctx *Context) GetChat(
 	opts ...GetChatOption,
 ) error {
@@ -1245,6 +1610,12 @@ func (ctx *Context) GetChat(
 	return err
 }
 
+// GetChatAdministrators calls Client.GetChatAdministrators with context-derived defaults.
+//
+// Use this method to get a list of administrators in a chat, which aren't bots.
+// Returns an Array of [ChatMember] objects.
+//
+// [ChatMember]: https://core.telegram.org/bots/api#chatmember
 func (ctx *Context) GetChatAdministrators(
 	opts ...GetChatAdministratorsOption,
 ) error {
@@ -1259,6 +1630,12 @@ func (ctx *Context) GetChatAdministrators(
 	return err
 }
 
+// GetChatGifts calls Client.GetChatGifts with context-derived defaults.
+//
+// Returns the gifts owned by a chat.
+// Returns [OwnedGifts] on success.
+//
+// [OwnedGifts]: https://core.telegram.org/bots/api#ownedgifts
 func (ctx *Context) GetChatGifts(
 	opts ...GetChatGiftsOption,
 ) error {
@@ -1273,6 +1650,13 @@ func (ctx *Context) GetChatGifts(
 	return err
 }
 
+// GetChatMember calls Client.GetChatMember with context-derived defaults.
+//
+// Use this method to get information about a member of a chat.
+// The method is only guaranteed to work for other users if the bot is an administrator in the chat.
+// Returns a [ChatMember] object on success.
+//
+// [ChatMember]: https://core.telegram.org/bots/api#chatmember
 func (ctx *Context) GetChatMember(
 	userID int64,
 	opts ...GetChatMemberOption,
@@ -1289,6 +1673,10 @@ func (ctx *Context) GetChatMember(
 	return err
 }
 
+// GetChatMemberCount calls Client.GetChatMemberCount with context-derived defaults.
+//
+// Use this method to get the number of members in a chat.
+// Returns Int on success.
 func (ctx *Context) GetChatMemberCount(
 	opts ...GetChatMemberCountOption,
 ) error {
@@ -1303,6 +1691,12 @@ func (ctx *Context) GetChatMemberCount(
 	return err
 }
 
+// GetChatMenuButton calls Client.GetChatMenuButton with context-derived defaults.
+//
+// Use this method to get the current value of the bot's menu button in a private chat, or the default menu button.
+// Returns [MenuButton] on success.
+//
+// [MenuButton]: https://core.telegram.org/bots/api#menubutton
 func (ctx *Context) GetChatMenuButton(
 	opts ...GetChatMenuButtonOption,
 ) error {
@@ -1317,6 +1711,12 @@ func (ctx *Context) GetChatMenuButton(
 	return err
 }
 
+// GetCustomEmojiStickers calls Client.GetCustomEmojiStickers with context-derived defaults.
+//
+// Use this method to get information about custom emoji stickers by their identifiers.
+// Returns an Array of [Sticker] objects.
+//
+// [Sticker]: https://core.telegram.org/bots/api#sticker
 func (ctx *Context) GetCustomEmojiStickers(
 	customEmojiIDs []string,
 	opts ...GetCustomEmojiStickersOption,
@@ -1332,6 +1732,19 @@ func (ctx *Context) GetCustomEmojiStickers(
 	return err
 }
 
+// GetFile calls Client.GetFile with context-derived defaults.
+//
+// Use this method to get basic information about a file and prepare it for downloading.
+// For the moment, bots can download files of up to 20MB in size.
+// On success, a [File] object is returned.
+// The file can then be downloaded via the link https://api.telegram.org/file/bot<token>/<file_path>, where <file_path> is taken from the response.
+// It is guaranteed that the link will be valid for at least 1 hour.
+// When the link expires, a new one can be requested by calling [getFile] again.
+// Note: This function may not preserve the original file name and MIME type.
+// You should save the file's MIME type and name (if available) when the File object is received.
+//
+// [File]: https://core.telegram.org/bots/api#file
+// [getFile]: https://core.telegram.org/bots/api#getfile
 func (ctx *Context) GetFile(
 	fileID string,
 	opts ...GetFileOption,
@@ -1347,6 +1760,13 @@ func (ctx *Context) GetFile(
 	return err
 }
 
+// GetForumTopicIconStickers calls Client.GetForumTopicIconStickers with context-derived defaults.
+//
+// Use this method to get custom emoji stickers, which can be used as a forum topic icon by any user.
+// Requires no parameters.
+// Returns an Array of [Sticker] objects.
+//
+// [Sticker]: https://core.telegram.org/bots/api#sticker
 func (ctx *Context) GetForumTopicIconStickers(
 	opts ...GetForumTopicIconStickersOption,
 ) error {
@@ -1359,6 +1779,13 @@ func (ctx *Context) GetForumTopicIconStickers(
 	return err
 }
 
+// GetGameHighScores calls Client.GetGameHighScores with context-derived defaults.
+//
+// Use this method to get data for high score tables.
+// Will return the score of the specified user and several of their neighbors in a game.
+// Returns an Array of [GameHighScore] objects.
+//
+// [GameHighScore]: https://core.telegram.org/bots/api#gamehighscore
 func (ctx *Context) GetGameHighScores(
 	userID int64,
 	opts ...GetGameHighScoresOption,
@@ -1375,6 +1802,13 @@ func (ctx *Context) GetGameHighScores(
 	return err
 }
 
+// GetMe calls Client.GetMe with context-derived defaults.
+//
+// A simple method for testing your bot's authentication token.
+// Requires no parameters.
+// Returns basic information about the bot in form of a [User] object.
+//
+// [User]: https://core.telegram.org/bots/api#user
 func (ctx *Context) GetMe(
 	opts ...GetMeOption,
 ) error {
@@ -1387,6 +1821,13 @@ func (ctx *Context) GetMe(
 	return err
 }
 
+// GetMyCommands calls Client.GetMyCommands with context-derived defaults.
+//
+// Use this method to get the current list of the bot's commands for the given scope and user language.
+// Returns an Array of [BotCommand] objects.
+// If commands aren't set, an empty list is returned.
+//
+// [BotCommand]: https://core.telegram.org/bots/api#botcommand
 func (ctx *Context) GetMyCommands(
 	opts ...GetMyCommandsOption,
 ) error {
@@ -1399,6 +1840,12 @@ func (ctx *Context) GetMyCommands(
 	return err
 }
 
+// GetMyDefaultAdministratorRights calls Client.GetMyDefaultAdministratorRights with context-derived defaults.
+//
+// Use this method to get the current default administrator rights of the bot.
+// Returns [ChatAdministratorRights] on success.
+//
+// [ChatAdministratorRights]: https://core.telegram.org/bots/api#chatadministratorrights
 func (ctx *Context) GetMyDefaultAdministratorRights(
 	opts ...GetMyDefaultAdministratorRightsOption,
 ) error {
@@ -1411,6 +1858,12 @@ func (ctx *Context) GetMyDefaultAdministratorRights(
 	return err
 }
 
+// GetMyDescription calls Client.GetMyDescription with context-derived defaults.
+//
+// Use this method to get the current bot description for the given user language.
+// Returns [BotDescription] on success.
+//
+// [BotDescription]: https://core.telegram.org/bots/api#botdescription
 func (ctx *Context) GetMyDescription(
 	opts ...GetMyDescriptionOption,
 ) error {
@@ -1423,6 +1876,12 @@ func (ctx *Context) GetMyDescription(
 	return err
 }
 
+// GetMyName calls Client.GetMyName with context-derived defaults.
+//
+// Use this method to get the current bot name for the given user language.
+// Returns [BotName] on success.
+//
+// [BotName]: https://core.telegram.org/bots/api#botname
 func (ctx *Context) GetMyName(
 	opts ...GetMyNameOption,
 ) error {
@@ -1435,6 +1894,12 @@ func (ctx *Context) GetMyName(
 	return err
 }
 
+// GetMyShortDescription calls Client.GetMyShortDescription with context-derived defaults.
+//
+// Use this method to get the current bot short description for the given user language.
+// Returns [BotShortDescription] on success.
+//
+// [BotShortDescription]: https://core.telegram.org/bots/api#botshortdescription
 func (ctx *Context) GetMyShortDescription(
 	opts ...GetMyShortDescriptionOption,
 ) error {
@@ -1447,6 +1912,13 @@ func (ctx *Context) GetMyShortDescription(
 	return err
 }
 
+// GetMyStarBalance calls Client.GetMyStarBalance with context-derived defaults.
+//
+// A method to get the current Telegram Stars balance of the bot.
+// Requires no parameters.
+// On success, returns a [StarAmount] object.
+//
+// [StarAmount]: https://core.telegram.org/bots/api#staramount
 func (ctx *Context) GetMyStarBalance(
 	opts ...GetMyStarBalanceOption,
 ) error {
@@ -1459,6 +1931,12 @@ func (ctx *Context) GetMyStarBalance(
 	return err
 }
 
+// GetStarTransactions calls Client.GetStarTransactions with context-derived defaults.
+//
+// Returns the bot's Telegram Star transactions in chronological order.
+// On success, returns a [StarTransactions] object.
+//
+// [StarTransactions]: https://core.telegram.org/bots/api#startransactions
 func (ctx *Context) GetStarTransactions(
 	opts ...GetStarTransactionsOption,
 ) error {
@@ -1471,6 +1949,12 @@ func (ctx *Context) GetStarTransactions(
 	return err
 }
 
+// GetStickerSet calls Client.GetStickerSet with context-derived defaults.
+//
+// Use this method to get a sticker set.
+// On success, a [StickerSet] object is returned.
+//
+// [StickerSet]: https://core.telegram.org/bots/api#stickerset
 func (ctx *Context) GetStickerSet(
 	name string,
 	opts ...GetStickerSetOption,
@@ -1486,6 +1970,13 @@ func (ctx *Context) GetStickerSet(
 	return err
 }
 
+// GetUpdates calls Client.GetUpdates with context-derived defaults.
+//
+// Use this method to receive incoming updates using long polling ([wiki]).
+// Returns an Array of [Update] objects.
+//
+// [wiki]: https://en.wikipedia.org/wiki/Push_technology#Long_polling
+// [Update]: https://core.telegram.org/bots/api#update
 func (ctx *Context) GetUpdates(
 	opts ...GetUpdatesOption,
 ) error {
@@ -1498,6 +1989,13 @@ func (ctx *Context) GetUpdates(
 	return err
 }
 
+// GetUserChatBoosts calls Client.GetUserChatBoosts with context-derived defaults.
+//
+// Use this method to get the list of boosts added to a chat by a user.
+// Requires administrator rights in the chat.
+// Returns a [UserChatBoosts] object.
+//
+// [UserChatBoosts]: https://core.telegram.org/bots/api#userchatboosts
 func (ctx *Context) GetUserChatBoosts(
 	userID int64,
 	opts ...GetUserChatBoostsOption,
@@ -1514,6 +2012,12 @@ func (ctx *Context) GetUserChatBoosts(
 	return err
 }
 
+// GetUserGifts calls Client.GetUserGifts with context-derived defaults.
+//
+// Returns the gifts owned and hosted by a user.
+// Returns [OwnedGifts] on success.
+//
+// [OwnedGifts]: https://core.telegram.org/bots/api#ownedgifts
 func (ctx *Context) GetUserGifts(
 	userID int64,
 	opts ...GetUserGiftsOption,
@@ -1529,6 +2033,12 @@ func (ctx *Context) GetUserGifts(
 	return err
 }
 
+// GetUserProfileAudios calls Client.GetUserProfileAudios with context-derived defaults.
+//
+// Use this method to get a list of profile audios for a user.
+// Returns a [UserProfileAudios] object.
+//
+// [UserProfileAudios]: https://core.telegram.org/bots/api#userprofileaudios
 func (ctx *Context) GetUserProfileAudios(
 	userID int64,
 	opts ...GetUserProfileAudiosOption,
@@ -1544,6 +2054,12 @@ func (ctx *Context) GetUserProfileAudios(
 	return err
 }
 
+// GetUserProfilePhotos calls Client.GetUserProfilePhotos with context-derived defaults.
+//
+// Use this method to get a list of profile pictures for a user.
+// Returns a [UserProfilePhotos] object.
+//
+// [UserProfilePhotos]: https://core.telegram.org/bots/api#userprofilephotos
 func (ctx *Context) GetUserProfilePhotos(
 	userID int64,
 	opts ...GetUserProfilePhotosOption,
@@ -1559,6 +2075,15 @@ func (ctx *Context) GetUserProfilePhotos(
 	return err
 }
 
+// GetWebhookInfo calls Client.GetWebhookInfo with context-derived defaults.
+//
+// Use this method to get current webhook status.
+// Requires no parameters.
+// On success, returns a [WebhookInfo] object.
+// If the bot is using [getUpdates], will return an object with the url field empty.
+//
+// [WebhookInfo]: https://core.telegram.org/bots/api#webhookinfo
+// [getUpdates]: https://core.telegram.org/bots/api#getupdates
 func (ctx *Context) GetWebhookInfo(
 	opts ...GetWebhookInfoOption,
 ) error {
@@ -1571,6 +2096,10 @@ func (ctx *Context) GetWebhookInfo(
 	return err
 }
 
+// GiftPremiumSubscription calls Client.GiftPremiumSubscription with context-derived defaults.
+//
+// Gifts a Telegram Premium subscription to the given user.
+// Returns True on success.
 func (ctx *Context) GiftPremiumSubscription(
 	userID int64,
 	monthCount int64,
@@ -1593,6 +2122,12 @@ func (ctx *Context) GiftPremiumSubscription(
 	return err
 }
 
+// HideGeneralForumTopic calls Client.HideGeneralForumTopic with context-derived defaults.
+//
+// Use this method to hide the 'General' topic in a forum supergroup chat.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights.
+// The topic will be automatically closed if it was open.
+// Returns True on success.
 func (ctx *Context) HideGeneralForumTopic(
 	opts ...HideGeneralForumTopicOption,
 ) error {
@@ -1607,6 +2142,10 @@ func (ctx *Context) HideGeneralForumTopic(
 	return err
 }
 
+// LeaveChat calls Client.LeaveChat with context-derived defaults.
+//
+// Use this method for your bot to leave a group, supergroup or channel.
+// Returns True on success.
 func (ctx *Context) LeaveChat(
 	opts ...LeaveChatOption,
 ) error {
@@ -1621,6 +2160,13 @@ func (ctx *Context) LeaveChat(
 	return err
 }
 
+// LogOut calls Client.LogOut with context-derived defaults.
+//
+// Use this method to log out from the cloud Bot API server before launching the bot locally.
+// You must log out the bot before running it locally, otherwise there is no guarantee that the bot will receive updates.
+// After a successful call, you can immediately log in on a local server, but will not be able to log in back to the cloud Bot API server for 10 minutes.
+// Returns True on success.
+// Requires no parameters.
 func (ctx *Context) LogOut(
 	opts ...LogOutOption,
 ) error {
@@ -1633,6 +2179,12 @@ func (ctx *Context) LogOut(
 	return err
 }
 
+// PinChatMessage calls Client.PinChatMessage with context-derived defaults.
+//
+// Use this method to add a message to the list of pinned messages in a chat.
+// In private chats and channel direct messages chats, all non-service messages can be pinned.
+// Conversely, the bot must be an administrator with the 'can_pin_messages' right or the 'can_edit_messages' right to pin messages in groups and channels respectively.
+// Returns True on success.
 func (ctx *Context) PinChatMessage(
 	messageID int64,
 	opts ...PinChatMessageOption,
@@ -1660,6 +2212,13 @@ func (ctx *Context) PinChatMessage(
 	return err
 }
 
+// PostStory calls Client.PostStory with context-derived defaults.
+//
+// Posts a story on behalf of a managed business account.
+// Requires the can_manage_stories business bot right.
+// Returns [Story] on success.
+//
+// [Story]: https://core.telegram.org/bots/api#story
 func (ctx *Context) PostStory(
 	content InputStoryContent,
 	activePeriod int64,
@@ -1694,6 +2253,12 @@ func (ctx *Context) PostStory(
 	return err
 }
 
+// PromoteChatMember calls Client.PromoteChatMember with context-derived defaults.
+//
+// Use this method to promote or demote a user in a supergroup or a channel.
+// The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
+// Pass False for all boolean parameters to demote a user.
+// Returns True on success.
 func (ctx *Context) PromoteChatMember(
 	userID int64,
 	opts ...PromoteChatMemberOption,
@@ -1710,6 +2275,11 @@ func (ctx *Context) PromoteChatMember(
 	return err
 }
 
+// ReadBusinessMessage calls Client.ReadBusinessMessage with context-derived defaults.
+//
+// Marks incoming message as read on behalf of a business account.
+// Requires the can_read_messages business bot right.
+// Returns True on success.
 func (ctx *Context) ReadBusinessMessage(
 	messageID int64,
 	opts ...ReadBusinessMessageOption,
@@ -1737,6 +2307,12 @@ func (ctx *Context) ReadBusinessMessage(
 	return err
 }
 
+// RefundStarPayment calls Client.RefundStarPayment with context-derived defaults.
+//
+// Refunds a successful payment in [Telegram Stars].
+// Returns True on success.
+//
+// [Telegram Stars]: https://t.me/BotNews/90
 func (ctx *Context) RefundStarPayment(
 	userID int64,
 	telegramPaymentChargeID string,
@@ -1754,6 +2330,11 @@ func (ctx *Context) RefundStarPayment(
 	return err
 }
 
+// RemoveBusinessAccountProfilePhoto calls Client.RemoveBusinessAccountProfilePhoto with context-derived defaults.
+//
+// Removes the current profile photo of a managed business account.
+// Requires the can_edit_profile_photo business bot right.
+// Returns True on success.
 func (ctx *Context) RemoveBusinessAccountProfilePhoto(
 	opts ...RemoveBusinessAccountProfilePhotoOption,
 ) error {
@@ -1778,6 +2359,12 @@ func (ctx *Context) RemoveBusinessAccountProfilePhoto(
 	return err
 }
 
+// RemoveChatVerification calls Client.RemoveChatVerification with context-derived defaults.
+//
+// Removes verification from a chat that is currently verified [on behalf of the organization] represented by the bot.
+// Returns True on success.
+//
+// [on behalf of the organization]: https://telegram.org/verify#third-party-verification
 func (ctx *Context) RemoveChatVerification(
 	opts ...RemoveChatVerificationOption,
 ) error {
@@ -1792,6 +2379,11 @@ func (ctx *Context) RemoveChatVerification(
 	return err
 }
 
+// RemoveMyProfilePhoto calls Client.RemoveMyProfilePhoto with context-derived defaults.
+//
+// Removes the profile photo of the bot.
+// Requires no parameters.
+// Returns True on success.
 func (ctx *Context) RemoveMyProfilePhoto(
 	opts ...RemoveMyProfilePhotoOption,
 ) error {
@@ -1804,6 +2396,12 @@ func (ctx *Context) RemoveMyProfilePhoto(
 	return err
 }
 
+// RemoveUserVerification calls Client.RemoveUserVerification with context-derived defaults.
+//
+// Removes verification from a user who is currently verified [on behalf of the organization] represented by the bot.
+// Returns True on success.
+//
+// [on behalf of the organization]: https://telegram.org/verify#third-party-verification
 func (ctx *Context) RemoveUserVerification(
 	userID int64,
 	opts ...RemoveUserVerificationOption,
@@ -1819,6 +2417,11 @@ func (ctx *Context) RemoveUserVerification(
 	return err
 }
 
+// ReopenForumTopic calls Client.ReopenForumTopic with context-derived defaults.
+//
+// Use this method to reopen a closed topic in a forum supergroup chat.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights, unless it is the creator of the topic.
+// Returns True on success.
 func (ctx *Context) ReopenForumTopic(
 	messageThreadID int64,
 	opts ...ReopenForumTopicOption,
@@ -1835,6 +2438,12 @@ func (ctx *Context) ReopenForumTopic(
 	return err
 }
 
+// ReopenGeneralForumTopic calls Client.ReopenGeneralForumTopic with context-derived defaults.
+//
+// Use this method to reopen a closed 'General' topic in a forum supergroup chat.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights.
+// The topic will be automatically unhidden if it was hidden.
+// Returns True on success.
 func (ctx *Context) ReopenGeneralForumTopic(
 	opts ...ReopenGeneralForumTopicOption,
 ) error {
@@ -1849,6 +2458,15 @@ func (ctx *Context) ReopenGeneralForumTopic(
 	return err
 }
 
+// ReplaceStickerInSet calls Client.ReplaceStickerInSet with context-derived defaults.
+//
+// Use this method to replace an existing sticker in a sticker set with a new one.
+// The method is equivalent to calling [deleteStickerFromSet], then [addStickerToSet], then [setStickerPositionInSet].
+// Returns True on success.
+//
+// [deleteStickerFromSet]: https://core.telegram.org/bots/api#deletestickerfromset
+// [addStickerToSet]: https://core.telegram.org/bots/api#addstickertoset
+// [setStickerPositionInSet]: https://core.telegram.org/bots/api#setstickerpositioninset
 func (ctx *Context) ReplaceStickerInSet(
 	userID int64,
 	name string,
@@ -1870,6 +2488,14 @@ func (ctx *Context) ReplaceStickerInSet(
 	return err
 }
 
+// RepostStory calls Client.RepostStory with context-derived defaults.
+//
+// Reposts a story on behalf of a business account from another business account.
+// Both business accounts must be managed by the same bot, and the story on the source account must have been posted (or reposted) by the bot.
+// Requires the can_manage_stories business bot right for both business accounts.
+// Returns [Story] on success.
+//
+// [Story]: https://core.telegram.org/bots/api#story
 func (ctx *Context) RepostStory(
 	fromChatID int64,
 	fromStoryID int64,
@@ -1900,6 +2526,12 @@ func (ctx *Context) RepostStory(
 	return err
 }
 
+// RestrictChatMember calls Client.RestrictChatMember with context-derived defaults.
+//
+// Use this method to restrict a user in a supergroup.
+// The bot must be an administrator in the supergroup for this to work and must have the appropriate administrator rights.
+// Pass True for all permissions to lift restrictions from a user.
+// Returns True on success.
 func (ctx *Context) RestrictChatMember(
 	userID int64,
 	permissions ChatPermissions,
@@ -1918,6 +2550,14 @@ func (ctx *Context) RestrictChatMember(
 	return err
 }
 
+// RevokeChatInviteLink calls Client.RevokeChatInviteLink with context-derived defaults.
+//
+// Use this method to revoke an invite link created by the bot.
+// If the primary link is revoked, a new link is automatically generated.
+// The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
+// Returns the revoked invite link as [ChatInviteLink] object.
+//
+// [ChatInviteLink]: https://core.telegram.org/bots/api#chatinvitelink
 func (ctx *Context) RevokeChatInviteLink(
 	inviteLink string,
 	opts ...RevokeChatInviteLinkOption,
@@ -1934,6 +2574,12 @@ func (ctx *Context) RevokeChatInviteLink(
 	return err
 }
 
+// SavePreparedInlineMessage calls Client.SavePreparedInlineMessage with context-derived defaults.
+//
+// Stores a message that can be sent by a user of a Mini App.
+// Returns a [PreparedInlineMessage] object.
+//
+// [PreparedInlineMessage]: https://core.telegram.org/bots/api#preparedinlinemessage
 func (ctx *Context) SavePreparedInlineMessage(
 	userID int64,
 	result InlineQueryResult,
@@ -1951,6 +2597,13 @@ func (ctx *Context) SavePreparedInlineMessage(
 	return err
 }
 
+// SendAnimation calls Client.SendAnimation with context-derived defaults.
+//
+// Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
+// On success, the sent [Message] is returned.
+// Bots can currently send animation files of up to 50 MB in size, this limit may be changed in the future.
+//
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SendAnimation(
 	animation InputFile,
 	opts ...SendAnimationOption,
@@ -1984,6 +2637,16 @@ func (ctx *Context) SendAnimation(
 	return err
 }
 
+// SendAudio calls Client.SendAudio with context-derived defaults.
+//
+// Use this method to send audio files, if you want Telegram clients to display them in the music player.
+// Your audio must be in the .MP3 or .M4A format.
+// On success, the sent [Message] is returned.
+// Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+// For sending voice messages, use the [sendVoice] method instead.
+//
+// [Message]: https://core.telegram.org/bots/api#message
+// [sendVoice]: https://core.telegram.org/bots/api#sendvoice
 func (ctx *Context) SendAudio(
 	audio InputFile,
 	opts ...SendAudioOption,
@@ -2017,6 +2680,12 @@ func (ctx *Context) SendAudio(
 	return err
 }
 
+// SendChatAction calls Client.SendChatAction with context-derived defaults.
+//
+// Use this method when you need to tell the user that something is happening on the bot's side.
+// The status is set for 5 seconds or less (when a message arrives from your bot, Telegram clients clear its typing status).
+// Returns True on success.
+// We only recommend using this method when a response from the bot will take a noticeable amount of time to arrive.
 func (ctx *Context) SendChatAction(
 	action string,
 	opts ...SendChatActionOption,
@@ -2044,6 +2713,12 @@ func (ctx *Context) SendChatAction(
 	return err
 }
 
+// SendChecklist calls Client.SendChecklist with context-derived defaults.
+//
+// Use this method to send a checklist on behalf of a connected business account.
+// On success, the sent [Message] is returned.
+//
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SendChecklist(
 	checklist InputChecklist,
 	opts ...SendChecklistOption,
@@ -2071,6 +2746,12 @@ func (ctx *Context) SendChecklist(
 	return err
 }
 
+// SendContact calls Client.SendContact with context-derived defaults.
+//
+// Use this method to send phone contacts.
+// On success, the sent [Message] is returned.
+//
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SendContact(
 	phoneNumber string,
 	firstName string,
@@ -2100,6 +2781,12 @@ func (ctx *Context) SendContact(
 	return err
 }
 
+// SendDice calls Client.SendDice with context-derived defaults.
+//
+// Use this method to send an animated emoji that will display a random value.
+// On success, the sent [Message] is returned.
+//
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SendDice(
 	opts ...SendDiceOption,
 ) error {
@@ -2125,6 +2812,13 @@ func (ctx *Context) SendDice(
 	return err
 }
 
+// SendDocument calls Client.SendDocument with context-derived defaults.
+//
+// Use this method to send general files.
+// On success, the sent [Message] is returned.
+// Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+//
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SendDocument(
 	document InputFile,
 	opts ...SendDocumentOption,
@@ -2158,6 +2852,12 @@ func (ctx *Context) SendDocument(
 	return err
 }
 
+// SendGame calls Client.SendGame with context-derived defaults.
+//
+// Use this method to send a game.
+// On success, the sent [Message] is returned.
+//
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SendGame(
 	gameShortName string,
 	opts ...SendGameOption,
@@ -2185,6 +2885,11 @@ func (ctx *Context) SendGame(
 	return err
 }
 
+// SendGift calls Client.SendGift with context-derived defaults.
+//
+// Sends a gift to the given user or channel chat.
+// The gift can't be converted to Telegram Stars by the receiver.
+// Returns True on success.
 func (ctx *Context) SendGift(
 	giftID string,
 	opts ...SendGiftOption,
@@ -2204,6 +2909,12 @@ func (ctx *Context) SendGift(
 	return err
 }
 
+// SendInvoice calls Client.SendInvoice with context-derived defaults.
+//
+// Use this method to send invoices.
+// On success, the sent [Message] is returned.
+//
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SendInvoice(
 	title string,
 	description string,
@@ -2228,6 +2939,12 @@ func (ctx *Context) SendInvoice(
 	return err
 }
 
+// SendLocation calls Client.SendLocation with context-derived defaults.
+//
+// Use this method to send point on the map.
+// On success, the sent [Message] is returned.
+//
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SendLocation(
 	latitude float64,
 	longitude float64,
@@ -2257,6 +2974,13 @@ func (ctx *Context) SendLocation(
 	return err
 }
 
+// SendMediaGroup calls Client.SendMediaGroup with context-derived defaults.
+//
+// Use this method to send a group of photos, videos, documents or audios as an album.
+// Documents and audio files can be only grouped in an album with messages of the same type.
+// On success, an array of [Message] objects that were sent is returned.
+//
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SendMediaGroup(
 	media []InputMedia,
 	opts ...SendMediaGroupOption,
@@ -2290,6 +3014,12 @@ func (ctx *Context) SendMediaGroup(
 	return err
 }
 
+// SendMessage calls Client.SendMessage with context-derived defaults.
+//
+// Use this method to send text messages.
+// On success, the sent [Message] is returned.
+//
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SendMessage(
 	text string,
 	opts ...SendMessageOption,
@@ -2323,6 +3053,10 @@ func (ctx *Context) SendMessage(
 	return err
 }
 
+// SendMessageDraft calls Client.SendMessageDraft with context-derived defaults.
+//
+// Use this method to stream a partial message to a user while the message is being generated; supported only for bots with forum topic mode enabled.
+// Returns True on success.
 func (ctx *Context) SendMessageDraft(
 	draftID int64,
 	text string,
@@ -2347,6 +3081,12 @@ func (ctx *Context) SendMessageDraft(
 	return err
 }
 
+// SendPaidMedia calls Client.SendPaidMedia with context-derived defaults.
+//
+// Use this method to send paid media.
+// On success, the sent [Message] is returned.
+//
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SendPaidMedia(
 	starCount int64,
 	media []InputPaidMedia,
@@ -2382,6 +3122,12 @@ func (ctx *Context) SendPaidMedia(
 	return err
 }
 
+// SendPhoto calls Client.SendPhoto with context-derived defaults.
+//
+// Use this method to send photos.
+// On success, the sent [Message] is returned.
+//
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SendPhoto(
 	photo InputFile,
 	opts ...SendPhotoOption,
@@ -2415,6 +3161,12 @@ func (ctx *Context) SendPhoto(
 	return err
 }
 
+// SendPoll calls Client.SendPoll with context-derived defaults.
+//
+// Use this method to send a native poll.
+// On success, the sent [Message] is returned.
+//
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SendPoll(
 	question string,
 	options []InputPollOption,
@@ -2447,6 +3199,14 @@ func (ctx *Context) SendPoll(
 	return err
 }
 
+// SendSticker calls Client.SendSticker with context-derived defaults.
+//
+// Use this method to send static .WEBP, [animated] .TGS, or [video] .WEBM stickers.
+// On success, the sent [Message] is returned.
+//
+// [animated]: https://telegram.org/blog/animated-stickers
+// [video]: https://telegram.org/blog/video-stickers-better-reactions
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SendSticker(
 	sticker InputFile,
 	opts ...SendStickerOption,
@@ -2474,6 +3234,12 @@ func (ctx *Context) SendSticker(
 	return err
 }
 
+// SendVenue calls Client.SendVenue with context-derived defaults.
+//
+// Use this method to send information about a venue.
+// On success, the sent [Message] is returned.
+//
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SendVenue(
 	latitude float64,
 	longitude float64,
@@ -2507,6 +3273,14 @@ func (ctx *Context) SendVenue(
 	return err
 }
 
+// SendVideo calls Client.SendVideo with context-derived defaults.
+//
+// Use this method to send video files, Telegram clients support MPEG4 videos (other formats may be sent as [Document]).
+// On success, the sent [Message] is returned.
+// Bots can currently send video files of up to 50 MB in size, this limit may be changed in the future.
+//
+// [Document]: https://core.telegram.org/bots/api#document
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SendVideo(
 	video InputFile,
 	opts ...SendVideoOption,
@@ -2540,6 +3314,14 @@ func (ctx *Context) SendVideo(
 	return err
 }
 
+// SendVideoNote calls Client.SendVideoNote with context-derived defaults.
+//
+// As of [v.4.0], Telegram clients support rounded square MPEG4 videos of up to 1 minute long.
+// Use this method to send video messages.
+// On success, the sent [Message] is returned.
+//
+// [v.4.0]: https://telegram.org/blog/video-messages-and-telescope
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SendVideoNote(
 	videoNote InputFile,
 	opts ...SendVideoNoteOption,
@@ -2567,6 +3349,16 @@ func (ctx *Context) SendVideoNote(
 	return err
 }
 
+// SendVoice calls Client.SendVoice with context-derived defaults.
+//
+// Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message.
+// For this to work, your audio must be in an .OGG file encoded with OPUS, or in .MP3 format, or in .M4A format (other formats may be sent as [Audio] or [Document]).
+// On success, the sent [Message] is returned.
+// Bots can currently send voice messages of up to 50 MB in size, this limit may be changed in the future.
+//
+// [Audio]: https://core.telegram.org/bots/api#audio
+// [Document]: https://core.telegram.org/bots/api#document
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SendVoice(
 	voice InputFile,
 	opts ...SendVoiceOption,
@@ -2600,6 +3392,11 @@ func (ctx *Context) SendVoice(
 	return err
 }
 
+// SetBusinessAccountBio calls Client.SetBusinessAccountBio with context-derived defaults.
+//
+// Changes the bio of a managed business account.
+// Requires the can_change_bio business bot right.
+// Returns True on success.
 func (ctx *Context) SetBusinessAccountBio(
 	opts ...SetBusinessAccountBioOption,
 ) error {
@@ -2624,6 +3421,11 @@ func (ctx *Context) SetBusinessAccountBio(
 	return err
 }
 
+// SetBusinessAccountGiftSettings calls Client.SetBusinessAccountGiftSettings with context-derived defaults.
+//
+// Changes the privacy settings pertaining to incoming gifts in a managed business account.
+// Requires the can_change_gift_settings business bot right.
+// Returns True on success.
 func (ctx *Context) SetBusinessAccountGiftSettings(
 	showGiftButton bool,
 	acceptedGiftTypes AcceptedGiftTypes,
@@ -2652,6 +3454,11 @@ func (ctx *Context) SetBusinessAccountGiftSettings(
 	return err
 }
 
+// SetBusinessAccountName calls Client.SetBusinessAccountName with context-derived defaults.
+//
+// Changes the first and last name of a managed business account.
+// Requires the can_change_name business bot right.
+// Returns True on success.
 func (ctx *Context) SetBusinessAccountName(
 	firstName string,
 	opts ...SetBusinessAccountNameOption,
@@ -2678,6 +3485,11 @@ func (ctx *Context) SetBusinessAccountName(
 	return err
 }
 
+// SetBusinessAccountProfilePhoto calls Client.SetBusinessAccountProfilePhoto with context-derived defaults.
+//
+// Changes the profile photo of a managed business account.
+// Requires the can_edit_profile_photo business bot right.
+// Returns True on success.
 func (ctx *Context) SetBusinessAccountProfilePhoto(
 	photo InputProfilePhoto,
 	opts ...SetBusinessAccountProfilePhotoOption,
@@ -2704,6 +3516,11 @@ func (ctx *Context) SetBusinessAccountProfilePhoto(
 	return err
 }
 
+// SetBusinessAccountUsername calls Client.SetBusinessAccountUsername with context-derived defaults.
+//
+// Changes the username of a managed business account.
+// Requires the can_change_username business bot right.
+// Returns True on success.
 func (ctx *Context) SetBusinessAccountUsername(
 	opts ...SetBusinessAccountUsernameOption,
 ) error {
@@ -2728,6 +3545,10 @@ func (ctx *Context) SetBusinessAccountUsername(
 	return err
 }
 
+// SetChatAdministratorCustomTitle calls Client.SetChatAdministratorCustomTitle with context-derived defaults.
+//
+// Use this method to set a custom title for an administrator in a supergroup promoted by the bot.
+// Returns True on success.
 func (ctx *Context) SetChatAdministratorCustomTitle(
 	userID int64,
 	customTitle string,
@@ -2746,6 +3567,11 @@ func (ctx *Context) SetChatAdministratorCustomTitle(
 	return err
 }
 
+// SetChatDescription calls Client.SetChatDescription with context-derived defaults.
+//
+// Use this method to change the description of a group, a supergroup or a channel.
+// The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
+// Returns True on success.
 func (ctx *Context) SetChatDescription(
 	opts ...SetChatDescriptionOption,
 ) error {
@@ -2760,6 +3586,10 @@ func (ctx *Context) SetChatDescription(
 	return err
 }
 
+// SetChatMenuButton calls Client.SetChatMenuButton with context-derived defaults.
+//
+// Use this method to change the bot's menu button in a private chat, or the default menu button.
+// Returns True on success.
 func (ctx *Context) SetChatMenuButton(
 	opts ...SetChatMenuButtonOption,
 ) error {
@@ -2774,6 +3604,11 @@ func (ctx *Context) SetChatMenuButton(
 	return err
 }
 
+// SetChatPermissions calls Client.SetChatPermissions with context-derived defaults.
+//
+// Use this method to set default chat permissions for all members.
+// The bot must be an administrator in the group or a supergroup for this to work and must have the can_restrict_members administrator rights.
+// Returns True on success.
 func (ctx *Context) SetChatPermissions(
 	permissions ChatPermissions,
 	opts ...SetChatPermissionsOption,
@@ -2790,6 +3625,12 @@ func (ctx *Context) SetChatPermissions(
 	return err
 }
 
+// SetChatPhoto calls Client.SetChatPhoto with context-derived defaults.
+//
+// Use this method to set a new profile photo for the chat.
+// Photos can't be changed for private chats.
+// The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
+// Returns True on success.
 func (ctx *Context) SetChatPhoto(
 	photo InputFile,
 	opts ...SetChatPhotoOption,
@@ -2806,6 +3647,14 @@ func (ctx *Context) SetChatPhoto(
 	return err
 }
 
+// SetChatStickerSet calls Client.SetChatStickerSet with context-derived defaults.
+//
+// Use this method to set a new group sticker set for a supergroup.
+// The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
+// Use the field can_set_sticker_set optionally returned in [getChat] requests to check if the bot can use this method.
+// Returns True on success.
+//
+// [getChat]: https://core.telegram.org/bots/api#getchat
 func (ctx *Context) SetChatStickerSet(
 	stickerSetName string,
 	opts ...SetChatStickerSetOption,
@@ -2822,6 +3671,12 @@ func (ctx *Context) SetChatStickerSet(
 	return err
 }
 
+// SetChatTitle calls Client.SetChatTitle with context-derived defaults.
+//
+// Use this method to change the title of a chat.
+// Titles can't be changed for private chats.
+// The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
+// Returns True on success.
 func (ctx *Context) SetChatTitle(
 	title string,
 	opts ...SetChatTitleOption,
@@ -2838,6 +3693,10 @@ func (ctx *Context) SetChatTitle(
 	return err
 }
 
+// SetCustomEmojiStickerSetThumbnail calls Client.SetCustomEmojiStickerSetThumbnail with context-derived defaults.
+//
+// Use this method to set the thumbnail of a custom emoji sticker set.
+// Returns True on success.
 func (ctx *Context) SetCustomEmojiStickerSetThumbnail(
 	name string,
 	opts ...SetCustomEmojiStickerSetThumbnailOption,
@@ -2853,6 +3712,13 @@ func (ctx *Context) SetCustomEmojiStickerSetThumbnail(
 	return err
 }
 
+// SetGameScore calls Client.SetGameScore with context-derived defaults.
+//
+// Use this method to set the score of the specified user in a game message.
+// On success, if the message is not an inline message, the [Message] is returned, otherwise True is returned.
+// Returns an error, if the new score is not greater than the user's current score in the chat and force is False.
+//
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SetGameScore(
 	userID int64,
 	score int64,
@@ -2871,6 +3737,13 @@ func (ctx *Context) SetGameScore(
 	return err
 }
 
+// SetMessageReaction calls Client.SetMessageReaction with context-derived defaults.
+//
+// Use this method to change the chosen reactions on a message.
+// Service messages of some types can't be reacted to.
+// Automatically forwarded messages from a channel to its discussion group have the same available reactions as messages in the channel.
+// Bots can't use paid reactions.
+// Returns True on success.
 func (ctx *Context) SetMessageReaction(
 	messageID int64,
 	opts ...SetMessageReactionOption,
@@ -2887,6 +3760,13 @@ func (ctx *Context) SetMessageReaction(
 	return err
 }
 
+// SetMyCommands calls Client.SetMyCommands with context-derived defaults.
+//
+// Use this method to change the list of the bot's commands.
+// See [this manual] for more details about bot commands.
+// Returns True on success.
+//
+// [this manual]: https://core.telegram.org/bots/features#commands
 func (ctx *Context) SetMyCommands(
 	commands []BotCommand,
 	opts ...SetMyCommandsOption,
@@ -2902,6 +3782,11 @@ func (ctx *Context) SetMyCommands(
 	return err
 }
 
+// SetMyDefaultAdministratorRights calls Client.SetMyDefaultAdministratorRights with context-derived defaults.
+//
+// Use this method to change the default administrator rights requested by the bot when it's added as an administrator to groups or channels.
+// These rights will be suggested to users, but they are free to modify the list before adding the bot.
+// Returns True on success.
 func (ctx *Context) SetMyDefaultAdministratorRights(
 	opts ...SetMyDefaultAdministratorRightsOption,
 ) error {
@@ -2914,6 +3799,10 @@ func (ctx *Context) SetMyDefaultAdministratorRights(
 	return err
 }
 
+// SetMyDescription calls Client.SetMyDescription with context-derived defaults.
+//
+// Use this method to change the bot's description, which is shown in the chat with the bot if the chat is empty.
+// Returns True on success.
 func (ctx *Context) SetMyDescription(
 	opts ...SetMyDescriptionOption,
 ) error {
@@ -2926,6 +3815,10 @@ func (ctx *Context) SetMyDescription(
 	return err
 }
 
+// SetMyName calls Client.SetMyName with context-derived defaults.
+//
+// Use this method to change the bot's name.
+// Returns True on success.
 func (ctx *Context) SetMyName(
 	opts ...SetMyNameOption,
 ) error {
@@ -2938,6 +3831,10 @@ func (ctx *Context) SetMyName(
 	return err
 }
 
+// SetMyProfilePhoto calls Client.SetMyProfilePhoto with context-derived defaults.
+//
+// Changes the profile photo of the bot.
+// Returns True on success.
 func (ctx *Context) SetMyProfilePhoto(
 	photo InputProfilePhoto,
 	opts ...SetMyProfilePhotoOption,
@@ -2953,6 +3850,10 @@ func (ctx *Context) SetMyProfilePhoto(
 	return err
 }
 
+// SetMyShortDescription calls Client.SetMyShortDescription with context-derived defaults.
+//
+// Use this method to change the bot's short description, which is shown on the bot's profile page and is sent together with the link when users share the bot.
+// Returns True on success.
 func (ctx *Context) SetMyShortDescription(
 	opts ...SetMyShortDescriptionOption,
 ) error {
@@ -2965,6 +3866,14 @@ func (ctx *Context) SetMyShortDescription(
 	return err
 }
 
+// SetPassportDataErrors calls Client.SetPassportDataErrors with context-derived defaults.
+//
+// Informs a user that some of the Telegram Passport elements they provided contains errors.
+// The user will not be able to re-submit their Passport to you until the errors are fixed (the contents of the field for which you returned the error must change).
+// Returns True on success.
+// Use this if the data submitted by the user doesn't satisfy the standards your service requires for any reason.
+// For example, if a birthday date seems invalid, a submitted document is blurry, a scan shows evidence of tampering, etc.
+// Supply some details in the error message to make sure the user knows how to correct the issues.
 func (ctx *Context) SetPassportDataErrors(
 	userID int64,
 	errors []PassportElementError,
@@ -2982,6 +3891,11 @@ func (ctx *Context) SetPassportDataErrors(
 	return err
 }
 
+// SetStickerEmojiList calls Client.SetStickerEmojiList with context-derived defaults.
+//
+// Use this method to change the list of emoji assigned to a regular or custom emoji sticker.
+// The sticker must belong to a sticker set created by the bot.
+// Returns True on success.
 func (ctx *Context) SetStickerEmojiList(
 	sticker string,
 	emojiList []string,
@@ -2999,6 +3913,11 @@ func (ctx *Context) SetStickerEmojiList(
 	return err
 }
 
+// SetStickerKeywords calls Client.SetStickerKeywords with context-derived defaults.
+//
+// Use this method to change search keywords assigned to a regular or custom emoji sticker.
+// The sticker must belong to a sticker set created by the bot.
+// Returns True on success.
 func (ctx *Context) SetStickerKeywords(
 	sticker string,
 	opts ...SetStickerKeywordsOption,
@@ -3014,6 +3933,13 @@ func (ctx *Context) SetStickerKeywords(
 	return err
 }
 
+// SetStickerMaskPosition calls Client.SetStickerMaskPosition with context-derived defaults.
+//
+// Use this method to change the [mask position] of a mask sticker.
+// The sticker must belong to a sticker set that was created by the bot.
+// Returns True on success.
+//
+// [mask position]: https://core.telegram.org/bots/api#maskposition
 func (ctx *Context) SetStickerMaskPosition(
 	sticker string,
 	opts ...SetStickerMaskPositionOption,
@@ -3029,6 +3955,10 @@ func (ctx *Context) SetStickerMaskPosition(
 	return err
 }
 
+// SetStickerPositionInSet calls Client.SetStickerPositionInSet with context-derived defaults.
+//
+// Use this method to move a sticker in a set created by the bot to a specific position.
+// Returns True on success.
 func (ctx *Context) SetStickerPositionInSet(
 	sticker string,
 	position int64,
@@ -3046,6 +3976,11 @@ func (ctx *Context) SetStickerPositionInSet(
 	return err
 }
 
+// SetStickerSetThumbnail calls Client.SetStickerSetThumbnail with context-derived defaults.
+//
+// Use this method to set the thumbnail of a regular or mask sticker set.
+// The format of the thumbnail file must match the format of the stickers in the set.
+// Returns True on success.
 func (ctx *Context) SetStickerSetThumbnail(
 	name string,
 	userID int64,
@@ -3065,6 +4000,10 @@ func (ctx *Context) SetStickerSetThumbnail(
 	return err
 }
 
+// SetStickerSetTitle calls Client.SetStickerSetTitle with context-derived defaults.
+//
+// Use this method to set the title of a created sticker set.
+// Returns True on success.
 func (ctx *Context) SetStickerSetTitle(
 	name string,
 	title string,
@@ -3082,6 +4021,12 @@ func (ctx *Context) SetStickerSetTitle(
 	return err
 }
 
+// SetUserEmojiStatus calls Client.SetUserEmojiStatus with context-derived defaults.
+//
+// Changes the emoji status for a given user that previously allowed the bot to manage their emoji status via the Mini App method [requestEmojiStatusAccess].
+// Returns True on success.
+//
+// [requestEmojiStatusAccess]: https://core.telegram.org/bots/webapps#initializing-mini-apps
 func (ctx *Context) SetUserEmojiStatus(
 	userID int64,
 	opts ...SetUserEmojiStatusOption,
@@ -3097,6 +4042,17 @@ func (ctx *Context) SetUserEmojiStatus(
 	return err
 }
 
+// SetWebhook calls Client.SetWebhook with context-derived defaults.
+//
+// Use this method to specify a URL and receive incoming updates via an outgoing webhook.
+// Whenever there is an update for the bot, we will send an HTTPS POST request to the specified URL, containing a JSON-serialized [Update].
+// In case of an unsuccessful request (a request with response [HTTP status code] different from 2XY), we will repeat the request and give up after a reasonable amount of attempts.
+// Returns True on success.
+// If you'd like to make sure that the webhook was set by you, you can specify secret data in the parameter secret_token.
+// If specified, the request will contain a header “X-Telegram-Bot-Api-Secret-Token” with the secret token as content.
+//
+// [Update]: https://core.telegram.org/bots/api#update
+// [HTTP status code]: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
 func (ctx *Context) SetWebhook(
 	uRL string,
 	opts ...SetWebhookOption,
@@ -3112,6 +4068,12 @@ func (ctx *Context) SetWebhook(
 	return err
 }
 
+// StopMessageLiveLocation calls Client.StopMessageLiveLocation with context-derived defaults.
+//
+// Use this method to stop updating a live location message before live_period expires.
+// On success, if the message is not an inline message, the edited [Message] is returned, otherwise True is returned.
+//
+// [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) StopMessageLiveLocation(
 	opts ...StopMessageLiveLocationOption,
 ) error {
@@ -3137,6 +4099,12 @@ func (ctx *Context) StopMessageLiveLocation(
 	return err
 }
 
+// StopPoll calls Client.StopPoll with context-derived defaults.
+//
+// Use this method to stop a poll which was sent by the bot.
+// On success, the stopped [Poll] is returned.
+//
+// [Poll]: https://core.telegram.org/bots/api#poll
 func (ctx *Context) StopPoll(
 	messageID int64,
 	opts ...StopPollOption,
@@ -3164,6 +4132,11 @@ func (ctx *Context) StopPoll(
 	return err
 }
 
+// TransferBusinessAccountStars calls Client.TransferBusinessAccountStars with context-derived defaults.
+//
+// Transfers Telegram Stars from the business account balance to the bot's balance.
+// Requires the can_transfer_stars business bot right.
+// Returns True on success.
 func (ctx *Context) TransferBusinessAccountStars(
 	starCount int64,
 	opts ...TransferBusinessAccountStarsOption,
@@ -3190,6 +4163,12 @@ func (ctx *Context) TransferBusinessAccountStars(
 	return err
 }
 
+// TransferGift calls Client.TransferGift with context-derived defaults.
+//
+// Transfers an owned unique gift to another user.
+// Requires the can_transfer_and_upgrade_gifts business bot right.
+// Requires can_transfer_stars business bot right if the transfer is paid.
+// Returns True on success.
 func (ctx *Context) TransferGift(
 	ownedGiftID string,
 	newOwnerChatID int64,
@@ -3218,6 +4197,15 @@ func (ctx *Context) TransferGift(
 	return err
 }
 
+// UnbanChatMember calls Client.UnbanChatMember with context-derived defaults.
+//
+// Use this method to unban a previously banned user in a supergroup or channel.
+// The user will not return to the group or channel automatically, but will be able to join via link, etc.
+// The bot must be an administrator for this to work.
+// By default, this method guarantees that after the call the user is not a member of the chat, but will be able to join it.
+// So if the user is a member of the chat they will also be removed from the chat.
+// If you don't want this, use the parameter only_if_banned.
+// Returns True on success.
 func (ctx *Context) UnbanChatMember(
 	userID int64,
 	opts ...UnbanChatMemberOption,
@@ -3234,6 +4222,11 @@ func (ctx *Context) UnbanChatMember(
 	return err
 }
 
+// UnbanChatSenderChat calls Client.UnbanChatSenderChat with context-derived defaults.
+//
+// Use this method to unban a previously banned channel chat in a supergroup or channel.
+// The bot must be an administrator for this to work and must have the appropriate administrator rights.
+// Returns True on success.
 func (ctx *Context) UnbanChatSenderChat(
 	senderChatID int64,
 	opts ...UnbanChatSenderChatOption,
@@ -3250,6 +4243,11 @@ func (ctx *Context) UnbanChatSenderChat(
 	return err
 }
 
+// UnhideGeneralForumTopic calls Client.UnhideGeneralForumTopic with context-derived defaults.
+//
+// Use this method to unhide the 'General' topic in a forum supergroup chat.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights.
+// Returns True on success.
 func (ctx *Context) UnhideGeneralForumTopic(
 	opts ...UnhideGeneralForumTopicOption,
 ) error {
@@ -3264,6 +4262,12 @@ func (ctx *Context) UnhideGeneralForumTopic(
 	return err
 }
 
+// UnpinAllChatMessages calls Client.UnpinAllChatMessages with context-derived defaults.
+//
+// Use this method to clear the list of pinned messages in a chat.
+// In private chats and channel direct messages chats, no additional rights are required to unpin all pinned messages.
+// Conversely, the bot must be an administrator with the 'can_pin_messages' right or the 'can_edit_messages' right to unpin all pinned messages in groups and channels respectively.
+// Returns True on success.
 func (ctx *Context) UnpinAllChatMessages(
 	opts ...UnpinAllChatMessagesOption,
 ) error {
@@ -3278,6 +4282,11 @@ func (ctx *Context) UnpinAllChatMessages(
 	return err
 }
 
+// UnpinAllForumTopicMessages calls Client.UnpinAllForumTopicMessages with context-derived defaults.
+//
+// Use this method to clear the list of pinned messages in a forum topic in a forum supergroup chat or a private chat with a user.
+// In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_pin_messages administrator right in the supergroup.
+// Returns True on success.
 func (ctx *Context) UnpinAllForumTopicMessages(
 	messageThreadID int64,
 	opts ...UnpinAllForumTopicMessagesOption,
@@ -3294,6 +4303,11 @@ func (ctx *Context) UnpinAllForumTopicMessages(
 	return err
 }
 
+// UnpinAllGeneralForumTopicMessages calls Client.UnpinAllGeneralForumTopicMessages with context-derived defaults.
+//
+// Use this method to clear the list of pinned messages in a General forum topic.
+// The bot must be an administrator in the chat for this to work and must have the can_pin_messages administrator right in the supergroup.
+// Returns True on success.
 func (ctx *Context) UnpinAllGeneralForumTopicMessages(
 	opts ...UnpinAllGeneralForumTopicMessagesOption,
 ) error {
@@ -3308,6 +4322,12 @@ func (ctx *Context) UnpinAllGeneralForumTopicMessages(
 	return err
 }
 
+// UnpinChatMessage calls Client.UnpinChatMessage with context-derived defaults.
+//
+// Use this method to remove a message from the list of pinned messages in a chat.
+// In private chats and channel direct messages chats, all messages can be unpinned.
+// Conversely, the bot must be an administrator with the 'can_pin_messages' right or the 'can_edit_messages' right to unpin messages in groups and channels respectively.
+// Returns True on success.
 func (ctx *Context) UnpinChatMessage(
 	opts ...UnpinChatMessageOption,
 ) error {
@@ -3333,6 +4353,12 @@ func (ctx *Context) UnpinChatMessage(
 	return err
 }
 
+// UpgradeGift calls Client.UpgradeGift with context-derived defaults.
+//
+// Upgrades a given regular gift to a unique gift.
+// Requires the can_transfer_and_upgrade_gifts business bot right.
+// Additionally requires the can_transfer_stars business bot right if the upgrade is paid.
+// Returns True on success.
 func (ctx *Context) UpgradeGift(
 	ownedGiftID string,
 	opts ...UpgradeGiftOption,
@@ -3359,6 +4385,15 @@ func (ctx *Context) UpgradeGift(
 	return err
 }
 
+// UploadStickerFile calls Client.UploadStickerFile with context-derived defaults.
+//
+// Use this method to upload a file with a sticker for later use in the [createNewStickerSet], [addStickerToSet], or [replaceStickerInSet] methods (the file can be used multiple times).
+// Returns the uploaded [File] on success.
+//
+// [createNewStickerSet]: https://core.telegram.org/bots/api#createnewstickerset
+// [addStickerToSet]: https://core.telegram.org/bots/api#addstickertoset
+// [replaceStickerInSet]: https://core.telegram.org/bots/api#replacestickerinset
+// [File]: https://core.telegram.org/bots/api#file
 func (ctx *Context) UploadStickerFile(
 	userID int64,
 	sticker InputFile,
@@ -3378,6 +4413,12 @@ func (ctx *Context) UploadStickerFile(
 	return err
 }
 
+// VerifyChat calls Client.VerifyChat with context-derived defaults.
+//
+// Verifies a chat [on behalf of the organization] which is represented by the bot.
+// Returns True on success.
+//
+// [on behalf of the organization]: https://telegram.org/verify#third-party-verification
 func (ctx *Context) VerifyChat(
 	opts ...VerifyChatOption,
 ) error {
@@ -3392,6 +4433,12 @@ func (ctx *Context) VerifyChat(
 	return err
 }
 
+// VerifyUser calls Client.VerifyUser with context-derived defaults.
+//
+// Verifies a user [on behalf of the organization] which is represented by the bot.
+// Returns True on success.
+//
+// [on behalf of the organization]: https://telegram.org/verify#third-party-verification
 func (ctx *Context) VerifyUser(
 	userID int64,
 	opts ...VerifyUserOption,

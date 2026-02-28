@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// Error represents a generic gogram error.
 type Error struct {
 	Code int
 	Text string
@@ -15,8 +16,7 @@ func (e *Error) Error() string {
 	return e.Text
 }
 
-// APIError
-// with description.
+// APIError represents a Telegram API error with a description.
 type APIError struct {
 	Err         error
 	Description string
@@ -34,8 +34,8 @@ func (e *APIError) Unwrap() error {
 	return e.Err
 }
 
-// RetryError
-// in case of exceeding flood control, the number of seconds left to wait before the request can be repeated.
+// RetryError represents a rate limit error.
+// It contains the duration to wait before retrying the request.
 type RetryError struct {
 	Err        error
 	RetryAfter time.Duration
@@ -49,8 +49,8 @@ func (e *RetryError) Unwrap() error {
 	return e.Err
 }
 
-// MigrateError
-// means the group has been migrated to a supergroup with the specified identifier.
+// MigrateError represents a chat migration error.
+// It indicates that the group has been migrated to a supergroup with a new identifier.
 type MigrateError struct {
 	Err             error
 	MigrateToChatID int64
@@ -64,6 +64,7 @@ func (e *MigrateError) Unwrap() error {
 	return e.Err
 }
 
+// NewError creates a new Error with the given code and text.
 func NewError(code int, text string) error {
 	return &Error{Code: code, Text: text}
 }
@@ -146,29 +147,45 @@ func genError(code int, text, description string, params *ResponseParameters) er
 	}
 }
 
+// Base API errors returned by Telegram.
 var (
-	ErrBadRequest          = NewError(http.StatusBadRequest, http.StatusText(http.StatusBadRequest))
-	ErrUnauthorized        = NewError(http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
-	ErrForbidden           = NewError(http.StatusForbidden, http.StatusText(http.StatusForbidden))
-	ErrNotFound            = NewError(http.StatusNotFound, http.StatusText(http.StatusNotFound))
-	ErrConflict            = NewError(http.StatusConflict, http.StatusText(http.StatusConflict))
-	ErrTooManyRequests     = NewError(http.StatusTooManyRequests, http.StatusText(http.StatusTooManyRequests))
+	// ErrBadRequest indicates an invalid request payload or parameters.
+	ErrBadRequest = NewError(http.StatusBadRequest, http.StatusText(http.StatusBadRequest))
+	// ErrUnauthorized indicates missing or invalid authentication.
+	ErrUnauthorized = NewError(http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
+	// ErrForbidden indicates that the operation is not allowed.
+	ErrForbidden = NewError(http.StatusForbidden, http.StatusText(http.StatusForbidden))
+	// ErrNotFound indicates that the requested resource does not exist.
+	ErrNotFound = NewError(http.StatusNotFound, http.StatusText(http.StatusNotFound))
+	// ErrConflict indicates a conflicting request state.
+	ErrConflict = NewError(http.StatusConflict, http.StatusText(http.StatusConflict))
+	// ErrTooManyRequests indicates that rate limits were exceeded.
+	ErrTooManyRequests = NewError(http.StatusTooManyRequests, http.StatusText(http.StatusTooManyRequests))
+	// ErrInternalServerError indicates an internal Telegram server error.
 	ErrInternalServerError = NewError(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
-	ErrBadGateway          = NewError(http.StatusBadGateway, http.StatusText(http.StatusBadGateway))
-	ErrServiceUnavailable  = NewError(http.StatusServiceUnavailable, http.StatusText(http.StatusServiceUnavailable))
-	ErrGatewayTimeout      = NewError(http.StatusGatewayTimeout, http.StatusText(http.StatusGatewayTimeout))
+	// ErrBadGateway indicates a Telegram upstream gateway failure.
+	ErrBadGateway = NewError(http.StatusBadGateway, http.StatusText(http.StatusBadGateway))
+	// ErrServiceUnavailable indicates temporary Telegram service unavailability.
+	ErrServiceUnavailable = NewError(http.StatusServiceUnavailable, http.StatusText(http.StatusServiceUnavailable))
+	// ErrGatewayTimeout indicates a Telegram upstream timeout.
+	ErrGatewayTimeout = NewError(http.StatusGatewayTimeout, http.StatusText(http.StatusGatewayTimeout))
 
+	// ErrEOF indicates an empty response body where JSON was expected.
 	ErrEOF = NewError(http.StatusBadRequest, "EOF")
 )
 
+// Known custom bad request errors returned by Telegram.
+//
 //nolint:lll
 var (
 	ErrBadRequestWrongRemoteFileIdentifierSpecified = NewError(http.StatusBadRequest, "Bad Request: wrong remote file identifier specified: Wrong character in the string")
 	ErrBadRequestCantUseFileOfTypeDocumentAsPhoto   = NewError(http.StatusBadRequest, "Bad Request: can't use file of type Document as Photo")
-	// ErrBadRequestParticipantIDInvalid means what bot don`t meet this user yet (and can`t use his id in any request).
+	// ErrBadRequestParticipantIDInvalid indicates the bot cannot access this user yet.
 	ErrBadRequestParticipantIDInvalid = NewError(http.StatusBadRequest, "Bad Request: PARTICIPANT_ID_INVALID")
-	ErrBadRequestChatNotFound         = NewError(http.StatusBadRequest, "Bad Request: chat not found")
-	ErrBadRequestFileMustBeNonEmpty   = NewError(http.StatusBadRequest, "Bad Request: file must be non-empty")
+	// ErrBadRequestChatNotFound indicates that the target chat does not exist or is inaccessible.
+	ErrBadRequestChatNotFound = NewError(http.StatusBadRequest, "Bad Request: chat not found")
+	// ErrBadRequestFileMustBeNonEmpty indicates that an uploaded file is empty.
+	ErrBadRequestFileMustBeNonEmpty = NewError(http.StatusBadRequest, "Bad Request: file must be non-empty")
 )
 
 func genErrorBadRequest(description string) error {
@@ -190,11 +207,15 @@ func genErrorBadRequest(description string) error {
 	}
 }
 
+// Forbidden errors returned by Telegram.
 var (
+	// ErrForbiddenBotWasBlockedByTheUser indicates that the user blocked the bot.
 	ErrForbiddenBotWasBlockedByTheUser = NewError(http.StatusForbidden, "Forbidden: bot was blocked by the user")
 )
 
+// Not-found flavored errors returned by Telegram.
 var (
+	// ErrNotFoundBanned indicates that the bot has been banned.
 	ErrNotFoundBanned = NewError(http.StatusNotFound, "Contact https://t.me/BotSupport for assistance")
 )
 
@@ -208,8 +229,11 @@ func genErrorNotFound(description string) error {
 	}
 }
 
+// Conflict errors returned by Telegram.
+//
 //nolint:lll
 var (
+	// ErrConflictWithBot indicates another getUpdates consumer is already running.
 	ErrConflictWithBot = NewError(http.StatusConflict, "Conflict: terminated by other getUpdates request; make sure that only one bot instance is running")
 )
 

@@ -2,6 +2,7 @@ package gogram
 
 import "encoding/json"
 
+// Response represents a root API JSON object.
 type Response struct {
 	Parameters  *ResponseParameters `json:"parameters,omitempty"`
 	Description string              `json:"description,omitempty"`

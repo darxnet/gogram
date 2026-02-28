@@ -16,6 +16,7 @@ const (
 	rootLink = "https://core.telegram.org"
 )
 
+// Field describes a Telegram API field for code generation.
 type Field struct {
 	Name, Desc    string
 	Type          string
@@ -23,6 +24,7 @@ type Field struct {
 	Discriminator string // unique value for subtypes
 }
 
+// AutoFillCode returns generated code used to auto-populate a method field from Context.
 func (field Field) AutoFillCode(types map[string]Type) string {
 	if field.Name == "chat_id" {
 		if toType(field.Type, field.IsRequired) == "string" {
@@ -61,20 +63,24 @@ func (field Field) AutoFillCode(types map[string]Type) string {
             }(ctx)`, toTitle(before))
 }
 
+// Type describes a Telegram API type for code generation.
 type Type struct {
 	Name, Desc string
 	Fields     []Field
 	Subtypes   []string
 }
 
+// Param is a method parameter descriptor.
 type Param = Field
 
+// Method describes a Telegram API method for code generation.
 type Method struct {
 	Name, Desc string
 	Params     []Param
 	Result     string
 }
 
+// Multipart reports whether the generated method should use multipart/form-data.
 func (m Method) Multipart() bool {
 	for _, field := range m.Params {
 		if field.Type == "InputFile" {
@@ -85,6 +91,7 @@ func (m Method) Multipart() bool {
 	return false
 }
 
+// Info aggregates parsed Telegram API types and methods.
 type Info struct {
 	Types   map[string]Type
 	Methods map[string]Method
@@ -125,7 +132,8 @@ func retrievePageRC() io.ReadCloser {
 	const timeout = 5 * time.Second
 
 	if localPath := os.Getenv("GOGRAM_HTML"); localPath != "" {
-		f, err := os.Open(localPath) //nolint:gosec // G703
+		//nolint:gosec // G703: we can use any file for tests
+		f, err := os.Open(localPath)
 		if err != nil {
 			log.Fatalln("failed to open html:", err)
 		}

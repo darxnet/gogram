@@ -15,12 +15,15 @@ import (
     {{ $params := print $method "Params" }}
     {{ $option := print $method "Option" }}
 
+    // {{ $params }} contains parameters for Client.{{ $method }}.
     type {{ $params }} struct {
         {{- template "fields.gotmpl" .Params }}
     }
 
+    // {{ $option }} configures {{ $params }}.
     type {{ $option }} func(params *{{ $params }}) {{ $option }}
 
+    // Option applies one or more {{ $option }} values and returns the last rollback option.
     func (r *{{ $params }}) Option(opts ...{{ $option }}) (previous {{ $option }}) {
         for _, opt := range opts {
             previous = opt(r)
@@ -30,6 +33,7 @@ import (
 
     {{ range .Params }}
         {{ $param := toTitle .Name }}
+        // With{{ $method }}{{ $param }} sets the {{ $param }} field.
         // {{ .Desc }}
         func With{{ $method }}{{ $param }} (value {{ toType .Type .IsRequired }}) {{ $option }} {
             return func(params *{{ $params }}) {{ $option }} {
@@ -41,7 +45,7 @@ import (
         }
     {{ end }}
 
-    // {{ $method }}
+    // {{ $method }} calls the {{ .Name }} Telegram Bot API method.
     // {{ .Desc }}
     func (c *Client) {{ $method }}(params *{{ $params }}) (ret {{ toType .Result false }}, err error) {
         var bs []byte

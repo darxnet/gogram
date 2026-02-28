@@ -1,7 +1,6 @@
 package gogram
 
-// WithSendMessageInlineKeyboard
-// helps add keyboard to ReplyMarkup.
+// WithSendMessageInlineKeyboard sets the inline keyboard for the message.
 func WithSendMessageInlineKeyboard(keyboard [][]InlineKeyboardButton) SendMessageOption {
 	return func(params *SendMessageParams) SendMessageOption {
 		if params.ReplyMarkup == nil || params.ReplyMarkup.InlineKeyboardMarkup == nil {
@@ -15,8 +14,7 @@ func WithSendMessageInlineKeyboard(keyboard [][]InlineKeyboardButton) SendMessag
 	}
 }
 
-// WithSendMessageInlineButtons
-// helps add bunch of buttons in one column.
+// WithSendMessageInlineButtons sets the inline keyboard with a single column of buttons for the message.
 func WithSendMessageInlineButtons(buttons ...InlineKeyboardButton) SendMessageOption {
 	return func(params *SendMessageParams) SendMessageOption {
 		keyboard := make(InlineKeyboard, 0, len(buttons))

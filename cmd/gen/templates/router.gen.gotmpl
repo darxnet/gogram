@@ -17,6 +17,7 @@ const (
 {{- range .Update.Fields }}
     {{- if ne .Name "update_id"}}
         {{ $name := toTitle .Name }}
+        // HandleOn{{ $name }} registers a handler for updates containing {{ $name }}.
         func (rg *RouterGroup) HandleOn{{ $name }}(handler func(*Context, {{ toType .Type .IsRequired }}) error, filters ...Filter) {
            	combined := func(ctx *Context) bool {
                 if !rg.filter(ctx) {

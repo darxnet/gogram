@@ -5,14 +5,18 @@ import (
 	"strings"
 )
 
+// Filter is a function that checks if the update matches the condition.
 type Filter func(ctx *Context) bool
 
+// FilterText creates a filter that matches the message text exactly.
 func FilterText(s string) Filter {
 	return func(ctx *Context) bool {
 		return ctx.Text() == s
 	}
 }
 
+// FilterCommand creates a filter that matches a command.
+// It supports commands with arguments and bot mentions (e.g., /command, /command@bot, /command arg).
 func FilterCommand(s string) Filter {
 	return func(ctx *Context) bool {
 		if s == "" {
@@ -43,6 +47,8 @@ func FilterCommand(s string) Filter {
 	}
 }
 
+// FilterRegexp creates a filter that matches the message text against a regular expression.
+// Note: It panics if the pattern is invalid.
 func FilterRegexp(pattern string) Filter {
 	re := regexp.MustCompile(pattern)
 	return func(ctx *Context) bool {
@@ -50,6 +56,7 @@ func FilterRegexp(pattern string) Filter {
 	}
 }
 
+// FilterMessageDocument creates a filter that matches messages with a document.
 func FilterMessageDocument() Filter {
 	return func(ctx *Context) bool {
 		m := ctx.Message()
@@ -57,6 +64,7 @@ func FilterMessageDocument() Filter {
 	}
 }
 
+// FilterMessageVideo creates a filter that matches messages with a video.
 func FilterMessageVideo() Filter {
 	return func(ctx *Context) bool {
 		m := ctx.Message()
@@ -64,6 +72,7 @@ func FilterMessageVideo() Filter {
 	}
 }
 
+// FilterMessageContact creates a filter that matches messages with a contact.
 func FilterMessageContact() Filter {
 	return func(ctx *Context) bool {
 		m := ctx.Message()

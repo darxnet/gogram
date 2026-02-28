@@ -20,6 +20,7 @@ var (
 	_ encoding.TextMarshaler = (*InputFile)(nil)
 )
 
+// AppendText implements encoding.TextAppender interface.
 func (r *InputFile) AppendText(buf []byte) ([]byte, error) {
 	switch {
 	case r.FileID != "":
@@ -36,6 +37,7 @@ func (r *InputFile) AppendText(buf []byte) ([]byte, error) {
 	}
 }
 
+// MarshalText implements encoding.TextMarshaler interface.
 func (r *InputFile) MarshalText() ([]byte, error) {
 	return r.AppendText(nil)
 }
