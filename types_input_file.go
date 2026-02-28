@@ -33,7 +33,7 @@ func (r *InputFile) AppendText(buf []byte) ([]byte, error) {
 		return append(append(buf, "attach://"...), r.fieldName...), nil
 
 	default:
-		return nil, nil
+		return buf, nil
 	}
 }
 
