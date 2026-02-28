@@ -131,7 +131,7 @@ func toMake(s, ret, ref string) string {
 		return fmt.Sprintf("%s := &%s", ref, ret)
 	}
 
-	return fmt.Sprintf("%s := new(%s)", ref, typ)
+	return fmt.Sprintf("%[1]s = new(%[3]s)\n%[2]s := %[1]s", ret, ref, typ)
 }
 
 func toLowerFirst(s string) string {

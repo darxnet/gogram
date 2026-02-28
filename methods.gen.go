@@ -687,7 +687,8 @@ func (c *Client) AnswerWebAppQuery(params *AnswerWebAppQueryParams) (ret *SentWe
 		return
 	}
 
-	ref := new(SentWebAppMessage)
+	ret = new(SentWebAppMessage)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -1662,7 +1663,8 @@ func (c *Client) CopyMessage(params *CopyMessageParams) (ret *MessageId, err err
 		return
 	}
 
-	ref := new(MessageId)
+	ret = new(MessageId)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -1845,7 +1847,8 @@ func (c *Client) CopyMessages(params *CopyMessagesParams) (ret *MessageId, err e
 		return
 	}
 
-	ref := new(MessageId)
+	ret = new(MessageId)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -1973,7 +1976,8 @@ func (c *Client) CreateChatInviteLink(params *CreateChatInviteLinkParams) (ret *
 		return
 	}
 
-	ref := new(ChatInviteLink)
+	ret = new(ChatInviteLink)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -2088,7 +2092,8 @@ func (c *Client) CreateChatSubscriptionInviteLink(params *CreateChatSubscription
 		return
 	}
 
-	ref := new(ChatInviteLink)
+	ret = new(ChatInviteLink)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -2205,7 +2210,8 @@ func (c *Client) CreateForumTopic(params *CreateForumTopicParams) (ret *ForumTop
 		return
 	}
 
-	ref := new(ForumTopic)
+	ret = new(ForumTopic)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -3949,7 +3955,8 @@ func (c *Client) EditChatInviteLink(params *EditChatInviteLinkParams) (ret *Chat
 		return
 	}
 
-	ref := new(ChatInviteLink)
+	ret = new(ChatInviteLink)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -4043,7 +4050,8 @@ func (c *Client) EditChatSubscriptionInviteLink(params *EditChatSubscriptionInvi
 		return
 	}
 
-	ref := new(ChatInviteLink)
+	ret = new(ChatInviteLink)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -4441,7 +4449,8 @@ func (c *Client) EditMessageCaption(params *EditMessageCaptionParams) (ret *Mess
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -4568,7 +4577,8 @@ func (c *Client) EditMessageChecklist(params *EditMessageChecklistParams) (ret *
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -4803,7 +4813,8 @@ func (c *Client) EditMessageLiveLocation(params *EditMessageLiveLocationParams) 
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -4954,7 +4965,8 @@ func (c *Client) EditMessageMedia(params *EditMessageMediaParams) (ret *Message,
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -5088,7 +5100,8 @@ func (c *Client) EditMessageReplyMarkup(params *EditMessageReplyMarkupParams) (r
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -5289,7 +5302,8 @@ func (c *Client) EditMessageText(params *EditMessageTextParams) (ret *Message, e
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -5449,7 +5463,8 @@ func (c *Client) EditStory(params *EditStoryParams) (ret *Story, err error) {
 		return
 	}
 
-	ref := new(Story)
+	ret = new(Story)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -5809,7 +5824,8 @@ func (c *Client) ForwardMessage(params *ForwardMessageParams) (ret *Message, err
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -5973,7 +5989,8 @@ func (c *Client) ForwardMessages(params *ForwardMessagesParams) (ret *MessageId,
 		return
 	}
 
-	ref := new(MessageId)
+	ret = new(MessageId)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -6023,7 +6040,8 @@ func (c *Client) GetAvailableGifts(params *GetAvailableGiftsParams) (ret *Gifts,
 		return
 	}
 
-	ref := new(Gifts)
+	ret = new(Gifts)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -6241,7 +6259,8 @@ func (c *Client) GetBusinessAccountGifts(params *GetBusinessAccountGiftsParams) 
 		return
 	}
 
-	ref := new(OwnedGifts)
+	ret = new(OwnedGifts)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -6305,7 +6324,8 @@ func (c *Client) GetBusinessAccountStarBalance(params *GetBusinessAccountStarBal
 		return
 	}
 
-	ref := new(StarAmount)
+	ret = new(StarAmount)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -6368,7 +6388,8 @@ func (c *Client) GetBusinessConnection(params *GetBusinessConnectionParams) (ret
 		return
 	}
 
-	ref := new(BusinessConnection)
+	ret = new(BusinessConnection)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -6431,7 +6452,8 @@ func (c *Client) GetChat(params *GetChatParams) (ret *ChatFullInfo, err error) {
 		return
 	}
 
-	ref := new(ChatFullInfo)
+	ret = new(ChatFullInfo)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -6716,7 +6738,8 @@ func (c *Client) GetChatGifts(params *GetChatGiftsParams) (ret *OwnedGifts, err 
 		return
 	}
 
-	ref := new(OwnedGifts)
+	ret = new(OwnedGifts)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -6795,7 +6818,8 @@ func (c *Client) GetChatMember(params *GetChatMemberParams) (ret *ChatMember, er
 		return
 	}
 
-	ref := new(ChatMember)
+	ret = new(ChatMember)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -6921,7 +6945,8 @@ func (c *Client) GetChatMenuButton(params *GetChatMenuButtonParams) (ret *MenuBu
 		return
 	}
 
-	ref := new(MenuButton)
+	ret = new(MenuButton)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -7057,7 +7082,8 @@ func (c *Client) GetFile(params *GetFileParams) (ret *File, err error) {
 		return
 	}
 
-	ref := new(File)
+	ret = new(File)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -7274,7 +7300,8 @@ func (c *Client) GetMe(params *GetMeParams) (ret *User, err error) {
 		return
 	}
 
-	ref := new(User)
+	ret = new(User)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -7425,7 +7452,8 @@ func (c *Client) GetMyDefaultAdministratorRights(params *GetMyDefaultAdministrat
 		return
 	}
 
-	ref := new(ChatAdministratorRights)
+	ret = new(ChatAdministratorRights)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -7488,7 +7516,8 @@ func (c *Client) GetMyDescription(params *GetMyDescriptionParams) (ret *BotDescr
 		return
 	}
 
-	ref := new(BotDescription)
+	ret = new(BotDescription)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -7551,7 +7580,8 @@ func (c *Client) GetMyName(params *GetMyNameParams) (ret *BotName, err error) {
 		return
 	}
 
-	ref := new(BotName)
+	ret = new(BotName)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -7614,7 +7644,8 @@ func (c *Client) GetMyShortDescription(params *GetMyShortDescriptionParams) (ret
 		return
 	}
 
-	ref := new(BotShortDescription)
+	ret = new(BotShortDescription)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -7664,7 +7695,8 @@ func (c *Client) GetMyStarBalance(params *GetMyStarBalanceParams) (ret *StarAmou
 		return
 	}
 
-	ref := new(StarAmount)
+	ret = new(StarAmount)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -7746,7 +7778,8 @@ func (c *Client) GetStarTransactions(params *GetStarTransactionsParams) (ret *St
 		return
 	}
 
-	ref := new(StarTransactions)
+	ret = new(StarTransactions)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -7809,7 +7842,8 @@ func (c *Client) GetStickerSet(params *GetStickerSetParams) (ret *StickerSet, er
 		return
 	}
 
-	ref := new(StickerSet)
+	ret = new(StickerSet)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -8038,7 +8072,8 @@ func (c *Client) GetUserChatBoosts(params *GetUserChatBoostsParams) (ret *UserCh
 		return
 	}
 
-	ref := new(UserChatBoosts)
+	ret = new(UserChatBoosts)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -8225,7 +8260,8 @@ func (c *Client) GetUserGifts(params *GetUserGiftsParams) (ret *OwnedGifts, err 
 		return
 	}
 
-	ref := new(OwnedGifts)
+	ret = new(OwnedGifts)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -8324,7 +8360,8 @@ func (c *Client) GetUserProfileAudios(params *GetUserProfileAudiosParams) (ret *
 		return
 	}
 
-	ref := new(UserProfileAudios)
+	ret = new(UserProfileAudios)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -8423,7 +8460,8 @@ func (c *Client) GetUserProfilePhotos(params *GetUserProfilePhotosParams) (ret *
 		return
 	}
 
-	ref := new(UserProfilePhotos)
+	ret = new(UserProfilePhotos)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -8475,7 +8513,8 @@ func (c *Client) GetWebhookInfo(params *GetWebhookInfoParams) (ret *WebhookInfo,
 		return
 	}
 
-	ref := new(WebhookInfo)
+	ret = new(WebhookInfo)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -9099,7 +9138,8 @@ func (c *Client) PostStory(params *PostStoryParams) (ret *Story, err error) {
 		return
 	}
 
-	ref := new(Story)
+	ret = new(Story)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -10239,7 +10279,8 @@ func (c *Client) RepostStory(params *RepostStoryParams) (ret *Story, err error) 
 		return
 	}
 
-	ref := new(Story)
+	ret = new(Story)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -10446,7 +10487,8 @@ func (c *Client) RevokeChatInviteLink(params *RevokeChatInviteLinkParams) (ret *
 		return
 	}
 
-	ref := new(ChatInviteLink)
+	ret = new(ChatInviteLink)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -10584,7 +10626,8 @@ func (c *Client) SavePreparedInlineMessage(params *SavePreparedInlineMessagePara
 		return
 	}
 
-	ref := new(PreparedInlineMessage)
+	ret = new(PreparedInlineMessage)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -11284,7 +11327,8 @@ func (c *Client) SendAnimation(params *SendAnimationParams) (ret *Message, err e
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -11939,7 +11983,8 @@ func (c *Client) SendAudio(params *SendAudioParams) (ret *Message, err error) {
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -12243,7 +12288,8 @@ func (c *Client) SendChecklist(params *SendChecklistParams) (ret *Message, err e
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -12542,7 +12588,8 @@ func (c *Client) SendContact(params *SendContactParams) (ret *Message, err error
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -12798,7 +12845,8 @@ func (c *Client) SendDice(params *SendDiceParams) (ret *Message, err error) {
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -13406,7 +13454,8 @@ func (c *Client) SendDocument(params *SendDocumentParams) (ret *Message, err err
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -13632,7 +13681,8 @@ func (c *Client) SendGame(params *SendGameParams) (ret *Message, err error) {
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -14431,7 +14481,8 @@ func (c *Client) SendInvoice(params *SendInvoiceParams) (ret *Message, err error
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -14764,7 +14815,8 @@ func (c *Client) SendLocation(params *SendLocationParams) (ret *Message, err err
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -14975,7 +15027,8 @@ func (c *Client) SendMediaGroup(params *SendMediaGroupParams) (ret *Message, err
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -15276,7 +15329,8 @@ func (c *Client) SendMessage(params *SendMessageParams) (ret *Message, err error
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -15757,7 +15811,8 @@ func (c *Client) SendPaidMedia(params *SendPaidMediaParams) (ret *Message, err e
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -16102,7 +16157,8 @@ func (c *Client) SendPhoto(params *SendPhotoParams) (ret *Message, err error) {
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -16543,7 +16599,8 @@ func (c *Client) SendPoll(params *SendPollParams) (ret *Message, err error) {
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -16820,7 +16877,8 @@ func (c *Client) SendSticker(params *SendStickerParams) (ret *Message, err error
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -17183,7 +17241,8 @@ func (c *Client) SendVenue(params *SendVenueParams) (ret *Message, err error) {
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -17997,7 +18056,8 @@ func (c *Client) SendVideo(params *SendVideoParams) (ret *Message, err error) {
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -18548,7 +18608,8 @@ func (c *Client) SendVideoNote(params *SendVideoNoteParams) (ret *Message, err e
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -18876,7 +18937,8 @@ func (c *Client) SendVoice(params *SendVoiceParams) (ret *Message, err error) {
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -20182,7 +20244,8 @@ func (c *Client) SetGameScore(params *SetGameScoreParams) (ret *Message, err err
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -21895,7 +21958,8 @@ func (c *Client) StopMessageLiveLocation(params *StopMessageLiveLocationParams) 
 		return
 	}
 
-	ref := new(Message)
+	ret = new(Message)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -22007,7 +22071,8 @@ func (c *Client) StopPoll(params *StopPollParams) (ret *Poll, err error) {
 		return
 	}
 
-	ref := new(Poll)
+	ret = new(Poll)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
@@ -23008,7 +23073,8 @@ func (c *Client) UploadStickerFile(params *UploadStickerFileParams) (ret *File, 
 		return
 	}
 
-	ref := new(File)
+	ret = new(File)
+	ref := ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
