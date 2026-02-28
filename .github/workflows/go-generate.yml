@@ -2,7 +2,7 @@ name: Go generate
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '4 15 * * *'
   workflow_dispatch:
 
 permissions:
@@ -27,7 +27,7 @@ jobs:
       - name: Check for changes
         id: git-check
         run: |
-          git add .
+          git add -A -- '*.gen.go'
           if [ -z "$(git status --porcelain)" ]; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else

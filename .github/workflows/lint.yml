@@ -23,6 +23,7 @@ jobs:
         cache: true
 
     - run: go version
+
     - name: Run golangci-lint
       uses: golangci/golangci-lint-action@v9
       with:
