@@ -66,6 +66,7 @@ import (
                     {{- range $subtype.Fields }}
                         {{- if .Discriminator }}
                             case "{{ .Discriminator }}":
+                                r.{{ $subtype.Name }} = new({{ toTitle $subtype.Name }})
                                 return json.Unmarshal(data, r.{{ $subtype.Name }})
                         {{ end }}
                     {{ end }}

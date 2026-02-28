@@ -186,12 +186,15 @@ func (r *BackgroundFill) UnmarshalJSON(data []byte) error {
 
 	switch v.Discriminator {
 	case "solid":
+		r.BackgroundFillSolid = new(BackgroundFillSolid)
 		return json.Unmarshal(data, r.BackgroundFillSolid)
 
 	case "gradient":
+		r.BackgroundFillGradient = new(BackgroundFillGradient)
 		return json.Unmarshal(data, r.BackgroundFillGradient)
 
 	case "freeform_gradient":
+		r.BackgroundFillFreeformGradient = new(BackgroundFillFreeformGradient)
 		return json.Unmarshal(data, r.BackgroundFillFreeformGradient)
 
 	default:
@@ -303,15 +306,19 @@ func (r *BackgroundType) UnmarshalJSON(data []byte) error {
 
 	switch v.Discriminator {
 	case "fill":
+		r.BackgroundTypeFill = new(BackgroundTypeFill)
 		return json.Unmarshal(data, r.BackgroundTypeFill)
 
 	case "wallpaper":
+		r.BackgroundTypeWallpaper = new(BackgroundTypeWallpaper)
 		return json.Unmarshal(data, r.BackgroundTypeWallpaper)
 
 	case "pattern":
+		r.BackgroundTypePattern = new(BackgroundTypePattern)
 		return json.Unmarshal(data, r.BackgroundTypePattern)
 
 	case "chat_theme":
+		r.BackgroundTypeChatTheme = new(BackgroundTypeChatTheme)
 		return json.Unmarshal(data, r.BackgroundTypeChatTheme)
 
 	default:
@@ -512,24 +519,31 @@ func (r *BotCommandScope) UnmarshalJSON(data []byte) error {
 
 	switch v.Discriminator {
 	case "default":
+		r.BotCommandScopeDefault = new(BotCommandScopeDefault)
 		return json.Unmarshal(data, r.BotCommandScopeDefault)
 
 	case "all_private_chats":
+		r.BotCommandScopeAllPrivateChats = new(BotCommandScopeAllPrivateChats)
 		return json.Unmarshal(data, r.BotCommandScopeAllPrivateChats)
 
 	case "all_group_chats":
+		r.BotCommandScopeAllGroupChats = new(BotCommandScopeAllGroupChats)
 		return json.Unmarshal(data, r.BotCommandScopeAllGroupChats)
 
 	case "all_chat_administrators":
+		r.BotCommandScopeAllChatAdministrators = new(BotCommandScopeAllChatAdministrators)
 		return json.Unmarshal(data, r.BotCommandScopeAllChatAdministrators)
 
 	case "chat":
+		r.BotCommandScopeChat = new(BotCommandScopeChat)
 		return json.Unmarshal(data, r.BotCommandScopeChat)
 
 	case "chat_administrators":
+		r.BotCommandScopeChatAdministrators = new(BotCommandScopeChatAdministrators)
 		return json.Unmarshal(data, r.BotCommandScopeChatAdministrators)
 
 	case "chat_member":
+		r.BotCommandScopeChatMember = new(BotCommandScopeChatMember)
 		return json.Unmarshal(data, r.BotCommandScopeChatMember)
 
 	default:
@@ -1056,12 +1070,15 @@ func (r *ChatBoostSource) UnmarshalJSON(data []byte) error {
 
 	switch v.Discriminator {
 	case "premium":
+		r.ChatBoostSourcePremium = new(ChatBoostSourcePremium)
 		return json.Unmarshal(data, r.ChatBoostSourcePremium)
 
 	case "gift_code":
+		r.ChatBoostSourceGiftCode = new(ChatBoostSourceGiftCode)
 		return json.Unmarshal(data, r.ChatBoostSourceGiftCode)
 
 	case "giveaway":
+		r.ChatBoostSourceGiveaway = new(ChatBoostSourceGiveaway)
 		return json.Unmarshal(data, r.ChatBoostSourceGiveaway)
 
 	default:
@@ -1521,21 +1538,27 @@ func (r *ChatMember) UnmarshalJSON(data []byte) error {
 
 	switch v.Discriminator {
 	case "creator":
+		r.ChatMemberOwner = new(ChatMemberOwner)
 		return json.Unmarshal(data, r.ChatMemberOwner)
 
 	case "administrator":
+		r.ChatMemberAdministrator = new(ChatMemberAdministrator)
 		return json.Unmarshal(data, r.ChatMemberAdministrator)
 
 	case "member":
+		r.ChatMemberMember = new(ChatMemberMember)
 		return json.Unmarshal(data, r.ChatMemberMember)
 
 	case "restricted":
+		r.ChatMemberRestricted = new(ChatMemberRestricted)
 		return json.Unmarshal(data, r.ChatMemberRestricted)
 
 	case "left":
+		r.ChatMemberLeft = new(ChatMemberLeft)
 		return json.Unmarshal(data, r.ChatMemberLeft)
 
 	case "kicked":
+		r.ChatMemberBanned = new(ChatMemberBanned)
 		return json.Unmarshal(data, r.ChatMemberBanned)
 
 	default:
@@ -4484,18 +4507,23 @@ func (r *InputMedia) UnmarshalJSON(data []byte) error {
 
 	switch v.Discriminator {
 	case "animation":
+		r.InputMediaAnimation = new(InputMediaAnimation)
 		return json.Unmarshal(data, r.InputMediaAnimation)
 
 	case "document":
+		r.InputMediaDocument = new(InputMediaDocument)
 		return json.Unmarshal(data, r.InputMediaDocument)
 
 	case "audio":
+		r.InputMediaAudio = new(InputMediaAudio)
 		return json.Unmarshal(data, r.InputMediaAudio)
 
 	case "photo":
+		r.InputMediaPhoto = new(InputMediaPhoto)
 		return json.Unmarshal(data, r.InputMediaPhoto)
 
 	case "video":
+		r.InputMediaVideo = new(InputMediaVideo)
 		return json.Unmarshal(data, r.InputMediaVideo)
 
 	default:
@@ -4880,9 +4908,11 @@ func (r *InputPaidMedia) UnmarshalJSON(data []byte) error {
 
 	switch v.Discriminator {
 	case "photo":
+		r.InputPaidMediaPhoto = new(InputPaidMediaPhoto)
 		return json.Unmarshal(data, r.InputPaidMediaPhoto)
 
 	case "video":
+		r.InputPaidMediaVideo = new(InputPaidMediaVideo)
 		return json.Unmarshal(data, r.InputPaidMediaVideo)
 
 	default:
@@ -5027,9 +5057,11 @@ func (r *InputProfilePhoto) UnmarshalJSON(data []byte) error {
 
 	switch v.Discriminator {
 	case "static":
+		r.InputProfilePhotoStatic = new(InputProfilePhotoStatic)
 		return json.Unmarshal(data, r.InputProfilePhotoStatic)
 
 	case "animated":
+		r.InputProfilePhotoAnimated = new(InputProfilePhotoAnimated)
 		return json.Unmarshal(data, r.InputProfilePhotoAnimated)
 
 	default:
@@ -5148,9 +5180,11 @@ func (r *InputStoryContent) UnmarshalJSON(data []byte) error {
 
 	switch v.Discriminator {
 	case "photo":
+		r.InputStoryContentPhoto = new(InputStoryContentPhoto)
 		return json.Unmarshal(data, r.InputStoryContentPhoto)
 
 	case "video":
+		r.InputStoryContentVideo = new(InputStoryContentVideo)
 		return json.Unmarshal(data, r.InputStoryContentVideo)
 
 	default:
@@ -5713,12 +5747,15 @@ func (r *MenuButton) UnmarshalJSON(data []byte) error {
 
 	switch v.Discriminator {
 	case "commands":
+		r.MenuButtonCommands = new(MenuButtonCommands)
 		return json.Unmarshal(data, r.MenuButtonCommands)
 
 	case "web_app":
+		r.MenuButtonWebApp = new(MenuButtonWebApp)
 		return json.Unmarshal(data, r.MenuButtonWebApp)
 
 	case "default":
+		r.MenuButtonDefault = new(MenuButtonDefault)
 		return json.Unmarshal(data, r.MenuButtonDefault)
 
 	default:
@@ -6360,15 +6397,19 @@ func (r *MessageOrigin) UnmarshalJSON(data []byte) error {
 
 	switch v.Discriminator {
 	case "user":
+		r.MessageOriginUser = new(MessageOriginUser)
 		return json.Unmarshal(data, r.MessageOriginUser)
 
 	case "hidden_user":
+		r.MessageOriginHiddenUser = new(MessageOriginHiddenUser)
 		return json.Unmarshal(data, r.MessageOriginHiddenUser)
 
 	case "chat":
+		r.MessageOriginChat = new(MessageOriginChat)
 		return json.Unmarshal(data, r.MessageOriginChat)
 
 	case "channel":
+		r.MessageOriginChannel = new(MessageOriginChannel)
 		return json.Unmarshal(data, r.MessageOriginChannel)
 
 	default:
@@ -6556,9 +6597,11 @@ func (r *OwnedGift) UnmarshalJSON(data []byte) error {
 
 	switch v.Discriminator {
 	case "regular":
+		r.OwnedGiftRegular = new(OwnedGiftRegular)
 		return json.Unmarshal(data, r.OwnedGiftRegular)
 
 	case "unique":
+		r.OwnedGiftUnique = new(OwnedGiftUnique)
 		return json.Unmarshal(data, r.OwnedGiftUnique)
 
 	default:
@@ -6742,12 +6785,15 @@ func (r *PaidMedia) UnmarshalJSON(data []byte) error {
 
 	switch v.Discriminator {
 	case "preview":
+		r.PaidMediaPreview = new(PaidMediaPreview)
 		return json.Unmarshal(data, r.PaidMediaPreview)
 
 	case "photo":
+		r.PaidMediaPhoto = new(PaidMediaPhoto)
 		return json.Unmarshal(data, r.PaidMediaPhoto)
 
 	case "video":
+		r.PaidMediaVideo = new(PaidMediaVideo)
 		return json.Unmarshal(data, r.PaidMediaVideo)
 
 	default:
@@ -6948,30 +6994,39 @@ func (r *PassportElementError) UnmarshalJSON(data []byte) error {
 
 	switch v.Discriminator {
 	case "data":
+		r.PassportElementErrorDataField = new(PassportElementErrorDataField)
 		return json.Unmarshal(data, r.PassportElementErrorDataField)
 
 	case "front_side":
+		r.PassportElementErrorFrontSide = new(PassportElementErrorFrontSide)
 		return json.Unmarshal(data, r.PassportElementErrorFrontSide)
 
 	case "reverse_side":
+		r.PassportElementErrorReverseSide = new(PassportElementErrorReverseSide)
 		return json.Unmarshal(data, r.PassportElementErrorReverseSide)
 
 	case "selfie":
+		r.PassportElementErrorSelfie = new(PassportElementErrorSelfie)
 		return json.Unmarshal(data, r.PassportElementErrorSelfie)
 
 	case "file":
+		r.PassportElementErrorFile = new(PassportElementErrorFile)
 		return json.Unmarshal(data, r.PassportElementErrorFile)
 
 	case "files":
+		r.PassportElementErrorFiles = new(PassportElementErrorFiles)
 		return json.Unmarshal(data, r.PassportElementErrorFiles)
 
 	case "translation_file":
+		r.PassportElementErrorTranslationFile = new(PassportElementErrorTranslationFile)
 		return json.Unmarshal(data, r.PassportElementErrorTranslationFile)
 
 	case "translation_files":
+		r.PassportElementErrorTranslationFiles = new(PassportElementErrorTranslationFiles)
 		return json.Unmarshal(data, r.PassportElementErrorTranslationFiles)
 
 	case "unspecified":
+		r.PassportElementErrorUnspecified = new(PassportElementErrorUnspecified)
 		return json.Unmarshal(data, r.PassportElementErrorUnspecified)
 
 	default:
@@ -7408,12 +7463,15 @@ func (r *ReactionType) UnmarshalJSON(data []byte) error {
 
 	switch v.Discriminator {
 	case "emoji":
+		r.ReactionTypeEmoji = new(ReactionTypeEmoji)
 		return json.Unmarshal(data, r.ReactionTypeEmoji)
 
 	case "custom_emoji":
+		r.ReactionTypeCustomEmoji = new(ReactionTypeCustomEmoji)
 		return json.Unmarshal(data, r.ReactionTypeCustomEmoji)
 
 	case "paid":
+		r.ReactionTypePaid = new(ReactionTypePaid)
 		return json.Unmarshal(data, r.ReactionTypePaid)
 
 	default:
@@ -7665,12 +7723,15 @@ func (r *RevenueWithdrawalState) UnmarshalJSON(data []byte) error {
 
 	switch v.Discriminator {
 	case "pending":
+		r.RevenueWithdrawalStatePending = new(RevenueWithdrawalStatePending)
 		return json.Unmarshal(data, r.RevenueWithdrawalStatePending)
 
 	case "succeeded":
+		r.RevenueWithdrawalStateSucceeded = new(RevenueWithdrawalStateSucceeded)
 		return json.Unmarshal(data, r.RevenueWithdrawalStateSucceeded)
 
 	case "failed":
+		r.RevenueWithdrawalStateFailed = new(RevenueWithdrawalStateFailed)
 		return json.Unmarshal(data, r.RevenueWithdrawalStateFailed)
 
 	default:
@@ -8063,18 +8124,23 @@ func (r *StoryAreaType) UnmarshalJSON(data []byte) error {
 
 	switch v.Discriminator {
 	case "location":
+		r.StoryAreaTypeLocation = new(StoryAreaTypeLocation)
 		return json.Unmarshal(data, r.StoryAreaTypeLocation)
 
 	case "suggested_reaction":
+		r.StoryAreaTypeSuggestedReaction = new(StoryAreaTypeSuggestedReaction)
 		return json.Unmarshal(data, r.StoryAreaTypeSuggestedReaction)
 
 	case "link":
+		r.StoryAreaTypeLink = new(StoryAreaTypeLink)
 		return json.Unmarshal(data, r.StoryAreaTypeLink)
 
 	case "weather":
+		r.StoryAreaTypeWeather = new(StoryAreaTypeWeather)
 		return json.Unmarshal(data, r.StoryAreaTypeWeather)
 
 	case "unique_gift":
+		r.StoryAreaTypeUniqueGift = new(StoryAreaTypeUniqueGift)
 		return json.Unmarshal(data, r.StoryAreaTypeUniqueGift)
 
 	default:
@@ -8491,24 +8557,31 @@ func (r *TransactionPartner) UnmarshalJSON(data []byte) error {
 
 	switch v.Discriminator {
 	case "user":
+		r.TransactionPartnerUser = new(TransactionPartnerUser)
 		return json.Unmarshal(data, r.TransactionPartnerUser)
 
 	case "chat":
+		r.TransactionPartnerChat = new(TransactionPartnerChat)
 		return json.Unmarshal(data, r.TransactionPartnerChat)
 
 	case "affiliate_program":
+		r.TransactionPartnerAffiliateProgram = new(TransactionPartnerAffiliateProgram)
 		return json.Unmarshal(data, r.TransactionPartnerAffiliateProgram)
 
 	case "fragment":
+		r.TransactionPartnerFragment = new(TransactionPartnerFragment)
 		return json.Unmarshal(data, r.TransactionPartnerFragment)
 
 	case "telegram_ads":
+		r.TransactionPartnerTelegramAds = new(TransactionPartnerTelegramAds)
 		return json.Unmarshal(data, r.TransactionPartnerTelegramAds)
 
 	case "telegram_api":
+		r.TransactionPartnerTelegramApi = new(TransactionPartnerTelegramApi)
 		return json.Unmarshal(data, r.TransactionPartnerTelegramApi)
 
 	case "other":
+		r.TransactionPartnerOther = new(TransactionPartnerOther)
 		return json.Unmarshal(data, r.TransactionPartnerOther)
 
 	default:
