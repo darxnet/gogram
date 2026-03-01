@@ -3995,27 +3995,6 @@ func (ctx *Context) SetChatMemberTag(
 	return err
 }
 
-// SetChatMemberTag calls Client.SetChatMemberTag with context-derived defaults.
-//
-// Use this method to set a tag for a regular member in a group or a supergroup.
-// The bot must be an administrator in the chat for this to work and must have the can_manage_tags administrator right.
-// Returns True on success.
-func (ctx *Context) SetChatMemberTag(
-	userID int64,
-	opts ...SetChatMemberTagOption,
-) error {
-	params := &SetChatMemberTagParams{
-		ChatID: ctx.Chat().Identifier(),
-		UserID: userID,
-	}
-
-	params.Option(opts...)
-
-	_, err := ctx.client.SetChatMemberTag(params)
-
-	return err
-}
-
 // SetChatMenuButton calls Client.SetChatMenuButton with context-derived defaults.
 //
 // Use this method to change the bot's menu button in a private chat, or the default menu button.
