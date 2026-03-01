@@ -9206,6 +9206,9 @@ type PromoteChatMemberParams struct {
 
 	// Pass True if the administrator can manage direct messages within the channel and decline suggested posts; for channels only
 	CanManageDirectMessages bool `json:"can_manage_direct_messages,omitempty"`
+
+	// Pass True if the administrator can edit the tags of regular members; for groups and supergroups only
+	CanManageTags bool `json:"can_manage_tags,omitempty"`
 }
 
 // PromoteChatMemberOption configures PromoteChatMemberParams.
@@ -9434,6 +9437,18 @@ func WithPromoteChatMemberCanManageDirectMessages(value bool) PromoteChatMemberO
 		params.CanManageDirectMessages = value
 
 		return WithPromoteChatMemberCanManageDirectMessages(previous)
+	}
+}
+
+// WithPromoteChatMemberCanManageTags sets the CanManageTags field.
+//
+// Pass True if the administrator can edit the tags of regular members; for groups and supergroups only
+func WithPromoteChatMemberCanManageTags(value bool) PromoteChatMemberOption {
+	return func(params *PromoteChatMemberParams) PromoteChatMemberOption {
+		previous := params.CanManageTags
+		params.CanManageTags = value
+
+		return WithPromoteChatMemberCanManageTags(previous)
 	}
 }
 
@@ -15454,7 +15469,7 @@ func WithSendMessageDraftEntities(value []MessageEntity) SendMessageDraftOption 
 
 // SendMessageDraft calls the sendMessageDraft Telegram Bot API method.
 //
-// Use this method to stream a partial message to a user while the message is being generated; supported only for bots with forum topic mode enabled.
+// Use this method to stream a partial message to a user while the message is being generated.
 // Returns True on success.
 func (c *Client) SendMessageDraft(params *SendMessageDraftParams) (ret bool, err error) {
 	var bs []byte
@@ -19534,6 +19549,98 @@ func (c *Client) SetChatDescription(params *SetChatDescriptionParams) (ret bool,
 	var result json.RawMessage
 
 	result, err = c.Raw("setChatDescription", reader, contentType)
+	if err != nil {
+		return
+	}
+
+	ref := &ret
+
+	err = json.Unmarshal(result, ref)
+	if err != nil {
+		return
+	}
+
+	return ret, err
+}
+
+// SetChatMemberTagParams contains parameters for Client.SetChatMemberTag.
+type SetChatMemberTagParams struct {
+	// Unique identifier for the target chat or username of the target supergroup (in the format @supergroupusername)
+	ChatID string `json:"chat_id"`
+
+	// Unique identifier of the target user
+	UserID int64 `json:"user_id"`
+
+	// New tag for the member; 0-16 characters, emoji are not allowed
+	Tag string `json:"tag,omitempty"`
+}
+
+// SetChatMemberTagOption configures SetChatMemberTagParams.
+type SetChatMemberTagOption func(params *SetChatMemberTagParams) SetChatMemberTagOption
+
+// Option applies one or more SetChatMemberTagOption values and returns the last rollback option.
+func (r *SetChatMemberTagParams) Option(opts ...SetChatMemberTagOption) (previous SetChatMemberTagOption) {
+	for _, opt := range opts {
+		previous = opt(r)
+	}
+	return previous
+}
+
+// WithSetChatMemberTagChatID sets the ChatID field.
+//
+// Unique identifier for the target chat or username of the target supergroup (in the format @supergroupusername)
+func WithSetChatMemberTagChatID(value string) SetChatMemberTagOption {
+	return func(params *SetChatMemberTagParams) SetChatMemberTagOption {
+		previous := params.ChatID
+		params.ChatID = value
+
+		return WithSetChatMemberTagChatID(previous)
+	}
+}
+
+// WithSetChatMemberTagUserID sets the UserID field.
+//
+// Unique identifier of the target user
+func WithSetChatMemberTagUserID(value int64) SetChatMemberTagOption {
+	return func(params *SetChatMemberTagParams) SetChatMemberTagOption {
+		previous := params.UserID
+		params.UserID = value
+
+		return WithSetChatMemberTagUserID(previous)
+	}
+}
+
+// WithSetChatMemberTagTag sets the Tag field.
+//
+// New tag for the member; 0-16 characters, emoji are not allowed
+func WithSetChatMemberTagTag(value string) SetChatMemberTagOption {
+	return func(params *SetChatMemberTagParams) SetChatMemberTagOption {
+		previous := params.Tag
+		params.Tag = value
+
+		return WithSetChatMemberTagTag(previous)
+	}
+}
+
+// SetChatMemberTag calls the setChatMemberTag Telegram Bot API method.
+//
+// Use this method to set a tag for a regular member in a group or a supergroup.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_tags administrator right.
+// Returns True on success.
+func (c *Client) SetChatMemberTag(params *SetChatMemberTagParams) (ret bool, err error) {
+	var bs []byte
+
+	bs, err = json.Marshal(params)
+	if err != nil {
+		return
+	}
+
+	reader := bytes.NewReader(bs)
+	contentType := "application/json"
+
+	var result json.RawMessage
+
+	result, err = c.Raw("setChatMemberTag", reader, contentType)
 	if err != nil {
 		return
 	}
