@@ -22,7 +22,7 @@ import (
 const (
 	defaultHost    = "api.telegram.org"
 	defaultRPS     = 30
-	defaultTimeout = 10 * time.Second
+	defaultTimeout = 25 * time.Second
 	defaultUpdates = 100
 )
 
@@ -270,10 +270,15 @@ func (c *Client) do(req *http.Request) (*http.Response, error) {
 }
 
 // Raw sends a raw request to the Telegram Bot API.
-func (c *Client) Raw(method string, reader io.Reader, contentType ...string) (json.RawMessage, error) {
+func (c *Client) Raw(
+	ctx context.Context,
+	method string,
+	reader io.Reader,
+	contentType ...string,
+) (json.RawMessage, error) {
 	link := c.linkPrefix + method
 
-	req, err := http.NewRequest(http.MethodPost, link, reader)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, link, reader)
 	if err != nil {
 		return nil, err
 	}
@@ -294,9 +299,6 @@ func (c *Client) Raw(method string, reader io.Reader, contentType ...string) (js
 
 	err = json.NewDecoder(resp.Body).Decode(v)
 	if err != nil {
-		if errors.Is(err, io.EOF) {
-			return nil, errors.Join(ErrBadRequest, ErrEOF)
-		}
 		return nil, err
 	}
 
@@ -305,11 +307,11 @@ func (c *Client) Raw(method string, reader io.Reader, contentType ...string) (js
 
 		err = genError(v.ErrorCode, resp.Status, v.Description, v.Parameters)
 
-		if errors.Is(err, ErrUnauthorized) || errors.Is(err, ErrNotFoundBanned) {
+		switch {
+		case errors.Is(err, ErrUnauthorized), errors.Is(err, ErrNotFoundBanned):
 			c.Stop()
-		}
 
-		if errors.As(err, &retryErr) {
+		case errors.As(err, &retryErr):
 			c.rateLimiter.SetLimitAt(
 				time.Now().Add(retryErr.RetryAfter),
 				c.rateLimiter.Limit(),
@@ -364,13 +366,9 @@ func (c *Client) Start(ctx context.Context, params *GetUpdatesParams) error {
 				return
 
 			default:
-				updates, err := c.GetUpdates(&localParams)
+				updates, err := c.GetUpdates(ctx, &localParams)
 				if err != nil {
-					c.locker.RLock()
-					handlerErr := c.Router().handlerErr
-					c.locker.RUnlock()
-
-					if handlerErr != nil {
+					if handlerErr := c.Router().handlerErr; handlerErr != nil {
 						gogramCtx := c.acquireContext(ctx, nil)
 						handlerErr(gogramCtx, err)
 						c.releaseContext(gogramCtx)

@@ -6,7 +6,7 @@ type handleOn int
 
 const (
     _ handleOn = iota
-    {{- range .Update.Fields }}
+    {{- range .Types.Update.Fields }}
         {{- if ne .Name "update_id"}}
             handleOn{{ toTitle .Name }}
         {{- end }}
@@ -14,7 +14,7 @@ const (
     handleOnCount
 )
 
-{{- range .Update.Fields }}
+{{- range .Types.Update.Fields }}
     {{- if ne .Name "update_id"}}
         {{ $name := toTitle .Name }}
         // HandleOn{{ $name }} registers a handler for updates containing {{ $name }}.

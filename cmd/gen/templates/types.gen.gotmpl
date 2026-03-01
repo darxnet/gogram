@@ -9,7 +9,7 @@ import (
 
 {{ $root := . }}
 
-{{ range . }}
+{{ range .Types }}
     // {{ .Name }}
     // {{ .Desc }}
     type {{ .Name }} struct {
@@ -25,7 +25,7 @@ import (
         // MarshalJSON marshals the currently set subtype of {{ .Name }}.
         func (r *{{ .Name }}) MarshalJSON() ([]byte, error) {
             {{- range .Subtypes }}
-                {{- $subtype := index $root . }}
+                {{- $subtype := index $root.Types . }}
                 if r.{{ $subtype.Name }} != nil {
                     {{- range $subtype.Fields }}
                         {{- if .Discriminator }}
@@ -44,7 +44,7 @@ import (
             func (r *{{ .Name }}) UnmarshalJSON(data []byte) error {
                 type T struct {
                     {{- range .Subtypes }}
-                        {{ $subtype := index $root . }}
+                        {{ $subtype := index $root.Types . }}
                         {{- range $subtype.Fields }}
                             {{ if .Discriminator }}
                                 Discriminator string `json:"{{ .Name }}"`
@@ -62,7 +62,7 @@ import (
 
                 switch v.Discriminator {
                 {{- range .Subtypes }}
-                    {{- $subtype := index $root . }}
+                    {{- $subtype := index $root.Types . }}
                     {{- range $subtype.Fields }}
                         {{- if .Discriminator }}
                             case "{{ .Discriminator }}":

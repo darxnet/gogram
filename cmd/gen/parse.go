@@ -251,18 +251,20 @@ func parseResult(paragraphs []*html.Node) string {
 			}
 
 			for _, key := range keys {
-				if strings.Contains(node.Data, key) {
-					s := findText(node.NextSibling)
-					if !isTitle(s[0]) {
-						continue
-					}
-
-					if strings.HasSuffix(node.Data, prefixArrayOf) {
-						return prefixArrayOf + s
-					}
-
-					return s
+				if !strings.Contains(node.Data, key) {
+					continue
 				}
+
+				s := findText(node.NextSibling)
+				if !isTitle(s[0]) {
+					continue
+				}
+
+				if strings.HasSuffix(strings.ToLower(node.Data), strings.ToLower(prefixArrayOf)) {
+					return prefixArrayOf + s
+				}
+
+				return s
 			}
 		}
 	}

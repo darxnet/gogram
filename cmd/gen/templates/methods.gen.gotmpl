@@ -5,12 +5,15 @@ package gogram
 import (
     "mime/multipart"
     "encoding/json"
+    "context"
     "strconv"
     "bytes"
     "io"
 )
 
-{{ range . }}
+{{ $root := . }}
+
+{{ range .Methods }}
     {{ $method := toTitle .Name }}
     {{ $params := print $method "Params" }}
     {{ $option := print $method "Option" }}
@@ -47,10 +50,8 @@ import (
 
     // {{ $method }} calls the {{ .Name }} Telegram Bot API method.
     // {{ .Desc }}
-    func (c *Client) {{ $method }}(params *{{ $params }}) (ret {{ toType .Result false }}, err error) {
-        var bs []byte
-
-        {{ $multipart := .Multipart }}
+    func (c *Client) {{ $method }}(ctx context.Context, params *{{ $params }}) (ret {{ toType .Result false }}, err error) {
+        {{- $multipart := .Multipart }}
         {{- if $multipart }}
             reader, pw := io.Pipe()
             writer := multipart.NewWriter(pw)
@@ -60,9 +61,9 @@ import (
                 defer writer.Close()
             {{ range .Params }}
                 {{- $goTitle := toTitle .Name }}
-                {{- $goType := toType .Type .IsRequired }}
+                {{- $goType := toType .Type true }}
 
-                {{- if eq $goType "int64" }}
+                {{ if eq $goType "int64" }}
                     {{ if not .IsRequired }} if params.{{ $goTitle }} != 0 {{ end }} {
                         v := strconv.FormatInt(params.{{ $goTitle }}, 10)
                         err = writer.WriteField("{{ .Name }}", v)
@@ -94,57 +95,75 @@ import (
                         }
                     }
                 {{- else }}
-                    {{ if not .IsRequired }} if params.{{ $goTitle }} != nil {{ end }} {
-                        {{- if eq (toType .Type true) "InputFile" }}
-                            if params.{{ $goTitle }}.File != nil {
-                                var w io.Writer
-                                params.{{ $goTitle }}.fieldName = "{{ .Name }}"
-
-                                w, err = writer.CreateFormFile(
-                                    params.{{ $goTitle }}.fieldName,
-                                    params.{{ $goTitle }}.FileName,
+                    {{ if not .IsRequired }}
+                        {{- if eq (slice $goType 0 2) "[]" }}
+                            if len(params.{{ $goTitle }}) != 0
+                        {{- else }}
+                            if params.{{ $goTitle }} != nil
+                        {{- end }}
+                    {{- end }} {
+                        {{- if eq $goType "InputFile" }}
+                            err = createFormFileFromInputFile(
+                                writer,
+                                {{ if .IsRequired }}&{{ end }}params.{{ $goTitle }},
+                                "{{ .Name }}",
+                            )
+                            if err != nil {
+                          		return
+                           	}
+                        {{- else if eq $goType "[]InputMedia" }}
+                            for i := range params.{{ $goTitle }} {
+                               err = createFormFileFromInputMedia(
+                                    writer,
+                                    &params.{{ $goTitle }}[i],
+                                    "{{ .Name }}" + strconv.Itoa(i),
                                 )
                                 if err != nil {
-                                    return
-                                }
+                                return
+                               	}
+                            }
 
-                                _, err = io.Copy(w, params.{{ $goTitle }}.File)
+                        {{- else if eq $goType "[]InputPaidMedia" }}
+                            for i := range params.{{ $goTitle }} {
+                                err = createFormFileFromInputPaidMedia(
+                                    writer,
+                                    &params.{{ $goTitle }}[i],
+                                    "{{ .Name }}" + strconv.Itoa(i),
+                                )
                                 if err != nil {
-                                    return
-                                }
-
-                                if closer, ok := params.{{ $goTitle }}.File.(io.Closer); ok {
-                                    err = closer.Close()
-                                    if err != nil {
-                                        return
-                                    }
+                              		return
                                 }
                             }
                         {{- end }}
+                        {{- if ne $goType "InputFile" }}
+                            var bs []byte
 
-                        bs, err = json.Marshal(params.{{ $goTitle }})
-                        if err != nil {
-                            return
-                        }
+                            bs, err = json.Marshal(params.{{ $goTitle }})
+                            if err != nil {
+                                return
+                            }
 
-                        var p io.Writer
+                            var p io.Writer
 
-                        p, err = writer.CreateFormField("{{ .Name }}")
-                       	if err != nil {
-                      		return
-                       	}
+                            p, err = writer.CreateFormField("{{ .Name }}")
+                           	if err != nil {
+                          		return
+                           	}
 
-                       	_, err = p.Write(bs)
-                       	if err != nil {
-                      		return
-                       	}
+                            _, err = p.Write(bs)
+                           	if err != nil {
+                          		return
+                           	}
+                        {{- end }}
                     }
-                {{ end }}
-            {{ end }}
+                {{- end }}
+            {{- end }}
             }()
 
             contentType := writer.FormDataContentType()
         {{- else }}
+            var bs []byte
+
             bs, err = json.Marshal(params)
             if err != nil {
                 return
@@ -156,7 +175,7 @@ import (
 
         var result json.RawMessage
 
-        result, err = c.Raw("{{ .Name }}", reader, contentType)
+        result, err = c.Raw(ctx, "{{ .Name }}", reader, contentType)
         if err != nil {
             return
         }
@@ -171,3 +190,67 @@ import (
        	return ret, err
     }
 {{ end }}
+
+func createFormFileFromInputFile(writer *multipart.Writer, f *InputFile, name string) error {
+	if f.File == nil {
+		return nil
+	}
+
+	var w io.Writer
+	var err error
+
+	f.fieldName = name
+
+	w, err = writer.CreateFormFile(f.fieldName, f.FileName)
+	if err != nil {
+		return err
+	}
+
+	_, err = io.Copy(w, f.File)
+	if err != nil {
+		return err
+	}
+
+	if closer, ok := f.File.(io.Closer); ok {
+		err = closer.Close()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func createFormFileFromInputMedia(writer *multipart.Writer, media *InputMedia, name string) error {
+	if media == nil {
+		return nil
+	}
+
+    switch {
+    {{- range $root.Types.InputMedia.Subtypes }}
+        {{ $sub := index $root.Types . }}
+        {{ $name := toTitle $sub.Name }}
+    	case media.{{ $name }} != nil:
+            return createFormFileFromInputFile(writer, &media.{{ $name }}.Media, name)
+    {{- end }}
+	}
+
+	return nil
+}
+
+func createFormFileFromInputPaidMedia(writer *multipart.Writer, media *InputPaidMedia, name string) error {
+	if media == nil {
+		return nil
+	}
+
+    switch {
+    {{- range $root.Types.InputPaidMedia.Subtypes }}
+        {{ $sub := index $root.Types . }}
+        {{ $name := toTitle $sub.Name }}
+    	case media.{{ $name }} != nil:
+            return createFormFileFromInputFile(writer, &media.{{ $name }}.Media, name)
+    {{- end }}
+	}
+
+	return nil
+}

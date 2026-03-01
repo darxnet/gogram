@@ -83,8 +83,13 @@ type Method struct {
 // Multipart reports whether the generated method should use multipart/form-data.
 func (m Method) Multipart() bool {
 	for _, field := range m.Params {
-		if field.Type == "InputFile" {
+		typ := toType(field.Type, true)
+		if typ == "InputFile" || typ == "[]InputMedia" || typ == "[]InputPaidMedia" {
 			return true
+		}
+
+		if field.Name == "media" {
+			log.Println(field.Type, typ)
 		}
 	}
 
@@ -117,10 +122,10 @@ func main() {
 		template string
 		data     any
 	}{
-		{path: "./types.gen.go", template: "types.gen.gotmpl", data: info.Types},
-		{path: "./methods.gen.go", template: "methods.gen.gotmpl", data: info.Methods},
+		{path: "./types.gen.go", template: "types.gen.gotmpl", data: info},
+		{path: "./methods.gen.go", template: "methods.gen.gotmpl", data: info},
 		{path: "./context.gen.go", template: "context.gen.gotmpl", data: info},
-		{path: "./router.gen.go", template: "router.gen.gotmpl", data: info.Types},
+		{path: "./router.gen.go", template: "router.gen.gotmpl", data: info},
 	}
 
 	for _, output := range outputs {

@@ -1,6 +1,7 @@
 package gogram
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -51,7 +52,10 @@ func ReceiveFileReader(client *Client, file *File) (io.ReadCloser, error) {
 // ReceiveFileReaderByFileID resolves the file path by fileID and returns a reader for the content.
 // The caller is responsible for closing the reader.
 func ReceiveFileReaderByFileID(client *Client, fileID string) (io.ReadCloser, error) {
-	file, err := client.GetFile(&GetFileParams{FileID: fileID})
+	ctx, cancel := context.WithTimeout(context.Background(), client.options.timeout)
+	defer cancel()
+
+	file, err := client.GetFile(ctx, &GetFileParams{FileID: fileID})
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +89,10 @@ func DownloadFile(client *Client, file *File, path string) error {
 
 // DownloadByFileID resolves the file path by fileID and downloads the file to the specified local path.
 func DownloadByFileID(client *Client, fileID, filePath string) error {
-	file, err := client.GetFile(&GetFileParams{FileID: fileID})
+	ctx, cancel := context.WithTimeout(context.Background(), client.options.timeout)
+	defer cancel()
+
+	file, err := client.GetFile(ctx, &GetFileParams{FileID: fileID})
 	if err != nil {
 		return err
 	}

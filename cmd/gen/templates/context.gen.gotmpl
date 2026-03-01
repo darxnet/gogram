@@ -2,6 +2,10 @@
 
 package gogram
 
+import (
+    "context"
+)
+
 {{ $root := . }}
 
 func (ctx *Context) findHandlerOn() handleOn {
@@ -180,7 +184,10 @@ func (ctx *Context) {{ $method }}(
         }
     {{ end }}
 
-    _, err := ctx.client.{{ $method }}(params)
+    ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+    _, err := ctx.client.{{ $method }}(ctxWithCancel, params)
 
     return err
 }

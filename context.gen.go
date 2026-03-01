@@ -2,6 +2,10 @@
 
 package gogram
 
+import (
+	"context"
+)
+
 func (ctx *Context) findHandlerOn() handleOn {
 	if ctx.update == nil {
 		return 0
@@ -198,7 +202,10 @@ func (ctx *Context) AddStickerToSet(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.AddStickerToSet(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.AddStickerToSet(ctxWithCancel, params)
 
 	return err
 }
@@ -229,7 +236,10 @@ func (ctx *Context) AnswerCallbackQuery(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.AnswerCallbackQuery(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.AnswerCallbackQuery(ctxWithCancel, params)
 
 	return err
 }
@@ -260,7 +270,10 @@ func (ctx *Context) AnswerInlineQuery(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.AnswerInlineQuery(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.AnswerInlineQuery(ctxWithCancel, params)
 
 	return err
 }
@@ -294,7 +307,10 @@ func (ctx *Context) AnswerPreCheckoutQuery(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.AnswerPreCheckoutQuery(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.AnswerPreCheckoutQuery(ctxWithCancel, params)
 
 	return err
 }
@@ -327,7 +343,10 @@ func (ctx *Context) AnswerShippingQuery(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.AnswerShippingQuery(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.AnswerShippingQuery(ctxWithCancel, params)
 
 	return err
 }
@@ -351,7 +370,10 @@ func (ctx *Context) AnswerWebAppQuery(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.AnswerWebAppQuery(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.AnswerWebAppQuery(ctxWithCancel, params)
 
 	return err
 }
@@ -372,7 +394,10 @@ func (ctx *Context) ApproveChatJoinRequest(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.ApproveChatJoinRequest(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.ApproveChatJoinRequest(ctxWithCancel, params)
 
 	return err
 }
@@ -393,7 +418,10 @@ func (ctx *Context) ApproveSuggestedPost(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.ApproveSuggestedPost(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.ApproveSuggestedPost(ctxWithCancel, params)
 
 	return err
 }
@@ -417,7 +445,10 @@ func (ctx *Context) BanChatMember(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.BanChatMember(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.BanChatMember(ctxWithCancel, params)
 
 	return err
 }
@@ -441,7 +472,10 @@ func (ctx *Context) BanChatSenderChat(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.BanChatSenderChat(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.BanChatSenderChat(ctxWithCancel, params)
 
 	return err
 }
@@ -460,7 +494,10 @@ func (ctx *Context) Close(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.Close(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.Close(ctxWithCancel, params)
 
 	return err
 }
@@ -481,7 +518,10 @@ func (ctx *Context) CloseForumTopic(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.CloseForumTopic(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.CloseForumTopic(ctxWithCancel, params)
 
 	return err
 }
@@ -500,7 +540,10 @@ func (ctx *Context) CloseGeneralForumTopic(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.CloseGeneralForumTopic(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.CloseGeneralForumTopic(ctxWithCancel, params)
 
 	return err
 }
@@ -531,7 +574,10 @@ func (ctx *Context) ConvertGiftToStars(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.ConvertGiftToStars(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.ConvertGiftToStars(ctxWithCancel, params)
 
 	return err
 }
@@ -566,7 +612,10 @@ func (ctx *Context) CopyMessage(
 		}
 	}
 
-	_, err := ctx.client.CopyMessage(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.CopyMessage(ctxWithCancel, params)
 
 	return err
 }
@@ -597,7 +646,10 @@ func (ctx *Context) CopyMessages(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.CopyMessages(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.CopyMessages(ctxWithCancel, params)
 
 	return err
 }
@@ -620,7 +672,10 @@ func (ctx *Context) CreateChatInviteLink(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.CreateChatInviteLink(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.CreateChatInviteLink(ctxWithCancel, params)
 
 	return err
 }
@@ -649,7 +704,10 @@ func (ctx *Context) CreateChatSubscriptionInviteLink(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.CreateChatSubscriptionInviteLink(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.CreateChatSubscriptionInviteLink(ctxWithCancel, params)
 
 	return err
 }
@@ -672,7 +730,10 @@ func (ctx *Context) CreateForumTopic(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.CreateForumTopic(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.CreateForumTopic(ctxWithCancel, params)
 
 	return err
 }
@@ -710,7 +771,10 @@ func (ctx *Context) CreateInvoiceLink(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.CreateInvoiceLink(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.CreateInvoiceLink(ctxWithCancel, params)
 
 	return err
 }
@@ -736,7 +800,10 @@ func (ctx *Context) CreateNewStickerSet(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.CreateNewStickerSet(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.CreateNewStickerSet(ctxWithCancel, params)
 
 	return err
 }
@@ -757,7 +824,10 @@ func (ctx *Context) DeclineChatJoinRequest(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeclineChatJoinRequest(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.DeclineChatJoinRequest(ctxWithCancel, params)
 
 	return err
 }
@@ -778,7 +848,10 @@ func (ctx *Context) DeclineSuggestedPost(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeclineSuggestedPost(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.DeclineSuggestedPost(ctxWithCancel, params)
 
 	return err
 }
@@ -809,7 +882,10 @@ func (ctx *Context) DeleteBusinessMessages(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteBusinessMessages(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.DeleteBusinessMessages(ctxWithCancel, params)
 
 	return err
 }
@@ -829,7 +905,10 @@ func (ctx *Context) DeleteChatPhoto(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteChatPhoto(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.DeleteChatPhoto(ctxWithCancel, params)
 
 	return err
 }
@@ -851,7 +930,10 @@ func (ctx *Context) DeleteChatStickerSet(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteChatStickerSet(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.DeleteChatStickerSet(ctxWithCancel, params)
 
 	return err
 }
@@ -872,7 +954,10 @@ func (ctx *Context) DeleteForumTopic(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteForumTopic(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.DeleteForumTopic(ctxWithCancel, params)
 
 	return err
 }
@@ -901,7 +986,10 @@ func (ctx *Context) DeleteMessage(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteMessage(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.DeleteMessage(ctxWithCancel, params)
 
 	return err
 }
@@ -922,7 +1010,10 @@ func (ctx *Context) DeleteMessages(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteMessages(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.DeleteMessages(ctxWithCancel, params)
 
 	return err
 }
@@ -941,7 +1032,10 @@ func (ctx *Context) DeleteMyCommands(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteMyCommands(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.DeleteMyCommands(ctxWithCancel, params)
 
 	return err
 }
@@ -960,7 +1054,10 @@ func (ctx *Context) DeleteStickerFromSet(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteStickerFromSet(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.DeleteStickerFromSet(ctxWithCancel, params)
 
 	return err
 }
@@ -979,7 +1076,10 @@ func (ctx *Context) DeleteStickerSet(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteStickerSet(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.DeleteStickerSet(ctxWithCancel, params)
 
 	return err
 }
@@ -1010,7 +1110,10 @@ func (ctx *Context) DeleteStory(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteStory(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.DeleteStory(ctxWithCancel, params)
 
 	return err
 }
@@ -1028,7 +1131,10 @@ func (ctx *Context) DeleteWebhook(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteWebhook(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.DeleteWebhook(ctxWithCancel, params)
 
 	return err
 }
@@ -1051,7 +1157,10 @@ func (ctx *Context) EditChatInviteLink(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.EditChatInviteLink(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.EditChatInviteLink(ctxWithCancel, params)
 
 	return err
 }
@@ -1074,7 +1183,10 @@ func (ctx *Context) EditChatSubscriptionInviteLink(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.EditChatSubscriptionInviteLink(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.EditChatSubscriptionInviteLink(ctxWithCancel, params)
 
 	return err
 }
@@ -1095,7 +1207,10 @@ func (ctx *Context) EditForumTopic(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.EditForumTopic(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.EditForumTopic(ctxWithCancel, params)
 
 	return err
 }
@@ -1116,7 +1231,10 @@ func (ctx *Context) EditGeneralForumTopic(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.EditGeneralForumTopic(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.EditGeneralForumTopic(ctxWithCancel, params)
 
 	return err
 }
@@ -1154,7 +1272,10 @@ func (ctx *Context) EditMessageCaption(
 		}
 	}
 
-	_, err := ctx.client.EditMessageCaption(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.EditMessageCaption(ctxWithCancel, params)
 
 	return err
 }
@@ -1189,7 +1310,10 @@ func (ctx *Context) EditMessageChecklist(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.EditMessageChecklist(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.EditMessageChecklist(ctxWithCancel, params)
 
 	return err
 }
@@ -1226,7 +1350,10 @@ func (ctx *Context) EditMessageLiveLocation(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.EditMessageLiveLocation(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.EditMessageLiveLocation(ctxWithCancel, params)
 
 	return err
 }
@@ -1266,7 +1393,10 @@ func (ctx *Context) EditMessageMedia(
 		defaultParseModeToInputMedia(&params.Media, defaultParseMode)
 	}
 
-	_, err := ctx.client.EditMessageMedia(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.EditMessageMedia(ctxWithCancel, params)
 
 	return err
 }
@@ -1298,7 +1428,10 @@ func (ctx *Context) EditMessageReplyMarkup(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.EditMessageReplyMarkup(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.EditMessageReplyMarkup(ctxWithCancel, params)
 
 	return err
 }
@@ -1339,7 +1472,10 @@ func (ctx *Context) EditMessageText(
 		}
 	}
 
-	_, err := ctx.client.EditMessageText(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.EditMessageText(ctxWithCancel, params)
 
 	return err
 }
@@ -1380,7 +1516,10 @@ func (ctx *Context) EditStory(
 		}
 	}
 
-	_, err := ctx.client.EditStory(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.EditStory(ctxWithCancel, params)
 
 	return err
 }
@@ -1403,7 +1542,10 @@ func (ctx *Context) EditUserStarSubscription(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.EditUserStarSubscription(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.EditUserStarSubscription(ctxWithCancel, params)
 
 	return err
 }
@@ -1422,7 +1564,10 @@ func (ctx *Context) ExportChatInviteLink(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.ExportChatInviteLink(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.ExportChatInviteLink(ctxWithCancel, params)
 
 	return err
 }
@@ -1447,7 +1592,10 @@ func (ctx *Context) ForwardMessage(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.ForwardMessage(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.ForwardMessage(ctxWithCancel, params)
 
 	return err
 }
@@ -1474,7 +1622,10 @@ func (ctx *Context) ForwardMessages(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.ForwardMessages(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.ForwardMessages(ctxWithCancel, params)
 
 	return err
 }
@@ -1493,7 +1644,10 @@ func (ctx *Context) GetAvailableGifts(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetAvailableGifts(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetAvailableGifts(ctxWithCancel, params)
 
 	return err
 }
@@ -1524,7 +1678,10 @@ func (ctx *Context) GetBusinessAccountGifts(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetBusinessAccountGifts(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetBusinessAccountGifts(ctxWithCancel, params)
 
 	return err
 }
@@ -1555,7 +1712,10 @@ func (ctx *Context) GetBusinessAccountStarBalance(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetBusinessAccountStarBalance(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetBusinessAccountStarBalance(ctxWithCancel, params)
 
 	return err
 }
@@ -1585,7 +1745,10 @@ func (ctx *Context) GetBusinessConnection(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetBusinessConnection(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetBusinessConnection(ctxWithCancel, params)
 
 	return err
 }
@@ -1605,7 +1768,10 @@ func (ctx *Context) GetChat(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetChat(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetChat(ctxWithCancel, params)
 
 	return err
 }
@@ -1625,7 +1791,10 @@ func (ctx *Context) GetChatAdministrators(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetChatAdministrators(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetChatAdministrators(ctxWithCancel, params)
 
 	return err
 }
@@ -1645,7 +1814,10 @@ func (ctx *Context) GetChatGifts(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetChatGifts(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetChatGifts(ctxWithCancel, params)
 
 	return err
 }
@@ -1668,7 +1840,10 @@ func (ctx *Context) GetChatMember(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetChatMember(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetChatMember(ctxWithCancel, params)
 
 	return err
 }
@@ -1686,7 +1861,10 @@ func (ctx *Context) GetChatMemberCount(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetChatMemberCount(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetChatMemberCount(ctxWithCancel, params)
 
 	return err
 }
@@ -1706,7 +1884,10 @@ func (ctx *Context) GetChatMenuButton(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetChatMenuButton(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetChatMenuButton(ctxWithCancel, params)
 
 	return err
 }
@@ -1727,7 +1908,10 @@ func (ctx *Context) GetCustomEmojiStickers(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetCustomEmojiStickers(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetCustomEmojiStickers(ctxWithCancel, params)
 
 	return err
 }
@@ -1755,7 +1939,10 @@ func (ctx *Context) GetFile(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetFile(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetFile(ctxWithCancel, params)
 
 	return err
 }
@@ -1774,7 +1961,10 @@ func (ctx *Context) GetForumTopicIconStickers(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetForumTopicIconStickers(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetForumTopicIconStickers(ctxWithCancel, params)
 
 	return err
 }
@@ -1797,7 +1987,10 @@ func (ctx *Context) GetGameHighScores(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetGameHighScores(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetGameHighScores(ctxWithCancel, params)
 
 	return err
 }
@@ -1816,7 +2009,10 @@ func (ctx *Context) GetMe(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetMe(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetMe(ctxWithCancel, params)
 
 	return err
 }
@@ -1835,7 +2031,10 @@ func (ctx *Context) GetMyCommands(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetMyCommands(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetMyCommands(ctxWithCancel, params)
 
 	return err
 }
@@ -1853,7 +2052,10 @@ func (ctx *Context) GetMyDefaultAdministratorRights(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetMyDefaultAdministratorRights(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetMyDefaultAdministratorRights(ctxWithCancel, params)
 
 	return err
 }
@@ -1871,7 +2073,10 @@ func (ctx *Context) GetMyDescription(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetMyDescription(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetMyDescription(ctxWithCancel, params)
 
 	return err
 }
@@ -1889,7 +2094,10 @@ func (ctx *Context) GetMyName(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetMyName(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetMyName(ctxWithCancel, params)
 
 	return err
 }
@@ -1907,7 +2115,10 @@ func (ctx *Context) GetMyShortDescription(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetMyShortDescription(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetMyShortDescription(ctxWithCancel, params)
 
 	return err
 }
@@ -1926,7 +2137,10 @@ func (ctx *Context) GetMyStarBalance(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetMyStarBalance(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetMyStarBalance(ctxWithCancel, params)
 
 	return err
 }
@@ -1944,7 +2158,10 @@ func (ctx *Context) GetStarTransactions(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetStarTransactions(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetStarTransactions(ctxWithCancel, params)
 
 	return err
 }
@@ -1965,7 +2182,10 @@ func (ctx *Context) GetStickerSet(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetStickerSet(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetStickerSet(ctxWithCancel, params)
 
 	return err
 }
@@ -1984,7 +2204,10 @@ func (ctx *Context) GetUpdates(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetUpdates(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetUpdates(ctxWithCancel, params)
 
 	return err
 }
@@ -2007,7 +2230,10 @@ func (ctx *Context) GetUserChatBoosts(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetUserChatBoosts(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetUserChatBoosts(ctxWithCancel, params)
 
 	return err
 }
@@ -2028,7 +2254,10 @@ func (ctx *Context) GetUserGifts(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetUserGifts(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetUserGifts(ctxWithCancel, params)
 
 	return err
 }
@@ -2049,7 +2278,10 @@ func (ctx *Context) GetUserProfileAudios(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetUserProfileAudios(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetUserProfileAudios(ctxWithCancel, params)
 
 	return err
 }
@@ -2070,7 +2302,10 @@ func (ctx *Context) GetUserProfilePhotos(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetUserProfilePhotos(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetUserProfilePhotos(ctxWithCancel, params)
 
 	return err
 }
@@ -2091,7 +2326,10 @@ func (ctx *Context) GetWebhookInfo(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetWebhookInfo(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GetWebhookInfo(ctxWithCancel, params)
 
 	return err
 }
@@ -2117,7 +2355,10 @@ func (ctx *Context) GiftPremiumSubscription(
 	if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
 	}
 
-	_, err := ctx.client.GiftPremiumSubscription(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.GiftPremiumSubscription(ctxWithCancel, params)
 
 	return err
 }
@@ -2137,7 +2378,10 @@ func (ctx *Context) HideGeneralForumTopic(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.HideGeneralForumTopic(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.HideGeneralForumTopic(ctxWithCancel, params)
 
 	return err
 }
@@ -2155,7 +2399,10 @@ func (ctx *Context) LeaveChat(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.LeaveChat(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.LeaveChat(ctxWithCancel, params)
 
 	return err
 }
@@ -2174,7 +2421,10 @@ func (ctx *Context) LogOut(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.LogOut(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.LogOut(ctxWithCancel, params)
 
 	return err
 }
@@ -2207,7 +2457,10 @@ func (ctx *Context) PinChatMessage(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.PinChatMessage(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.PinChatMessage(ctxWithCancel, params)
 
 	return err
 }
@@ -2248,7 +2501,10 @@ func (ctx *Context) PostStory(
 		}
 	}
 
-	_, err := ctx.client.PostStory(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.PostStory(ctxWithCancel, params)
 
 	return err
 }
@@ -2270,7 +2526,10 @@ func (ctx *Context) PromoteChatMember(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.PromoteChatMember(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.PromoteChatMember(ctxWithCancel, params)
 
 	return err
 }
@@ -2302,7 +2561,10 @@ func (ctx *Context) ReadBusinessMessage(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.ReadBusinessMessage(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.ReadBusinessMessage(ctxWithCancel, params)
 
 	return err
 }
@@ -2325,7 +2587,10 @@ func (ctx *Context) RefundStarPayment(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.RefundStarPayment(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.RefundStarPayment(ctxWithCancel, params)
 
 	return err
 }
@@ -2354,7 +2619,10 @@ func (ctx *Context) RemoveBusinessAccountProfilePhoto(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.RemoveBusinessAccountProfilePhoto(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.RemoveBusinessAccountProfilePhoto(ctxWithCancel, params)
 
 	return err
 }
@@ -2374,7 +2642,10 @@ func (ctx *Context) RemoveChatVerification(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.RemoveChatVerification(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.RemoveChatVerification(ctxWithCancel, params)
 
 	return err
 }
@@ -2391,7 +2662,10 @@ func (ctx *Context) RemoveMyProfilePhoto(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.RemoveMyProfilePhoto(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.RemoveMyProfilePhoto(ctxWithCancel, params)
 
 	return err
 }
@@ -2412,7 +2686,10 @@ func (ctx *Context) RemoveUserVerification(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.RemoveUserVerification(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.RemoveUserVerification(ctxWithCancel, params)
 
 	return err
 }
@@ -2433,7 +2710,10 @@ func (ctx *Context) ReopenForumTopic(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.ReopenForumTopic(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.ReopenForumTopic(ctxWithCancel, params)
 
 	return err
 }
@@ -2453,7 +2733,10 @@ func (ctx *Context) ReopenGeneralForumTopic(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.ReopenGeneralForumTopic(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.ReopenGeneralForumTopic(ctxWithCancel, params)
 
 	return err
 }
@@ -2483,7 +2766,10 @@ func (ctx *Context) ReplaceStickerInSet(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.ReplaceStickerInSet(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.ReplaceStickerInSet(ctxWithCancel, params)
 
 	return err
 }
@@ -2521,7 +2807,10 @@ func (ctx *Context) RepostStory(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.RepostStory(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.RepostStory(ctxWithCancel, params)
 
 	return err
 }
@@ -2545,7 +2834,10 @@ func (ctx *Context) RestrictChatMember(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.RestrictChatMember(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.RestrictChatMember(ctxWithCancel, params)
 
 	return err
 }
@@ -2569,7 +2861,10 @@ func (ctx *Context) RevokeChatInviteLink(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.RevokeChatInviteLink(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.RevokeChatInviteLink(ctxWithCancel, params)
 
 	return err
 }
@@ -2592,7 +2887,10 @@ func (ctx *Context) SavePreparedInlineMessage(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SavePreparedInlineMessage(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SavePreparedInlineMessage(ctxWithCancel, params)
 
 	return err
 }
@@ -2632,7 +2930,10 @@ func (ctx *Context) SendAnimation(
 		}
 	}
 
-	_, err := ctx.client.SendAnimation(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SendAnimation(ctxWithCancel, params)
 
 	return err
 }
@@ -2675,7 +2976,10 @@ func (ctx *Context) SendAudio(
 		}
 	}
 
-	_, err := ctx.client.SendAudio(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SendAudio(ctxWithCancel, params)
 
 	return err
 }
@@ -2708,7 +3012,10 @@ func (ctx *Context) SendChatAction(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SendChatAction(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SendChatAction(ctxWithCancel, params)
 
 	return err
 }
@@ -2741,7 +3048,10 @@ func (ctx *Context) SendChecklist(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SendChecklist(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SendChecklist(ctxWithCancel, params)
 
 	return err
 }
@@ -2776,7 +3086,10 @@ func (ctx *Context) SendContact(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SendContact(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SendContact(ctxWithCancel, params)
 
 	return err
 }
@@ -2807,7 +3120,10 @@ func (ctx *Context) SendDice(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SendDice(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SendDice(ctxWithCancel, params)
 
 	return err
 }
@@ -2847,7 +3163,10 @@ func (ctx *Context) SendDocument(
 		}
 	}
 
-	_, err := ctx.client.SendDocument(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SendDocument(ctxWithCancel, params)
 
 	return err
 }
@@ -2880,7 +3199,10 @@ func (ctx *Context) SendGame(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SendGame(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SendGame(ctxWithCancel, params)
 
 	return err
 }
@@ -2904,7 +3226,10 @@ func (ctx *Context) SendGift(
 	if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
 	}
 
-	_, err := ctx.client.SendGift(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SendGift(ctxWithCancel, params)
 
 	return err
 }
@@ -2934,7 +3259,10 @@ func (ctx *Context) SendInvoice(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SendInvoice(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SendInvoice(ctxWithCancel, params)
 
 	return err
 }
@@ -2969,7 +3297,10 @@ func (ctx *Context) SendLocation(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SendLocation(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SendLocation(ctxWithCancel, params)
 
 	return err
 }
@@ -3009,7 +3340,10 @@ func (ctx *Context) SendMediaGroup(
 		}
 	}
 
-	_, err := ctx.client.SendMediaGroup(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SendMediaGroup(ctxWithCancel, params)
 
 	return err
 }
@@ -3048,7 +3382,10 @@ func (ctx *Context) SendMessage(
 		}
 	}
 
-	_, err := ctx.client.SendMessage(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SendMessage(ctxWithCancel, params)
 
 	return err
 }
@@ -3076,7 +3413,10 @@ func (ctx *Context) SendMessageDraft(
 		}
 	}
 
-	_, err := ctx.client.SendMessageDraft(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SendMessageDraft(ctxWithCancel, params)
 
 	return err
 }
@@ -3117,7 +3457,10 @@ func (ctx *Context) SendPaidMedia(
 		}
 	}
 
-	_, err := ctx.client.SendPaidMedia(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SendPaidMedia(ctxWithCancel, params)
 
 	return err
 }
@@ -3156,7 +3499,10 @@ func (ctx *Context) SendPhoto(
 		}
 	}
 
-	_, err := ctx.client.SendPhoto(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SendPhoto(ctxWithCancel, params)
 
 	return err
 }
@@ -3194,7 +3540,10 @@ func (ctx *Context) SendPoll(
 	if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
 	}
 
-	_, err := ctx.client.SendPoll(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SendPoll(ctxWithCancel, params)
 
 	return err
 }
@@ -3229,7 +3578,10 @@ func (ctx *Context) SendSticker(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SendSticker(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SendSticker(ctxWithCancel, params)
 
 	return err
 }
@@ -3268,7 +3620,10 @@ func (ctx *Context) SendVenue(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SendVenue(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SendVenue(ctxWithCancel, params)
 
 	return err
 }
@@ -3309,7 +3664,10 @@ func (ctx *Context) SendVideo(
 		}
 	}
 
-	_, err := ctx.client.SendVideo(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SendVideo(ctxWithCancel, params)
 
 	return err
 }
@@ -3344,7 +3702,10 @@ func (ctx *Context) SendVideoNote(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SendVideoNote(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SendVideoNote(ctxWithCancel, params)
 
 	return err
 }
@@ -3387,7 +3748,10 @@ func (ctx *Context) SendVoice(
 		}
 	}
 
-	_, err := ctx.client.SendVoice(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SendVoice(ctxWithCancel, params)
 
 	return err
 }
@@ -3416,7 +3780,10 @@ func (ctx *Context) SetBusinessAccountBio(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetBusinessAccountBio(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetBusinessAccountBio(ctxWithCancel, params)
 
 	return err
 }
@@ -3449,7 +3816,10 @@ func (ctx *Context) SetBusinessAccountGiftSettings(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetBusinessAccountGiftSettings(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetBusinessAccountGiftSettings(ctxWithCancel, params)
 
 	return err
 }
@@ -3480,7 +3850,10 @@ func (ctx *Context) SetBusinessAccountName(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetBusinessAccountName(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetBusinessAccountName(ctxWithCancel, params)
 
 	return err
 }
@@ -3511,7 +3884,10 @@ func (ctx *Context) SetBusinessAccountProfilePhoto(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetBusinessAccountProfilePhoto(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetBusinessAccountProfilePhoto(ctxWithCancel, params)
 
 	return err
 }
@@ -3540,7 +3916,10 @@ func (ctx *Context) SetBusinessAccountUsername(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetBusinessAccountUsername(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetBusinessAccountUsername(ctxWithCancel, params)
 
 	return err
 }
@@ -3562,7 +3941,10 @@ func (ctx *Context) SetChatAdministratorCustomTitle(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetChatAdministratorCustomTitle(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetChatAdministratorCustomTitle(ctxWithCancel, params)
 
 	return err
 }
@@ -3581,7 +3963,34 @@ func (ctx *Context) SetChatDescription(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetChatDescription(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetChatDescription(ctxWithCancel, params)
+
+	return err
+}
+
+// SetChatMemberTag calls Client.SetChatMemberTag with context-derived defaults.
+//
+// Use this method to set a tag for a regular member in a group or a supergroup.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_tags administrator right.
+// Returns True on success.
+func (ctx *Context) SetChatMemberTag(
+	userID int64,
+	opts ...SetChatMemberTagOption,
+) error {
+	params := &SetChatMemberTagParams{
+		ChatID: ctx.Chat().Identifier(),
+		UserID: userID,
+	}
+
+	params.Option(opts...)
+
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetChatMemberTag(ctxWithCancel, params)
 
 	return err
 }
@@ -3620,7 +4029,10 @@ func (ctx *Context) SetChatMenuButton(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetChatMenuButton(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetChatMenuButton(ctxWithCancel, params)
 
 	return err
 }
@@ -3641,7 +4053,10 @@ func (ctx *Context) SetChatPermissions(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetChatPermissions(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetChatPermissions(ctxWithCancel, params)
 
 	return err
 }
@@ -3663,7 +4078,10 @@ func (ctx *Context) SetChatPhoto(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetChatPhoto(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetChatPhoto(ctxWithCancel, params)
 
 	return err
 }
@@ -3687,7 +4105,10 @@ func (ctx *Context) SetChatStickerSet(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetChatStickerSet(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetChatStickerSet(ctxWithCancel, params)
 
 	return err
 }
@@ -3709,7 +4130,10 @@ func (ctx *Context) SetChatTitle(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetChatTitle(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetChatTitle(ctxWithCancel, params)
 
 	return err
 }
@@ -3728,7 +4152,10 @@ func (ctx *Context) SetCustomEmojiStickerSetThumbnail(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetCustomEmojiStickerSetThumbnail(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetCustomEmojiStickerSetThumbnail(ctxWithCancel, params)
 
 	return err
 }
@@ -3753,7 +4180,10 @@ func (ctx *Context) SetGameScore(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetGameScore(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetGameScore(ctxWithCancel, params)
 
 	return err
 }
@@ -3776,7 +4206,10 @@ func (ctx *Context) SetMessageReaction(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetMessageReaction(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetMessageReaction(ctxWithCancel, params)
 
 	return err
 }
@@ -3798,7 +4231,10 @@ func (ctx *Context) SetMyCommands(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetMyCommands(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetMyCommands(ctxWithCancel, params)
 
 	return err
 }
@@ -3815,7 +4251,10 @@ func (ctx *Context) SetMyDefaultAdministratorRights(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetMyDefaultAdministratorRights(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetMyDefaultAdministratorRights(ctxWithCancel, params)
 
 	return err
 }
@@ -3831,7 +4270,10 @@ func (ctx *Context) SetMyDescription(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetMyDescription(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetMyDescription(ctxWithCancel, params)
 
 	return err
 }
@@ -3847,7 +4289,10 @@ func (ctx *Context) SetMyName(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetMyName(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetMyName(ctxWithCancel, params)
 
 	return err
 }
@@ -3866,7 +4311,10 @@ func (ctx *Context) SetMyProfilePhoto(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetMyProfilePhoto(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetMyProfilePhoto(ctxWithCancel, params)
 
 	return err
 }
@@ -3882,7 +4330,10 @@ func (ctx *Context) SetMyShortDescription(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetMyShortDescription(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetMyShortDescription(ctxWithCancel, params)
 
 	return err
 }
@@ -3907,7 +4358,10 @@ func (ctx *Context) SetPassportDataErrors(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetPassportDataErrors(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetPassportDataErrors(ctxWithCancel, params)
 
 	return err
 }
@@ -3929,7 +4383,10 @@ func (ctx *Context) SetStickerEmojiList(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetStickerEmojiList(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetStickerEmojiList(ctxWithCancel, params)
 
 	return err
 }
@@ -3949,7 +4406,10 @@ func (ctx *Context) SetStickerKeywords(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetStickerKeywords(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetStickerKeywords(ctxWithCancel, params)
 
 	return err
 }
@@ -3971,7 +4431,10 @@ func (ctx *Context) SetStickerMaskPosition(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetStickerMaskPosition(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetStickerMaskPosition(ctxWithCancel, params)
 
 	return err
 }
@@ -3992,7 +4455,10 @@ func (ctx *Context) SetStickerPositionInSet(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetStickerPositionInSet(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetStickerPositionInSet(ctxWithCancel, params)
 
 	return err
 }
@@ -4016,7 +4482,10 @@ func (ctx *Context) SetStickerSetThumbnail(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetStickerSetThumbnail(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetStickerSetThumbnail(ctxWithCancel, params)
 
 	return err
 }
@@ -4037,7 +4506,10 @@ func (ctx *Context) SetStickerSetTitle(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetStickerSetTitle(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetStickerSetTitle(ctxWithCancel, params)
 
 	return err
 }
@@ -4058,7 +4530,10 @@ func (ctx *Context) SetUserEmojiStatus(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetUserEmojiStatus(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetUserEmojiStatus(ctxWithCancel, params)
 
 	return err
 }
@@ -4084,7 +4559,10 @@ func (ctx *Context) SetWebhook(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetWebhook(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.SetWebhook(ctxWithCancel, params)
 
 	return err
 }
@@ -4115,7 +4593,10 @@ func (ctx *Context) StopMessageLiveLocation(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.StopMessageLiveLocation(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.StopMessageLiveLocation(ctxWithCancel, params)
 
 	return err
 }
@@ -4148,7 +4629,10 @@ func (ctx *Context) StopPoll(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.StopPoll(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.StopPoll(ctxWithCancel, params)
 
 	return err
 }
@@ -4179,7 +4663,10 @@ func (ctx *Context) TransferBusinessAccountStars(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.TransferBusinessAccountStars(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.TransferBusinessAccountStars(ctxWithCancel, params)
 
 	return err
 }
@@ -4213,7 +4700,10 @@ func (ctx *Context) TransferGift(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.TransferGift(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.TransferGift(ctxWithCancel, params)
 
 	return err
 }
@@ -4238,7 +4728,10 @@ func (ctx *Context) UnbanChatMember(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.UnbanChatMember(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.UnbanChatMember(ctxWithCancel, params)
 
 	return err
 }
@@ -4259,7 +4752,10 @@ func (ctx *Context) UnbanChatSenderChat(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.UnbanChatSenderChat(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.UnbanChatSenderChat(ctxWithCancel, params)
 
 	return err
 }
@@ -4278,7 +4774,10 @@ func (ctx *Context) UnhideGeneralForumTopic(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.UnhideGeneralForumTopic(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.UnhideGeneralForumTopic(ctxWithCancel, params)
 
 	return err
 }
@@ -4298,7 +4797,10 @@ func (ctx *Context) UnpinAllChatMessages(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.UnpinAllChatMessages(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.UnpinAllChatMessages(ctxWithCancel, params)
 
 	return err
 }
@@ -4319,7 +4821,10 @@ func (ctx *Context) UnpinAllForumTopicMessages(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.UnpinAllForumTopicMessages(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.UnpinAllForumTopicMessages(ctxWithCancel, params)
 
 	return err
 }
@@ -4338,7 +4843,10 @@ func (ctx *Context) UnpinAllGeneralForumTopicMessages(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.UnpinAllGeneralForumTopicMessages(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.UnpinAllGeneralForumTopicMessages(ctxWithCancel, params)
 
 	return err
 }
@@ -4369,7 +4877,10 @@ func (ctx *Context) UnpinChatMessage(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.UnpinChatMessage(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.UnpinChatMessage(ctxWithCancel, params)
 
 	return err
 }
@@ -4401,7 +4912,10 @@ func (ctx *Context) UpgradeGift(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.UpgradeGift(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.UpgradeGift(ctxWithCancel, params)
 
 	return err
 }
@@ -4429,7 +4943,10 @@ func (ctx *Context) UploadStickerFile(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.UploadStickerFile(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.UploadStickerFile(ctxWithCancel, params)
 
 	return err
 }
@@ -4449,7 +4966,10 @@ func (ctx *Context) VerifyChat(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.VerifyChat(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.VerifyChat(ctxWithCancel, params)
 
 	return err
 }
@@ -4470,7 +4990,10 @@ func (ctx *Context) VerifyUser(
 
 	params.Option(opts...)
 
-	_, err := ctx.client.VerifyUser(params)
+	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
+	defer cancel()
+
+	_, err := ctx.client.VerifyUser(ctxWithCancel, params)
 
 	return err
 }
