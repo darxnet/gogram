@@ -962,6 +962,11 @@ type ChatAdministratorRights struct {
 	// Optional.
 	// True, if the administrator can manage direct messages of the channel and decline suggested posts; for channels only
 	CanManageDirectMessages bool `json:"can_manage_direct_messages,omitempty"`
+
+	// Optional.
+	// True, if the administrator can edit the tags of regular members; for groups and supergroups only.
+	// If omitted defaults to the value of can_pin_messages.
+	CanManageTags bool `json:"can_manage_tags,omitempty"`
 }
 
 // ChatBackground
@@ -1636,6 +1641,11 @@ type ChatMemberAdministrator struct {
 	CanManageDirectMessages bool `json:"can_manage_direct_messages,omitempty"`
 
 	// Optional.
+	// True, if the administrator can edit the tags of regular members; for groups and supergroups only.
+	// If omitted defaults to the value of can_pin_messages.
+	CanManageTags bool `json:"can_manage_tags,omitempty"`
+
+	// Optional.
 	// Custom title for this user
 	CustomTitle string `json:"custom_title,omitempty"`
 }
@@ -1679,6 +1689,10 @@ type ChatMemberMember struct {
 	// The member's status in the chat, always “member”
 	Status string `json:"status"`
 
+	// Optional.
+	// Tag of the member
+	Tag string `json:"tag,omitempty"`
+
 	// Information about the user
 	User User `json:"user"`
 
@@ -1717,6 +1731,10 @@ type ChatMemberRestricted struct {
 	// The member's status in the chat, always “restricted”
 	Status string `json:"status"`
 
+	// Optional.
+	// Tag of the member
+	Tag string `json:"tag,omitempty"`
+
 	// Information about the user
 	User User `json:"user"`
 
@@ -1752,6 +1770,9 @@ type ChatMemberRestricted struct {
 
 	// True, if the user is allowed to add web page previews to their messages
 	CanAddWebPagePreviews bool `json:"can_add_web_page_previews"`
+
+	// True, if the user is allowed to edit their own tag
+	CanEditTag bool `json:"can_edit_tag"`
 
 	// True, if the user is allowed to change the chat title, photo and other settings
 	CanChangeInfo bool `json:"can_change_info"`
@@ -1862,6 +1883,10 @@ type ChatPermissions struct {
 	// Optional.
 	// True, if the user is allowed to add web page previews to their messages
 	CanAddWebPagePreviews bool `json:"can_add_web_page_previews,omitempty"`
+
+	// Optional.
+	// True, if the user is allowed to edit their own tag
+	CanEditTag bool `json:"can_edit_tag,omitempty"`
 
 	// Optional.
 	// True, if the user is allowed to change the chat title, photo and other settings.
@@ -5836,6 +5861,10 @@ type Message struct {
 	// Available only for outgoing messages sent on behalf of the connected business account.
 	SenderBusinessBot *User `json:"sender_business_bot,omitempty"`
 
+	// Optional.
+	// Tag or custom title of the sender of the message; for supergroups only
+	SenderTag string `json:"sender_tag,omitempty"`
+
 	// Date the message was sent in Unix time.
 	// It is always a positive number, representing a valid date.
 	Date int64 `json:"date"`
@@ -5905,7 +5934,7 @@ type Message struct {
 	IsPaidPost bool `json:"is_paid_post,omitempty"`
 
 	// Optional.
-	// The unique identifier of a media message group this message belongs to
+	// The unique identifier inside this chat of a media message group this message belongs to
 	MediaGroupID string `json:"media_group_id,omitempty"`
 
 	// Optional.
@@ -6287,7 +6316,7 @@ type MessageAutoDeleteTimerChanged struct {
 // For example, hashtags, usernames, URLs, etc.
 type MessageEntity struct {
 	// Type of the entity.
-	// Currently, can be “mention” (@username), “hashtag” (#hashtag or #hashtag@chatusername), “cashtag” ($USD or $USD@chatusername), “bot_command” (/start@jobs_bot), “url” (https://telegram.org), “email” (do-not-reply@telegram.org), “phone_number” (+1-212-555-0123), “bold” (bold text), “italic” (italic text), “underline” (underlined text), “strikethrough” (strikethrough text), “spoiler” (spoiler message), “blockquote” (block quotation), “expandable_blockquote” (collapsed-by-default block quotation), “code” (monowidth string), “pre” (monowidth block), “text_link” (for clickable text URLs), “text_mention” (for users [without usernames]), “custom_emoji” (for inline custom emoji stickers)
+	// Currently, can be “mention” (@username), “hashtag” (#hashtag or #hashtag@chatusername), “cashtag” ($USD or $USD@chatusername), “bot_command” (/start@jobs_bot), “url” (https://telegram.org), “email” (do-not-reply@telegram.org), “phone_number” (+1-212-555-0123), “bold” (bold text), “italic” (italic text), “underline” (underlined text), “strikethrough” (strikethrough text), “spoiler” (spoiler message), “blockquote” (block quotation), “expandable_blockquote” (collapsed-by-default block quotation), “code” (monowidth string), “pre” (monowidth block), “text_link” (for clickable text URLs), “text_mention” (for users [without usernames]), “custom_emoji” (for inline custom emoji stickers), or “date_time” (for formatted date and time)
 	//
 	// [without usernames]: https://telegram.org/blog/edit#new-mentions
 	Type string `json:"type"`
@@ -6320,6 +6349,17 @@ type MessageEntity struct {
 	//
 	// [getCustomEmojiStickers]: https://core.telegram.org/bots/api#getcustomemojistickers
 	CustomEmojiID string `json:"custom_emoji_id,omitempty"`
+
+	// Optional.
+	// For “date_time” only, the Unix time associated with the entity
+	UnixTime int64 `json:"unix_time,omitempty"`
+
+	// Optional.
+	// For “date_time” only, the string that defines the formatting of the date and time.
+	// See [date-time entity formatting] for more details.
+	//
+	// [date-time entity formatting]: https://core.telegram.org/bots/api#date-time-entity-formatting
+	DateTimeFormat string `json:"date_time_format,omitempty"`
 }
 
 // MessageId

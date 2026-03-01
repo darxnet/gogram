@@ -3055,7 +3055,7 @@ func (ctx *Context) SendMessage(
 
 // SendMessageDraft calls Client.SendMessageDraft with context-derived defaults.
 //
-// Use this method to stream a partial message to a user while the message is being generated; supported only for bots with forum topic mode enabled.
+// Use this method to stream a partial message to a user while the message is being generated.
 // Returns True on success.
 func (ctx *Context) SendMessageDraft(
 	draftID int64,
@@ -3582,6 +3582,27 @@ func (ctx *Context) SetChatDescription(
 	params.Option(opts...)
 
 	_, err := ctx.client.SetChatDescription(params)
+
+	return err
+}
+
+// SetChatMemberTag calls Client.SetChatMemberTag with context-derived defaults.
+//
+// Use this method to set a tag for a regular member in a group or a supergroup.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_tags administrator right.
+// Returns True on success.
+func (ctx *Context) SetChatMemberTag(
+	userID int64,
+	opts ...SetChatMemberTagOption,
+) error {
+	params := &SetChatMemberTagParams{
+		ChatID: ctx.Chat().Identifier(),
+		UserID: userID,
+	}
+
+	params.Option(opts...)
+
+	_, err := ctx.client.SetChatMemberTag(params)
 
 	return err
 }
