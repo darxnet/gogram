@@ -408,12 +408,22 @@ func (ctx *Context) ApproveChatJoinRequest(
 // The bot must have the 'can_post_messages' administrator right in the corresponding channel chat.
 // Returns True on success.
 func (ctx *Context) ApproveSuggestedPost(
-	messageID int64,
 	opts ...ApproveSuggestedPostOption,
 ) error {
 	params := &ApproveSuggestedPostParams{
-		ChatID:    ctx.Chat().ID,
-		MessageID: messageID,
+		ChatID: ctx.Chat().ID,
+		MessageID: func(ctx *Context) int64 {
+			if ctx.update == nil {
+				return 0
+			}
+
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			return m.MessageID
+		}(ctx),
 	}
 
 	params.Option(opts...)
@@ -508,12 +518,11 @@ func (ctx *Context) Close(
 // The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights, unless it is the creator of the topic.
 // Returns True on success.
 func (ctx *Context) CloseForumTopic(
-	messageThreadID int64,
 	opts ...CloseForumTopicOption,
 ) error {
 	params := &CloseForumTopicParams{
 		ChatID:          ctx.Chat().Identifier(),
-		MessageThreadID: messageThreadID,
+		MessageThreadID: ctx.Message().MessageThreadID,
 	}
 
 	params.Option(opts...)
@@ -558,18 +567,8 @@ func (ctx *Context) ConvertGiftToStars(
 	opts ...ConvertGiftToStarsOption,
 ) error {
 	params := &ConvertGiftToStarsParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		OwnedGiftID: ownedGiftID,
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		OwnedGiftID:          ownedGiftID,
 	}
 
 	params.Option(opts...)
@@ -595,13 +594,25 @@ func (ctx *Context) ConvertGiftToStars(
 // [MessageId]: https://core.telegram.org/bots/api#messageid
 func (ctx *Context) CopyMessage(
 	fromChatID string,
-	messageID int64,
 	opts ...CopyMessageOption,
 ) error {
 	params := &CopyMessageParams{
-		ChatID:     ctx.Chat().Identifier(),
-		FromChatID: fromChatID,
-		MessageID:  messageID,
+		ChatID:                ctx.Chat().Identifier(),
+		MessageThreadID:       ctx.Message().MessageThreadID,
+		DirectMessagesTopicID: ctx.Message().DirectMessagesTopic.TopicID,
+		FromChatID:            fromChatID,
+		MessageID: func(ctx *Context) int64 {
+			if ctx.update == nil {
+				return 0
+			}
+
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			return m.MessageID
+		}(ctx),
 	}
 
 	params.Option(opts...)
@@ -639,9 +650,11 @@ func (ctx *Context) CopyMessages(
 	opts ...CopyMessagesOption,
 ) error {
 	params := &CopyMessagesParams{
-		ChatID:     ctx.Chat().Identifier(),
-		FromChatID: fromChatID,
-		MessageIDs: messageIDs,
+		ChatID:                ctx.Chat().Identifier(),
+		MessageThreadID:       ctx.Message().MessageThreadID,
+		DirectMessagesTopicID: ctx.Message().DirectMessagesTopic.TopicID,
+		FromChatID:            fromChatID,
+		MessageIDs:            messageIDs,
 	}
 
 	params.Option(opts...)
@@ -751,22 +764,12 @@ func (ctx *Context) CreateInvoiceLink(
 	opts ...CreateInvoiceLinkOption,
 ) error {
 	params := &CreateInvoiceLinkParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		Title:       title,
-		Description: description,
-		Payload:     payload,
-		Currency:    currency,
-		Prices:      prices,
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		Title:                title,
+		Description:          description,
+		Payload:              payload,
+		Currency:             currency,
+		Prices:               prices,
 	}
 
 	params.Option(opts...)
@@ -838,12 +841,22 @@ func (ctx *Context) DeclineChatJoinRequest(
 // The bot must have the 'can_manage_direct_messages' administrator right in the corresponding channel chat.
 // Returns True on success.
 func (ctx *Context) DeclineSuggestedPost(
-	messageID int64,
 	opts ...DeclineSuggestedPostOption,
 ) error {
 	params := &DeclineSuggestedPostParams{
-		ChatID:    ctx.Chat().ID,
-		MessageID: messageID,
+		ChatID: ctx.Chat().ID,
+		MessageID: func(ctx *Context) int64 {
+			if ctx.update == nil {
+				return 0
+			}
+
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			return m.MessageID
+		}(ctx),
 	}
 
 	params.Option(opts...)
@@ -866,18 +879,8 @@ func (ctx *Context) DeleteBusinessMessages(
 	opts ...DeleteBusinessMessagesOption,
 ) error {
 	params := &DeleteBusinessMessagesParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		MessageIDs: messageIDs,
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		MessageIDs:           messageIDs,
 	}
 
 	params.Option(opts...)
@@ -944,12 +947,11 @@ func (ctx *Context) DeleteChatStickerSet(
 // In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_delete_messages administrator rights.
 // Returns True on success.
 func (ctx *Context) DeleteForumTopic(
-	messageThreadID int64,
 	opts ...DeleteForumTopicOption,
 ) error {
 	params := &DeleteForumTopicParams{
 		ChatID:          ctx.Chat().Identifier(),
-		MessageThreadID: messageThreadID,
+		MessageThreadID: ctx.Message().MessageThreadID,
 	}
 
 	params.Option(opts...)
@@ -976,12 +978,22 @@ func (ctx *Context) DeleteForumTopic(
 // - If the bot has can_manage_direct_messages administrator right in a channel, it can delete any message in the corresponding direct messages chat.
 // Returns True on success.
 func (ctx *Context) DeleteMessage(
-	messageID int64,
 	opts ...DeleteMessageOption,
 ) error {
 	params := &DeleteMessageParams{
-		ChatID:    ctx.Chat().Identifier(),
-		MessageID: messageID,
+		ChatID: ctx.Chat().Identifier(),
+		MessageID: func(ctx *Context) int64 {
+			if ctx.update == nil {
+				return 0
+			}
+
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			return m.MessageID
+		}(ctx),
 	}
 
 	params.Option(opts...)
@@ -1094,18 +1106,8 @@ func (ctx *Context) DeleteStory(
 	opts ...DeleteStoryOption,
 ) error {
 	params := &DeleteStoryParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		StoryID: storyID,
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		StoryID:              storyID,
 	}
 
 	params.Option(opts...)
@@ -1197,12 +1199,11 @@ func (ctx *Context) EditChatSubscriptionInviteLink(
 // In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights, unless it is the creator of the topic.
 // Returns True on success.
 func (ctx *Context) EditForumTopic(
-	messageThreadID int64,
 	opts ...EditForumTopicOption,
 ) error {
 	params := &EditForumTopicParams{
 		ChatID:          ctx.Chat().Identifier(),
-		MessageThreadID: messageThreadID,
+		MessageThreadID: ctx.Message().MessageThreadID,
 	}
 
 	params.Option(opts...)
@@ -1250,18 +1251,31 @@ func (ctx *Context) EditMessageCaption(
 	opts ...EditMessageCaptionOption,
 ) error {
 	params := &EditMessageCaptionParams{
-		BusinessConnectionID: func(ctx *Context) string {
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		ChatID:               ctx.Chat().Identifier(),
+		MessageID: func(ctx *Context) int64 {
+			if ctx.update == nil {
+				return 0
+			}
+
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			return m.MessageID
+		}(ctx),
+		InlineMessageID: func(ctx *Context) string {
 			if ctx.update == nil {
 				return ""
 			}
 
-			if ctx.update.BusinessConnection == nil {
+			if ctx.update.CallbackQuery == nil {
 				return ""
 			}
 
-			return ctx.update.BusinessConnection.ID
+			return ctx.update.CallbackQuery.InlineMessageID
 		}(ctx),
-		ChatID: ctx.Chat().Identifier(),
 	}
 
 	params.Option(opts...)
@@ -1287,24 +1301,24 @@ func (ctx *Context) EditMessageCaption(
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) EditMessageChecklist(
-	messageID int64,
 	checklist InputChecklist,
 	opts ...EditMessageChecklistOption,
 ) error {
 	params := &EditMessageChecklistParams{
-		BusinessConnectionID: func(ctx *Context) string {
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		ChatID:               ctx.Chat().ID,
+		MessageID: func(ctx *Context) int64 {
 			if ctx.update == nil {
-				return ""
+				return 0
 			}
 
-			if ctx.update.BusinessConnection == nil {
-				return ""
+			m := ctx.Message()
+			if m == nil {
+				return 0
 			}
 
-			return ctx.update.BusinessConnection.ID
+			return m.MessageID
 		}(ctx),
-		ChatID:    ctx.Chat().ID,
-		MessageID: messageID,
 		Checklist: checklist,
 	}
 
@@ -1332,18 +1346,31 @@ func (ctx *Context) EditMessageLiveLocation(
 	opts ...EditMessageLiveLocationOption,
 ) error {
 	params := &EditMessageLiveLocationParams{
-		BusinessConnectionID: func(ctx *Context) string {
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		ChatID:               ctx.Chat().Identifier(),
+		MessageID: func(ctx *Context) int64 {
+			if ctx.update == nil {
+				return 0
+			}
+
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			return m.MessageID
+		}(ctx),
+		InlineMessageID: func(ctx *Context) string {
 			if ctx.update == nil {
 				return ""
 			}
 
-			if ctx.update.BusinessConnection == nil {
+			if ctx.update.CallbackQuery == nil {
 				return ""
 			}
 
-			return ctx.update.BusinessConnection.ID
+			return ctx.update.CallbackQuery.InlineMessageID
 		}(ctx),
-		ChatID:    ctx.Chat().Identifier(),
 		Latitude:  latitude,
 		Longitude: longitude,
 	}
@@ -1372,19 +1399,32 @@ func (ctx *Context) EditMessageMedia(
 	opts ...EditMessageMediaOption,
 ) error {
 	params := &EditMessageMediaParams{
-		BusinessConnectionID: func(ctx *Context) string {
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		ChatID:               ctx.Chat().Identifier(),
+		MessageID: func(ctx *Context) int64 {
+			if ctx.update == nil {
+				return 0
+			}
+
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			return m.MessageID
+		}(ctx),
+		InlineMessageID: func(ctx *Context) string {
 			if ctx.update == nil {
 				return ""
 			}
 
-			if ctx.update.BusinessConnection == nil {
+			if ctx.update.CallbackQuery == nil {
 				return ""
 			}
 
-			return ctx.update.BusinessConnection.ID
+			return ctx.update.CallbackQuery.InlineMessageID
 		}(ctx),
-		ChatID: ctx.Chat().Identifier(),
-		Media:  media,
+		Media: media,
 	}
 
 	params.Option(opts...)
@@ -1412,18 +1452,31 @@ func (ctx *Context) EditMessageReplyMarkup(
 	opts ...EditMessageReplyMarkupOption,
 ) error {
 	params := &EditMessageReplyMarkupParams{
-		BusinessConnectionID: func(ctx *Context) string {
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		ChatID:               ctx.Chat().Identifier(),
+		MessageID: func(ctx *Context) int64 {
+			if ctx.update == nil {
+				return 0
+			}
+
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			return m.MessageID
+		}(ctx),
+		InlineMessageID: func(ctx *Context) string {
 			if ctx.update == nil {
 				return ""
 			}
 
-			if ctx.update.BusinessConnection == nil {
+			if ctx.update.CallbackQuery == nil {
 				return ""
 			}
 
-			return ctx.update.BusinessConnection.ID
+			return ctx.update.CallbackQuery.InlineMessageID
 		}(ctx),
-		ChatID: ctx.Chat().Identifier(),
 	}
 
 	params.Option(opts...)
@@ -1449,19 +1502,32 @@ func (ctx *Context) EditMessageText(
 	opts ...EditMessageTextOption,
 ) error {
 	params := &EditMessageTextParams{
-		BusinessConnectionID: func(ctx *Context) string {
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		ChatID:               ctx.Chat().Identifier(),
+		MessageID: func(ctx *Context) int64 {
+			if ctx.update == nil {
+				return 0
+			}
+
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			return m.MessageID
+		}(ctx),
+		InlineMessageID: func(ctx *Context) string {
 			if ctx.update == nil {
 				return ""
 			}
 
-			if ctx.update.BusinessConnection == nil {
+			if ctx.update.CallbackQuery == nil {
 				return ""
 			}
 
-			return ctx.update.BusinessConnection.ID
+			return ctx.update.CallbackQuery.InlineMessageID
 		}(ctx),
-		ChatID: ctx.Chat().Identifier(),
-		Text:   text,
+		Text: text,
 	}
 
 	params.Option(opts...)
@@ -1493,19 +1559,9 @@ func (ctx *Context) EditStory(
 	opts ...EditStoryOption,
 ) error {
 	params := &EditStoryParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		StoryID: storyID,
-		Content: content,
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		StoryID:              storyID,
+		Content:              content,
 	}
 
 	params.Option(opts...)
@@ -1581,13 +1637,25 @@ func (ctx *Context) ExportChatInviteLink(
 // [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) ForwardMessage(
 	fromChatID string,
-	messageID int64,
 	opts ...ForwardMessageOption,
 ) error {
 	params := &ForwardMessageParams{
-		ChatID:     ctx.Chat().Identifier(),
-		FromChatID: fromChatID,
-		MessageID:  messageID,
+		ChatID:                ctx.Chat().Identifier(),
+		MessageThreadID:       ctx.Message().MessageThreadID,
+		DirectMessagesTopicID: ctx.Message().DirectMessagesTopic.TopicID,
+		FromChatID:            fromChatID,
+		MessageID: func(ctx *Context) int64 {
+			if ctx.update == nil {
+				return 0
+			}
+
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			return m.MessageID
+		}(ctx),
 	}
 
 	params.Option(opts...)
@@ -1615,9 +1683,11 @@ func (ctx *Context) ForwardMessages(
 	opts ...ForwardMessagesOption,
 ) error {
 	params := &ForwardMessagesParams{
-		ChatID:     ctx.Chat().Identifier(),
-		FromChatID: fromChatID,
-		MessageIDs: messageIDs,
+		ChatID:                ctx.Chat().Identifier(),
+		MessageThreadID:       ctx.Message().MessageThreadID,
+		DirectMessagesTopicID: ctx.Message().DirectMessagesTopic.TopicID,
+		FromChatID:            fromChatID,
+		MessageIDs:            messageIDs,
 	}
 
 	params.Option(opts...)
@@ -1663,17 +1733,7 @@ func (ctx *Context) GetBusinessAccountGifts(
 	opts ...GetBusinessAccountGiftsOption,
 ) error {
 	params := &GetBusinessAccountGiftsParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
 	}
 
 	params.Option(opts...)
@@ -1697,17 +1757,7 @@ func (ctx *Context) GetBusinessAccountStarBalance(
 	opts ...GetBusinessAccountStarBalanceOption,
 ) error {
 	params := &GetBusinessAccountStarBalanceParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
 	}
 
 	params.Option(opts...)
@@ -1730,17 +1780,7 @@ func (ctx *Context) GetBusinessConnection(
 	opts ...GetBusinessConnectionOption,
 ) error {
 	params := &GetBusinessConnectionParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
 	}
 
 	params.Option(opts...)
@@ -1983,6 +2023,29 @@ func (ctx *Context) GetGameHighScores(
 	params := &GetGameHighScoresParams{
 		UserID: userID,
 		ChatID: ctx.Chat().ID,
+		MessageID: func(ctx *Context) int64 {
+			if ctx.update == nil {
+				return 0
+			}
+
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			return m.MessageID
+		}(ctx),
+		InlineMessageID: func(ctx *Context) string {
+			if ctx.update == nil {
+				return ""
+			}
+
+			if ctx.update.CallbackQuery == nil {
+				return ""
+			}
+
+			return ctx.update.CallbackQuery.InlineMessageID
+		}(ctx),
 	}
 
 	params.Option(opts...)
@@ -2436,23 +2499,23 @@ func (ctx *Context) LogOut(
 // Conversely, the bot must be an administrator with the 'can_pin_messages' right or the 'can_edit_messages' right to pin messages in groups and channels respectively.
 // Returns True on success.
 func (ctx *Context) PinChatMessage(
-	messageID int64,
 	opts ...PinChatMessageOption,
 ) error {
 	params := &PinChatMessageParams{
-		BusinessConnectionID: func(ctx *Context) string {
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		ChatID:               ctx.Chat().Identifier(),
+		MessageID: func(ctx *Context) int64 {
 			if ctx.update == nil {
-				return ""
+				return 0
 			}
 
-			if ctx.update.BusinessConnection == nil {
-				return ""
+			m := ctx.Message()
+			if m == nil {
+				return 0
 			}
 
-			return ctx.update.BusinessConnection.ID
+			return m.MessageID
 		}(ctx),
-		ChatID:    ctx.Chat().Identifier(),
-		MessageID: messageID,
 	}
 
 	params.Option(opts...)
@@ -2478,19 +2541,9 @@ func (ctx *Context) PostStory(
 	opts ...PostStoryOption,
 ) error {
 	params := &PostStoryParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		Content:      content,
-		ActivePeriod: activePeriod,
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		Content:              content,
+		ActivePeriod:         activePeriod,
 	}
 
 	params.Option(opts...)
@@ -2540,23 +2593,23 @@ func (ctx *Context) PromoteChatMember(
 // Requires the can_read_messages business bot right.
 // Returns True on success.
 func (ctx *Context) ReadBusinessMessage(
-	messageID int64,
 	opts ...ReadBusinessMessageOption,
 ) error {
 	params := &ReadBusinessMessageParams{
-		BusinessConnectionID: func(ctx *Context) string {
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		ChatID:               ctx.Chat().ID,
+		MessageID: func(ctx *Context) int64 {
 			if ctx.update == nil {
-				return ""
+				return 0
 			}
 
-			if ctx.update.BusinessConnection == nil {
-				return ""
+			m := ctx.Message()
+			if m == nil {
+				return 0
 			}
 
-			return ctx.update.BusinessConnection.ID
+			return m.MessageID
 		}(ctx),
-		ChatID:    ctx.Chat().ID,
-		MessageID: messageID,
 	}
 
 	params.Option(opts...)
@@ -2604,17 +2657,7 @@ func (ctx *Context) RemoveBusinessAccountProfilePhoto(
 	opts ...RemoveBusinessAccountProfilePhotoOption,
 ) error {
 	params := &RemoveBusinessAccountProfilePhotoParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
 	}
 
 	params.Option(opts...)
@@ -2700,12 +2743,11 @@ func (ctx *Context) RemoveUserVerification(
 // The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights, unless it is the creator of the topic.
 // Returns True on success.
 func (ctx *Context) ReopenForumTopic(
-	messageThreadID int64,
 	opts ...ReopenForumTopicOption,
 ) error {
 	params := &ReopenForumTopicParams{
 		ChatID:          ctx.Chat().Identifier(),
-		MessageThreadID: messageThreadID,
+		MessageThreadID: ctx.Message().MessageThreadID,
 	}
 
 	params.Option(opts...)
@@ -2789,20 +2831,10 @@ func (ctx *Context) RepostStory(
 	opts ...RepostStoryOption,
 ) error {
 	params := &RepostStoryParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		FromChatID:   fromChatID,
-		FromStoryID:  fromStoryID,
-		ActivePeriod: activePeriod,
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		FromChatID:           fromChatID,
+		FromStoryID:          fromStoryID,
+		ActivePeriod:         activePeriod,
 	}
 
 	params.Option(opts...)
@@ -2907,19 +2939,11 @@ func (ctx *Context) SendAnimation(
 	opts ...SendAnimationOption,
 ) error {
 	params := &SendAnimationParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		ChatID:    ctx.Chat().Identifier(),
-		Animation: animation,
+		BusinessConnectionID:  ctx.Message().BusinessConnectionID,
+		ChatID:                ctx.Chat().Identifier(),
+		MessageThreadID:       ctx.Message().MessageThreadID,
+		DirectMessagesTopicID: ctx.Message().DirectMessagesTopic.TopicID,
+		Animation:             animation,
 	}
 
 	params.Option(opts...)
@@ -2953,19 +2977,11 @@ func (ctx *Context) SendAudio(
 	opts ...SendAudioOption,
 ) error {
 	params := &SendAudioParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		ChatID: ctx.Chat().Identifier(),
-		Audio:  audio,
+		BusinessConnectionID:  ctx.Message().BusinessConnectionID,
+		ChatID:                ctx.Chat().Identifier(),
+		MessageThreadID:       ctx.Message().MessageThreadID,
+		DirectMessagesTopicID: ctx.Message().DirectMessagesTopic.TopicID,
+		Audio:                 audio,
 	}
 
 	params.Option(opts...)
@@ -2995,19 +3011,10 @@ func (ctx *Context) SendChatAction(
 	opts ...SendChatActionOption,
 ) error {
 	params := &SendChatActionParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		ChatID: ctx.Chat().Identifier(),
-		Action: action,
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		ChatID:               ctx.Chat().Identifier(),
+		MessageThreadID:      ctx.Message().MessageThreadID,
+		Action:               action,
 	}
 
 	params.Option(opts...)
@@ -3031,19 +3038,9 @@ func (ctx *Context) SendChecklist(
 	opts ...SendChecklistOption,
 ) error {
 	params := &SendChecklistParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		ChatID:    ctx.Chat().ID,
-		Checklist: checklist,
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		ChatID:               ctx.Chat().ID,
+		Checklist:            checklist,
 	}
 
 	params.Option(opts...)
@@ -3068,20 +3065,12 @@ func (ctx *Context) SendContact(
 	opts ...SendContactOption,
 ) error {
 	params := &SendContactParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		ChatID:      ctx.Chat().Identifier(),
-		PhoneNumber: phoneNumber,
-		FirstName:   firstName,
+		BusinessConnectionID:  ctx.Message().BusinessConnectionID,
+		ChatID:                ctx.Chat().Identifier(),
+		MessageThreadID:       ctx.Message().MessageThreadID,
+		DirectMessagesTopicID: ctx.Message().DirectMessagesTopic.TopicID,
+		PhoneNumber:           phoneNumber,
+		FirstName:             firstName,
 	}
 
 	params.Option(opts...)
@@ -3104,18 +3093,10 @@ func (ctx *Context) SendDice(
 	opts ...SendDiceOption,
 ) error {
 	params := &SendDiceParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		ChatID: ctx.Chat().Identifier(),
+		BusinessConnectionID:  ctx.Message().BusinessConnectionID,
+		ChatID:                ctx.Chat().Identifier(),
+		MessageThreadID:       ctx.Message().MessageThreadID,
+		DirectMessagesTopicID: ctx.Message().DirectMessagesTopic.TopicID,
 	}
 
 	params.Option(opts...)
@@ -3140,19 +3121,11 @@ func (ctx *Context) SendDocument(
 	opts ...SendDocumentOption,
 ) error {
 	params := &SendDocumentParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		ChatID:   ctx.Chat().Identifier(),
-		Document: document,
+		BusinessConnectionID:  ctx.Message().BusinessConnectionID,
+		ChatID:                ctx.Chat().Identifier(),
+		MessageThreadID:       ctx.Message().MessageThreadID,
+		DirectMessagesTopicID: ctx.Message().DirectMessagesTopic.TopicID,
+		Document:              document,
 	}
 
 	params.Option(opts...)
@@ -3182,19 +3155,10 @@ func (ctx *Context) SendGame(
 	opts ...SendGameOption,
 ) error {
 	params := &SendGameParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		ChatID:        ctx.Chat().ID,
-		GameShortName: gameShortName,
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		ChatID:               ctx.Chat().ID,
+		MessageThreadID:      ctx.Message().MessageThreadID,
+		GameShortName:        gameShortName,
 	}
 
 	params.Option(opts...)
@@ -3249,12 +3213,14 @@ func (ctx *Context) SendInvoice(
 	opts ...SendInvoiceOption,
 ) error {
 	params := &SendInvoiceParams{
-		ChatID:      ctx.Chat().Identifier(),
-		Title:       title,
-		Description: description,
-		Payload:     payload,
-		Currency:    currency,
-		Prices:      prices,
+		ChatID:                ctx.Chat().Identifier(),
+		MessageThreadID:       ctx.Message().MessageThreadID,
+		DirectMessagesTopicID: ctx.Message().DirectMessagesTopic.TopicID,
+		Title:                 title,
+		Description:           description,
+		Payload:               payload,
+		Currency:              currency,
+		Prices:                prices,
 	}
 
 	params.Option(opts...)
@@ -3279,20 +3245,12 @@ func (ctx *Context) SendLocation(
 	opts ...SendLocationOption,
 ) error {
 	params := &SendLocationParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		ChatID:    ctx.Chat().Identifier(),
-		Latitude:  latitude,
-		Longitude: longitude,
+		BusinessConnectionID:  ctx.Message().BusinessConnectionID,
+		ChatID:                ctx.Chat().Identifier(),
+		MessageThreadID:       ctx.Message().MessageThreadID,
+		DirectMessagesTopicID: ctx.Message().DirectMessagesTopic.TopicID,
+		Latitude:              latitude,
+		Longitude:             longitude,
 	}
 
 	params.Option(opts...)
@@ -3317,19 +3275,11 @@ func (ctx *Context) SendMediaGroup(
 	opts ...SendMediaGroupOption,
 ) error {
 	params := &SendMediaGroupParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		ChatID: ctx.Chat().Identifier(),
-		Media:  media,
+		BusinessConnectionID:  ctx.Message().BusinessConnectionID,
+		ChatID:                ctx.Chat().Identifier(),
+		MessageThreadID:       ctx.Message().MessageThreadID,
+		DirectMessagesTopicID: ctx.Message().DirectMessagesTopic.TopicID,
+		Media:                 media,
 	}
 
 	params.Option(opts...)
@@ -3359,19 +3309,11 @@ func (ctx *Context) SendMessage(
 	opts ...SendMessageOption,
 ) error {
 	params := &SendMessageParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		ChatID: ctx.Chat().Identifier(),
-		Text:   text,
+		BusinessConnectionID:  ctx.Message().BusinessConnectionID,
+		ChatID:                ctx.Chat().Identifier(),
+		MessageThreadID:       ctx.Message().MessageThreadID,
+		DirectMessagesTopicID: ctx.Message().DirectMessagesTopic.TopicID,
+		Text:                  text,
 	}
 
 	params.Option(opts...)
@@ -3400,9 +3342,10 @@ func (ctx *Context) SendMessageDraft(
 	opts ...SendMessageDraftOption,
 ) error {
 	params := &SendMessageDraftParams{
-		ChatID:  ctx.Chat().ID,
-		DraftID: draftID,
-		Text:    text,
+		ChatID:          ctx.Chat().ID,
+		MessageThreadID: ctx.Message().MessageThreadID,
+		DraftID:         draftID,
+		Text:            text,
 	}
 
 	params.Option(opts...)
@@ -3433,20 +3376,12 @@ func (ctx *Context) SendPaidMedia(
 	opts ...SendPaidMediaOption,
 ) error {
 	params := &SendPaidMediaParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		ChatID:    ctx.Chat().Identifier(),
-		StarCount: starCount,
-		Media:     media,
+		BusinessConnectionID:  ctx.Message().BusinessConnectionID,
+		ChatID:                ctx.Chat().Identifier(),
+		MessageThreadID:       ctx.Message().MessageThreadID,
+		DirectMessagesTopicID: ctx.Message().DirectMessagesTopic.TopicID,
+		StarCount:             starCount,
+		Media:                 media,
 	}
 
 	params.Option(opts...)
@@ -3476,19 +3411,11 @@ func (ctx *Context) SendPhoto(
 	opts ...SendPhotoOption,
 ) error {
 	params := &SendPhotoParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		ChatID: ctx.Chat().Identifier(),
-		Photo:  photo,
+		BusinessConnectionID:  ctx.Message().BusinessConnectionID,
+		ChatID:                ctx.Chat().Identifier(),
+		MessageThreadID:       ctx.Message().MessageThreadID,
+		DirectMessagesTopicID: ctx.Message().DirectMessagesTopic.TopicID,
+		Photo:                 photo,
 	}
 
 	params.Option(opts...)
@@ -3519,20 +3446,11 @@ func (ctx *Context) SendPoll(
 	opts ...SendPollOption,
 ) error {
 	params := &SendPollParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		ChatID:   ctx.Chat().Identifier(),
-		Question: question,
-		Options:  options,
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		ChatID:               ctx.Chat().Identifier(),
+		MessageThreadID:      ctx.Message().MessageThreadID,
+		Question:             question,
+		Options:              options,
 	}
 
 	params.Option(opts...)
@@ -3561,19 +3479,11 @@ func (ctx *Context) SendSticker(
 	opts ...SendStickerOption,
 ) error {
 	params := &SendStickerParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		ChatID:  ctx.Chat().Identifier(),
-		Sticker: sticker,
+		BusinessConnectionID:  ctx.Message().BusinessConnectionID,
+		ChatID:                ctx.Chat().Identifier(),
+		MessageThreadID:       ctx.Message().MessageThreadID,
+		DirectMessagesTopicID: ctx.Message().DirectMessagesTopic.TopicID,
+		Sticker:               sticker,
 	}
 
 	params.Option(opts...)
@@ -3600,22 +3510,14 @@ func (ctx *Context) SendVenue(
 	opts ...SendVenueOption,
 ) error {
 	params := &SendVenueParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		ChatID:    ctx.Chat().Identifier(),
-		Latitude:  latitude,
-		Longitude: longitude,
-		Title:     title,
-		Address:   address,
+		BusinessConnectionID:  ctx.Message().BusinessConnectionID,
+		ChatID:                ctx.Chat().Identifier(),
+		MessageThreadID:       ctx.Message().MessageThreadID,
+		DirectMessagesTopicID: ctx.Message().DirectMessagesTopic.TopicID,
+		Latitude:              latitude,
+		Longitude:             longitude,
+		Title:                 title,
+		Address:               address,
 	}
 
 	params.Option(opts...)
@@ -3641,19 +3543,11 @@ func (ctx *Context) SendVideo(
 	opts ...SendVideoOption,
 ) error {
 	params := &SendVideoParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		ChatID: ctx.Chat().Identifier(),
-		Video:  video,
+		BusinessConnectionID:  ctx.Message().BusinessConnectionID,
+		ChatID:                ctx.Chat().Identifier(),
+		MessageThreadID:       ctx.Message().MessageThreadID,
+		DirectMessagesTopicID: ctx.Message().DirectMessagesTopic.TopicID,
+		Video:                 video,
 	}
 
 	params.Option(opts...)
@@ -3685,19 +3579,11 @@ func (ctx *Context) SendVideoNote(
 	opts ...SendVideoNoteOption,
 ) error {
 	params := &SendVideoNoteParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		ChatID:    ctx.Chat().Identifier(),
-		VideoNote: videoNote,
+		BusinessConnectionID:  ctx.Message().BusinessConnectionID,
+		ChatID:                ctx.Chat().Identifier(),
+		MessageThreadID:       ctx.Message().MessageThreadID,
+		DirectMessagesTopicID: ctx.Message().DirectMessagesTopic.TopicID,
+		VideoNote:             videoNote,
 	}
 
 	params.Option(opts...)
@@ -3725,19 +3611,11 @@ func (ctx *Context) SendVoice(
 	opts ...SendVoiceOption,
 ) error {
 	params := &SendVoiceParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		ChatID: ctx.Chat().Identifier(),
-		Voice:  voice,
+		BusinessConnectionID:  ctx.Message().BusinessConnectionID,
+		ChatID:                ctx.Chat().Identifier(),
+		MessageThreadID:       ctx.Message().MessageThreadID,
+		DirectMessagesTopicID: ctx.Message().DirectMessagesTopic.TopicID,
+		Voice:                 voice,
 	}
 
 	params.Option(opts...)
@@ -3765,17 +3643,7 @@ func (ctx *Context) SetBusinessAccountBio(
 	opts ...SetBusinessAccountBioOption,
 ) error {
 	params := &SetBusinessAccountBioParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
 	}
 
 	params.Option(opts...)
@@ -3799,19 +3667,9 @@ func (ctx *Context) SetBusinessAccountGiftSettings(
 	opts ...SetBusinessAccountGiftSettingsOption,
 ) error {
 	params := &SetBusinessAccountGiftSettingsParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		ShowGiftButton:    showGiftButton,
-		AcceptedGiftTypes: acceptedGiftTypes,
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		ShowGiftButton:       showGiftButton,
+		AcceptedGiftTypes:    acceptedGiftTypes,
 	}
 
 	params.Option(opts...)
@@ -3834,18 +3692,8 @@ func (ctx *Context) SetBusinessAccountName(
 	opts ...SetBusinessAccountNameOption,
 ) error {
 	params := &SetBusinessAccountNameParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		FirstName: firstName,
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		FirstName:            firstName,
 	}
 
 	params.Option(opts...)
@@ -3868,18 +3716,8 @@ func (ctx *Context) SetBusinessAccountProfilePhoto(
 	opts ...SetBusinessAccountProfilePhotoOption,
 ) error {
 	params := &SetBusinessAccountProfilePhotoParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		Photo: photo,
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		Photo:                photo,
 	}
 
 	params.Option(opts...)
@@ -3901,17 +3739,7 @@ func (ctx *Context) SetBusinessAccountUsername(
 	opts ...SetBusinessAccountUsernameOption,
 ) error {
 	params := &SetBusinessAccountUsernameParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
 	}
 
 	params.Option(opts...)
@@ -4155,6 +3983,29 @@ func (ctx *Context) SetGameScore(
 		UserID: userID,
 		Score:  score,
 		ChatID: ctx.Chat().ID,
+		MessageID: func(ctx *Context) int64 {
+			if ctx.update == nil {
+				return 0
+			}
+
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			return m.MessageID
+		}(ctx),
+		InlineMessageID: func(ctx *Context) string {
+			if ctx.update == nil {
+				return ""
+			}
+
+			if ctx.update.CallbackQuery == nil {
+				return ""
+			}
+
+			return ctx.update.CallbackQuery.InlineMessageID
+		}(ctx),
 	}
 
 	params.Option(opts...)
@@ -4175,12 +4026,22 @@ func (ctx *Context) SetGameScore(
 // Bots can't use paid reactions.
 // Returns True on success.
 func (ctx *Context) SetMessageReaction(
-	messageID int64,
 	opts ...SetMessageReactionOption,
 ) error {
 	params := &SetMessageReactionParams{
-		ChatID:    ctx.Chat().Identifier(),
-		MessageID: messageID,
+		ChatID: ctx.Chat().Identifier(),
+		MessageID: func(ctx *Context) int64 {
+			if ctx.update == nil {
+				return 0
+			}
+
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			return m.MessageID
+		}(ctx),
 	}
 
 	params.Option(opts...)
@@ -4556,18 +4417,31 @@ func (ctx *Context) StopMessageLiveLocation(
 	opts ...StopMessageLiveLocationOption,
 ) error {
 	params := &StopMessageLiveLocationParams{
-		BusinessConnectionID: func(ctx *Context) string {
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		ChatID:               ctx.Chat().Identifier(),
+		MessageID: func(ctx *Context) int64 {
+			if ctx.update == nil {
+				return 0
+			}
+
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			return m.MessageID
+		}(ctx),
+		InlineMessageID: func(ctx *Context) string {
 			if ctx.update == nil {
 				return ""
 			}
 
-			if ctx.update.BusinessConnection == nil {
+			if ctx.update.CallbackQuery == nil {
 				return ""
 			}
 
-			return ctx.update.BusinessConnection.ID
+			return ctx.update.CallbackQuery.InlineMessageID
 		}(ctx),
-		ChatID: ctx.Chat().Identifier(),
 	}
 
 	params.Option(opts...)
@@ -4587,23 +4461,23 @@ func (ctx *Context) StopMessageLiveLocation(
 //
 // [Poll]: https://core.telegram.org/bots/api#poll
 func (ctx *Context) StopPoll(
-	messageID int64,
 	opts ...StopPollOption,
 ) error {
 	params := &StopPollParams{
-		BusinessConnectionID: func(ctx *Context) string {
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		ChatID:               ctx.Chat().Identifier(),
+		MessageID: func(ctx *Context) int64 {
 			if ctx.update == nil {
-				return ""
+				return 0
 			}
 
-			if ctx.update.BusinessConnection == nil {
-				return ""
+			m := ctx.Message()
+			if m == nil {
+				return 0
 			}
 
-			return ctx.update.BusinessConnection.ID
+			return m.MessageID
 		}(ctx),
-		ChatID:    ctx.Chat().Identifier(),
-		MessageID: messageID,
 	}
 
 	params.Option(opts...)
@@ -4626,18 +4500,8 @@ func (ctx *Context) TransferBusinessAccountStars(
 	opts ...TransferBusinessAccountStarsOption,
 ) error {
 	params := &TransferBusinessAccountStarsParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		StarCount: starCount,
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		StarCount:            starCount,
 	}
 
 	params.Option(opts...)
@@ -4662,19 +4526,9 @@ func (ctx *Context) TransferGift(
 	opts ...TransferGiftOption,
 ) error {
 	params := &TransferGiftParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		OwnedGiftID:    ownedGiftID,
-		NewOwnerChatID: newOwnerChatID,
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		OwnedGiftID:          ownedGiftID,
+		NewOwnerChatID:       newOwnerChatID,
 	}
 
 	params.Option(opts...)
@@ -4790,12 +4644,11 @@ func (ctx *Context) UnpinAllChatMessages(
 // In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_pin_messages administrator right in the supergroup.
 // Returns True on success.
 func (ctx *Context) UnpinAllForumTopicMessages(
-	messageThreadID int64,
 	opts ...UnpinAllForumTopicMessagesOption,
 ) error {
 	params := &UnpinAllForumTopicMessagesParams{
 		ChatID:          ctx.Chat().Identifier(),
-		MessageThreadID: messageThreadID,
+		MessageThreadID: ctx.Message().MessageThreadID,
 	}
 
 	params.Option(opts...)
@@ -4840,18 +4693,20 @@ func (ctx *Context) UnpinChatMessage(
 	opts ...UnpinChatMessageOption,
 ) error {
 	params := &UnpinChatMessageParams{
-		BusinessConnectionID: func(ctx *Context) string {
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		ChatID:               ctx.Chat().Identifier(),
+		MessageID: func(ctx *Context) int64 {
 			if ctx.update == nil {
-				return ""
+				return 0
 			}
 
-			if ctx.update.BusinessConnection == nil {
-				return ""
+			m := ctx.Message()
+			if m == nil {
+				return 0
 			}
 
-			return ctx.update.BusinessConnection.ID
+			return m.MessageID
 		}(ctx),
-		ChatID: ctx.Chat().Identifier(),
 	}
 
 	params.Option(opts...)
@@ -4875,18 +4730,8 @@ func (ctx *Context) UpgradeGift(
 	opts ...UpgradeGiftOption,
 ) error {
 	params := &UpgradeGiftParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.BusinessConnection == nil {
-				return ""
-			}
-
-			return ctx.update.BusinessConnection.ID
-		}(ctx),
-		OwnedGiftID: ownedGiftID,
+		BusinessConnectionID: ctx.Message().BusinessConnectionID,
+		OwnedGiftID:          ownedGiftID,
 	}
 
 	params.Option(opts...)

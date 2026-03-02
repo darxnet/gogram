@@ -26,13 +26,51 @@ type Field struct {
 
 // AutoFillCode returns generated code used to auto-populate a method field from Context.
 func (field Field) AutoFillCode(types map[string]Type) string {
-	if field.Name == "chat_id" {
+	switch field.Name {
+	case "chat_id":
 		if toType(field.Type, field.IsRequired) == "string" {
 			return "ctx.Chat().Identifier()"
 		}
-
 		return "ctx.Chat().ID"
+
+	case "message_thread_id":
+		return "ctx.Message().MessageThreadID"
+
+	case "business_connection_id":
+		return "ctx.Message().BusinessConnectionID"
+
+	case "direct_messages_topic_id":
+		return "ctx.Message().DirectMessagesTopic.TopicID"
+
+	case "message_id":
+		return `func(ctx *Context) int64 {
+            if ctx.update == nil {
+                return 0
+            }
+
+		    m := ctx.Message()
+			if m == nil {
+			    return 0
+			}
+
+			return m.MessageID
+		}(ctx)`
+
+	case "inline_message_id":
+		return `func(ctx *Context) string {
+            if ctx.update == nil {
+                return ""
+            }
+
+      		if ctx.update.CallbackQuery == nil {
+      		    return ""
+      		}
+
+      		return ctx.update.CallbackQuery.InlineMessageID
+       	}(ctx)`
 	}
+
+	// overwise for some_name_id auto set update.some_name.id if presents
 
 	before, _, found := strings.Cut(field.Name, "_id")
 	if !found {
@@ -40,9 +78,6 @@ func (field Field) AutoFillCode(types map[string]Type) string {
 	}
 
 	if !slices.ContainsFunc(types["Update"].Fields, func(f Field) bool { return f.Name == before }) {
-		if field.Name == "callback_query_id" {
-			return types["Update"].Fields[13].Name
-		}
 		return ""
 	}
 
