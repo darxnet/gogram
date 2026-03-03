@@ -26,48 +26,95 @@ type Field struct {
 
 // AutoFillCode returns generated code used to auto-populate a method field from Context.
 func (field Field) AutoFillCode(types map[string]Type) string {
+	skipList := []string{
+		"text",
+		"caption",
+	}
+
+	if slices.Contains(skipList, field.Name) {
+		return ""
+	}
+
 	switch field.Name {
 	case "chat_id":
-		if toType(field.Type, field.IsRequired) == "string" {
-			return "ctx.Chat().Identifier()"
+		switch toType(field.Type, field.IsRequired) {
+		case "string":
+			return `func(ctx *Context) string {
+			    c := ctx.Chat()
+				if c == nil {
+				    return ""
+				}
+
+				return c.Identifier()
+			}(ctx)`
+
+		case "int64":
+			return `func(ctx *Context) int64 {
+			    c := ctx.Chat()
+				if c == nil {
+				    return 0
+				}
+
+				return c.ID
+			}(ctx)`
 		}
-		return "ctx.Chat().ID"
 
-	case "message_thread_id":
-		return "ctx.Message().MessageThreadID"
+	case "user_id":
+		return `func(ctx *Context) int64 {
+		    u := ctx.User()
+			if u == nil {
+			    return 0
+			}
 
-	case "business_connection_id":
-		return "ctx.Message().BusinessConnectionID"
+			return u.ID
+		}(ctx)`
 
 	case "direct_messages_topic_id":
-		return "ctx.Message().DirectMessagesTopic.TopicID"
-
-	case "message_id":
 		return `func(ctx *Context) int64 {
-            if ctx.update == nil {
-                return 0
-            }
-
 		    m := ctx.Message()
 			if m == nil {
 			    return 0
 			}
 
-			return m.MessageID
+			return m.DirectMessagesTopic.TopicID
 		}(ctx)`
 
 	case "inline_message_id":
 		return `func(ctx *Context) string {
-            if ctx.update == nil {
-                return ""
-            }
-
       		if ctx.update.CallbackQuery == nil {
       		    return ""
       		}
 
       		return ctx.update.CallbackQuery.InlineMessageID
        	}(ctx)`
+	}
+
+	// auto-fill if field.Name presents in Message
+
+	if slices.ContainsFunc(types["Message"].Fields, func(f Field) bool {
+		return f.Name == field.Name && f.Type == field.Type
+	}) {
+		switch toType(field.Type, field.IsRequired) {
+		case "string":
+			return fmt.Sprintf(`func(ctx *Context) string {
+    			m := ctx.Message()
+    			if m == nil {
+    			    return ""
+    			}
+
+			return m.%s
+		}(ctx)`, toTitle(field.Name))
+
+		case "int64":
+			return fmt.Sprintf(`func(ctx *Context) int64 {
+    			m := ctx.Message()
+    			if m == nil {
+    			    return 0
+    			}
+
+			return m.%s
+		}(ctx)`, toTitle(field.Name))
+		}
 	}
 
 	// overwise for some_name_id auto set update.some_name.id if presents
@@ -86,16 +133,16 @@ func (field Field) AutoFillCode(types map[string]Type) string {
 	}
 
 	return fmt.Sprintf(`func(ctx *Context) string {
-                if ctx.update == nil {
-                    return ""
-                }
+        if ctx.update == nil {
+            return ""
+        }
 
-                if ctx.update.%[1]s == nil {
-                    return ""
-                }
+        if ctx.update.%[1]s == nil {
+            return ""
+        }
 
-                return ctx.update.%[1]s.ID
-            }(ctx)`, toTitle(before))
+        return ctx.update.%[1]s.ID
+    }(ctx)`, toTitle(before))
 }
 
 // Type describes a Telegram API type for code generation.
