@@ -51,7 +51,7 @@ import (
     // {{ $method }} calls the {{ .Name }} Telegram Bot API method.
     // {{ .Desc }}
     func (c *Client) {{ $method }}(ctx context.Context, params *{{ $params }}) (ret {{ toType .Result false }}, err error) {
-        {{- $multipart := .Multipart }}
+        {{- $multipart := .Multipart $root.Types }}
         {{- if $multipart }}
             reader, pw := io.Pipe()
             writer := multipart.NewWriter(pw)
@@ -102,38 +102,9 @@ import (
                             if params.{{ $goTitle }} != nil
                         {{- end }}
                     {{- end }} {
-                        {{- if eq $goType "InputFile" }}
-                            err = createFormFileFromInputFile(
-                                writer,
-                                {{ if .IsRequired }}&{{ end }}params.{{ $goTitle }},
-                                "{{ .Name }}",
-                            )
-                            if err != nil {
-                          		return
-                           	}
-                        {{- else if eq $goType "[]InputMedia" }}
-                            for i := range params.{{ $goTitle }} {
-                               err = createFormFileFromInputMedia(
-                                    writer,
-                                    &params.{{ $goTitle }}[i],
-                                    "{{ .Name }}" + strconv.Itoa(i),
-                                )
-                                if err != nil {
-                                return
-                               	}
-                            }
-
-                        {{- else if eq $goType "[]InputPaidMedia" }}
-                            for i := range params.{{ $goTitle }} {
-                                err = createFormFileFromInputPaidMedia(
-                                    writer,
-                                    &params.{{ $goTitle }}[i],
-                                    "{{ .Name }}" + strconv.Itoa(i),
-                                )
-                                if err != nil {
-                              		return
-                                }
-                            }
+                        {{- $uploadCode := .FileUploadCode $root.Types }}
+                        {{- if ne $uploadCode "" }}
+                            {{ $uploadCode }}
                         {{- end }}
                         {{- if ne $goType "InputFile" }}
                             var bs []byte
@@ -216,40 +187,6 @@ func createFormFileFromInputFile(writer *multipart.Writer, f *InputFile, name st
 		if err != nil {
 			return err
 		}
-	}
-
-	return nil
-}
-
-func createFormFileFromInputMedia(writer *multipart.Writer, media *InputMedia, name string) error {
-	if media == nil {
-		return nil
-	}
-
-    switch {
-    {{- range $root.Types.InputMedia.Subtypes }}
-        {{ $sub := index $root.Types . }}
-        {{ $name := toTitle $sub.Name }}
-    	case media.{{ $name }} != nil:
-            return createFormFileFromInputFile(writer, &media.{{ $name }}.Media, name)
-    {{- end }}
-	}
-
-	return nil
-}
-
-func createFormFileFromInputPaidMedia(writer *multipart.Writer, media *InputPaidMedia, name string) error {
-	if media == nil {
-		return nil
-	}
-
-    switch {
-    {{- range $root.Types.InputPaidMedia.Subtypes }}
-        {{ $sub := index $root.Types . }}
-        {{ $name := toTitle $sub.Name }}
-    	case media.{{ $name }} != nil:
-            return createFormFileFromInputFile(writer, &media.{{ $name }}.Media, name)
-    {{- end }}
 	}
 
 	return nil
