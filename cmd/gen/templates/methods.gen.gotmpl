@@ -95,37 +95,37 @@ import (
                         }
                     }
                 {{- else }}
-                    {{ if not .IsRequired }}
+                    {{- $uploadCode := .FileUploadCode $root.Types }}
+                    {{ if and (not $uploadCode) (not .IsRequired) }}
                         {{- if eq (slice $goType 0 2) "[]" }}
                             if len(params.{{ $goTitle }}) != 0
                         {{- else }}
                             if params.{{ $goTitle }} != nil
                         {{- end }}
                     {{- end }} {
-                        {{- $uploadCode := .FileUploadCode $root.Types }}
-                        {{- if ne $uploadCode "" }}
-                            {{ $uploadCode }}
-                        {{- end }}
-                        {{- if ne $goType "InputFile" }}
-                            var bs []byte
+                    {{- if $uploadCode }}
+                        {{- $uploadCode }}
+                    {{- end }}
+                    {{- if ne $goType "InputFile" }}
+                        var bs []byte
 
-                            bs, err = json.Marshal(params.{{ $goTitle }})
-                            if err != nil {
-                                return
-                            }
+                        bs, err = json.Marshal(params.{{ $goTitle }})
+                        if err != nil {
+                            return
+                        }
 
-                            var p io.Writer
+                        var p io.Writer
 
-                            p, err = writer.CreateFormField("{{ .Name }}")
-                           	if err != nil {
-                          		return
-                           	}
+                        p, err = writer.CreateFormField("{{ .Name }}")
+                       	if err != nil {
+                      		return
+                       	}
 
-                            _, err = p.Write(bs)
-                           	if err != nil {
-                          		return
-                           	}
-                        {{- end }}
+                        _, err = p.Write(bs)
+                       	if err != nil {
+                      		return
+                       	}
+                    {{- end }}
                     }
                 {{- end }}
             {{- end }}

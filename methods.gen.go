@@ -2853,7 +2853,11 @@ func (c *Client) CreateNewStickerSet(ctx context.Context, params *CreateNewStick
 
 		{
 			for i := range params.Stickers {
-				err = createFormFileFromInputFile(writer, &params.Stickers[i].Sticker, "stickers_sticker")
+				err = createFormFileFromInputFile(
+					writer,
+					&params.Stickers[i].Sticker,
+					"stickers__sticker"+strconv.Itoa(i),
+				)
 				if err != nil {
 					return
 				}
@@ -11143,7 +11147,11 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 		}
 
 		{
-			err = createFormFileFromInputFile(writer, &params.Animation, "animation")
+			err = createFormFileFromInputFile(
+				writer,
+				&params.Animation,
+				"animation",
+			)
 			if err != nil {
 				return
 			}
@@ -11174,9 +11182,13 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 			}
 		}
 
-		if params.Thumbnail != nil {
+		{
 			if params.Thumbnail != nil {
-				err = createFormFileFromInputFile(writer, params.Thumbnail, "thumbnail")
+				err = createFormFileFromInputFile(
+					writer,
+					params.Thumbnail,
+					"thumbnail",
+				)
 				if err != nil {
 					return
 				}
@@ -11748,7 +11760,11 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 		}
 
 		{
-			err = createFormFileFromInputFile(writer, &params.Audio, "audio")
+			err = createFormFileFromInputFile(
+				writer,
+				&params.Audio,
+				"audio",
+			)
 			if err != nil {
 				return
 			}
@@ -11812,9 +11828,13 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 			}
 		}
 
-		if params.Thumbnail != nil {
+		{
 			if params.Thumbnail != nil {
-				err = createFormFileFromInputFile(writer, params.Thumbnail, "thumbnail")
+				err = createFormFileFromInputFile(
+					writer,
+					params.Thumbnail,
+					"thumbnail",
+				)
 				if err != nil {
 					return
 				}
@@ -13164,16 +13184,24 @@ func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (
 		}
 
 		{
-			err = createFormFileFromInputFile(writer, &params.Document, "document")
+			err = createFormFileFromInputFile(
+				writer,
+				&params.Document,
+				"document",
+			)
 			if err != nil {
 				return
 			}
 
 		}
 
-		if params.Thumbnail != nil {
+		{
 			if params.Thumbnail != nil {
-				err = createFormFileFromInputFile(writer, params.Thumbnail, "thumbnail")
+				err = createFormFileFromInputFile(
+					writer,
+					params.Thumbnail,
+					"thumbnail",
+				)
 				if err != nil {
 					return
 				}
@@ -14925,56 +14953,96 @@ func (c *Client) SendMediaGroup(ctx context.Context, params *SendMediaGroupParam
 			for i := range params.Media {
 				switch {
 				case params.Media[i].InputMediaAnimation != nil:
-					err = createFormFileFromInputFile(writer, &params.Media[i].InputMediaAnimation.Media, "media_media")
+					err = createFormFileFromInputFile(
+						writer,
+						&params.Media[i].InputMediaAnimation.Media,
+						"media_animation_media"+strconv.Itoa(i),
+					)
 					if err != nil {
 						return
 					}
 					if params.Media[i].InputMediaAnimation.Thumbnail != nil {
-						err = createFormFileFromInputFile(writer, params.Media[i].InputMediaAnimation.Thumbnail, "media_thumbnail")
+						err = createFormFileFromInputFile(
+							writer,
+							params.Media[i].InputMediaAnimation.Thumbnail,
+							"media_animation_thumbnail"+strconv.Itoa(i),
+						)
 						if err != nil {
 							return
 						}
 					}
 				case params.Media[i].InputMediaDocument != nil:
-					err = createFormFileFromInputFile(writer, &params.Media[i].InputMediaDocument.Media, "media_media")
+					err = createFormFileFromInputFile(
+						writer,
+						&params.Media[i].InputMediaDocument.Media,
+						"media_document_media"+strconv.Itoa(i),
+					)
 					if err != nil {
 						return
 					}
 					if params.Media[i].InputMediaDocument.Thumbnail != nil {
-						err = createFormFileFromInputFile(writer, params.Media[i].InputMediaDocument.Thumbnail, "media_thumbnail")
+						err = createFormFileFromInputFile(
+							writer,
+							params.Media[i].InputMediaDocument.Thumbnail,
+							"media_document_thumbnail"+strconv.Itoa(i),
+						)
 						if err != nil {
 							return
 						}
 					}
 				case params.Media[i].InputMediaAudio != nil:
-					err = createFormFileFromInputFile(writer, &params.Media[i].InputMediaAudio.Media, "media_media")
+					err = createFormFileFromInputFile(
+						writer,
+						&params.Media[i].InputMediaAudio.Media,
+						"media_audio_media"+strconv.Itoa(i),
+					)
 					if err != nil {
 						return
 					}
 					if params.Media[i].InputMediaAudio.Thumbnail != nil {
-						err = createFormFileFromInputFile(writer, params.Media[i].InputMediaAudio.Thumbnail, "media_thumbnail")
+						err = createFormFileFromInputFile(
+							writer,
+							params.Media[i].InputMediaAudio.Thumbnail,
+							"media_audio_thumbnail"+strconv.Itoa(i),
+						)
 						if err != nil {
 							return
 						}
 					}
 				case params.Media[i].InputMediaPhoto != nil:
-					err = createFormFileFromInputFile(writer, &params.Media[i].InputMediaPhoto.Media, "media_media")
+					err = createFormFileFromInputFile(
+						writer,
+						&params.Media[i].InputMediaPhoto.Media,
+						"media_photo_media"+strconv.Itoa(i),
+					)
 					if err != nil {
 						return
 					}
 				case params.Media[i].InputMediaVideo != nil:
-					err = createFormFileFromInputFile(writer, &params.Media[i].InputMediaVideo.Media, "media_media")
+					err = createFormFileFromInputFile(
+						writer,
+						&params.Media[i].InputMediaVideo.Media,
+						"media_video_media"+strconv.Itoa(i),
+					)
 					if err != nil {
 						return
 					}
 					if params.Media[i].InputMediaVideo.Thumbnail != nil {
-						err = createFormFileFromInputFile(writer, params.Media[i].InputMediaVideo.Thumbnail, "media_thumbnail")
+						err = createFormFileFromInputFile(
+							writer,
+							params.Media[i].InputMediaVideo.Thumbnail,
+							"media_video_thumbnail"+strconv.Itoa(i),
+						)
 						if err != nil {
 							return
 						}
 					}
 					if params.Media[i].InputMediaVideo.Cover != nil {
-						err = createFormFileFromInputFile(writer, params.Media[i].InputMediaVideo.Cover, "media_cover")
+						err = createFormFileFromInputFile(
+							writer,
+							params.Media[i].InputMediaVideo.Cover,
+							"media_video_cover"+strconv.Itoa(i),
+						)
 						if err != nil {
 							return
 						}
@@ -15880,23 +15948,39 @@ func (c *Client) SendPaidMedia(ctx context.Context, params *SendPaidMediaParams)
 			for i := range params.Media {
 				switch {
 				case params.Media[i].InputPaidMediaPhoto != nil:
-					err = createFormFileFromInputFile(writer, &params.Media[i].InputPaidMediaPhoto.Media, "media_media")
+					err = createFormFileFromInputFile(
+						writer,
+						&params.Media[i].InputPaidMediaPhoto.Media,
+						"media_photo_media"+strconv.Itoa(i),
+					)
 					if err != nil {
 						return
 					}
 				case params.Media[i].InputPaidMediaVideo != nil:
-					err = createFormFileFromInputFile(writer, &params.Media[i].InputPaidMediaVideo.Media, "media_media")
+					err = createFormFileFromInputFile(
+						writer,
+						&params.Media[i].InputPaidMediaVideo.Media,
+						"media_video_media"+strconv.Itoa(i),
+					)
 					if err != nil {
 						return
 					}
 					if params.Media[i].InputPaidMediaVideo.Thumbnail != nil {
-						err = createFormFileFromInputFile(writer, params.Media[i].InputPaidMediaVideo.Thumbnail, "media_thumbnail")
+						err = createFormFileFromInputFile(
+							writer,
+							params.Media[i].InputPaidMediaVideo.Thumbnail,
+							"media_video_thumbnail"+strconv.Itoa(i),
+						)
 						if err != nil {
 							return
 						}
 					}
 					if params.Media[i].InputPaidMediaVideo.Cover != nil {
-						err = createFormFileFromInputFile(writer, params.Media[i].InputPaidMediaVideo.Cover, "media_cover")
+						err = createFormFileFromInputFile(
+							writer,
+							params.Media[i].InputPaidMediaVideo.Cover,
+							"media_video_cover"+strconv.Itoa(i),
+						)
 						if err != nil {
 							return
 						}
@@ -16438,7 +16522,11 @@ func (c *Client) SendPhoto(ctx context.Context, params *SendPhotoParams) (ret *M
 		}
 
 		{
-			err = createFormFileFromInputFile(writer, &params.Photo, "photo")
+			err = createFormFileFromInputFile(
+				writer,
+				&params.Photo,
+				"photo",
+			)
 			if err != nil {
 				return
 			}
@@ -17341,7 +17429,11 @@ func (c *Client) SendSticker(ctx context.Context, params *SendStickerParams) (re
 		}
 
 		{
-			err = createFormFileFromInputFile(writer, &params.Sticker, "sticker")
+			err = createFormFileFromInputFile(
+				writer,
+				&params.Sticker,
+				"sticker",
+			)
 			if err != nil {
 				return
 			}
@@ -18313,7 +18405,11 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 		}
 
 		{
-			err = createFormFileFromInputFile(writer, &params.Video, "video")
+			err = createFormFileFromInputFile(
+				writer,
+				&params.Video,
+				"video",
+			)
 			if err != nil {
 				return
 			}
@@ -18344,9 +18440,13 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 			}
 		}
 
-		if params.Thumbnail != nil {
+		{
 			if params.Thumbnail != nil {
-				err = createFormFileFromInputFile(writer, params.Thumbnail, "thumbnail")
+				err = createFormFileFromInputFile(
+					writer,
+					params.Thumbnail,
+					"thumbnail",
+				)
 				if err != nil {
 					return
 				}
@@ -18354,9 +18454,13 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 
 		}
 
-		if params.Cover != nil {
+		{
 			if params.Cover != nil {
-				err = createFormFileFromInputFile(writer, params.Cover, "cover")
+				err = createFormFileFromInputFile(
+					writer,
+					params.Cover,
+					"cover",
+				)
 				if err != nil {
 					return
 				}
@@ -18880,7 +18984,11 @@ func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams)
 		}
 
 		{
-			err = createFormFileFromInputFile(writer, &params.VideoNote, "video_note")
+			err = createFormFileFromInputFile(
+				writer,
+				&params.VideoNote,
+				"video_note",
+			)
 			if err != nil {
 				return
 			}
@@ -18903,9 +19011,13 @@ func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams)
 			}
 		}
 
-		if params.Thumbnail != nil {
+		{
 			if params.Thumbnail != nil {
-				err = createFormFileFromInputFile(writer, params.Thumbnail, "thumbnail")
+				err = createFormFileFromInputFile(
+					writer,
+					params.Thumbnail,
+					"thumbnail",
+				)
 				if err != nil {
 					return
 				}
@@ -19367,7 +19479,11 @@ func (c *Client) SendVoice(ctx context.Context, params *SendVoiceParams) (ret *M
 		}
 
 		{
-			err = createFormFileFromInputFile(writer, &params.Voice, "voice")
+			err = createFormFileFromInputFile(
+				writer,
+				&params.Voice,
+				"voice",
+			)
 			if err != nil {
 				return
 			}
@@ -20468,7 +20584,11 @@ func (c *Client) SetChatPhoto(ctx context.Context, params *SetChatPhotoParams) (
 		}
 
 		{
-			err = createFormFileFromInputFile(writer, &params.Photo, "photo")
+			err = createFormFileFromInputFile(
+				writer,
+				&params.Photo,
+				"photo",
+			)
 			if err != nil {
 				return
 			}
@@ -22004,9 +22124,13 @@ func (c *Client) SetStickerSetThumbnail(ctx context.Context, params *SetStickerS
 			}
 		}
 
-		if params.Thumbnail != nil {
+		{
 			if params.Thumbnail != nil {
-				err = createFormFileFromInputFile(writer, params.Thumbnail, "thumbnail")
+				err = createFormFileFromInputFile(
+					writer,
+					params.Thumbnail,
+					"thumbnail",
+				)
 				if err != nil {
 					return
 				}
@@ -22387,9 +22511,13 @@ func (c *Client) SetWebhook(ctx context.Context, params *SetWebhookParams) (ret 
 			}
 		}
 
-		if params.Certificate != nil {
+		{
 			if params.Certificate != nil {
-				err = createFormFileFromInputFile(writer, params.Certificate, "certificate")
+				err = createFormFileFromInputFile(
+					writer,
+					params.Certificate,
+					"certificate",
+				)
 				if err != nil {
 					return
 				}
@@ -23643,7 +23771,11 @@ func (c *Client) UploadStickerFile(ctx context.Context, params *UploadStickerFil
 		}
 
 		{
-			err = createFormFileFromInputFile(writer, &params.Sticker, "sticker")
+			err = createFormFileFromInputFile(
+				writer,
+				&params.Sticker,
+				"sticker",
+			)
 			if err != nil {
 				return
 			}

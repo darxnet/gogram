@@ -25,45 +25,22 @@ type Field struct {
 	Discriminator string // unique value for subtypes
 }
 
-// //nolint
 func (field Field) FileUploadCode(types map[string]Type) string {
-	genFunc := func(expr, name string) string {
-		return fmt.Sprintf(`err = createFormFileFromInputFile(writer, %s, "%s")
-		if err != nil {
-		    return
-		}
-		`, expr, name)
-	}
-
 	buffer := new(bytes.Buffer)
 
 	fieldTitle := toTitle(field.Name)
-	fieldType := toType(field.Type, field.IsRequired)
+	fieldType := toType(field.Type, true)
+	fieldExpr := "params." + fieldTitle
 
-	switch fieldType {
-	case "InputFile":
-		expr := "&params." + fieldTitle
-		name := field.Name
-		buffer.WriteString(genFunc(expr, name))
+	if fieldType == "InputFile" {
+		inputFileUploadCode(buffer, fieldExpr, fmt.Sprintf("%q", field.Name), field.IsRequired)
 
-	case "*InputFile":
-		_, _ = fmt.Fprintf(buffer, "if params.%s != nil {\n", fieldTitle)
-
-		expr := "params." + fieldTitle
-		name := field.Name
-		buffer.WriteString(genFunc(expr, name))
-
-		buffer.WriteString("}\n")
+		if buffer.Len() != 0 {
+			return buffer.String()
+		}
 	}
-
-	if buffer.Len() != 0 {
-		return buffer.String()
-	}
-
-	found := false
 
 	var isArray bool
-
 	_, fieldType, isArray = strings.Cut(fieldType, "[]")
 
 	parent, ok := types[fieldType]
@@ -72,135 +49,30 @@ func (field Field) FileUploadCode(types map[string]Type) string {
 	}
 
 	if isArray {
-		_, _ = fmt.Fprintf(buffer, "for i := range params.%s {\n", fieldTitle)
-
-		for _, subfield := range parent.Fields {
-			subtyp := toType(subfield.Type, subfield.IsRequired)
-
-			switch subtyp {
-			case "InputFile":
-				found = true
-				expr := fmt.Sprintf("&params.%s[i].%s", toTitle(field.Name), toTitle(subfield.Name))
-				name := fmt.Sprintf("%s_%s", field.Name, subfield.Name)
-				buffer.WriteString(genFunc(expr, name))
-
-			case "*InputFile":
-				found = true
-				_, _ = fmt.Fprintf(buffer, "if params.%s[i].%s != nil {\n", toTitle(field.Name), toTitle(subfield.Name))
-
-				expr := fmt.Sprintf("params.%s[i].%s", toTitle(field.Name), toTitle(subfield.Name))
-				name := fmt.Sprintf("%s_%s", field.Name, subfield.Name)
-				buffer.WriteString(genFunc(expr, name))
-
-				buffer.WriteString("}\n")
-			}
-		}
-
-		buffer.WriteString("}\n")
-
-		if found {
+		_, _ = fmt.Fprintf(buffer, "for i := range %s {\n", fieldExpr)
+		if inputFileFieldsCode(buffer, parent.Fields, fieldExpr+"[i]", field.Name, true) {
+			buffer.WriteString("}\n")
 			return buffer.String()
 		}
 
 		buffer.Reset()
 
-		_, _ = fmt.Fprintf(buffer, "for i := range params.%s {\n", fieldTitle)
-		buffer.WriteString("switch {\n")
-
-		for _, subtype := range parent.Subtypes {
-			_, _ = fmt.Fprintf(buffer, "case params.%s[i].%s != nil:\n", toTitle(field.Name), subtype)
-
-			for _, subfield := range types[subtype].Fields {
-				subtyp := toType(subfield.Type, subfield.IsRequired)
-
-				switch subtyp {
-				case "InputFile":
-					found = true
-					expr := fmt.Sprintf("&params.%s[i].%s.%s", toTitle(field.Name), subtype, toTitle(subfield.Name))
-					name := fmt.Sprintf("%s_%s", field.Name, subfield.Name)
-					buffer.WriteString(genFunc(expr, name))
-
-				case "*InputFile":
-					found = true
-					_, _ = fmt.Fprintf(buffer, "if params.%s[i].%s.%s != nil {\n", toTitle(field.Name), subtype, toTitle(subfield.Name))
-
-					expr := fmt.Sprintf("params.%s[i].%s.%s", toTitle(field.Name), subtype, toTitle(subfield.Name))
-					name := fmt.Sprintf("%s_%s", field.Name, subfield.Name)
-					buffer.WriteString(genFunc(expr, name))
-
-					buffer.WriteString("}\n")
-				}
-			}
-		}
-
-		buffer.WriteString("}\n")
-		buffer.WriteString("}\n")
-
-		if found {
+		_, _ = fmt.Fprintf(buffer, "for i := range %s {\n", fieldExpr)
+		if inputFileSubtypesCode(buffer, parent.Subtypes, fieldExpr+"[i]", field.Name, true, types) {
+			buffer.WriteString("}\n")
 			return buffer.String()
 		}
+
+		buffer.Reset()
 	}
 
-	buffer.Reset()
-
-	for _, subfield := range parent.Fields {
-		subtyp := toType(subfield.Type, subfield.IsRequired)
-
-		switch subtyp {
-		case "InputFile":
-			found = true
-			expr := fmt.Sprintf("&params.%s.%s", toTitle(field.Name), toTitle(subfield.Name))
-			name := fmt.Sprintf("%s_%s", field.Name, subfield.Name)
-			buffer.WriteString(genFunc(expr, name))
-
-		case "*InputFile":
-			found = true
-			_, _ = fmt.Fprintf(buffer, "if params.%s.%s != nil {\n", toTitle(field.Name), toTitle(subfield.Name))
-
-			expr := fmt.Sprintf("params.%s.%s", toTitle(field.Name), toTitle(subfield.Name))
-			name := fmt.Sprintf("%s_%s", field.Name, subfield.Name)
-			buffer.WriteString(genFunc(expr, name))
-
-			buffer.WriteString("}\n")
-		}
-	}
-
-	if found {
+	if inputFileFieldsCode(buffer, parent.Fields, fieldExpr, field.Name, false) {
 		return buffer.String()
 	}
 
 	buffer.Reset()
-	buffer.WriteString("switch {\n")
 
-	for _, subtype := range parent.Subtypes {
-		_, _ = fmt.Fprintf(buffer, "case params.%s.%s != nil:\n", toTitle(field.Name), subtype)
-
-		for _, subfield := range types[subtype].Fields {
-			subtyp := toType(subfield.Type, subfield.IsRequired)
-
-			switch subtyp {
-			case "InputFile":
-				found = true
-				expr := fmt.Sprintf("&params.%s.%s.%s", toTitle(field.Name), subtype, toTitle(subfield.Name))
-				name := fmt.Sprintf("%s_%s", field.Name, subfield.Name)
-				buffer.WriteString(genFunc(expr, name))
-
-			case "*InputFile":
-				found = true
-				_, _ = fmt.Fprintf(buffer, "if params.%s.%s.%s != nil {\n", toTitle(field.Name), subtype, toTitle(subfield.Name))
-
-				expr := fmt.Sprintf("params.%s.%s.%s", toTitle(field.Name), subtype, toTitle(subfield.Name))
-				name := fmt.Sprintf("%s_%s", field.Name, subfield.Name)
-				buffer.WriteString(genFunc(expr, name))
-
-				buffer.WriteString("}\n")
-			}
-		}
-	}
-
-	buffer.WriteString("}\n")
-
-	if found {
+	if inputFileSubtypesCode(buffer, parent.Subtypes, fieldExpr, field.Name, false, types) {
 		return buffer.String()
 	}
 
