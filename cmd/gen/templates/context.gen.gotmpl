@@ -91,11 +91,13 @@ func (ctx *Context) Message() *Message {
     {{- range .Types.Update.Fields }}
         {{- $name := toTitle .Name }}
         {{- $typ := toType .Type true }}
-        {{- if toType .Type true | eq "Message" }}
+        {{- if eq $typ "Message" }}
             case ctx.update.{{ $name }} != nil:
                 return ctx.update.{{ $name }}
         {{- end }}
     {{- end }}
+    case ctx.update.CallbackQuery != nil:
+        return ctx.update.CallbackQuery.Message.Message
     }
 
     return nil

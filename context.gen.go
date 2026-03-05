@@ -162,6 +162,8 @@ func (ctx *Context) Message() *Message {
 		return ctx.update.BusinessMessage
 	case ctx.update.EditedBusinessMessage != nil:
 		return ctx.update.EditedBusinessMessage
+	case ctx.update.CallbackQuery != nil:
+		return ctx.update.CallbackQuery.Message.Message
 	}
 
 	return nil
