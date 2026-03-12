@@ -131,6 +131,10 @@ func (field Field) AutoFillCode(types map[string]Type) string {
 			    return 0
 			}
 
+			if m.DirectMessagesTopic == nil {
+				return 0
+			}
+
 			return m.DirectMessagesTopic.TopicID
 		}(ctx)`
 
