@@ -691,6 +691,10 @@ func (ctx *Context) CopyMessage(
 				return 0
 			}
 
+			if m.DirectMessagesTopic == nil {
+				return 0
+			}
+
 			return m.DirectMessagesTopic.TopicID
 		}(ctx),
 		FromChatID: fromChatID,
@@ -758,6 +762,10 @@ func (ctx *Context) CopyMessages(
 		DirectMessagesTopicID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
+				return 0
+			}
+
+			if m.DirectMessagesTopic == nil {
 				return 0
 			}
 
@@ -1969,6 +1977,10 @@ func (ctx *Context) ForwardMessage(
 				return 0
 			}
 
+			if m.DirectMessagesTopic == nil {
+				return 0
+			}
+
 			return m.DirectMessagesTopic.TopicID
 		}(ctx),
 		FromChatID: fromChatID,
@@ -2026,6 +2038,10 @@ func (ctx *Context) ForwardMessages(
 		DirectMessagesTopicID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
+				return 0
+			}
+
+			if m.DirectMessagesTopic == nil {
 				return 0
 			}
 
@@ -3565,6 +3581,10 @@ func (ctx *Context) SendAnimation(
 				return 0
 			}
 
+			if m.DirectMessagesTopic == nil {
+				return 0
+			}
+
 			return m.DirectMessagesTopic.TopicID
 		}(ctx),
 		Animation: animation,
@@ -3628,6 +3648,10 @@ func (ctx *Context) SendAudio(
 		DirectMessagesTopicID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
+				return 0
+			}
+
+			if m.DirectMessagesTopic == nil {
 				return 0
 			}
 
@@ -3782,6 +3806,10 @@ func (ctx *Context) SendContact(
 				return 0
 			}
 
+			if m.DirectMessagesTopic == nil {
+				return 0
+			}
+
 			return m.DirectMessagesTopic.TopicID
 		}(ctx),
 		PhoneNumber: phoneNumber,
@@ -3838,6 +3866,10 @@ func (ctx *Context) SendDice(
 				return 0
 			}
 
+			if m.DirectMessagesTopic == nil {
+				return 0
+			}
+
 			return m.DirectMessagesTopic.TopicID
 		}(ctx),
 	}
@@ -3891,6 +3923,10 @@ func (ctx *Context) SendDocument(
 		DirectMessagesTopicID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
+				return 0
+			}
+
+			if m.DirectMessagesTopic == nil {
 				return 0
 			}
 
@@ -4042,6 +4078,10 @@ func (ctx *Context) SendInvoice(
 				return 0
 			}
 
+			if m.DirectMessagesTopic == nil {
+				return 0
+			}
+
 			return m.DirectMessagesTopic.TopicID
 		}(ctx),
 		Title:       title,
@@ -4103,6 +4143,10 @@ func (ctx *Context) SendLocation(
 				return 0
 			}
 
+			if m.DirectMessagesTopic == nil {
+				return 0
+			}
+
 			return m.DirectMessagesTopic.TopicID
 		}(ctx),
 		Latitude:  latitude,
@@ -4158,6 +4202,10 @@ func (ctx *Context) SendMediaGroup(
 		DirectMessagesTopicID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
+				return 0
+			}
+
+			if m.DirectMessagesTopic == nil {
 				return 0
 			}
 
@@ -4220,6 +4268,10 @@ func (ctx *Context) SendMessage(
 		DirectMessagesTopicID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
+				return 0
+			}
+
+			if m.DirectMessagesTopic == nil {
 				return 0
 			}
 
@@ -4332,6 +4384,10 @@ func (ctx *Context) SendPaidMedia(
 				return 0
 			}
 
+			if m.DirectMessagesTopic == nil {
+				return 0
+			}
+
 			return m.DirectMessagesTopic.TopicID
 		}(ctx),
 		StarCount: starCount,
@@ -4392,6 +4448,10 @@ func (ctx *Context) SendPhoto(
 		DirectMessagesTopicID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
+				return 0
+			}
+
+			if m.DirectMessagesTopic == nil {
 				return 0
 			}
 
@@ -4512,6 +4572,10 @@ func (ctx *Context) SendSticker(
 				return 0
 			}
 
+			if m.DirectMessagesTopic == nil {
+				return 0
+			}
+
 			return m.DirectMessagesTopic.TopicID
 		}(ctx),
 		Sticker: sticker,
@@ -4568,6 +4632,10 @@ func (ctx *Context) SendVenue(
 		DirectMessagesTopicID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
+				return 0
+			}
+
+			if m.DirectMessagesTopic == nil {
 				return 0
 			}
 
@@ -4629,6 +4697,10 @@ func (ctx *Context) SendVideo(
 		DirectMessagesTopicID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
+				return 0
+			}
+
+			if m.DirectMessagesTopic == nil {
 				return 0
 			}
 
@@ -4696,6 +4768,10 @@ func (ctx *Context) SendVideoNote(
 				return 0
 			}
 
+			if m.DirectMessagesTopic == nil {
+				return 0
+			}
+
 			return m.DirectMessagesTopic.TopicID
 		}(ctx),
 		VideoNote: videoNote,
@@ -4753,6 +4829,10 @@ func (ctx *Context) SendVoice(
 		DirectMessagesTopicID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
+				return 0
+			}
+
+			if m.DirectMessagesTopic == nil {
 				return 0
 			}
 
