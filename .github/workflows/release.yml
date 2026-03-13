@@ -1,0 +1,47 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+
+      - name: Verify Build
+        run: go build -v ./...
+
+      - name: Run Tests
+        run: go test -race -failfast ./...
+
+      - name: Calculate Next Version
+        uses: caarlos0/svu-action@v2
+        id: svu
+        with:
+          command: next
+
+      - name: Push Tag
+        if: steps.svu.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ steps.svu.outputs.version }}" -m "chore(release): ${{ steps.svu.outputs.version }}"
+          git push origin "${{ steps.svu.outputs.version }}"

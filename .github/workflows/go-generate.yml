@@ -5,6 +5,10 @@ on:
     - cron: '4 15 * * *'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 permissions:
   contents: write
   pull-requests: write
@@ -12,83 +16,48 @@ permissions:
 jobs:
   go-gen:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
 
       - uses: actions/setup-go@v6
         with:
-          go-version: 'stable'
+          go-version-file: 'go.mod'
           cache: true
 
-      - run: go mod download
-
-      - run: go generate ./...
-
-      - name: Check for changes
-        id: git-check
+      - name: Generate Code
         run: |
-          git add -A -- '*.gen.go'
-          if [ -z "$(git status --porcelain)" ]; then
-            echo "changed=false" >> $GITHUB_OUTPUT
+          go mod download
+          go generate ./...
+          go mod tidy
+
+      - name: Verify Changes
+        id: check
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
           else
-            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Safety Check
+        if: steps.check.outputs.has_changes == 'true'
+        run: |
+          if go test -race ./...; then
+            echo "Tests passed, proceeding to PR"
+          else
+            echo "::error::Generated code broke tests"
+            exit 1
           fi
 
       - name: Create Pull Request
-        id: cpr
-        if: steps.git-check.outputs.changed == 'true'
+        if: steps.check.outputs.has_changes == 'true'
         uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "chore: update generated code"
+          commit-message: "feat(api): update generated code from latest docs"
+          title: "feat(api): update generated code from latest docs"
+          body: Automated changes triggered by `go generate`.
           branch: create-pull-request/go-generate
-          title: "chore: update generated code"
-          body: This is an automated PR triggered by `go generate`
+          delete-branch: true
           labels: go-generate
-
-      - name: Enable Pull Request Automerge
-        if: ${{ steps.cpr.outputs.pull-request-number }}
-        run: gh pr merge --auto --merge "$PR_URL"
-        env:
-          PR_URL: ${{ steps.cpr.outputs.pull-request-url }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create next patch tag
-        if: ${{ steps.cpr.outputs.pull-request-number }}
-        env:
-          PR_NUMBER: ${{ steps.cpr.outputs.pull-request-number }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-
-          merge_sha=""
-          for _ in $(seq 1 30); do
-            merged="$(gh pr view "$PR_NUMBER" --json merged --jq '.merged')"
-            if [ "$merged" = "true" ]; then
-              merge_sha="$(gh pr view "$PR_NUMBER" --json mergeCommit --jq '.mergeCommit.oid')"
-              break
-            fi
-            sleep 10
-          done
-
-          if [ -z "$merge_sha" ]; then
-            echo "PR #$PR_NUMBER is not merged yet, skipping tag."
-            exit 0
-          fi
-
-          git fetch --tags --force
-
-          latest_tag="$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n 1)"
-          if [ -z "$latest_tag" ]; then
-            next_tag="v0.0.1"
-          else
-            version="${latest_tag#v}"
-            major="${version%%.*}"
-            rest="${version#*.}"
-            minor="${rest%%.*}"
-            patch="${rest##*.}"
-            next_tag="v${major}.${minor}.$((patch + 1))"
-          fi
-
-          git tag -a "$next_tag" "$merge_sha" -m "chore(release): $next_tag"
-          git push origin "$next_tag"
