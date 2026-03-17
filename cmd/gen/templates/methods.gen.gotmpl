@@ -5,9 +5,9 @@ package gogram
 import (
     "mime/multipart"
     "encoding/json"
+    "bytes"
     "context"
     "strconv"
-    "bytes"
     "io"
 )
 
@@ -66,31 +66,32 @@ import (
                 {{ if eq $goType "int64" }}
                     {{ if not .IsRequired }} if params.{{ $goTitle }} != 0 {{ end }} {
                         v := strconv.FormatInt(params.{{ $goTitle }}, 10)
-                        err = writer.WriteField("{{ .Name }}", v)
-                        if err != nil {
+                        if err := writer.WriteField("{{ .Name }}", v); err != nil {
+                            _ = pw.CloseWithError(err)
                             return
                         }
                     }
                 {{- else if eq $goType "string" }}
                     {{ if not .IsRequired }} if params.{{ $goTitle }} != "" {{ end }} {
-                        err = writer.WriteField("{{ .Name }}", params.{{ $goTitle }})
-                        if err != nil {
+                        v := params.{{ $goTitle }}
+                        if err := writer.WriteField("{{ .Name }}", v); err != nil {
+                            _ = pw.CloseWithError(err)
                             return
                         }
                     }
                 {{- else if eq $goType "bool" }}
                     {{ if not .IsRequired }} if params.{{ $goTitle }} {{ end }} {
                         v := strconv.FormatBool(params.{{ $goTitle }})
-                        err = writer.WriteField("{{ .Name }}", v)
-                        if err != nil {
+                        if err := writer.WriteField("{{ .Name }}", v); err != nil {
+                            _ = pw.CloseWithError(err)
                             return
                         }
                     }
                 {{- else if eq $goType "float64" }}
                     {{ if not .IsRequired }} if params.{{ $goTitle }} != 0 {{ end }} {
                         v := strconv.FormatFloat(params.{{ $goTitle }}, 'f', -1, 64)
-                        err = writer.WriteField("{{ .Name }}", v)
-                        if err != nil {
+                        if err := writer.WriteField("{{ .Name }}", v); err != nil {
+                            _ = pw.CloseWithError(err)
                             return
                         }
                     }
@@ -107,22 +108,21 @@ import (
                         {{- $uploadCode }}
                     {{- end }}
                     {{- if ne $goType "InputFile" }}
-                        var bs []byte
-
-                        bs, err = json.Marshal(params.{{ $goTitle }})
+                        bs, err := json.Marshal(params.{{ $goTitle }})
                         if err != nil {
+                            _ = pw.CloseWithError(err)
                             return
                         }
 
-                        var p io.Writer
-
-                        p, err = writer.CreateFormField("{{ .Name }}")
+                        p, err := writer.CreateFormField("{{ .Name }}")
                        	if err != nil {
+                            _ = pw.CloseWithError(err)
                       		return
                        	}
 
                         _, err = p.Write(bs)
                        	if err != nil {
+                            _ = pw.CloseWithError(err)
                       		return
                        	}
                     {{- end }}
@@ -133,14 +133,13 @@ import (
 
             contentType := writer.FormDataContentType()
         {{- else }}
-            var bs []byte
+            buffer := new(bytes.Buffer)
+           	if err = json.NewEncoder(buffer).Encode(params); err != nil {
+          		return
+           	}
 
-            bs, err = json.Marshal(params)
-            if err != nil {
-                return
-            }
+           	reader := bytes.NewReader(buffer.Bytes())
 
-            reader := bytes.NewReader(bs)
             contentType := "application/json"
         {{ end }}
 
@@ -148,6 +147,7 @@ import (
 
         result, err = c.Raw(ctx, "{{ .Name }}", reader, contentType)
         if err != nil {
+            {{- if $multipart }} _ = reader.CloseWithError(err) {{ end }}
             return
         }
 

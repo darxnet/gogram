@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+const defaultTimeoutOnError = 5 * time.Second
+
 // Error represents a generic gogram error.
 type Error struct {
 	Code int
@@ -107,7 +109,7 @@ func genError(code int, text, description string, params *ResponseParameters) er
 		if params != nil && params.RetryAfter != 0 {
 			retryAfter = time.Duration(params.RetryAfter) * time.Second
 		} else {
-			retryAfter = defaultTimeout
+			retryAfter = defaultTimeoutOnError
 		}
 
 		return &RetryError{
@@ -118,25 +120,25 @@ func genError(code int, text, description string, params *ResponseParameters) er
 	case http.StatusInternalServerError:
 		return &RetryError{
 			Err:        ErrInternalServerError,
-			RetryAfter: defaultTimeout,
+			RetryAfter: defaultTimeoutOnError,
 		}
 
 	case http.StatusBadGateway:
 		return &RetryError{
 			Err:        ErrBadGateway,
-			RetryAfter: defaultTimeout,
+			RetryAfter: defaultTimeoutOnError,
 		}
 
 	case http.StatusServiceUnavailable:
 		return &RetryError{
 			Err:        ErrServiceUnavailable,
-			RetryAfter: defaultTimeout,
+			RetryAfter: defaultTimeoutOnError,
 		}
 
 	case http.StatusGatewayTimeout:
 		return &RetryError{
 			Err:        ErrGatewayTimeout,
-			RetryAfter: defaultTimeout,
+			RetryAfter: defaultTimeoutOnError,
 		}
 
 	default:

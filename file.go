@@ -2,6 +2,7 @@ package gogram
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -10,25 +11,25 @@ import (
 	"strings"
 )
 
+// ErrFileIsNil is returned when a file is nil.
+var ErrFileIsNil = errors.New("gogram: file is nil")
+
 func (c *Client) fileLink(filePath string) string {
-	c.locker.RLock()
-	host := c.options.host
-	token := c.token
-	test := c.options.test
-	c.locker.RUnlock()
+	c.cfg.rw.RLock()
+	linkFilePrefix := c.cfg.linkFilePrefix
+	c.cfg.rw.RUnlock()
 
-	link := "https://" + host + "/file/bot" + token + "/"
-	if test {
-		link += "test/"
-	}
-
-	return link + strings.TrimPrefix(filePath, "/")
+	return linkFilePrefix + strings.TrimPrefix(filePath, "/")
 }
 
 // ReceiveFileReader returns a reader for the file content from Telegram servers.
 // The caller is responsible for closing the reader.
 func (c *Client) ReceiveFileReader(ctx context.Context, file *File) (io.ReadCloser, error) {
-	if file == nil || file.FilePath == "" {
+	if file == nil {
+		return nil, ErrFileIsNil
+	}
+
+	if file.FilePath == "" {
 		return c.ReceiveFileReaderByFileID(ctx, file.FileID)
 	}
 
@@ -39,7 +40,7 @@ func (c *Client) ReceiveFileReader(ctx context.Context, file *File) (io.ReadClos
 		return nil, fmt.Errorf("gogram: failed to create request: %w", err)
 	}
 
-	resp, err := c.do(req)
+	resp, err := c.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("gogram: failed to download file: %w", err)
 	}
@@ -66,24 +67,42 @@ func (c *Client) ReceiveFileReaderByFileID(ctx context.Context, fileID string) (
 
 // DownloadFile downloads a file from Telegram servers to the specified local path.
 func (c *Client) DownloadFile(ctx context.Context, file *File, path string) error {
-	const perm = 0o640
-
-	f, err := os.OpenFile(filepath.Clean(path), os.O_RDWR|os.O_CREATE|os.O_TRUNC, perm)
-	if err != nil {
-		return fmt.Errorf("gogram: failed to open file: %w", err)
-	}
-	defer f.Close() //nolint:errcheck
-
 	rc, err := c.ReceiveFileReader(ctx, file)
 	if err != nil {
 		return err
 	}
 	defer rc.Close() //nolint:errcheck
 
-	_, err = io.Copy(f, rc)
+	dir := filepath.Dir(path)
+	isRenamed := false
+
+	tmpFile, err := os.CreateTemp(dir, path+".*.tmp")
 	if err != nil {
-		return fmt.Errorf("gogram: failed to copy file: %w", err)
+		return fmt.Errorf("gogram: failed to create temporary file: %w", err)
 	}
+	defer func() {
+		if !isRenamed {
+			_ = os.Remove(tmpFile.Name()) //nolint:gosec // G703: path traversal
+		}
+	}()
+	defer tmpFile.Close() //nolint:errcheck
+
+	_, err = io.Copy(tmpFile, rc)
+	if err != nil {
+		return fmt.Errorf("gogram: failed to copy to temporary file: %w", err)
+	}
+
+	err = tmpFile.Close()
+	if err != nil {
+		return fmt.Errorf("gogram: failed to close temporary file: %w", err)
+	}
+
+	err = os.Rename(tmpFile.Name(), path) //nolint:gosec // G703: path traversal
+	if err != nil {
+		return fmt.Errorf("gogram: failed to rename temporary file: %w", err)
+	}
+
+	isRenamed = true
 
 	return nil
 }

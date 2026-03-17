@@ -15,14 +15,9 @@ func (ctx *Context) findHandlerOn() handleOn {
 
     switch {
     {{- range .Types.Update.Fields }}
-        {{- $name := toTitle .Name }}
-        {{- $typ := toType .Type true }}
-        {{- range (index $root.Types $typ).Fields }}
-            {{- if toType .Type true | eq "User" }}
-                case ctx.update.{{ $name }} != nil:
-                    return handleOn{{ $name }}
-                {{- break }}
-            {{- end }}
+        {{- if ne .Name "update_id"}}
+        case ctx.update.{{ toTitle .Name }} != nil:
+            return handleOn{{ toTitle .Name }}
         {{- end }}
     {{- end }}
     }
@@ -169,7 +164,9 @@ func (ctx *Context) {{ $method }}(
     {{- end }}
 
     {{ if or $parseModeName $entitiesName $inputMediaName $inputMediasName }}
-        if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
+        defaultParseMode := ctx.client.defaultParseMode()
+
+        if defaultParseMode != "" {
             {{- if $parseModeName }}
                 if params.{{ $parseModeName }} == "" && len(params.{{ $entitiesName }}) == 0 {
                     params.{{ $parseModeName }} = defaultParseMode
@@ -186,10 +183,8 @@ func (ctx *Context) {{ $method }}(
         }
     {{ end }}
 
-    ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-    _, err := ctx.client.{{ $method }}(ctxWithCancel, params)
+    // Detach cancellation while preserving context values for worker-side requests.
+    _, err := ctx.client.{{ $method }}(context.WithoutCancel(ctx.context), params)
 
     return err
 }

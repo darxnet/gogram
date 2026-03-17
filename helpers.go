@@ -24,12 +24,12 @@ func ExtractPayload(text string) string {
 }
 
 // PhotoBiggest returns the largest photo from a list of PhotoSize.
-func PhotoBiggest(list []PhotoSize) PhotoSize {
-	var v PhotoSize
+func PhotoBiggest(list []PhotoSize) *PhotoSize {
+	var v *PhotoSize
 
-	for _, photo := range list {
-		if photo.Width > v.Width {
-			v = photo
+	for i := range list {
+		if v == nil || list[i].Width > v.Width {
+			v = &list[i]
 		}
 	}
 

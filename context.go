@@ -9,9 +9,14 @@ import (
 var contextPool = sync.Pool{
 	New: func() any {
 		return &Context{
-			values: map[any]any{},
+			values: make(map[any]any, 32<<(^uint(0)>>63)),
 		}
 	},
+}
+
+// NewTestContext creates a new context for testing purposes.
+func NewTestContext(ctx context.Context, c *Client, u *Update) *Context {
+	return c.acquireContext(ctx, u)
 }
 
 func (c *Client) acquireContext(ctx context.Context, update *Update) *Context {

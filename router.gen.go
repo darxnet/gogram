@@ -34,506 +34,207 @@ const (
 
 // HandleOnMessage registers a handler for updates containing Message.
 func (rg *RouterGroup) HandleOnMessage(handler func(*Context, *Message) error, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().Message)
 	}
 
-	rg.router.handlersOn[handleOnMessage] = append(rg.router.handlersOn[handleOnMessage], route{
-		filter: combined,
-		handler: rg.applyMiddlewares(func(ctx *Context) error {
-			return handler(ctx, ctx.Update().Message)
-		}),
-	})
+	rg.handleOn(handleOnMessage, fn, filters...)
 }
 
 // HandleOnEditedMessage registers a handler for updates containing EditedMessage.
 func (rg *RouterGroup) HandleOnEditedMessage(handler func(*Context, *Message) error, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().EditedMessage)
 	}
 
-	rg.router.handlersOn[handleOnEditedMessage] = append(rg.router.handlersOn[handleOnEditedMessage], route{
-		filter: combined,
-		handler: rg.applyMiddlewares(func(ctx *Context) error {
-			return handler(ctx, ctx.Update().EditedMessage)
-		}),
-	})
+	rg.handleOn(handleOnEditedMessage, fn, filters...)
 }
 
 // HandleOnChannelPost registers a handler for updates containing ChannelPost.
 func (rg *RouterGroup) HandleOnChannelPost(handler func(*Context, *Message) error, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().ChannelPost)
 	}
 
-	rg.router.handlersOn[handleOnChannelPost] = append(rg.router.handlersOn[handleOnChannelPost], route{
-		filter: combined,
-		handler: rg.applyMiddlewares(func(ctx *Context) error {
-			return handler(ctx, ctx.Update().ChannelPost)
-		}),
-	})
+	rg.handleOn(handleOnChannelPost, fn, filters...)
 }
 
 // HandleOnEditedChannelPost registers a handler for updates containing EditedChannelPost.
 func (rg *RouterGroup) HandleOnEditedChannelPost(handler func(*Context, *Message) error, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().EditedChannelPost)
 	}
 
-	rg.router.handlersOn[handleOnEditedChannelPost] = append(rg.router.handlersOn[handleOnEditedChannelPost], route{
-		filter: combined,
-		handler: rg.applyMiddlewares(func(ctx *Context) error {
-			return handler(ctx, ctx.Update().EditedChannelPost)
-		}),
-	})
+	rg.handleOn(handleOnEditedChannelPost, fn, filters...)
 }
 
 // HandleOnBusinessConnection registers a handler for updates containing BusinessConnection.
 func (rg *RouterGroup) HandleOnBusinessConnection(handler func(*Context, *BusinessConnection) error, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().BusinessConnection)
 	}
 
-	rg.router.handlersOn[handleOnBusinessConnection] = append(rg.router.handlersOn[handleOnBusinessConnection], route{
-		filter: combined,
-		handler: rg.applyMiddlewares(func(ctx *Context) error {
-			return handler(ctx, ctx.Update().BusinessConnection)
-		}),
-	})
+	rg.handleOn(handleOnBusinessConnection, fn, filters...)
 }
 
 // HandleOnBusinessMessage registers a handler for updates containing BusinessMessage.
 func (rg *RouterGroup) HandleOnBusinessMessage(handler func(*Context, *Message) error, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().BusinessMessage)
 	}
 
-	rg.router.handlersOn[handleOnBusinessMessage] = append(rg.router.handlersOn[handleOnBusinessMessage], route{
-		filter: combined,
-		handler: rg.applyMiddlewares(func(ctx *Context) error {
-			return handler(ctx, ctx.Update().BusinessMessage)
-		}),
-	})
+	rg.handleOn(handleOnBusinessMessage, fn, filters...)
 }
 
 // HandleOnEditedBusinessMessage registers a handler for updates containing EditedBusinessMessage.
 func (rg *RouterGroup) HandleOnEditedBusinessMessage(handler func(*Context, *Message) error, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().EditedBusinessMessage)
 	}
 
-	rg.router.handlersOn[handleOnEditedBusinessMessage] = append(rg.router.handlersOn[handleOnEditedBusinessMessage], route{
-		filter: combined,
-		handler: rg.applyMiddlewares(func(ctx *Context) error {
-			return handler(ctx, ctx.Update().EditedBusinessMessage)
-		}),
-	})
+	rg.handleOn(handleOnEditedBusinessMessage, fn, filters...)
 }
 
 // HandleOnDeletedBusinessMessages registers a handler for updates containing DeletedBusinessMessages.
 func (rg *RouterGroup) HandleOnDeletedBusinessMessages(handler func(*Context, *BusinessMessagesDeleted) error, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().DeletedBusinessMessages)
 	}
 
-	rg.router.handlersOn[handleOnDeletedBusinessMessages] = append(rg.router.handlersOn[handleOnDeletedBusinessMessages], route{
-		filter: combined,
-		handler: rg.applyMiddlewares(func(ctx *Context) error {
-			return handler(ctx, ctx.Update().DeletedBusinessMessages)
-		}),
-	})
+	rg.handleOn(handleOnDeletedBusinessMessages, fn, filters...)
 }
 
 // HandleOnMessageReaction registers a handler for updates containing MessageReaction.
 func (rg *RouterGroup) HandleOnMessageReaction(handler func(*Context, *MessageReactionUpdated) error, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().MessageReaction)
 	}
 
-	rg.router.handlersOn[handleOnMessageReaction] = append(rg.router.handlersOn[handleOnMessageReaction], route{
-		filter: combined,
-		handler: rg.applyMiddlewares(func(ctx *Context) error {
-			return handler(ctx, ctx.Update().MessageReaction)
-		}),
-	})
+	rg.handleOn(handleOnMessageReaction, fn, filters...)
 }
 
 // HandleOnMessageReactionCount registers a handler for updates containing MessageReactionCount.
 func (rg *RouterGroup) HandleOnMessageReactionCount(handler func(*Context, *MessageReactionCountUpdated) error, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().MessageReactionCount)
 	}
 
-	rg.router.handlersOn[handleOnMessageReactionCount] = append(rg.router.handlersOn[handleOnMessageReactionCount], route{
-		filter: combined,
-		handler: rg.applyMiddlewares(func(ctx *Context) error {
-			return handler(ctx, ctx.Update().MessageReactionCount)
-		}),
-	})
+	rg.handleOn(handleOnMessageReactionCount, fn, filters...)
 }
 
 // HandleOnInlineQuery registers a handler for updates containing InlineQuery.
 func (rg *RouterGroup) HandleOnInlineQuery(handler func(*Context, *InlineQuery) error, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().InlineQuery)
 	}
 
-	rg.router.handlersOn[handleOnInlineQuery] = append(rg.router.handlersOn[handleOnInlineQuery], route{
-		filter: combined,
-		handler: rg.applyMiddlewares(func(ctx *Context) error {
-			return handler(ctx, ctx.Update().InlineQuery)
-		}),
-	})
+	rg.handleOn(handleOnInlineQuery, fn, filters...)
 }
 
 // HandleOnChosenInlineResult registers a handler for updates containing ChosenInlineResult.
 func (rg *RouterGroup) HandleOnChosenInlineResult(handler func(*Context, *ChosenInlineResult) error, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().ChosenInlineResult)
 	}
 
-	rg.router.handlersOn[handleOnChosenInlineResult] = append(rg.router.handlersOn[handleOnChosenInlineResult], route{
-		filter: combined,
-		handler: rg.applyMiddlewares(func(ctx *Context) error {
-			return handler(ctx, ctx.Update().ChosenInlineResult)
-		}),
-	})
+	rg.handleOn(handleOnChosenInlineResult, fn, filters...)
 }
 
 // HandleOnCallbackQuery registers a handler for updates containing CallbackQuery.
 func (rg *RouterGroup) HandleOnCallbackQuery(handler func(*Context, *CallbackQuery) error, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().CallbackQuery)
 	}
 
-	rg.router.handlersOn[handleOnCallbackQuery] = append(rg.router.handlersOn[handleOnCallbackQuery], route{
-		filter: combined,
-		handler: rg.applyMiddlewares(func(ctx *Context) error {
-			return handler(ctx, ctx.Update().CallbackQuery)
-		}),
-	})
+	rg.handleOn(handleOnCallbackQuery, fn, filters...)
 }
 
 // HandleOnShippingQuery registers a handler for updates containing ShippingQuery.
 func (rg *RouterGroup) HandleOnShippingQuery(handler func(*Context, *ShippingQuery) error, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().ShippingQuery)
 	}
 
-	rg.router.handlersOn[handleOnShippingQuery] = append(rg.router.handlersOn[handleOnShippingQuery], route{
-		filter: combined,
-		handler: rg.applyMiddlewares(func(ctx *Context) error {
-			return handler(ctx, ctx.Update().ShippingQuery)
-		}),
-	})
+	rg.handleOn(handleOnShippingQuery, fn, filters...)
 }
 
 // HandleOnPreCheckoutQuery registers a handler for updates containing PreCheckoutQuery.
 func (rg *RouterGroup) HandleOnPreCheckoutQuery(handler func(*Context, *PreCheckoutQuery) error, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().PreCheckoutQuery)
 	}
 
-	rg.router.handlersOn[handleOnPreCheckoutQuery] = append(rg.router.handlersOn[handleOnPreCheckoutQuery], route{
-		filter: combined,
-		handler: rg.applyMiddlewares(func(ctx *Context) error {
-			return handler(ctx, ctx.Update().PreCheckoutQuery)
-		}),
-	})
+	rg.handleOn(handleOnPreCheckoutQuery, fn, filters...)
 }
 
 // HandleOnPurchasedPaidMedia registers a handler for updates containing PurchasedPaidMedia.
 func (rg *RouterGroup) HandleOnPurchasedPaidMedia(handler func(*Context, *PaidMediaPurchased) error, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().PurchasedPaidMedia)
 	}
 
-	rg.router.handlersOn[handleOnPurchasedPaidMedia] = append(rg.router.handlersOn[handleOnPurchasedPaidMedia], route{
-		filter: combined,
-		handler: rg.applyMiddlewares(func(ctx *Context) error {
-			return handler(ctx, ctx.Update().PurchasedPaidMedia)
-		}),
-	})
+	rg.handleOn(handleOnPurchasedPaidMedia, fn, filters...)
 }
 
 // HandleOnPoll registers a handler for updates containing Poll.
 func (rg *RouterGroup) HandleOnPoll(handler func(*Context, *Poll) error, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().Poll)
 	}
 
-	rg.router.handlersOn[handleOnPoll] = append(rg.router.handlersOn[handleOnPoll], route{
-		filter: combined,
-		handler: rg.applyMiddlewares(func(ctx *Context) error {
-			return handler(ctx, ctx.Update().Poll)
-		}),
-	})
+	rg.handleOn(handleOnPoll, fn, filters...)
 }
 
 // HandleOnPollAnswer registers a handler for updates containing PollAnswer.
 func (rg *RouterGroup) HandleOnPollAnswer(handler func(*Context, *PollAnswer) error, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().PollAnswer)
 	}
 
-	rg.router.handlersOn[handleOnPollAnswer] = append(rg.router.handlersOn[handleOnPollAnswer], route{
-		filter: combined,
-		handler: rg.applyMiddlewares(func(ctx *Context) error {
-			return handler(ctx, ctx.Update().PollAnswer)
-		}),
-	})
+	rg.handleOn(handleOnPollAnswer, fn, filters...)
 }
 
 // HandleOnMyChatMember registers a handler for updates containing MyChatMember.
 func (rg *RouterGroup) HandleOnMyChatMember(handler func(*Context, *ChatMemberUpdated) error, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().MyChatMember)
 	}
 
-	rg.router.handlersOn[handleOnMyChatMember] = append(rg.router.handlersOn[handleOnMyChatMember], route{
-		filter: combined,
-		handler: rg.applyMiddlewares(func(ctx *Context) error {
-			return handler(ctx, ctx.Update().MyChatMember)
-		}),
-	})
+	rg.handleOn(handleOnMyChatMember, fn, filters...)
 }
 
 // HandleOnChatMember registers a handler for updates containing ChatMember.
 func (rg *RouterGroup) HandleOnChatMember(handler func(*Context, *ChatMemberUpdated) error, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().ChatMember)
 	}
 
-	rg.router.handlersOn[handleOnChatMember] = append(rg.router.handlersOn[handleOnChatMember], route{
-		filter: combined,
-		handler: rg.applyMiddlewares(func(ctx *Context) error {
-			return handler(ctx, ctx.Update().ChatMember)
-		}),
-	})
+	rg.handleOn(handleOnChatMember, fn, filters...)
 }
 
 // HandleOnChatJoinRequest registers a handler for updates containing ChatJoinRequest.
 func (rg *RouterGroup) HandleOnChatJoinRequest(handler func(*Context, *ChatJoinRequest) error, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().ChatJoinRequest)
 	}
 
-	rg.router.handlersOn[handleOnChatJoinRequest] = append(rg.router.handlersOn[handleOnChatJoinRequest], route{
-		filter: combined,
-		handler: rg.applyMiddlewares(func(ctx *Context) error {
-			return handler(ctx, ctx.Update().ChatJoinRequest)
-		}),
-	})
+	rg.handleOn(handleOnChatJoinRequest, fn, filters...)
 }
 
 // HandleOnChatBoost registers a handler for updates containing ChatBoost.
 func (rg *RouterGroup) HandleOnChatBoost(handler func(*Context, *ChatBoostUpdated) error, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().ChatBoost)
 	}
 
-	rg.router.handlersOn[handleOnChatBoost] = append(rg.router.handlersOn[handleOnChatBoost], route{
-		filter: combined,
-		handler: rg.applyMiddlewares(func(ctx *Context) error {
-			return handler(ctx, ctx.Update().ChatBoost)
-		}),
-	})
+	rg.handleOn(handleOnChatBoost, fn, filters...)
 }
 
 // HandleOnRemovedChatBoost registers a handler for updates containing RemovedChatBoost.
 func (rg *RouterGroup) HandleOnRemovedChatBoost(handler func(*Context, *ChatBoostRemoved) error, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().RemovedChatBoost)
 	}
 
-	rg.router.handlersOn[handleOnRemovedChatBoost] = append(rg.router.handlersOn[handleOnRemovedChatBoost], route{
-		filter: combined,
-		handler: rg.applyMiddlewares(func(ctx *Context) error {
-			return handler(ctx, ctx.Update().RemovedChatBoost)
-		}),
-	})
+	rg.handleOn(handleOnRemovedChatBoost, fn, filters...)
 }

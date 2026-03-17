@@ -79,14 +79,13 @@ func WithAddStickerToSetSticker(value InputSticker) AddStickerToSetOption {
 // Other sticker sets can have up to 120 stickers.
 // Returns True on success.
 func (c *Client) AddStickerToSet(ctx context.Context, params *AddStickerToSetParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -225,14 +224,13 @@ func WithAnswerCallbackQueryCacheTime(value int64) AnswerCallbackQueryOption {
 //
 // [inline keyboards]: https://core.telegram.org/bots/features#inline-keyboards
 func (c *Client) AnswerCallbackQuery(ctx context.Context, params *AnswerCallbackQueryParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -370,14 +368,13 @@ func WithAnswerInlineQueryButton(value *InlineQueryResultsButton) AnswerInlineQu
 // On success, True is returned.
 // No more than 50 results per query are allowed.
 func (c *Client) AnswerInlineQuery(ctx context.Context, params *AnswerInlineQueryParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -475,14 +472,13 @@ func WithAnswerPreCheckoutQueryErrorMessage(value string) AnswerPreCheckoutQuery
 //
 // [Update]: https://core.telegram.org/bots/api#update
 func (c *Client) AnswerPreCheckoutQuery(ctx context.Context, params *AnswerPreCheckoutQueryParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -592,14 +588,13 @@ func WithAnswerShippingQueryErrorMessage(value string) AnswerShippingQueryOption
 //
 // [Update]: https://core.telegram.org/bots/api#update
 func (c *Client) AnswerShippingQuery(ctx context.Context, params *AnswerShippingQueryParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -671,14 +666,13 @@ func WithAnswerWebAppQueryResult(value InlineQueryResult) AnswerWebAppQueryOptio
 // [Web App]: https://core.telegram.org/bots/webapps
 // [SentWebAppMessage]: https://core.telegram.org/bots/api#sentwebappmessage
 func (c *Client) AnswerWebAppQuery(ctx context.Context, params *AnswerWebAppQueryParams) (ret *SentWebAppMessage, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -749,14 +743,13 @@ func WithApproveChatJoinRequestUserID(value int64) ApproveChatJoinRequestOption 
 // The bot must be an administrator in the chat for this to work and must have the can_invite_users administrator right.
 // Returns True on success.
 func (c *Client) ApproveChatJoinRequest(ctx context.Context, params *ApproveChatJoinRequestParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -843,14 +836,13 @@ func WithApproveSuggestedPostSendDate(value int64) ApproveSuggestedPostOption {
 // The bot must have the 'can_post_messages' administrator right in the corresponding channel chat.
 // Returns True on success.
 func (c *Client) ApproveSuggestedPost(ctx context.Context, params *ApproveSuggestedPostParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -961,14 +953,13 @@ func WithBanChatMemberRevokeMessages(value bool) BanChatMemberOption {
 //
 // [unbanned]: https://core.telegram.org/bots/api#unbanchatmember
 func (c *Client) BanChatMember(ctx context.Context, params *BanChatMemberParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -1041,14 +1032,13 @@ func WithBanChatSenderChatSenderChatID(value int64) BanChatSenderChatOption {
 //
 // [unbanned]: https://core.telegram.org/bots/api#unbanchatsenderchat
 func (c *Client) BanChatSenderChat(ctx context.Context, params *BanChatSenderChatParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -1091,14 +1081,13 @@ func (r *CloseParams) Option(opts ...CloseOption) (previous CloseOption) {
 // Returns True on success.
 // Requires no parameters.
 func (c *Client) Close(ctx context.Context, params *CloseParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -1168,14 +1157,13 @@ func WithCloseForumTopicMessageThreadID(value int64) CloseForumTopicOption {
 // The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights, unless it is the creator of the topic.
 // Returns True on success.
 func (c *Client) CloseForumTopic(ctx context.Context, params *CloseForumTopicParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -1230,14 +1218,13 @@ func WithCloseGeneralForumTopicChatID(value string) CloseGeneralForumTopicOption
 // The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights.
 // Returns True on success.
 func (c *Client) CloseGeneralForumTopic(ctx context.Context, params *CloseGeneralForumTopicParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -1307,14 +1294,13 @@ func WithConvertGiftToStarsOwnedGiftID(value string) ConvertGiftToStarsOption {
 // Requires the can_convert_gifts_to_stars business bot right.
 // Returns True on success.
 func (c *Client) ConvertGiftToStars(ctx context.Context, params *ConvertGiftToStarsParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -1647,14 +1633,13 @@ func WithCopyMessageReplyMarkup(value *ReplyMarkup) CopyMessageOption {
 // [forwardMessage]: https://core.telegram.org/bots/api#forwardmessage
 // [MessageId]: https://core.telegram.org/bots/api#messageid
 func (c *Client) CopyMessage(ctx context.Context, params *CopyMessageParams) (ret *MessageId, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -1831,14 +1816,13 @@ func WithCopyMessagesRemoveCaption(value bool) CopyMessagesOption {
 // [forwardMessages]: https://core.telegram.org/bots/api#forwardmessages
 // [MessageId]: https://core.telegram.org/bots/api#messageid
 func (c *Client) CopyMessages(ctx context.Context, params *CopyMessagesParams) (ret []MessageId, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -1960,14 +1944,13 @@ func WithCreateChatInviteLinkCreatesJoinRequest(value bool) CreateChatInviteLink
 // [revokeChatInviteLink]: https://core.telegram.org/bots/api#revokechatinvitelink
 // [ChatInviteLink]: https://core.telegram.org/bots/api#chatinvitelink
 func (c *Client) CreateChatInviteLink(ctx context.Context, params *CreateChatInviteLinkParams) (ret *ChatInviteLink, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -2076,14 +2059,13 @@ func WithCreateChatSubscriptionInviteLinkSubscriptionPrice(value int64) CreateCh
 // [revokeChatInviteLink]: https://core.telegram.org/bots/api#revokechatinvitelink
 // [ChatInviteLink]: https://core.telegram.org/bots/api#chatinvitelink
 func (c *Client) CreateChatSubscriptionInviteLink(ctx context.Context, params *CreateChatSubscriptionInviteLinkParams) (ret *ChatInviteLink, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -2194,14 +2176,13 @@ func WithCreateForumTopicIconCustomEmojiID(value string) CreateForumTopicOption 
 //
 // [ForumTopic]: https://core.telegram.org/bots/api#forumtopic
 func (c *Client) CreateForumTopic(ctx context.Context, params *CreateForumTopicParams) (ret *ForumTopic, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -2675,14 +2656,13 @@ func WithCreateInvoiceLinkIsFlexible(value bool) CreateInvoiceLinkOption {
 // Use this method to create a link for an invoice.
 // Returns the created invoice link as String on success.
 func (c *Client) CreateInvoiceLink(ctx context.Context, params *CreateInvoiceLinkParams) (ret string, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -2831,22 +2811,24 @@ func (c *Client) CreateNewStickerSet(ctx context.Context, params *CreateNewStick
 
 		{
 			v := strconv.FormatInt(params.UserID, 10)
-			err = writer.WriteField("user_id", v)
-			if err != nil {
+			if err := writer.WriteField("user_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		{
-			err = writer.WriteField("name", params.Name)
-			if err != nil {
+			v := params.Name
+			if err := writer.WriteField("name", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		{
-			err = writer.WriteField("title", params.Title)
-			if err != nil {
+			v := params.Title
+			if err := writer.WriteField("title", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -2863,37 +2845,37 @@ func (c *Client) CreateNewStickerSet(ctx context.Context, params *CreateNewStick
 				}
 			}
 
-			var bs []byte
-
-			bs, err = json.Marshal(params.Stickers)
+			bs, err := json.Marshal(params.Stickers)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("stickers")
+			p, err := writer.CreateFormField("stickers")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.StickerType != "" {
-			err = writer.WriteField("sticker_type", params.StickerType)
-			if err != nil {
+			v := params.StickerType
+			if err := writer.WriteField("sticker_type", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.NeedsRepainting {
 			v := strconv.FormatBool(params.NeedsRepainting)
-			err = writer.WriteField("needs_repainting", v)
-			if err != nil {
+			if err := writer.WriteField("needs_repainting", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -2905,6 +2887,7 @@ func (c *Client) CreateNewStickerSet(ctx context.Context, params *CreateNewStick
 
 	result, err = c.Raw(ctx, "createNewStickerSet", reader, contentType)
 	if err != nil {
+		_ = reader.CloseWithError(err)
 		return
 	}
 
@@ -2968,14 +2951,13 @@ func WithDeclineChatJoinRequestUserID(value int64) DeclineChatJoinRequestOption 
 // The bot must be an administrator in the chat for this to work and must have the can_invite_users administrator right.
 // Returns True on success.
 func (c *Client) DeclineChatJoinRequest(ctx context.Context, params *DeclineChatJoinRequestParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -3060,14 +3042,13 @@ func WithDeclineSuggestedPostComment(value string) DeclineSuggestedPostOption {
 // The bot must have the 'can_manage_direct_messages' administrator right in the corresponding channel chat.
 // Returns True on success.
 func (c *Client) DeclineSuggestedPost(ctx context.Context, params *DeclineSuggestedPostParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -3145,14 +3126,13 @@ func WithDeleteBusinessMessagesMessageIDs(value []int64) DeleteBusinessMessagesO
 // Requires the can_delete_sent_messages business bot right to delete messages sent by the bot itself, or the can_delete_all_messages business bot right to delete any message.
 // Returns True on success.
 func (c *Client) DeleteBusinessMessages(ctx context.Context, params *DeleteBusinessMessagesParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -3208,14 +3188,13 @@ func WithDeleteChatPhotoChatID(value string) DeleteChatPhotoOption {
 // The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
 // Returns True on success.
 func (c *Client) DeleteChatPhoto(ctx context.Context, params *DeleteChatPhotoParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -3273,14 +3252,13 @@ func WithDeleteChatStickerSetChatID(value string) DeleteChatStickerSetOption {
 //
 // [getChat]: https://core.telegram.org/bots/api#getchat
 func (c *Client) DeleteChatStickerSet(ctx context.Context, params *DeleteChatStickerSetParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -3350,14 +3328,13 @@ func WithDeleteForumTopicMessageThreadID(value int64) DeleteForumTopicOption {
 // In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_delete_messages administrator rights.
 // Returns True on success.
 func (c *Client) DeleteForumTopic(ctx context.Context, params *DeleteForumTopicParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -3435,14 +3412,13 @@ func WithDeleteMessageMessageID(value int64) DeleteMessageOption {
 // - If the bot has can_manage_direct_messages administrator right in a channel, it can delete any message in the corresponding direct messages chat.
 // Returns True on success.
 func (c *Client) DeleteMessage(ctx context.Context, params *DeleteMessageParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -3518,14 +3494,13 @@ func WithDeleteMessagesMessageIDs(value []int64) DeleteMessagesOption {
 // If some of the specified messages can't be found, they are skipped.
 // Returns True on success.
 func (c *Client) DeleteMessages(ctx context.Context, params *DeleteMessagesParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -3605,14 +3580,13 @@ func WithDeleteMyCommandsLanguageCode(value string) DeleteMyCommandsOption {
 //
 // [higher level commands]: https://core.telegram.org/bots/api#determining-list-of-commands
 func (c *Client) DeleteMyCommands(ctx context.Context, params *DeleteMyCommandsParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -3666,14 +3640,13 @@ func WithDeleteStickerFromSetSticker(value string) DeleteStickerFromSetOption {
 // Use this method to delete a sticker from a set created by the bot.
 // Returns True on success.
 func (c *Client) DeleteStickerFromSet(ctx context.Context, params *DeleteStickerFromSetParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -3727,14 +3700,13 @@ func WithDeleteStickerSetName(value string) DeleteStickerSetOption {
 // Use this method to delete a sticker set that was created by the bot.
 // Returns True on success.
 func (c *Client) DeleteStickerSet(ctx context.Context, params *DeleteStickerSetParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -3804,14 +3776,13 @@ func WithDeleteStoryStoryID(value int64) DeleteStoryOption {
 // Requires the can_manage_stories business bot right.
 // Returns True on success.
 func (c *Client) DeleteStory(ctx context.Context, params *DeleteStoryParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -3867,14 +3838,13 @@ func WithDeleteWebhookDropPendingUpdates(value bool) DeleteWebhookOption {
 //
 // [getUpdates]: https://core.telegram.org/bots/api#getupdates
 func (c *Client) DeleteWebhook(ctx context.Context, params *DeleteWebhookParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -4008,14 +3978,13 @@ func WithEditChatInviteLinkCreatesJoinRequest(value bool) EditChatInviteLinkOpti
 //
 // [ChatInviteLink]: https://core.telegram.org/bots/api#chatinvitelink
 func (c *Client) EditChatInviteLink(ctx context.Context, params *EditChatInviteLinkParams) (ret *ChatInviteLink, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -4103,14 +4072,13 @@ func WithEditChatSubscriptionInviteLinkName(value string) EditChatSubscriptionIn
 //
 // [ChatInviteLink]: https://core.telegram.org/bots/api#chatinvitelink
 func (c *Client) EditChatSubscriptionInviteLink(ctx context.Context, params *EditChatSubscriptionInviteLinkParams) (ret *ChatInviteLink, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -4223,14 +4191,13 @@ func WithEditForumTopicIconCustomEmojiID(value string) EditForumTopicOption {
 // In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights, unless it is the creator of the topic.
 // Returns True on success.
 func (c *Client) EditForumTopic(ctx context.Context, params *EditForumTopicParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -4300,14 +4267,13 @@ func WithEditGeneralForumTopicName(value string) EditGeneralForumTopicOption {
 // The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights.
 // Returns True on success.
 func (c *Client) EditGeneralForumTopic(ctx context.Context, params *EditGeneralForumTopicParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -4502,14 +4468,13 @@ func WithEditMessageCaptionReplyMarkup(value *InlineKeyboardMarkup) EditMessageC
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) EditMessageCaption(ctx context.Context, params *EditMessageCaptionParams) (ret *Message, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -4630,14 +4595,13 @@ func WithEditMessageChecklistReplyMarkup(value *InlineKeyboardMarkup) EditMessag
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) EditMessageChecklist(ctx context.Context, params *EditMessageChecklistParams) (ret *Message, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -4866,14 +4830,13 @@ func WithEditMessageLiveLocationReplyMarkup(value *InlineKeyboardMarkup) EditMes
 // [stopMessageLiveLocation]: https://core.telegram.org/bots/api#stopmessagelivelocation
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) EditMessageLiveLocation(ctx context.Context, params *EditMessageLiveLocationParams) (ret *Message, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -5018,14 +4981,13 @@ func WithEditMessageMediaReplyMarkup(value *InlineKeyboardMarkup) EditMessageMed
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) EditMessageMedia(ctx context.Context, params *EditMessageMediaParams) (ret *Message, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -5153,14 +5115,13 @@ func WithEditMessageReplyMarkupReplyMarkup(value *InlineKeyboardMarkup) EditMess
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) EditMessageReplyMarkup(ctx context.Context, params *EditMessageReplyMarkupParams) (ret *Message, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -5355,14 +5316,13 @@ func WithEditMessageTextReplyMarkup(value *InlineKeyboardMarkup) EditMessageText
 // [game]: https://core.telegram.org/bots/api#games
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) EditMessageText(ctx context.Context, params *EditMessageTextParams) (ret *Message, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -5516,14 +5476,13 @@ func WithEditStoryAreas(value []StoryArea) EditStoryOption {
 //
 // [Story]: https://core.telegram.org/bots/api#story
 func (c *Client) EditStory(ctx context.Context, params *EditStoryParams) (ret *Story, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -5610,14 +5569,13 @@ func WithEditUserStarSubscriptionIsCanceled(value bool) EditUserStarSubscription
 // Allows the bot to cancel or re-enable extension of a subscription paid in Telegram Stars.
 // Returns True on success.
 func (c *Client) EditUserStarSubscription(ctx context.Context, params *EditUserStarSubscriptionParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -5672,14 +5630,13 @@ func WithExportChatInviteLinkChatID(value string) ExportChatInviteLinkOption {
 // The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
 // Returns the new invite link as String on success.
 func (c *Client) ExportChatInviteLink(ctx context.Context, params *ExportChatInviteLinkParams) (ret string, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -5877,14 +5834,13 @@ func WithForwardMessageMessageID(value int64) ForwardMessageOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) ForwardMessage(ctx context.Context, params *ForwardMessageParams) (ret *Message, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -6042,14 +5998,13 @@ func WithForwardMessagesProtectContent(value bool) ForwardMessagesOption {
 //
 // [MessageId]: https://core.telegram.org/bots/api#messageid
 func (c *Client) ForwardMessages(ctx context.Context, params *ForwardMessagesParams) (ret []MessageId, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -6093,14 +6048,13 @@ func (r *GetAvailableGiftsParams) Option(opts ...GetAvailableGiftsOption) (previ
 //
 // [Gifts]: https://core.telegram.org/bots/api#gifts
 func (c *Client) GetAvailableGifts(ctx context.Context, params *GetAvailableGiftsParams) (ret *Gifts, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -6312,14 +6266,13 @@ func WithGetBusinessAccountGiftsLimit(value int64) GetBusinessAccountGiftsOption
 //
 // [OwnedGifts]: https://core.telegram.org/bots/api#ownedgifts
 func (c *Client) GetBusinessAccountGifts(ctx context.Context, params *GetBusinessAccountGiftsParams) (ret *OwnedGifts, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -6377,14 +6330,13 @@ func WithGetBusinessAccountStarBalanceBusinessConnectionID(value string) GetBusi
 //
 // [StarAmount]: https://core.telegram.org/bots/api#staramount
 func (c *Client) GetBusinessAccountStarBalance(ctx context.Context, params *GetBusinessAccountStarBalanceParams) (ret *StarAmount, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -6441,14 +6393,13 @@ func WithGetBusinessConnectionBusinessConnectionID(value string) GetBusinessConn
 //
 // [BusinessConnection]: https://core.telegram.org/bots/api#businessconnection
 func (c *Client) GetBusinessConnection(ctx context.Context, params *GetBusinessConnectionParams) (ret *BusinessConnection, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -6505,14 +6456,13 @@ func WithGetChatChatID(value string) GetChatOption {
 //
 // [ChatFullInfo]: https://core.telegram.org/bots/api#chatfullinfo
 func (c *Client) GetChat(ctx context.Context, params *GetChatParams) (ret *ChatFullInfo, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -6569,14 +6519,13 @@ func WithGetChatAdministratorsChatID(value string) GetChatAdministratorsOption {
 //
 // [ChatMember]: https://core.telegram.org/bots/api#chatmember
 func (c *Client) GetChatAdministrators(ctx context.Context, params *GetChatAdministratorsParams) (ret []ChatMember, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -6791,14 +6740,13 @@ func WithGetChatGiftsLimit(value int64) GetChatGiftsOption {
 //
 // [OwnedGifts]: https://core.telegram.org/bots/api#ownedgifts
 func (c *Client) GetChatGifts(ctx context.Context, params *GetChatGiftsParams) (ret *OwnedGifts, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -6871,14 +6819,13 @@ func WithGetChatMemberUserID(value int64) GetChatMemberOption {
 //
 // [ChatMember]: https://core.telegram.org/bots/api#chatmember
 func (c *Client) GetChatMember(ctx context.Context, params *GetChatMemberParams) (ret *ChatMember, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -6933,14 +6880,13 @@ func WithGetChatMemberCountChatID(value string) GetChatMemberCountOption {
 // Use this method to get the number of members in a chat.
 // Returns Int on success.
 func (c *Client) GetChatMemberCount(ctx context.Context, params *GetChatMemberCountParams) (ret int64, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -6998,14 +6944,13 @@ func WithGetChatMenuButtonChatID(value int64) GetChatMenuButtonOption {
 //
 // [MenuButton]: https://core.telegram.org/bots/api#menubutton
 func (c *Client) GetChatMenuButton(ctx context.Context, params *GetChatMenuButtonParams) (ret *MenuButton, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -7064,14 +7009,13 @@ func WithGetCustomEmojiStickersCustomEmojiIDs(value []string) GetCustomEmojiStic
 //
 // [Sticker]: https://core.telegram.org/bots/api#sticker
 func (c *Client) GetCustomEmojiStickers(ctx context.Context, params *GetCustomEmojiStickersParams) (ret []Sticker, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -7135,14 +7079,13 @@ func WithGetFileFileID(value string) GetFileOption {
 // [File]: https://core.telegram.org/bots/api#file
 // [getFile]: https://core.telegram.org/bots/api#getfile
 func (c *Client) GetFile(ctx context.Context, params *GetFileParams) (ret *File, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -7186,14 +7129,13 @@ func (r *GetForumTopicIconStickersParams) Option(opts ...GetForumTopicIconSticke
 //
 // [Sticker]: https://core.telegram.org/bots/api#sticker
 func (c *Client) GetForumTopicIconStickers(ctx context.Context, params *GetForumTopicIconStickersParams) (ret []Sticker, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -7302,14 +7244,13 @@ func WithGetGameHighScoresInlineMessageID(value string) GetGameHighScoresOption 
 //
 // [GameHighScore]: https://core.telegram.org/bots/api#gamehighscore
 func (c *Client) GetGameHighScores(ctx context.Context, params *GetGameHighScoresParams) (ret []GameHighScore, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -7353,14 +7294,13 @@ func (r *GetMeParams) Option(opts ...GetMeOption) (previous GetMeOption) {
 //
 // [User]: https://core.telegram.org/bots/api#user
 func (c *Client) GetMe(ctx context.Context, params *GetMeParams) (ret *User, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -7439,14 +7379,13 @@ func WithGetMyCommandsLanguageCode(value string) GetMyCommandsOption {
 //
 // [BotCommand]: https://core.telegram.org/bots/api#botcommand
 func (c *Client) GetMyCommands(ctx context.Context, params *GetMyCommandsParams) (ret []BotCommand, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -7505,14 +7444,13 @@ func WithGetMyDefaultAdministratorRightsForChannels(value bool) GetMyDefaultAdmi
 //
 // [ChatAdministratorRights]: https://core.telegram.org/bots/api#chatadministratorrights
 func (c *Client) GetMyDefaultAdministratorRights(ctx context.Context, params *GetMyDefaultAdministratorRightsParams) (ret *ChatAdministratorRights, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -7569,14 +7507,13 @@ func WithGetMyDescriptionLanguageCode(value string) GetMyDescriptionOption {
 //
 // [BotDescription]: https://core.telegram.org/bots/api#botdescription
 func (c *Client) GetMyDescription(ctx context.Context, params *GetMyDescriptionParams) (ret *BotDescription, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -7633,14 +7570,13 @@ func WithGetMyNameLanguageCode(value string) GetMyNameOption {
 //
 // [BotName]: https://core.telegram.org/bots/api#botname
 func (c *Client) GetMyName(ctx context.Context, params *GetMyNameParams) (ret *BotName, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -7697,14 +7633,13 @@ func WithGetMyShortDescriptionLanguageCode(value string) GetMyShortDescriptionOp
 //
 // [BotShortDescription]: https://core.telegram.org/bots/api#botshortdescription
 func (c *Client) GetMyShortDescription(ctx context.Context, params *GetMyShortDescriptionParams) (ret *BotShortDescription, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -7748,14 +7683,13 @@ func (r *GetMyStarBalanceParams) Option(opts ...GetMyStarBalanceOption) (previou
 //
 // [StarAmount]: https://core.telegram.org/bots/api#staramount
 func (c *Client) GetMyStarBalance(ctx context.Context, params *GetMyStarBalanceParams) (ret *StarAmount, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -7831,14 +7765,13 @@ func WithGetStarTransactionsLimit(value int64) GetStarTransactionsOption {
 //
 // [StarTransactions]: https://core.telegram.org/bots/api#startransactions
 func (c *Client) GetStarTransactions(ctx context.Context, params *GetStarTransactionsParams) (ret *StarTransactions, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -7895,14 +7828,13 @@ func WithGetStickerSetName(value string) GetStickerSetOption {
 //
 // [StickerSet]: https://core.telegram.org/bots/api#stickerset
 func (c *Client) GetStickerSet(ctx context.Context, params *GetStickerSetParams) (ret *StickerSet, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -8045,14 +7977,13 @@ func WithGetUpdatesAllowedUpdates(value []string) GetUpdatesOption {
 // [wiki]: https://en.wikipedia.org/wiki/Push_technology#Long_polling
 // [Update]: https://core.telegram.org/bots/api#update
 func (c *Client) GetUpdates(ctx context.Context, params *GetUpdatesParams) (ret []Update, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -8125,14 +8056,13 @@ func WithGetUserChatBoostsUserID(value int64) GetUserChatBoostsOption {
 //
 // [UserChatBoosts]: https://core.telegram.org/bots/api#userchatboosts
 func (c *Client) GetUserChatBoosts(ctx context.Context, params *GetUserChatBoostsParams) (ret *UserChatBoosts, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -8313,14 +8243,13 @@ func WithGetUserGiftsLimit(value int64) GetUserGiftsOption {
 //
 // [OwnedGifts]: https://core.telegram.org/bots/api#ownedgifts
 func (c *Client) GetUserGifts(ctx context.Context, params *GetUserGiftsParams) (ret *OwnedGifts, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -8413,14 +8342,13 @@ func WithGetUserProfileAudiosLimit(value int64) GetUserProfileAudiosOption {
 //
 // [UserProfileAudios]: https://core.telegram.org/bots/api#userprofileaudios
 func (c *Client) GetUserProfileAudios(ctx context.Context, params *GetUserProfileAudiosParams) (ret *UserProfileAudios, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -8513,14 +8441,13 @@ func WithGetUserProfilePhotosLimit(value int64) GetUserProfilePhotosOption {
 //
 // [UserProfilePhotos]: https://core.telegram.org/bots/api#userprofilephotos
 func (c *Client) GetUserProfilePhotos(ctx context.Context, params *GetUserProfilePhotosParams) (ret *UserProfilePhotos, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -8566,14 +8493,13 @@ func (r *GetWebhookInfoParams) Option(opts ...GetWebhookInfoOption) (previous Ge
 // [WebhookInfo]: https://core.telegram.org/bots/api#webhookinfo
 // [getUpdates]: https://core.telegram.org/bots/api#getupdates
 func (c *Client) GetWebhookInfo(ctx context.Context, params *GetWebhookInfoParams) (ret *WebhookInfo, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -8715,14 +8641,13 @@ func WithGiftPremiumSubscriptionTextEntities(value []MessageEntity) GiftPremiumS
 // Gifts a Telegram Premium subscription to the given user.
 // Returns True on success.
 func (c *Client) GiftPremiumSubscription(ctx context.Context, params *GiftPremiumSubscriptionParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -8778,14 +8703,13 @@ func WithHideGeneralForumTopicChatID(value string) HideGeneralForumTopicOption {
 // The topic will be automatically closed if it was open.
 // Returns True on success.
 func (c *Client) HideGeneralForumTopic(ctx context.Context, params *HideGeneralForumTopicParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -8841,14 +8765,13 @@ func WithLeaveChatChatID(value string) LeaveChatOption {
 // Use this method for your bot to leave a group, supergroup or channel.
 // Returns True on success.
 func (c *Client) LeaveChat(ctx context.Context, params *LeaveChatParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -8891,14 +8814,13 @@ func (r *LogOutParams) Option(opts ...LogOutOption) (previous LogOutOption) {
 // Returns True on success.
 // Requires no parameters.
 func (c *Client) LogOut(ctx context.Context, params *LogOutParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -9001,14 +8923,13 @@ func WithPinChatMessageDisableNotification(value bool) PinChatMessageOption {
 // Conversely, the bot must be an administrator with the 'can_pin_messages' right or the 'can_edit_messages' right to pin messages in groups and channels respectively.
 // Returns True on success.
 func (c *Client) PinChatMessage(ctx context.Context, params *PinChatMessageParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -9191,14 +9112,13 @@ func WithPostStoryProtectContent(value bool) PostStoryOption {
 //
 // [Story]: https://core.telegram.org/bots/api#story
 func (c *Client) PostStory(ctx context.Context, params *PostStoryParams) (ret *Story, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -9529,14 +9449,13 @@ func WithPromoteChatMemberCanManageTags(value bool) PromoteChatMemberOption {
 // Pass False for all boolean parameters to demote a user.
 // Returns True on success.
 func (c *Client) PromoteChatMember(ctx context.Context, params *PromoteChatMemberParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -9623,14 +9542,13 @@ func WithReadBusinessMessageMessageID(value int64) ReadBusinessMessageOption {
 // Requires the can_read_messages business bot right.
 // Returns True on success.
 func (c *Client) ReadBusinessMessage(ctx context.Context, params *ReadBusinessMessageParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -9701,14 +9619,13 @@ func WithRefundStarPaymentTelegramPaymentChargeID(value string) RefundStarPaymen
 //
 // [Telegram Stars]: https://t.me/BotNews/90
 func (c *Client) RefundStarPayment(ctx context.Context, params *RefundStarPaymentParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -9780,14 +9697,13 @@ func WithRemoveBusinessAccountProfilePhotoIsPublic(value bool) RemoveBusinessAcc
 // Requires the can_edit_profile_photo business bot right.
 // Returns True on success.
 func (c *Client) RemoveBusinessAccountProfilePhoto(ctx context.Context, params *RemoveBusinessAccountProfilePhotoParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -9843,14 +9759,13 @@ func WithRemoveChatVerificationChatID(value string) RemoveChatVerificationOption
 //
 // [on behalf of the organization]: https://telegram.org/verify#third-party-verification
 func (c *Client) RemoveChatVerification(ctx context.Context, params *RemoveChatVerificationParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -9891,14 +9806,13 @@ func (r *RemoveMyProfilePhotoParams) Option(opts ...RemoveMyProfilePhotoOption) 
 // Requires no parameters.
 // Returns True on success.
 func (c *Client) RemoveMyProfilePhoto(ctx context.Context, params *RemoveMyProfilePhotoParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -9954,14 +9868,13 @@ func WithRemoveUserVerificationUserID(value int64) RemoveUserVerificationOption 
 //
 // [on behalf of the organization]: https://telegram.org/verify#third-party-verification
 func (c *Client) RemoveUserVerification(ctx context.Context, params *RemoveUserVerificationParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -10031,14 +9944,13 @@ func WithReopenForumTopicMessageThreadID(value int64) ReopenForumTopicOption {
 // The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights, unless it is the creator of the topic.
 // Returns True on success.
 func (c *Client) ReopenForumTopic(ctx context.Context, params *ReopenForumTopicParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -10094,14 +10006,13 @@ func WithReopenGeneralForumTopicChatID(value string) ReopenGeneralForumTopicOpti
 // The topic will be automatically unhidden if it was hidden.
 // Returns True on success.
 func (c *Client) ReopenGeneralForumTopic(ctx context.Context, params *ReopenGeneralForumTopicParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -10207,14 +10118,13 @@ func WithReplaceStickerInSetSticker(value InputSticker) ReplaceStickerInSetOptio
 // [addStickerToSet]: https://core.telegram.org/bots/api#addstickertoset
 // [setStickerPositionInSet]: https://core.telegram.org/bots/api#setstickerpositioninset
 func (c *Client) ReplaceStickerInSet(ctx context.Context, params *ReplaceStickerInSetParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -10347,14 +10257,13 @@ func WithRepostStoryProtectContent(value bool) RepostStoryOption {
 //
 // [Story]: https://core.telegram.org/bots/api#story
 func (c *Client) RepostStory(ctx context.Context, params *RepostStoryParams) (ret *Story, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -10475,14 +10384,13 @@ func WithRestrictChatMemberUntilDate(value int64) RestrictChatMemberOption {
 // Pass True for all permissions to lift restrictions from a user.
 // Returns True on success.
 func (c *Client) RestrictChatMember(ctx context.Context, params *RestrictChatMemberParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -10555,14 +10463,13 @@ func WithRevokeChatInviteLinkInviteLink(value string) RevokeChatInviteLinkOption
 //
 // [ChatInviteLink]: https://core.telegram.org/bots/api#chatinvitelink
 func (c *Client) RevokeChatInviteLink(ctx context.Context, params *RevokeChatInviteLinkParams) (ret *ChatInviteLink, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -10694,14 +10601,13 @@ func WithSavePreparedInlineMessageAllowChannelChats(value bool) SavePreparedInli
 //
 // [PreparedInlineMessage]: https://core.telegram.org/bots/api#preparedinlinemessage
 func (c *Client) SavePreparedInlineMessage(ctx context.Context, params *SavePreparedInlineMessageParams) (ret *PreparedInlineMessage, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -11117,31 +11023,33 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 		defer writer.Close()
 
 		if params.BusinessConnectionID != "" {
-			err = writer.WriteField("business_connection_id", params.BusinessConnectionID)
-			if err != nil {
+			v := params.BusinessConnectionID
+			if err := writer.WriteField("business_connection_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		{
-			err = writer.WriteField("chat_id", params.ChatID)
-			if err != nil {
+			v := params.ChatID
+			if err := writer.WriteField("chat_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.MessageThreadID != 0 {
 			v := strconv.FormatInt(params.MessageThreadID, 10)
-			err = writer.WriteField("message_thread_id", v)
-			if err != nil {
+			if err := writer.WriteField("message_thread_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DirectMessagesTopicID != 0 {
 			v := strconv.FormatInt(params.DirectMessagesTopicID, 10)
-			err = writer.WriteField("direct_messages_topic_id", v)
-			if err != nil {
+			if err := writer.WriteField("direct_messages_topic_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -11160,24 +11068,24 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 
 		if params.Duration != 0 {
 			v := strconv.FormatInt(params.Duration, 10)
-			err = writer.WriteField("duration", v)
-			if err != nil {
+			if err := writer.WriteField("duration", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.Width != 0 {
 			v := strconv.FormatInt(params.Width, 10)
-			err = writer.WriteField("width", v)
-			if err != nil {
+			if err := writer.WriteField("width", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.Height != 0 {
 			v := strconv.FormatInt(params.Height, 10)
-			err = writer.WriteField("height", v)
-			if err != nil {
+			if err := writer.WriteField("height", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -11197,146 +11105,145 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 		}
 
 		if params.Caption != "" {
-			err = writer.WriteField("caption", params.Caption)
-			if err != nil {
+			v := params.Caption
+			if err := writer.WriteField("caption", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ParseMode != "" {
-			err = writer.WriteField("parse_mode", params.ParseMode)
-			if err != nil {
+			v := params.ParseMode
+			if err := writer.WriteField("parse_mode", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			var bs []byte
-
-			bs, err = json.Marshal(params.CaptionEntities)
+			bs, err := json.Marshal(params.CaptionEntities)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("caption_entities")
+			p, err := writer.CreateFormField("caption_entities")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ShowCaptionAboveMedia {
 			v := strconv.FormatBool(params.ShowCaptionAboveMedia)
-			err = writer.WriteField("show_caption_above_media", v)
-			if err != nil {
+			if err := writer.WriteField("show_caption_above_media", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.HasSpoiler {
 			v := strconv.FormatBool(params.HasSpoiler)
-			err = writer.WriteField("has_spoiler", v)
-			if err != nil {
+			if err := writer.WriteField("has_spoiler", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DisableNotification {
 			v := strconv.FormatBool(params.DisableNotification)
-			err = writer.WriteField("disable_notification", v)
-			if err != nil {
+			if err := writer.WriteField("disable_notification", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ProtectContent {
 			v := strconv.FormatBool(params.ProtectContent)
-			err = writer.WriteField("protect_content", v)
-			if err != nil {
+			if err := writer.WriteField("protect_content", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.AllowPaidBroadcast {
 			v := strconv.FormatBool(params.AllowPaidBroadcast)
-			err = writer.WriteField("allow_paid_broadcast", v)
-			if err != nil {
+			if err := writer.WriteField("allow_paid_broadcast", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.MessageEffectID != "" {
-			err = writer.WriteField("message_effect_id", params.MessageEffectID)
-			if err != nil {
+			v := params.MessageEffectID
+			if err := writer.WriteField("message_effect_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.SuggestedPostParameters != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.SuggestedPostParameters)
+			bs, err := json.Marshal(params.SuggestedPostParameters)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("suggested_post_parameters")
+			p, err := writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.ReplyParameters)
+			bs, err := json.Marshal(params.ReplyParameters)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("reply_parameters")
+			p, err := writer.CreateFormField("reply_parameters")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.ReplyMarkup)
+			bs, err := json.Marshal(params.ReplyMarkup)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("reply_markup")
+			p, err := writer.CreateFormField("reply_markup")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -11348,6 +11255,7 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 
 	result, err = c.Raw(ctx, "sendAnimation", reader, contentType)
 	if err != nil {
+		_ = reader.CloseWithError(err)
 		return
 	}
 
@@ -11730,31 +11638,33 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 		defer writer.Close()
 
 		if params.BusinessConnectionID != "" {
-			err = writer.WriteField("business_connection_id", params.BusinessConnectionID)
-			if err != nil {
+			v := params.BusinessConnectionID
+			if err := writer.WriteField("business_connection_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		{
-			err = writer.WriteField("chat_id", params.ChatID)
-			if err != nil {
+			v := params.ChatID
+			if err := writer.WriteField("chat_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.MessageThreadID != 0 {
 			v := strconv.FormatInt(params.MessageThreadID, 10)
-			err = writer.WriteField("message_thread_id", v)
-			if err != nil {
+			if err := writer.WriteField("message_thread_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DirectMessagesTopicID != 0 {
 			v := strconv.FormatInt(params.DirectMessagesTopicID, 10)
-			err = writer.WriteField("direct_messages_topic_id", v)
-			if err != nil {
+			if err := writer.WriteField("direct_messages_topic_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -11772,58 +11682,61 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 		}
 
 		if params.Caption != "" {
-			err = writer.WriteField("caption", params.Caption)
-			if err != nil {
+			v := params.Caption
+			if err := writer.WriteField("caption", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ParseMode != "" {
-			err = writer.WriteField("parse_mode", params.ParseMode)
-			if err != nil {
+			v := params.ParseMode
+			if err := writer.WriteField("parse_mode", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			var bs []byte
-
-			bs, err = json.Marshal(params.CaptionEntities)
+			bs, err := json.Marshal(params.CaptionEntities)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("caption_entities")
+			p, err := writer.CreateFormField("caption_entities")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.Duration != 0 {
 			v := strconv.FormatInt(params.Duration, 10)
-			err = writer.WriteField("duration", v)
-			if err != nil {
+			if err := writer.WriteField("duration", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.Performer != "" {
-			err = writer.WriteField("performer", params.Performer)
-			if err != nil {
+			v := params.Performer
+			if err := writer.WriteField("performer", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.Title != "" {
-			err = writer.WriteField("title", params.Title)
-			if err != nil {
+			v := params.Title
+			if err := writer.WriteField("title", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -11844,94 +11757,92 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 
 		if params.DisableNotification {
 			v := strconv.FormatBool(params.DisableNotification)
-			err = writer.WriteField("disable_notification", v)
-			if err != nil {
+			if err := writer.WriteField("disable_notification", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ProtectContent {
 			v := strconv.FormatBool(params.ProtectContent)
-			err = writer.WriteField("protect_content", v)
-			if err != nil {
+			if err := writer.WriteField("protect_content", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.AllowPaidBroadcast {
 			v := strconv.FormatBool(params.AllowPaidBroadcast)
-			err = writer.WriteField("allow_paid_broadcast", v)
-			if err != nil {
+			if err := writer.WriteField("allow_paid_broadcast", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.MessageEffectID != "" {
-			err = writer.WriteField("message_effect_id", params.MessageEffectID)
-			if err != nil {
+			v := params.MessageEffectID
+			if err := writer.WriteField("message_effect_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.SuggestedPostParameters != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.SuggestedPostParameters)
+			bs, err := json.Marshal(params.SuggestedPostParameters)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("suggested_post_parameters")
+			p, err := writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.ReplyParameters)
+			bs, err := json.Marshal(params.ReplyParameters)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("reply_parameters")
+			p, err := writer.CreateFormField("reply_parameters")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.ReplyMarkup)
+			bs, err := json.Marshal(params.ReplyMarkup)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("reply_markup")
+			p, err := writer.CreateFormField("reply_markup")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -11943,6 +11854,7 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 
 	result, err = c.Raw(ctx, "sendAudio", reader, contentType)
 	if err != nil {
+		_ = reader.CloseWithError(err)
 		return
 	}
 
@@ -12060,14 +11972,13 @@ func WithSendChatActionAction(value string) SendChatActionOption {
 // Returns True on success.
 // We only recommend using this method when a response from the bot will take a noticeable amount of time to arrive.
 func (c *Client) SendChatAction(ctx context.Context, params *SendChatActionParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -12234,14 +12145,13 @@ func WithSendChecklistReplyMarkup(value *InlineKeyboardMarkup) SendChecklistOpti
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendChecklist(ctx context.Context, params *SendChecklistParams) (ret *Message, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -12534,14 +12444,13 @@ func WithSendContactReplyMarkup(value *ReplyMarkup) SendContactOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendContact(ctx context.Context, params *SendContactParams) (ret *Message, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -12791,14 +12700,13 @@ func WithSendDiceReplyMarkup(value *ReplyMarkup) SendDiceOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendDice(ctx context.Context, params *SendDiceParams) (ret *Message, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -13154,31 +13062,33 @@ func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (
 		defer writer.Close()
 
 		if params.BusinessConnectionID != "" {
-			err = writer.WriteField("business_connection_id", params.BusinessConnectionID)
-			if err != nil {
+			v := params.BusinessConnectionID
+			if err := writer.WriteField("business_connection_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		{
-			err = writer.WriteField("chat_id", params.ChatID)
-			if err != nil {
+			v := params.ChatID
+			if err := writer.WriteField("chat_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.MessageThreadID != 0 {
 			v := strconv.FormatInt(params.MessageThreadID, 10)
-			err = writer.WriteField("message_thread_id", v)
-			if err != nil {
+			if err := writer.WriteField("message_thread_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DirectMessagesTopicID != 0 {
 			v := strconv.FormatInt(params.DirectMessagesTopicID, 10)
-			err = writer.WriteField("direct_messages_topic_id", v)
-			if err != nil {
+			if err := writer.WriteField("direct_messages_topic_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -13210,138 +13120,137 @@ func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (
 		}
 
 		if params.Caption != "" {
-			err = writer.WriteField("caption", params.Caption)
-			if err != nil {
+			v := params.Caption
+			if err := writer.WriteField("caption", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ParseMode != "" {
-			err = writer.WriteField("parse_mode", params.ParseMode)
-			if err != nil {
+			v := params.ParseMode
+			if err := writer.WriteField("parse_mode", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			var bs []byte
-
-			bs, err = json.Marshal(params.CaptionEntities)
+			bs, err := json.Marshal(params.CaptionEntities)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("caption_entities")
+			p, err := writer.CreateFormField("caption_entities")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DisableContentTypeDetection {
 			v := strconv.FormatBool(params.DisableContentTypeDetection)
-			err = writer.WriteField("disable_content_type_detection", v)
-			if err != nil {
+			if err := writer.WriteField("disable_content_type_detection", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DisableNotification {
 			v := strconv.FormatBool(params.DisableNotification)
-			err = writer.WriteField("disable_notification", v)
-			if err != nil {
+			if err := writer.WriteField("disable_notification", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ProtectContent {
 			v := strconv.FormatBool(params.ProtectContent)
-			err = writer.WriteField("protect_content", v)
-			if err != nil {
+			if err := writer.WriteField("protect_content", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.AllowPaidBroadcast {
 			v := strconv.FormatBool(params.AllowPaidBroadcast)
-			err = writer.WriteField("allow_paid_broadcast", v)
-			if err != nil {
+			if err := writer.WriteField("allow_paid_broadcast", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.MessageEffectID != "" {
-			err = writer.WriteField("message_effect_id", params.MessageEffectID)
-			if err != nil {
+			v := params.MessageEffectID
+			if err := writer.WriteField("message_effect_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.SuggestedPostParameters != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.SuggestedPostParameters)
+			bs, err := json.Marshal(params.SuggestedPostParameters)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("suggested_post_parameters")
+			p, err := writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.ReplyParameters)
+			bs, err := json.Marshal(params.ReplyParameters)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("reply_parameters")
+			p, err := writer.CreateFormField("reply_parameters")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.ReplyMarkup)
+			bs, err := json.Marshal(params.ReplyMarkup)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("reply_markup")
+			p, err := writer.CreateFormField("reply_markup")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -13353,6 +13262,7 @@ func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (
 
 	result, err = c.Raw(ctx, "sendDocument", reader, contentType)
 	if err != nil {
+		_ = reader.CloseWithError(err)
 		return
 	}
 
@@ -13566,14 +13476,13 @@ func WithSendGameReplyMarkup(value *InlineKeyboardMarkup) SendGameOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendGame(ctx context.Context, params *SendGameParams) (ret *Message, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -13735,14 +13644,13 @@ func WithSendGiftTextEntities(value []MessageEntity) SendGiftOption {
 // The gift can't be converted to Telegram Stars by the receiver.
 // Returns True on success.
 func (c *Client) SendGift(ctx context.Context, params *SendGiftParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -14366,14 +14274,13 @@ func WithSendInvoiceReplyMarkup(value *InlineKeyboardMarkup) SendInvoiceOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendInvoice(ctx context.Context, params *SendInvoiceParams) (ret *Message, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -14700,14 +14607,13 @@ func WithSendLocationReplyMarkup(value *ReplyMarkup) SendLocationOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendLocation(ctx context.Context, params *SendLocationParams) (ret *Message, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -14920,31 +14826,33 @@ func (c *Client) SendMediaGroup(ctx context.Context, params *SendMediaGroupParam
 		defer writer.Close()
 
 		if params.BusinessConnectionID != "" {
-			err = writer.WriteField("business_connection_id", params.BusinessConnectionID)
-			if err != nil {
+			v := params.BusinessConnectionID
+			if err := writer.WriteField("business_connection_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		{
-			err = writer.WriteField("chat_id", params.ChatID)
-			if err != nil {
+			v := params.ChatID
+			if err := writer.WriteField("chat_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.MessageThreadID != 0 {
 			v := strconv.FormatInt(params.MessageThreadID, 10)
-			err = writer.WriteField("message_thread_id", v)
-			if err != nil {
+			if err := writer.WriteField("message_thread_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DirectMessagesTopicID != 0 {
 			v := strconv.FormatInt(params.DirectMessagesTopicID, 10)
-			err = writer.WriteField("direct_messages_topic_id", v)
-			if err != nil {
+			if err := writer.WriteField("direct_messages_topic_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -15050,74 +14958,73 @@ func (c *Client) SendMediaGroup(ctx context.Context, params *SendMediaGroupParam
 				}
 			}
 
-			var bs []byte
-
-			bs, err = json.Marshal(params.Media)
+			bs, err := json.Marshal(params.Media)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("media")
+			p, err := writer.CreateFormField("media")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DisableNotification {
 			v := strconv.FormatBool(params.DisableNotification)
-			err = writer.WriteField("disable_notification", v)
-			if err != nil {
+			if err := writer.WriteField("disable_notification", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ProtectContent {
 			v := strconv.FormatBool(params.ProtectContent)
-			err = writer.WriteField("protect_content", v)
-			if err != nil {
+			if err := writer.WriteField("protect_content", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.AllowPaidBroadcast {
 			v := strconv.FormatBool(params.AllowPaidBroadcast)
-			err = writer.WriteField("allow_paid_broadcast", v)
-			if err != nil {
+			if err := writer.WriteField("allow_paid_broadcast", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.MessageEffectID != "" {
-			err = writer.WriteField("message_effect_id", params.MessageEffectID)
-			if err != nil {
+			v := params.MessageEffectID
+			if err := writer.WriteField("message_effect_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.ReplyParameters)
+			bs, err := json.Marshal(params.ReplyParameters)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("reply_parameters")
+			p, err := writer.CreateFormField("reply_parameters")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -15129,6 +15036,7 @@ func (c *Client) SendMediaGroup(ctx context.Context, params *SendMediaGroupParam
 
 	result, err = c.Raw(ctx, "sendMediaGroup", reader, contentType)
 	if err != nil {
+		_ = reader.CloseWithError(err)
 		return
 	}
 
@@ -15417,14 +15325,13 @@ func WithSendMessageReplyMarkup(value *ReplyMarkup) SendMessageOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendMessage(ctx context.Context, params *SendMessageParams) (ret *Message, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -15562,14 +15469,13 @@ func WithSendMessageDraftEntities(value []MessageEntity) SendMessageDraftOption 
 // Use this method to stream a partial message to a user while the message is being generated.
 // Returns True on success.
 func (c *Client) SendMessageDraft(ctx context.Context, params *SendMessageDraftParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -15907,39 +15813,41 @@ func (c *Client) SendPaidMedia(ctx context.Context, params *SendPaidMediaParams)
 		defer writer.Close()
 
 		if params.BusinessConnectionID != "" {
-			err = writer.WriteField("business_connection_id", params.BusinessConnectionID)
-			if err != nil {
+			v := params.BusinessConnectionID
+			if err := writer.WriteField("business_connection_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		{
-			err = writer.WriteField("chat_id", params.ChatID)
-			if err != nil {
+			v := params.ChatID
+			if err := writer.WriteField("chat_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.MessageThreadID != 0 {
 			v := strconv.FormatInt(params.MessageThreadID, 10)
-			err = writer.WriteField("message_thread_id", v)
-			if err != nil {
+			if err := writer.WriteField("message_thread_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DirectMessagesTopicID != 0 {
 			v := strconv.FormatInt(params.DirectMessagesTopicID, 10)
-			err = writer.WriteField("direct_messages_topic_id", v)
-			if err != nil {
+			if err := writer.WriteField("direct_messages_topic_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		{
 			v := strconv.FormatInt(params.StarCount, 10)
-			err = writer.WriteField("star_count", v)
-			if err != nil {
+			if err := writer.WriteField("star_count", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -15988,159 +15896,157 @@ func (c *Client) SendPaidMedia(ctx context.Context, params *SendPaidMediaParams)
 				}
 			}
 
-			var bs []byte
-
-			bs, err = json.Marshal(params.Media)
+			bs, err := json.Marshal(params.Media)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("media")
+			p, err := writer.CreateFormField("media")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.Payload != "" {
-			err = writer.WriteField("payload", params.Payload)
-			if err != nil {
+			v := params.Payload
+			if err := writer.WriteField("payload", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.Caption != "" {
-			err = writer.WriteField("caption", params.Caption)
-			if err != nil {
+			v := params.Caption
+			if err := writer.WriteField("caption", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ParseMode != "" {
-			err = writer.WriteField("parse_mode", params.ParseMode)
-			if err != nil {
+			v := params.ParseMode
+			if err := writer.WriteField("parse_mode", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			var bs []byte
-
-			bs, err = json.Marshal(params.CaptionEntities)
+			bs, err := json.Marshal(params.CaptionEntities)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("caption_entities")
+			p, err := writer.CreateFormField("caption_entities")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ShowCaptionAboveMedia {
 			v := strconv.FormatBool(params.ShowCaptionAboveMedia)
-			err = writer.WriteField("show_caption_above_media", v)
-			if err != nil {
+			if err := writer.WriteField("show_caption_above_media", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DisableNotification {
 			v := strconv.FormatBool(params.DisableNotification)
-			err = writer.WriteField("disable_notification", v)
-			if err != nil {
+			if err := writer.WriteField("disable_notification", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ProtectContent {
 			v := strconv.FormatBool(params.ProtectContent)
-			err = writer.WriteField("protect_content", v)
-			if err != nil {
+			if err := writer.WriteField("protect_content", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.AllowPaidBroadcast {
 			v := strconv.FormatBool(params.AllowPaidBroadcast)
-			err = writer.WriteField("allow_paid_broadcast", v)
-			if err != nil {
+			if err := writer.WriteField("allow_paid_broadcast", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.SuggestedPostParameters != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.SuggestedPostParameters)
+			bs, err := json.Marshal(params.SuggestedPostParameters)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("suggested_post_parameters")
+			p, err := writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.ReplyParameters)
+			bs, err := json.Marshal(params.ReplyParameters)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("reply_parameters")
+			p, err := writer.CreateFormField("reply_parameters")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.ReplyMarkup)
+			bs, err := json.Marshal(params.ReplyMarkup)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("reply_markup")
+			p, err := writer.CreateFormField("reply_markup")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -16152,6 +16058,7 @@ func (c *Client) SendPaidMedia(ctx context.Context, params *SendPaidMediaParams)
 
 	result, err = c.Raw(ctx, "sendPaidMedia", reader, contentType)
 	if err != nil {
+		_ = reader.CloseWithError(err)
 		return
 	}
 
@@ -16492,31 +16399,33 @@ func (c *Client) SendPhoto(ctx context.Context, params *SendPhotoParams) (ret *M
 		defer writer.Close()
 
 		if params.BusinessConnectionID != "" {
-			err = writer.WriteField("business_connection_id", params.BusinessConnectionID)
-			if err != nil {
+			v := params.BusinessConnectionID
+			if err := writer.WriteField("business_connection_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		{
-			err = writer.WriteField("chat_id", params.ChatID)
-			if err != nil {
+			v := params.ChatID
+			if err := writer.WriteField("chat_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.MessageThreadID != 0 {
 			v := strconv.FormatInt(params.MessageThreadID, 10)
-			err = writer.WriteField("message_thread_id", v)
-			if err != nil {
+			if err := writer.WriteField("message_thread_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DirectMessagesTopicID != 0 {
 			v := strconv.FormatInt(params.DirectMessagesTopicID, 10)
-			err = writer.WriteField("direct_messages_topic_id", v)
-			if err != nil {
+			if err := writer.WriteField("direct_messages_topic_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -16534,146 +16443,145 @@ func (c *Client) SendPhoto(ctx context.Context, params *SendPhotoParams) (ret *M
 		}
 
 		if params.Caption != "" {
-			err = writer.WriteField("caption", params.Caption)
-			if err != nil {
+			v := params.Caption
+			if err := writer.WriteField("caption", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ParseMode != "" {
-			err = writer.WriteField("parse_mode", params.ParseMode)
-			if err != nil {
+			v := params.ParseMode
+			if err := writer.WriteField("parse_mode", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			var bs []byte
-
-			bs, err = json.Marshal(params.CaptionEntities)
+			bs, err := json.Marshal(params.CaptionEntities)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("caption_entities")
+			p, err := writer.CreateFormField("caption_entities")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ShowCaptionAboveMedia {
 			v := strconv.FormatBool(params.ShowCaptionAboveMedia)
-			err = writer.WriteField("show_caption_above_media", v)
-			if err != nil {
+			if err := writer.WriteField("show_caption_above_media", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.HasSpoiler {
 			v := strconv.FormatBool(params.HasSpoiler)
-			err = writer.WriteField("has_spoiler", v)
-			if err != nil {
+			if err := writer.WriteField("has_spoiler", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DisableNotification {
 			v := strconv.FormatBool(params.DisableNotification)
-			err = writer.WriteField("disable_notification", v)
-			if err != nil {
+			if err := writer.WriteField("disable_notification", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ProtectContent {
 			v := strconv.FormatBool(params.ProtectContent)
-			err = writer.WriteField("protect_content", v)
-			if err != nil {
+			if err := writer.WriteField("protect_content", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.AllowPaidBroadcast {
 			v := strconv.FormatBool(params.AllowPaidBroadcast)
-			err = writer.WriteField("allow_paid_broadcast", v)
-			if err != nil {
+			if err := writer.WriteField("allow_paid_broadcast", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.MessageEffectID != "" {
-			err = writer.WriteField("message_effect_id", params.MessageEffectID)
-			if err != nil {
+			v := params.MessageEffectID
+			if err := writer.WriteField("message_effect_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.SuggestedPostParameters != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.SuggestedPostParameters)
+			bs, err := json.Marshal(params.SuggestedPostParameters)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("suggested_post_parameters")
+			p, err := writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.ReplyParameters)
+			bs, err := json.Marshal(params.ReplyParameters)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("reply_parameters")
+			p, err := writer.CreateFormField("reply_parameters")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.ReplyMarkup)
+			bs, err := json.Marshal(params.ReplyMarkup)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("reply_markup")
+			p, err := writer.CreateFormField("reply_markup")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -16685,6 +16593,7 @@ func (c *Client) SendPhoto(ctx context.Context, params *SendPhotoParams) (ret *M
 
 	result, err = c.Raw(ctx, "sendPhoto", reader, contentType)
 	if err != nil {
+		_ = reader.CloseWithError(err)
 		return
 	}
 
@@ -17113,14 +17022,13 @@ func WithSendPollReplyMarkup(value *ReplyMarkup) SendPollOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Message, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -17399,31 +17307,33 @@ func (c *Client) SendSticker(ctx context.Context, params *SendStickerParams) (re
 		defer writer.Close()
 
 		if params.BusinessConnectionID != "" {
-			err = writer.WriteField("business_connection_id", params.BusinessConnectionID)
-			if err != nil {
+			v := params.BusinessConnectionID
+			if err := writer.WriteField("business_connection_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		{
-			err = writer.WriteField("chat_id", params.ChatID)
-			if err != nil {
+			v := params.ChatID
+			if err := writer.WriteField("chat_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.MessageThreadID != 0 {
 			v := strconv.FormatInt(params.MessageThreadID, 10)
-			err = writer.WriteField("message_thread_id", v)
-			if err != nil {
+			if err := writer.WriteField("message_thread_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DirectMessagesTopicID != 0 {
 			v := strconv.FormatInt(params.DirectMessagesTopicID, 10)
-			err = writer.WriteField("direct_messages_topic_id", v)
-			if err != nil {
+			if err := writer.WriteField("direct_messages_topic_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -17441,102 +17351,101 @@ func (c *Client) SendSticker(ctx context.Context, params *SendStickerParams) (re
 		}
 
 		if params.Emoji != "" {
-			err = writer.WriteField("emoji", params.Emoji)
-			if err != nil {
+			v := params.Emoji
+			if err := writer.WriteField("emoji", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DisableNotification {
 			v := strconv.FormatBool(params.DisableNotification)
-			err = writer.WriteField("disable_notification", v)
-			if err != nil {
+			if err := writer.WriteField("disable_notification", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ProtectContent {
 			v := strconv.FormatBool(params.ProtectContent)
-			err = writer.WriteField("protect_content", v)
-			if err != nil {
+			if err := writer.WriteField("protect_content", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.AllowPaidBroadcast {
 			v := strconv.FormatBool(params.AllowPaidBroadcast)
-			err = writer.WriteField("allow_paid_broadcast", v)
-			if err != nil {
+			if err := writer.WriteField("allow_paid_broadcast", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.MessageEffectID != "" {
-			err = writer.WriteField("message_effect_id", params.MessageEffectID)
-			if err != nil {
+			v := params.MessageEffectID
+			if err := writer.WriteField("message_effect_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.SuggestedPostParameters != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.SuggestedPostParameters)
+			bs, err := json.Marshal(params.SuggestedPostParameters)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("suggested_post_parameters")
+			p, err := writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.ReplyParameters)
+			bs, err := json.Marshal(params.ReplyParameters)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("reply_parameters")
+			p, err := writer.CreateFormField("reply_parameters")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.ReplyMarkup)
+			bs, err := json.Marshal(params.ReplyMarkup)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("reply_markup")
+			p, err := writer.CreateFormField("reply_markup")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -17548,6 +17457,7 @@ func (c *Client) SendSticker(ctx context.Context, params *SendStickerParams) (re
 
 	result, err = c.Raw(ctx, "sendSticker", reader, contentType)
 	if err != nil {
+		_ = reader.CloseWithError(err)
 		return
 	}
 
@@ -17898,14 +17808,13 @@ func WithSendVenueReplyMarkup(value *ReplyMarkup) SendVenueOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendVenue(ctx context.Context, params *SendVenueParams) (ret *Message, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -18375,31 +18284,33 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 		defer writer.Close()
 
 		if params.BusinessConnectionID != "" {
-			err = writer.WriteField("business_connection_id", params.BusinessConnectionID)
-			if err != nil {
+			v := params.BusinessConnectionID
+			if err := writer.WriteField("business_connection_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		{
-			err = writer.WriteField("chat_id", params.ChatID)
-			if err != nil {
+			v := params.ChatID
+			if err := writer.WriteField("chat_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.MessageThreadID != 0 {
 			v := strconv.FormatInt(params.MessageThreadID, 10)
-			err = writer.WriteField("message_thread_id", v)
-			if err != nil {
+			if err := writer.WriteField("message_thread_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DirectMessagesTopicID != 0 {
 			v := strconv.FormatInt(params.DirectMessagesTopicID, 10)
-			err = writer.WriteField("direct_messages_topic_id", v)
-			if err != nil {
+			if err := writer.WriteField("direct_messages_topic_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -18418,24 +18329,24 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 
 		if params.Duration != 0 {
 			v := strconv.FormatInt(params.Duration, 10)
-			err = writer.WriteField("duration", v)
-			if err != nil {
+			if err := writer.WriteField("duration", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.Width != 0 {
 			v := strconv.FormatInt(params.Width, 10)
-			err = writer.WriteField("width", v)
-			if err != nil {
+			if err := writer.WriteField("width", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.Height != 0 {
 			v := strconv.FormatInt(params.Height, 10)
-			err = writer.WriteField("height", v)
-			if err != nil {
+			if err := writer.WriteField("height", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -18470,161 +18381,160 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 
 		if params.StartTimestamp != 0 {
 			v := strconv.FormatInt(params.StartTimestamp, 10)
-			err = writer.WriteField("start_timestamp", v)
-			if err != nil {
+			if err := writer.WriteField("start_timestamp", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.Caption != "" {
-			err = writer.WriteField("caption", params.Caption)
-			if err != nil {
+			v := params.Caption
+			if err := writer.WriteField("caption", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ParseMode != "" {
-			err = writer.WriteField("parse_mode", params.ParseMode)
-			if err != nil {
+			v := params.ParseMode
+			if err := writer.WriteField("parse_mode", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			var bs []byte
-
-			bs, err = json.Marshal(params.CaptionEntities)
+			bs, err := json.Marshal(params.CaptionEntities)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("caption_entities")
+			p, err := writer.CreateFormField("caption_entities")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ShowCaptionAboveMedia {
 			v := strconv.FormatBool(params.ShowCaptionAboveMedia)
-			err = writer.WriteField("show_caption_above_media", v)
-			if err != nil {
+			if err := writer.WriteField("show_caption_above_media", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.HasSpoiler {
 			v := strconv.FormatBool(params.HasSpoiler)
-			err = writer.WriteField("has_spoiler", v)
-			if err != nil {
+			if err := writer.WriteField("has_spoiler", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.SupportsStreaming {
 			v := strconv.FormatBool(params.SupportsStreaming)
-			err = writer.WriteField("supports_streaming", v)
-			if err != nil {
+			if err := writer.WriteField("supports_streaming", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DisableNotification {
 			v := strconv.FormatBool(params.DisableNotification)
-			err = writer.WriteField("disable_notification", v)
-			if err != nil {
+			if err := writer.WriteField("disable_notification", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ProtectContent {
 			v := strconv.FormatBool(params.ProtectContent)
-			err = writer.WriteField("protect_content", v)
-			if err != nil {
+			if err := writer.WriteField("protect_content", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.AllowPaidBroadcast {
 			v := strconv.FormatBool(params.AllowPaidBroadcast)
-			err = writer.WriteField("allow_paid_broadcast", v)
-			if err != nil {
+			if err := writer.WriteField("allow_paid_broadcast", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.MessageEffectID != "" {
-			err = writer.WriteField("message_effect_id", params.MessageEffectID)
-			if err != nil {
+			v := params.MessageEffectID
+			if err := writer.WriteField("message_effect_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.SuggestedPostParameters != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.SuggestedPostParameters)
+			bs, err := json.Marshal(params.SuggestedPostParameters)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("suggested_post_parameters")
+			p, err := writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.ReplyParameters)
+			bs, err := json.Marshal(params.ReplyParameters)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("reply_parameters")
+			p, err := writer.CreateFormField("reply_parameters")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.ReplyMarkup)
+			bs, err := json.Marshal(params.ReplyMarkup)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("reply_markup")
+			p, err := writer.CreateFormField("reply_markup")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -18636,6 +18546,7 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 
 	result, err = c.Raw(ctx, "sendVideo", reader, contentType)
 	if err != nil {
+		_ = reader.CloseWithError(err)
 		return
 	}
 
@@ -18954,31 +18865,33 @@ func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams)
 		defer writer.Close()
 
 		if params.BusinessConnectionID != "" {
-			err = writer.WriteField("business_connection_id", params.BusinessConnectionID)
-			if err != nil {
+			v := params.BusinessConnectionID
+			if err := writer.WriteField("business_connection_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		{
-			err = writer.WriteField("chat_id", params.ChatID)
-			if err != nil {
+			v := params.ChatID
+			if err := writer.WriteField("chat_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.MessageThreadID != 0 {
 			v := strconv.FormatInt(params.MessageThreadID, 10)
-			err = writer.WriteField("message_thread_id", v)
-			if err != nil {
+			if err := writer.WriteField("message_thread_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DirectMessagesTopicID != 0 {
 			v := strconv.FormatInt(params.DirectMessagesTopicID, 10)
-			err = writer.WriteField("direct_messages_topic_id", v)
-			if err != nil {
+			if err := writer.WriteField("direct_messages_topic_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -18997,16 +18910,16 @@ func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams)
 
 		if params.Duration != 0 {
 			v := strconv.FormatInt(params.Duration, 10)
-			err = writer.WriteField("duration", v)
-			if err != nil {
+			if err := writer.WriteField("duration", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.Length != 0 {
 			v := strconv.FormatInt(params.Length, 10)
-			err = writer.WriteField("length", v)
-			if err != nil {
+			if err := writer.WriteField("length", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -19027,94 +18940,92 @@ func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams)
 
 		if params.DisableNotification {
 			v := strconv.FormatBool(params.DisableNotification)
-			err = writer.WriteField("disable_notification", v)
-			if err != nil {
+			if err := writer.WriteField("disable_notification", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ProtectContent {
 			v := strconv.FormatBool(params.ProtectContent)
-			err = writer.WriteField("protect_content", v)
-			if err != nil {
+			if err := writer.WriteField("protect_content", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.AllowPaidBroadcast {
 			v := strconv.FormatBool(params.AllowPaidBroadcast)
-			err = writer.WriteField("allow_paid_broadcast", v)
-			if err != nil {
+			if err := writer.WriteField("allow_paid_broadcast", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.MessageEffectID != "" {
-			err = writer.WriteField("message_effect_id", params.MessageEffectID)
-			if err != nil {
+			v := params.MessageEffectID
+			if err := writer.WriteField("message_effect_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.SuggestedPostParameters != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.SuggestedPostParameters)
+			bs, err := json.Marshal(params.SuggestedPostParameters)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("suggested_post_parameters")
+			p, err := writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.ReplyParameters)
+			bs, err := json.Marshal(params.ReplyParameters)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("reply_parameters")
+			p, err := writer.CreateFormField("reply_parameters")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.ReplyMarkup)
+			bs, err := json.Marshal(params.ReplyMarkup)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("reply_markup")
+			p, err := writer.CreateFormField("reply_markup")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -19126,6 +19037,7 @@ func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams)
 
 	result, err = c.Raw(ctx, "sendVideoNote", reader, contentType)
 	if err != nil {
+		_ = reader.CloseWithError(err)
 		return
 	}
 
@@ -19449,31 +19361,33 @@ func (c *Client) SendVoice(ctx context.Context, params *SendVoiceParams) (ret *M
 		defer writer.Close()
 
 		if params.BusinessConnectionID != "" {
-			err = writer.WriteField("business_connection_id", params.BusinessConnectionID)
-			if err != nil {
+			v := params.BusinessConnectionID
+			if err := writer.WriteField("business_connection_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		{
-			err = writer.WriteField("chat_id", params.ChatID)
-			if err != nil {
+			v := params.ChatID
+			if err := writer.WriteField("chat_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.MessageThreadID != 0 {
 			v := strconv.FormatInt(params.MessageThreadID, 10)
-			err = writer.WriteField("message_thread_id", v)
-			if err != nil {
+			if err := writer.WriteField("message_thread_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DirectMessagesTopicID != 0 {
 			v := strconv.FormatInt(params.DirectMessagesTopicID, 10)
-			err = writer.WriteField("direct_messages_topic_id", v)
-			if err != nil {
+			if err := writer.WriteField("direct_messages_topic_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -19491,138 +19405,137 @@ func (c *Client) SendVoice(ctx context.Context, params *SendVoiceParams) (ret *M
 		}
 
 		if params.Caption != "" {
-			err = writer.WriteField("caption", params.Caption)
-			if err != nil {
+			v := params.Caption
+			if err := writer.WriteField("caption", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ParseMode != "" {
-			err = writer.WriteField("parse_mode", params.ParseMode)
-			if err != nil {
+			v := params.ParseMode
+			if err := writer.WriteField("parse_mode", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			var bs []byte
-
-			bs, err = json.Marshal(params.CaptionEntities)
+			bs, err := json.Marshal(params.CaptionEntities)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("caption_entities")
+			p, err := writer.CreateFormField("caption_entities")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.Duration != 0 {
 			v := strconv.FormatInt(params.Duration, 10)
-			err = writer.WriteField("duration", v)
-			if err != nil {
+			if err := writer.WriteField("duration", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DisableNotification {
 			v := strconv.FormatBool(params.DisableNotification)
-			err = writer.WriteField("disable_notification", v)
-			if err != nil {
+			if err := writer.WriteField("disable_notification", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ProtectContent {
 			v := strconv.FormatBool(params.ProtectContent)
-			err = writer.WriteField("protect_content", v)
-			if err != nil {
+			if err := writer.WriteField("protect_content", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.AllowPaidBroadcast {
 			v := strconv.FormatBool(params.AllowPaidBroadcast)
-			err = writer.WriteField("allow_paid_broadcast", v)
-			if err != nil {
+			if err := writer.WriteField("allow_paid_broadcast", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.MessageEffectID != "" {
-			err = writer.WriteField("message_effect_id", params.MessageEffectID)
-			if err != nil {
+			v := params.MessageEffectID
+			if err := writer.WriteField("message_effect_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.SuggestedPostParameters != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.SuggestedPostParameters)
+			bs, err := json.Marshal(params.SuggestedPostParameters)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("suggested_post_parameters")
+			p, err := writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.ReplyParameters)
+			bs, err := json.Marshal(params.ReplyParameters)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("reply_parameters")
+			p, err := writer.CreateFormField("reply_parameters")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			var bs []byte
-
-			bs, err = json.Marshal(params.ReplyMarkup)
+			bs, err := json.Marshal(params.ReplyMarkup)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("reply_markup")
+			p, err := writer.CreateFormField("reply_markup")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -19634,6 +19547,7 @@ func (c *Client) SendVoice(ctx context.Context, params *SendVoiceParams) (ret *M
 
 	result, err = c.Raw(ctx, "sendVoice", reader, contentType)
 	if err != nil {
+		_ = reader.CloseWithError(err)
 		return
 	}
 
@@ -19698,14 +19612,13 @@ func WithSetBusinessAccountBioBio(value string) SetBusinessAccountBioOption {
 // Requires the can_change_bio business bot right.
 // Returns True on success.
 func (c *Client) SetBusinessAccountBio(ctx context.Context, params *SetBusinessAccountBioParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -19790,14 +19703,13 @@ func WithSetBusinessAccountGiftSettingsAcceptedGiftTypes(value AcceptedGiftTypes
 // Requires the can_change_gift_settings business bot right.
 // Returns True on success.
 func (c *Client) SetBusinessAccountGiftSettings(ctx context.Context, params *SetBusinessAccountGiftSettingsParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -19882,14 +19794,13 @@ func WithSetBusinessAccountNameLastName(value string) SetBusinessAccountNameOpti
 // Requires the can_change_name business bot right.
 // Returns True on success.
 func (c *Client) SetBusinessAccountName(ctx context.Context, params *SetBusinessAccountNameParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -19976,14 +19887,13 @@ func WithSetBusinessAccountProfilePhotoIsPublic(value bool) SetBusinessAccountPr
 // Requires the can_edit_profile_photo business bot right.
 // Returns True on success.
 func (c *Client) SetBusinessAccountProfilePhoto(ctx context.Context, params *SetBusinessAccountProfilePhotoParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -20053,14 +19963,13 @@ func WithSetBusinessAccountUsernameUsername(value string) SetBusinessAccountUser
 // Requires the can_change_username business bot right.
 // Returns True on success.
 func (c *Client) SetBusinessAccountUsername(ctx context.Context, params *SetBusinessAccountUsernameParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -20144,14 +20053,13 @@ func WithSetChatAdministratorCustomTitleCustomTitle(value string) SetChatAdminis
 // Use this method to set a custom title for an administrator in a supergroup promoted by the bot.
 // Returns True on success.
 func (c *Client) SetChatAdministratorCustomTitle(ctx context.Context, params *SetChatAdministratorCustomTitleParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -20221,14 +20129,13 @@ func WithSetChatDescriptionDescription(value string) SetChatDescriptionOption {
 // The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
 // Returns True on success.
 func (c *Client) SetChatDescription(ctx context.Context, params *SetChatDescriptionParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -20313,14 +20220,13 @@ func WithSetChatMemberTagTag(value string) SetChatMemberTagOption {
 // The bot must be an administrator in the chat for this to work and must have the can_manage_tags administrator right.
 // Returns True on success.
 func (c *Client) SetChatMemberTag(ctx context.Context, params *SetChatMemberTagParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -20397,14 +20303,13 @@ func WithSetChatMenuButtonMenuButton(value *MenuButton) SetChatMenuButtonOption 
 // Use this method to change the bot's menu button in a private chat, or the default menu button.
 // Returns True on success.
 func (c *Client) SetChatMenuButton(ctx context.Context, params *SetChatMenuButtonParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -20491,14 +20396,13 @@ func WithSetChatPermissionsUseIndependentChatPermissions(value bool) SetChatPerm
 // The bot must be an administrator in the group or a supergroup for this to work and must have the can_restrict_members administrator rights.
 // Returns True on success.
 func (c *Client) SetChatPermissions(ctx context.Context, params *SetChatPermissionsParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -20577,8 +20481,9 @@ func (c *Client) SetChatPhoto(ctx context.Context, params *SetChatPhotoParams) (
 		defer writer.Close()
 
 		{
-			err = writer.WriteField("chat_id", params.ChatID)
-			if err != nil {
+			v := params.ChatID
+			if err := writer.WriteField("chat_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -20602,6 +20507,7 @@ func (c *Client) SetChatPhoto(ctx context.Context, params *SetChatPhotoParams) (
 
 	result, err = c.Raw(ctx, "setChatPhoto", reader, contentType)
 	if err != nil {
+		_ = reader.CloseWithError(err)
 		return
 	}
 
@@ -20668,14 +20574,13 @@ func WithSetChatStickerSetStickerSetName(value string) SetChatStickerSetOption {
 //
 // [getChat]: https://core.telegram.org/bots/api#getchat
 func (c *Client) SetChatStickerSet(ctx context.Context, params *SetChatStickerSetParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -20746,14 +20651,13 @@ func WithSetChatTitleTitle(value string) SetChatTitleOption {
 // The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
 // Returns True on success.
 func (c *Client) SetChatTitle(ctx context.Context, params *SetChatTitleParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -20822,14 +20726,13 @@ func WithSetCustomEmojiStickerSetThumbnailCustomEmojiID(value string) SetCustomE
 // Use this method to set the thumbnail of a custom emoji sticker set.
 // Returns True on success.
 func (c *Client) SetCustomEmojiStickerSetThumbnail(ctx context.Context, params *SetCustomEmojiStickerSetThumbnailParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -20984,14 +20887,13 @@ func WithSetGameScoreInlineMessageID(value string) SetGameScoreOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SetGameScore(ctx context.Context, params *SetGameScoreParams) (ret *Message, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -21102,14 +21004,13 @@ func WithSetMessageReactionIsBig(value bool) SetMessageReactionOption {
 // Bots can't use paid reactions.
 // Returns True on success.
 func (c *Client) SetMessageReaction(ctx context.Context, params *SetMessageReactionParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -21206,14 +21107,13 @@ func WithSetMyCommandsLanguageCode(value string) SetMyCommandsOption {
 //
 // [this manual]: https://core.telegram.org/bots/features#commands
 func (c *Client) SetMyCommands(ctx context.Context, params *SetMyCommandsParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -21287,14 +21187,13 @@ func WithSetMyDefaultAdministratorRightsForChannels(value bool) SetMyDefaultAdmi
 // These rights will be suggested to users, but they are free to modify the list before adding the bot.
 // Returns True on success.
 func (c *Client) SetMyDefaultAdministratorRights(ctx context.Context, params *SetMyDefaultAdministratorRightsParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -21367,14 +21266,13 @@ func WithSetMyDescriptionLanguageCode(value string) SetMyDescriptionOption {
 // Use this method to change the bot's description, which is shown in the chat with the bot if the chat is empty.
 // Returns True on success.
 func (c *Client) SetMyDescription(ctx context.Context, params *SetMyDescriptionParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -21447,14 +21345,13 @@ func WithSetMyNameLanguageCode(value string) SetMyNameOption {
 // Use this method to change the bot's name.
 // Returns True on success.
 func (c *Client) SetMyName(ctx context.Context, params *SetMyNameParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -21508,14 +21405,13 @@ func WithSetMyProfilePhotoPhoto(value InputProfilePhoto) SetMyProfilePhotoOption
 // Changes the profile photo of the bot.
 // Returns True on success.
 func (c *Client) SetMyProfilePhoto(ctx context.Context, params *SetMyProfilePhotoParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -21588,14 +21484,13 @@ func WithSetMyShortDescriptionLanguageCode(value string) SetMyShortDescriptionOp
 // Use this method to change the bot's short description, which is shown on the bot's profile page and is sent together with the link when users share the bot.
 // Returns True on success.
 func (c *Client) SetMyShortDescription(ctx context.Context, params *SetMyShortDescriptionParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -21668,14 +21563,13 @@ func WithSetPassportDataErrorsErrors(value []PassportElementError) SetPassportDa
 // For example, if a birthday date seems invalid, a submitted document is blurry, a scan shows evidence of tampering, etc.
 // Supply some details in the error message to make sure the user knows how to correct the issues.
 func (c *Client) SetPassportDataErrors(ctx context.Context, params *SetPassportDataErrorsParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -21745,14 +21639,13 @@ func WithSetStickerEmojiListEmojiList(value []string) SetStickerEmojiListOption 
 // The sticker must belong to a sticker set created by the bot.
 // Returns True on success.
 func (c *Client) SetStickerEmojiList(ctx context.Context, params *SetStickerEmojiListParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -21822,14 +21715,13 @@ func WithSetStickerKeywordsKeywords(value []string) SetStickerKeywordsOption {
 // The sticker must belong to a sticker set created by the bot.
 // Returns True on success.
 func (c *Client) SetStickerKeywords(ctx context.Context, params *SetStickerKeywordsParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -21903,14 +21795,13 @@ func WithSetStickerMaskPositionMaskPosition(value *MaskPosition) SetStickerMaskP
 //
 // [mask position]: https://core.telegram.org/bots/api#maskposition
 func (c *Client) SetStickerMaskPosition(ctx context.Context, params *SetStickerMaskPositionParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -21979,14 +21870,13 @@ func WithSetStickerPositionInSetPosition(value int64) SetStickerPositionInSetOpt
 // Use this method to move a sticker in a set created by the bot to a specific position.
 // Returns True on success.
 func (c *Client) SetStickerPositionInSet(ctx context.Context, params *SetStickerPositionInSetParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -22110,16 +22000,17 @@ func (c *Client) SetStickerSetThumbnail(ctx context.Context, params *SetStickerS
 		defer writer.Close()
 
 		{
-			err = writer.WriteField("name", params.Name)
-			if err != nil {
+			v := params.Name
+			if err := writer.WriteField("name", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		{
 			v := strconv.FormatInt(params.UserID, 10)
-			err = writer.WriteField("user_id", v)
-			if err != nil {
+			if err := writer.WriteField("user_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -22139,8 +22030,9 @@ func (c *Client) SetStickerSetThumbnail(ctx context.Context, params *SetStickerS
 		}
 
 		{
-			err = writer.WriteField("format", params.Format)
-			if err != nil {
+			v := params.Format
+			if err := writer.WriteField("format", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -22152,6 +22044,7 @@ func (c *Client) SetStickerSetThumbnail(ctx context.Context, params *SetStickerS
 
 	result, err = c.Raw(ctx, "setStickerSetThumbnail", reader, contentType)
 	if err != nil {
+		_ = reader.CloseWithError(err)
 		return
 	}
 
@@ -22214,14 +22107,13 @@ func WithSetStickerSetTitleTitle(value string) SetStickerSetTitleOption {
 // Use this method to set the title of a created sticker set.
 // Returns True on success.
 func (c *Client) SetStickerSetTitle(ctx context.Context, params *SetStickerSetTitleParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -22309,14 +22201,13 @@ func WithSetUserEmojiStatusEmojiStatusExpirationDate(value int64) SetUserEmojiSt
 //
 // [requestEmojiStatusAccess]: https://core.telegram.org/bots/webapps#initializing-mini-apps
 func (c *Client) SetUserEmojiStatus(ctx context.Context, params *SetUserEmojiStatusParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -22505,8 +22396,9 @@ func (c *Client) SetWebhook(ctx context.Context, params *SetWebhookParams) (ret 
 		defer writer.Close()
 
 		{
-			err = writer.WriteField("url", params.URL)
-			if err != nil {
+			v := params.URL
+			if err := writer.WriteField("url", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -22526,52 +22418,53 @@ func (c *Client) SetWebhook(ctx context.Context, params *SetWebhookParams) (ret 
 		}
 
 		if params.IpAddress != "" {
-			err = writer.WriteField("ip_address", params.IpAddress)
-			if err != nil {
+			v := params.IpAddress
+			if err := writer.WriteField("ip_address", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.MaxConnections != 0 {
 			v := strconv.FormatInt(params.MaxConnections, 10)
-			err = writer.WriteField("max_connections", v)
-			if err != nil {
+			if err := writer.WriteField("max_connections", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if len(params.AllowedUpdates) != 0 {
-			var bs []byte
-
-			bs, err = json.Marshal(params.AllowedUpdates)
+			bs, err := json.Marshal(params.AllowedUpdates)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
-			var p io.Writer
-
-			p, err = writer.CreateFormField("allowed_updates")
+			p, err := writer.CreateFormField("allowed_updates")
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DropPendingUpdates {
 			v := strconv.FormatBool(params.DropPendingUpdates)
-			err = writer.WriteField("drop_pending_updates", v)
-			if err != nil {
+			if err := writer.WriteField("drop_pending_updates", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.SecretToken != "" {
-			err = writer.WriteField("secret_token", params.SecretToken)
-			if err != nil {
+			v := params.SecretToken
+			if err := writer.WriteField("secret_token", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -22583,6 +22476,7 @@ func (c *Client) SetWebhook(ctx context.Context, params *SetWebhookParams) (ret 
 
 	result, err = c.Raw(ctx, "setWebhook", reader, contentType)
 	if err != nil {
+		_ = reader.CloseWithError(err)
 		return
 	}
 
@@ -22702,14 +22596,13 @@ func WithStopMessageLiveLocationReplyMarkup(value *InlineKeyboardMarkup) StopMes
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) StopMessageLiveLocation(ctx context.Context, params *StopMessageLiveLocationParams) (ret *Message, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -22815,14 +22708,13 @@ func WithStopPollReplyMarkup(value *InlineKeyboardMarkup) StopPollOption {
 //
 // [Poll]: https://core.telegram.org/bots/api#poll
 func (c *Client) StopPoll(ctx context.Context, params *StopPollParams) (ret *Poll, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -22893,14 +22785,13 @@ func WithTransferBusinessAccountStarsStarCount(value int64) TransferBusinessAcco
 // Requires the can_transfer_stars business bot right.
 // Returns True on success.
 func (c *Client) TransferBusinessAccountStars(ctx context.Context, params *TransferBusinessAccountStarsParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -23005,14 +22896,13 @@ func WithTransferGiftStarCount(value int64) TransferGiftOption {
 // Requires can_transfer_stars business bot right if the transfer is paid.
 // Returns True on success.
 func (c *Client) TransferGift(ctx context.Context, params *TransferGiftParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -23101,14 +22991,13 @@ func WithUnbanChatMemberOnlyIfBanned(value bool) UnbanChatMemberOption {
 // If you don't want this, use the parameter only_if_banned.
 // Returns True on success.
 func (c *Client) UnbanChatMember(ctx context.Context, params *UnbanChatMemberParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -23178,14 +23067,13 @@ func WithUnbanChatSenderChatSenderChatID(value int64) UnbanChatSenderChatOption 
 // The bot must be an administrator for this to work and must have the appropriate administrator rights.
 // Returns True on success.
 func (c *Client) UnbanChatSenderChat(ctx context.Context, params *UnbanChatSenderChatParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -23240,14 +23128,13 @@ func WithUnhideGeneralForumTopicChatID(value string) UnhideGeneralForumTopicOpti
 // The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights.
 // Returns True on success.
 func (c *Client) UnhideGeneralForumTopic(ctx context.Context, params *UnhideGeneralForumTopicParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -23303,14 +23190,13 @@ func WithUnpinAllChatMessagesChatID(value string) UnpinAllChatMessagesOption {
 // Conversely, the bot must be an administrator with the 'can_pin_messages' right or the 'can_edit_messages' right to unpin all pinned messages in groups and channels respectively.
 // Returns True on success.
 func (c *Client) UnpinAllChatMessages(ctx context.Context, params *UnpinAllChatMessagesParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -23380,14 +23266,13 @@ func WithUnpinAllForumTopicMessagesMessageThreadID(value int64) UnpinAllForumTop
 // In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_pin_messages administrator right in the supergroup.
 // Returns True on success.
 func (c *Client) UnpinAllForumTopicMessages(ctx context.Context, params *UnpinAllForumTopicMessagesParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -23442,14 +23327,13 @@ func WithUnpinAllGeneralForumTopicMessagesChatID(value string) UnpinAllGeneralFo
 // The bot must be an administrator in the chat for this to work and must have the can_pin_messages administrator right in the supergroup.
 // Returns True on success.
 func (c *Client) UnpinAllGeneralForumTopicMessages(ctx context.Context, params *UnpinAllGeneralForumTopicMessagesParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -23539,14 +23423,13 @@ func WithUnpinChatMessageMessageID(value int64) UnpinChatMessageOption {
 // Conversely, the bot must be an administrator with the 'can_pin_messages' right or the 'can_edit_messages' right to unpin messages in groups and channels respectively.
 // Returns True on success.
 func (c *Client) UnpinChatMessage(ctx context.Context, params *UnpinChatMessageParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -23649,14 +23532,13 @@ func WithUpgradeGiftStarCount(value int64) UpgradeGiftOption {
 // Additionally requires the can_transfer_stars business bot right if the upgrade is paid.
 // Returns True on success.
 func (c *Client) UpgradeGift(ctx context.Context, params *UpgradeGiftParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -23764,8 +23646,8 @@ func (c *Client) UploadStickerFile(ctx context.Context, params *UploadStickerFil
 
 		{
 			v := strconv.FormatInt(params.UserID, 10)
-			err = writer.WriteField("user_id", v)
-			if err != nil {
+			if err := writer.WriteField("user_id", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -23783,8 +23665,9 @@ func (c *Client) UploadStickerFile(ctx context.Context, params *UploadStickerFil
 		}
 
 		{
-			err = writer.WriteField("sticker_format", params.StickerFormat)
-			if err != nil {
+			v := params.StickerFormat
+			if err := writer.WriteField("sticker_format", v); err != nil {
+				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -23796,6 +23679,7 @@ func (c *Client) UploadStickerFile(ctx context.Context, params *UploadStickerFil
 
 	result, err = c.Raw(ctx, "uploadStickerFile", reader, contentType)
 	if err != nil {
+		_ = reader.CloseWithError(err)
 		return
 	}
 
@@ -23865,14 +23749,13 @@ func WithVerifyChatCustomDescription(value string) VerifyChatOption {
 //
 // [on behalf of the organization]: https://telegram.org/verify#third-party-verification
 func (c *Client) VerifyChat(ctx context.Context, params *VerifyChatParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage
@@ -23945,14 +23828,13 @@ func WithVerifyUserCustomDescription(value string) VerifyUserOption {
 //
 // [on behalf of the organization]: https://telegram.org/verify#third-party-verification
 func (c *Client) VerifyUser(ctx context.Context, params *VerifyUserParams) (ret bool, err error) {
-	var bs []byte
-
-	bs, err = json.Marshal(params)
-	if err != nil {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(bs)
+	reader := bytes.NewReader(buffer.Bytes())
+
 	contentType := "application/json"
 
 	var result json.RawMessage

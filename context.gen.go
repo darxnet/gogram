@@ -26,8 +26,12 @@ func (ctx *Context) findHandlerOn() handleOn {
 		return handleOnBusinessMessage
 	case ctx.update.EditedBusinessMessage != nil:
 		return handleOnEditedBusinessMessage
+	case ctx.update.DeletedBusinessMessages != nil:
+		return handleOnDeletedBusinessMessages
 	case ctx.update.MessageReaction != nil:
 		return handleOnMessageReaction
+	case ctx.update.MessageReactionCount != nil:
+		return handleOnMessageReactionCount
 	case ctx.update.InlineQuery != nil:
 		return handleOnInlineQuery
 	case ctx.update.ChosenInlineResult != nil:
@@ -40,6 +44,8 @@ func (ctx *Context) findHandlerOn() handleOn {
 		return handleOnPreCheckoutQuery
 	case ctx.update.PurchasedPaidMedia != nil:
 		return handleOnPurchasedPaidMedia
+	case ctx.update.Poll != nil:
+		return handleOnPoll
 	case ctx.update.PollAnswer != nil:
 		return handleOnPollAnswer
 	case ctx.update.MyChatMember != nil:
@@ -48,6 +54,10 @@ func (ctx *Context) findHandlerOn() handleOn {
 		return handleOnChatMember
 	case ctx.update.ChatJoinRequest != nil:
 		return handleOnChatJoinRequest
+	case ctx.update.ChatBoost != nil:
+		return handleOnChatBoost
+	case ctx.update.RemovedChatBoost != nil:
+		return handleOnRemovedChatBoost
 	}
 
 	return 0
@@ -210,10 +220,8 @@ func (ctx *Context) AddStickerToSet(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.AddStickerToSet(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.AddStickerToSet(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -244,10 +252,8 @@ func (ctx *Context) AnswerCallbackQuery(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.AnswerCallbackQuery(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.AnswerCallbackQuery(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -278,10 +284,8 @@ func (ctx *Context) AnswerInlineQuery(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.AnswerInlineQuery(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.AnswerInlineQuery(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -315,10 +319,8 @@ func (ctx *Context) AnswerPreCheckoutQuery(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.AnswerPreCheckoutQuery(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.AnswerPreCheckoutQuery(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -351,10 +353,8 @@ func (ctx *Context) AnswerShippingQuery(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.AnswerShippingQuery(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.AnswerShippingQuery(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -378,10 +378,8 @@ func (ctx *Context) AnswerWebAppQuery(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.AnswerWebAppQuery(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.AnswerWebAppQuery(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -415,10 +413,8 @@ func (ctx *Context) ApproveChatJoinRequest(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.ApproveChatJoinRequest(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.ApproveChatJoinRequest(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -452,10 +448,8 @@ func (ctx *Context) ApproveSuggestedPost(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.ApproveSuggestedPost(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.ApproveSuggestedPost(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -492,10 +486,8 @@ func (ctx *Context) BanChatMember(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.BanChatMember(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.BanChatMember(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -526,10 +518,8 @@ func (ctx *Context) BanChatSenderChat(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.BanChatSenderChat(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.BanChatSenderChat(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -548,10 +538,8 @@ func (ctx *Context) Close(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.Close(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.Close(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -585,10 +573,8 @@ func (ctx *Context) CloseForumTopic(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.CloseForumTopic(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.CloseForumTopic(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -614,10 +600,8 @@ func (ctx *Context) CloseGeneralForumTopic(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.CloseGeneralForumTopic(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.CloseGeneralForumTopic(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -645,10 +629,8 @@ func (ctx *Context) ConvertGiftToStars(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.ConvertGiftToStars(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.ConvertGiftToStars(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -710,16 +692,16 @@ func (ctx *Context) CopyMessage(
 
 	params.Option(opts...)
 
-	if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
+	defaultParseMode := ctx.client.defaultParseMode()
+
+	if defaultParseMode != "" {
 		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
 			params.ParseMode = defaultParseMode
 		}
 	}
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.CopyMessage(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.CopyMessage(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -777,10 +759,8 @@ func (ctx *Context) CopyMessages(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.CopyMessages(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.CopyMessages(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -810,10 +790,8 @@ func (ctx *Context) CreateChatInviteLink(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.CreateChatInviteLink(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.CreateChatInviteLink(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -849,10 +827,8 @@ func (ctx *Context) CreateChatSubscriptionInviteLink(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.CreateChatSubscriptionInviteLink(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.CreateChatSubscriptionInviteLink(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -882,10 +858,8 @@ func (ctx *Context) CreateForumTopic(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.CreateForumTopic(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.CreateForumTopic(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -920,10 +894,8 @@ func (ctx *Context) CreateInvoiceLink(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.CreateInvoiceLink(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.CreateInvoiceLink(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -955,10 +927,8 @@ func (ctx *Context) CreateNewStickerSet(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.CreateNewStickerSet(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.CreateNewStickerSet(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -992,10 +962,8 @@ func (ctx *Context) DeclineChatJoinRequest(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.DeclineChatJoinRequest(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.DeclineChatJoinRequest(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1029,10 +997,8 @@ func (ctx *Context) DeclineSuggestedPost(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.DeclineSuggestedPost(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.DeclineSuggestedPost(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1060,10 +1026,8 @@ func (ctx *Context) DeleteBusinessMessages(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.DeleteBusinessMessages(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.DeleteBusinessMessages(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1090,10 +1054,8 @@ func (ctx *Context) DeleteChatPhoto(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.DeleteChatPhoto(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.DeleteChatPhoto(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1122,10 +1084,8 @@ func (ctx *Context) DeleteChatStickerSet(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.DeleteChatStickerSet(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.DeleteChatStickerSet(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1159,10 +1119,8 @@ func (ctx *Context) DeleteForumTopic(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.DeleteForumTopic(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.DeleteForumTopic(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1204,10 +1162,8 @@ func (ctx *Context) DeleteMessage(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.DeleteMessage(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.DeleteMessage(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1235,10 +1191,8 @@ func (ctx *Context) DeleteMessages(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.DeleteMessages(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.DeleteMessages(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1257,10 +1211,8 @@ func (ctx *Context) DeleteMyCommands(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.DeleteMyCommands(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.DeleteMyCommands(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1279,10 +1231,8 @@ func (ctx *Context) DeleteStickerFromSet(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.DeleteStickerFromSet(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.DeleteStickerFromSet(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1301,10 +1251,8 @@ func (ctx *Context) DeleteStickerSet(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.DeleteStickerSet(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.DeleteStickerSet(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1332,10 +1280,8 @@ func (ctx *Context) DeleteStory(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.DeleteStory(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.DeleteStory(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1353,10 +1299,8 @@ func (ctx *Context) DeleteWebhook(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.DeleteWebhook(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.DeleteWebhook(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1386,10 +1330,8 @@ func (ctx *Context) EditChatInviteLink(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.EditChatInviteLink(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.EditChatInviteLink(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1419,10 +1361,8 @@ func (ctx *Context) EditChatSubscriptionInviteLink(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.EditChatSubscriptionInviteLink(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.EditChatSubscriptionInviteLink(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1456,10 +1396,8 @@ func (ctx *Context) EditForumTopic(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.EditForumTopic(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.EditForumTopic(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1487,10 +1425,8 @@ func (ctx *Context) EditGeneralForumTopic(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.EditGeneralForumTopic(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.EditGeneralForumTopic(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1541,16 +1477,16 @@ func (ctx *Context) EditMessageCaption(
 
 	params.Option(opts...)
 
-	if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
+	defaultParseMode := ctx.client.defaultParseMode()
+
+	if defaultParseMode != "" {
 		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
 			params.ParseMode = defaultParseMode
 		}
 	}
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.EditMessageCaption(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.EditMessageCaption(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1595,10 +1531,8 @@ func (ctx *Context) EditMessageChecklist(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.EditMessageChecklist(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.EditMessageChecklist(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1654,10 +1588,8 @@ func (ctx *Context) EditMessageLiveLocation(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.EditMessageLiveLocation(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.EditMessageLiveLocation(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1712,14 +1644,14 @@ func (ctx *Context) EditMessageMedia(
 
 	params.Option(opts...)
 
-	if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
+	defaultParseMode := ctx.client.defaultParseMode()
+
+	if defaultParseMode != "" {
 		defaultParseModeToInputMedia(&params.Media, defaultParseMode)
 	}
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.EditMessageMedia(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.EditMessageMedia(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1770,10 +1702,8 @@ func (ctx *Context) EditMessageReplyMarkup(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.EditMessageReplyMarkup(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.EditMessageReplyMarkup(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1827,16 +1757,16 @@ func (ctx *Context) EditMessageText(
 
 	params.Option(opts...)
 
-	if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
+	defaultParseMode := ctx.client.defaultParseMode()
+
+	if defaultParseMode != "" {
 		if params.ParseMode == "" && len(params.Entities) == 0 {
 			params.ParseMode = defaultParseMode
 		}
 	}
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.EditMessageText(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.EditMessageText(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1868,16 +1798,16 @@ func (ctx *Context) EditStory(
 
 	params.Option(opts...)
 
-	if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
+	defaultParseMode := ctx.client.defaultParseMode()
+
+	if defaultParseMode != "" {
 		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
 			params.ParseMode = defaultParseMode
 		}
 	}
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.EditStory(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.EditStory(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1906,10 +1836,8 @@ func (ctx *Context) EditUserStarSubscription(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.EditUserStarSubscription(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.EditUserStarSubscription(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1935,10 +1863,8 @@ func (ctx *Context) ExportChatInviteLink(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.ExportChatInviteLink(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.ExportChatInviteLink(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1996,10 +1922,8 @@ func (ctx *Context) ForwardMessage(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.ForwardMessage(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.ForwardMessage(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2053,10 +1977,8 @@ func (ctx *Context) ForwardMessages(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.ForwardMessages(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.ForwardMessages(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2075,10 +1997,8 @@ func (ctx *Context) GetAvailableGifts(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetAvailableGifts(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetAvailableGifts(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2106,10 +2026,8 @@ func (ctx *Context) GetBusinessAccountGifts(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetBusinessAccountGifts(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetBusinessAccountGifts(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2137,10 +2055,8 @@ func (ctx *Context) GetBusinessAccountStarBalance(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetBusinessAccountStarBalance(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetBusinessAccountStarBalance(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2167,10 +2083,8 @@ func (ctx *Context) GetBusinessConnection(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetBusinessConnection(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetBusinessConnection(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2197,10 +2111,8 @@ func (ctx *Context) GetChat(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetChat(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetChat(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2227,10 +2139,8 @@ func (ctx *Context) GetChatAdministrators(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetChatAdministrators(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetChatAdministrators(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2257,10 +2167,8 @@ func (ctx *Context) GetChatGifts(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetChatGifts(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetChatGifts(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2296,10 +2204,8 @@ func (ctx *Context) GetChatMember(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetChatMember(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetChatMember(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2324,10 +2230,8 @@ func (ctx *Context) GetChatMemberCount(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetChatMemberCount(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetChatMemberCount(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2354,10 +2258,8 @@ func (ctx *Context) GetChatMenuButton(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetChatMenuButton(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetChatMenuButton(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2378,10 +2280,8 @@ func (ctx *Context) GetCustomEmojiStickers(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetCustomEmojiStickers(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetCustomEmojiStickers(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2409,10 +2309,8 @@ func (ctx *Context) GetFile(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetFile(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetFile(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2431,10 +2329,8 @@ func (ctx *Context) GetForumTopicIconStickers(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetForumTopicIconStickers(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetForumTopicIconStickers(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2485,10 +2381,8 @@ func (ctx *Context) GetGameHighScores(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetGameHighScores(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetGameHighScores(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2507,10 +2401,8 @@ func (ctx *Context) GetMe(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetMe(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetMe(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2529,10 +2421,8 @@ func (ctx *Context) GetMyCommands(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetMyCommands(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetMyCommands(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2550,10 +2440,8 @@ func (ctx *Context) GetMyDefaultAdministratorRights(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetMyDefaultAdministratorRights(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetMyDefaultAdministratorRights(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2571,10 +2459,8 @@ func (ctx *Context) GetMyDescription(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetMyDescription(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetMyDescription(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2592,10 +2478,8 @@ func (ctx *Context) GetMyName(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetMyName(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetMyName(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2613,10 +2497,8 @@ func (ctx *Context) GetMyShortDescription(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetMyShortDescription(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetMyShortDescription(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2635,10 +2517,8 @@ func (ctx *Context) GetMyStarBalance(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetMyStarBalance(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetMyStarBalance(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2656,10 +2536,8 @@ func (ctx *Context) GetStarTransactions(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetStarTransactions(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetStarTransactions(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2680,10 +2558,8 @@ func (ctx *Context) GetStickerSet(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetStickerSet(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetStickerSet(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2702,10 +2578,8 @@ func (ctx *Context) GetUpdates(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetUpdates(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetUpdates(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2741,10 +2615,8 @@ func (ctx *Context) GetUserChatBoosts(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetUserChatBoosts(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetUserChatBoosts(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2771,10 +2643,8 @@ func (ctx *Context) GetUserGifts(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetUserGifts(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetUserGifts(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2801,10 +2671,8 @@ func (ctx *Context) GetUserProfileAudios(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetUserProfileAudios(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetUserProfileAudios(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2831,10 +2699,8 @@ func (ctx *Context) GetUserProfilePhotos(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetUserProfilePhotos(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetUserProfilePhotos(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2855,10 +2721,8 @@ func (ctx *Context) GetWebhookInfo(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GetWebhookInfo(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetWebhookInfo(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2887,13 +2751,13 @@ func (ctx *Context) GiftPremiumSubscription(
 
 	params.Option(opts...)
 
-	if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
+	defaultParseMode := ctx.client.defaultParseMode()
+
+	if defaultParseMode != "" {
 	}
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.GiftPremiumSubscription(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GiftPremiumSubscription(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2920,10 +2784,8 @@ func (ctx *Context) HideGeneralForumTopic(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.HideGeneralForumTopic(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.HideGeneralForumTopic(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2948,10 +2810,8 @@ func (ctx *Context) LeaveChat(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.LeaveChat(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.LeaveChat(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2970,10 +2830,8 @@ func (ctx *Context) LogOut(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.LogOut(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.LogOut(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3016,10 +2874,8 @@ func (ctx *Context) PinChatMessage(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.PinChatMessage(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.PinChatMessage(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3051,16 +2907,16 @@ func (ctx *Context) PostStory(
 
 	params.Option(opts...)
 
-	if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
+	defaultParseMode := ctx.client.defaultParseMode()
+
+	if defaultParseMode != "" {
 		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
 			params.ParseMode = defaultParseMode
 		}
 	}
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.PostStory(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.PostStory(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3095,10 +2951,8 @@ func (ctx *Context) PromoteChatMember(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.PromoteChatMember(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.PromoteChatMember(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3140,10 +2994,8 @@ func (ctx *Context) ReadBusinessMessage(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.ReadBusinessMessage(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.ReadBusinessMessage(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3172,10 +3024,8 @@ func (ctx *Context) RefundStarPayment(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.RefundStarPayment(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.RefundStarPayment(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3201,10 +3051,8 @@ func (ctx *Context) RemoveBusinessAccountProfilePhoto(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.RemoveBusinessAccountProfilePhoto(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.RemoveBusinessAccountProfilePhoto(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3231,10 +3079,8 @@ func (ctx *Context) RemoveChatVerification(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.RemoveChatVerification(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.RemoveChatVerification(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3251,10 +3097,8 @@ func (ctx *Context) RemoveMyProfilePhoto(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.RemoveMyProfilePhoto(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.RemoveMyProfilePhoto(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3281,10 +3125,8 @@ func (ctx *Context) RemoveUserVerification(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.RemoveUserVerification(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.RemoveUserVerification(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3318,10 +3160,8 @@ func (ctx *Context) ReopenForumTopic(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.ReopenForumTopic(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.ReopenForumTopic(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3348,10 +3188,8 @@ func (ctx *Context) ReopenGeneralForumTopic(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.ReopenGeneralForumTopic(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.ReopenGeneralForumTopic(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3387,10 +3225,8 @@ func (ctx *Context) ReplaceStickerInSet(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.ReplaceStickerInSet(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.ReplaceStickerInSet(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3425,10 +3261,8 @@ func (ctx *Context) RepostStory(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.RepostStory(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.RepostStory(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3465,10 +3299,8 @@ func (ctx *Context) RestrictChatMember(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.RestrictChatMember(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.RestrictChatMember(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3499,10 +3331,8 @@ func (ctx *Context) RevokeChatInviteLink(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.RevokeChatInviteLink(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.RevokeChatInviteLink(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3531,10 +3361,8 @@ func (ctx *Context) SavePreparedInlineMessage(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SavePreparedInlineMessage(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SavePreparedInlineMessage(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3592,16 +3420,16 @@ func (ctx *Context) SendAnimation(
 
 	params.Option(opts...)
 
-	if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
+	defaultParseMode := ctx.client.defaultParseMode()
+
+	if defaultParseMode != "" {
 		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
 			params.ParseMode = defaultParseMode
 		}
 	}
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SendAnimation(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendAnimation(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3662,16 +3490,16 @@ func (ctx *Context) SendAudio(
 
 	params.Option(opts...)
 
-	if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
+	defaultParseMode := ctx.client.defaultParseMode()
+
+	if defaultParseMode != "" {
 		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
 			params.ParseMode = defaultParseMode
 		}
 	}
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SendAudio(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendAudio(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3716,10 +3544,8 @@ func (ctx *Context) SendChatAction(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SendChatAction(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendChatAction(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3756,10 +3582,8 @@ func (ctx *Context) SendChecklist(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SendChecklist(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendChecklist(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3818,10 +3642,8 @@ func (ctx *Context) SendContact(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SendContact(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendContact(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3876,10 +3698,8 @@ func (ctx *Context) SendDice(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SendDice(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendDice(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3937,16 +3757,16 @@ func (ctx *Context) SendDocument(
 
 	params.Option(opts...)
 
-	if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
+	defaultParseMode := ctx.client.defaultParseMode()
+
+	if defaultParseMode != "" {
 		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
 			params.ParseMode = defaultParseMode
 		}
 	}
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SendDocument(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendDocument(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3991,10 +3811,8 @@ func (ctx *Context) SendGame(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SendGame(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendGame(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -4030,13 +3848,13 @@ func (ctx *Context) SendGift(
 
 	params.Option(opts...)
 
-	if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
+	defaultParseMode := ctx.client.defaultParseMode()
+
+	if defaultParseMode != "" {
 	}
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SendGift(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendGift(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -4093,10 +3911,8 @@ func (ctx *Context) SendInvoice(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SendInvoice(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendInvoice(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -4155,10 +3971,8 @@ func (ctx *Context) SendLocation(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SendLocation(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendLocation(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -4216,16 +4030,16 @@ func (ctx *Context) SendMediaGroup(
 
 	params.Option(opts...)
 
-	if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
+	defaultParseMode := ctx.client.defaultParseMode()
+
+	if defaultParseMode != "" {
 		for i := range params.Media {
 			defaultParseModeToInputMedia(&params.Media[i], defaultParseMode)
 		}
 	}
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SendMediaGroup(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendMediaGroup(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -4282,16 +4096,16 @@ func (ctx *Context) SendMessage(
 
 	params.Option(opts...)
 
-	if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
+	defaultParseMode := ctx.client.defaultParseMode()
+
+	if defaultParseMode != "" {
 		if params.ParseMode == "" && len(params.Entities) == 0 {
 			params.ParseMode = defaultParseMode
 		}
 	}
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SendMessage(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendMessage(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -4328,16 +4142,16 @@ func (ctx *Context) SendMessageDraft(
 
 	params.Option(opts...)
 
-	if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
+	defaultParseMode := ctx.client.defaultParseMode()
+
+	if defaultParseMode != "" {
 		if params.ParseMode == "" && len(params.Entities) == 0 {
 			params.ParseMode = defaultParseMode
 		}
 	}
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SendMessageDraft(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendMessageDraft(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -4396,16 +4210,16 @@ func (ctx *Context) SendPaidMedia(
 
 	params.Option(opts...)
 
-	if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
+	defaultParseMode := ctx.client.defaultParseMode()
+
+	if defaultParseMode != "" {
 		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
 			params.ParseMode = defaultParseMode
 		}
 	}
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SendPaidMedia(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendPaidMedia(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -4462,16 +4276,16 @@ func (ctx *Context) SendPhoto(
 
 	params.Option(opts...)
 
-	if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
+	defaultParseMode := ctx.client.defaultParseMode()
+
+	if defaultParseMode != "" {
 		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
 			params.ParseMode = defaultParseMode
 		}
 	}
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SendPhoto(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendPhoto(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -4518,13 +4332,13 @@ func (ctx *Context) SendPoll(
 
 	params.Option(opts...)
 
-	if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
+	defaultParseMode := ctx.client.defaultParseMode()
+
+	if defaultParseMode != "" {
 	}
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SendPoll(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendPoll(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -4583,10 +4397,8 @@ func (ctx *Context) SendSticker(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SendSticker(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendSticker(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -4649,10 +4461,8 @@ func (ctx *Context) SendVenue(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SendVenue(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendVenue(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -4711,16 +4521,16 @@ func (ctx *Context) SendVideo(
 
 	params.Option(opts...)
 
-	if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
+	defaultParseMode := ctx.client.defaultParseMode()
+
+	if defaultParseMode != "" {
 		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
 			params.ParseMode = defaultParseMode
 		}
 	}
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SendVideo(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendVideo(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -4779,10 +4589,8 @@ func (ctx *Context) SendVideoNote(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SendVideoNote(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendVideoNote(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -4843,16 +4651,16 @@ func (ctx *Context) SendVoice(
 
 	params.Option(opts...)
 
-	if defaultParseMode := ctx.client.defaultParseMode; defaultParseMode != "" {
+	defaultParseMode := ctx.client.defaultParseMode()
+
+	if defaultParseMode != "" {
 		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
 			params.ParseMode = defaultParseMode
 		}
 	}
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SendVoice(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendVoice(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -4878,10 +4686,8 @@ func (ctx *Context) SetBusinessAccountBio(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetBusinessAccountBio(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetBusinessAccountBio(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -4911,10 +4717,8 @@ func (ctx *Context) SetBusinessAccountGiftSettings(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetBusinessAccountGiftSettings(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetBusinessAccountGiftSettings(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -4942,10 +4746,8 @@ func (ctx *Context) SetBusinessAccountName(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetBusinessAccountName(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetBusinessAccountName(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -4973,10 +4775,8 @@ func (ctx *Context) SetBusinessAccountProfilePhoto(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetBusinessAccountProfilePhoto(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetBusinessAccountProfilePhoto(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5002,10 +4802,8 @@ func (ctx *Context) SetBusinessAccountUsername(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetBusinessAccountUsername(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetBusinessAccountUsername(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5040,10 +4838,8 @@ func (ctx *Context) SetChatAdministratorCustomTitle(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetChatAdministratorCustomTitle(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetChatAdministratorCustomTitle(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5069,10 +4865,8 @@ func (ctx *Context) SetChatDescription(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetChatDescription(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetChatDescription(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5106,10 +4900,8 @@ func (ctx *Context) SetChatMemberTag(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetChatMemberTag(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetChatMemberTag(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5134,10 +4926,8 @@ func (ctx *Context) SetChatMenuButton(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetChatMenuButton(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetChatMenuButton(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5165,10 +4955,8 @@ func (ctx *Context) SetChatPermissions(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetChatPermissions(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetChatPermissions(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5197,10 +4985,8 @@ func (ctx *Context) SetChatPhoto(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetChatPhoto(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetChatPhoto(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5231,10 +5017,8 @@ func (ctx *Context) SetChatStickerSet(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetChatStickerSet(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetChatStickerSet(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5263,10 +5047,8 @@ func (ctx *Context) SetChatTitle(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetChatTitle(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetChatTitle(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5285,10 +5067,8 @@ func (ctx *Context) SetCustomEmojiStickerSetThumbnail(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetCustomEmojiStickerSetThumbnail(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetCustomEmojiStickerSetThumbnail(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5341,10 +5121,8 @@ func (ctx *Context) SetGameScore(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetGameScore(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetGameScore(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5380,10 +5158,8 @@ func (ctx *Context) SetMessageReaction(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetMessageReaction(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetMessageReaction(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5405,10 +5181,8 @@ func (ctx *Context) SetMyCommands(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetMyCommands(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetMyCommands(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5425,10 +5199,8 @@ func (ctx *Context) SetMyDefaultAdministratorRights(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetMyDefaultAdministratorRights(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetMyDefaultAdministratorRights(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5444,10 +5216,8 @@ func (ctx *Context) SetMyDescription(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetMyDescription(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetMyDescription(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5463,10 +5233,8 @@ func (ctx *Context) SetMyName(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetMyName(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetMyName(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5485,10 +5253,8 @@ func (ctx *Context) SetMyProfilePhoto(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetMyProfilePhoto(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetMyProfilePhoto(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5504,10 +5270,8 @@ func (ctx *Context) SetMyShortDescription(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetMyShortDescription(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetMyShortDescription(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5538,10 +5302,8 @@ func (ctx *Context) SetPassportDataErrors(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetPassportDataErrors(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetPassportDataErrors(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5563,10 +5325,8 @@ func (ctx *Context) SetStickerEmojiList(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetStickerEmojiList(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetStickerEmojiList(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5586,10 +5346,8 @@ func (ctx *Context) SetStickerKeywords(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetStickerKeywords(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetStickerKeywords(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5611,10 +5369,8 @@ func (ctx *Context) SetStickerMaskPosition(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetStickerMaskPosition(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetStickerMaskPosition(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5635,10 +5391,8 @@ func (ctx *Context) SetStickerPositionInSet(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetStickerPositionInSet(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetStickerPositionInSet(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5668,10 +5422,8 @@ func (ctx *Context) SetStickerSetThumbnail(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetStickerSetThumbnail(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetStickerSetThumbnail(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5692,10 +5444,8 @@ func (ctx *Context) SetStickerSetTitle(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetStickerSetTitle(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetStickerSetTitle(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5722,10 +5472,8 @@ func (ctx *Context) SetUserEmojiStatus(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetUserEmojiStatus(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetUserEmojiStatus(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5751,10 +5499,8 @@ func (ctx *Context) SetWebhook(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.SetWebhook(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetWebhook(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5804,10 +5550,8 @@ func (ctx *Context) StopMessageLiveLocation(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.StopMessageLiveLocation(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.StopMessageLiveLocation(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5850,10 +5594,8 @@ func (ctx *Context) StopPoll(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.StopPoll(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.StopPoll(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5881,10 +5623,8 @@ func (ctx *Context) TransferBusinessAccountStars(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.TransferBusinessAccountStars(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.TransferBusinessAccountStars(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5915,10 +5655,8 @@ func (ctx *Context) TransferGift(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.TransferGift(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.TransferGift(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5956,10 +5694,8 @@ func (ctx *Context) UnbanChatMember(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.UnbanChatMember(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.UnbanChatMember(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -5987,10 +5723,8 @@ func (ctx *Context) UnbanChatSenderChat(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.UnbanChatSenderChat(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.UnbanChatSenderChat(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -6016,10 +5750,8 @@ func (ctx *Context) UnhideGeneralForumTopic(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.UnhideGeneralForumTopic(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.UnhideGeneralForumTopic(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -6046,10 +5778,8 @@ func (ctx *Context) UnpinAllChatMessages(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.UnpinAllChatMessages(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.UnpinAllChatMessages(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -6083,10 +5813,8 @@ func (ctx *Context) UnpinAllForumTopicMessages(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.UnpinAllForumTopicMessages(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.UnpinAllForumTopicMessages(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -6112,10 +5840,8 @@ func (ctx *Context) UnpinAllGeneralForumTopicMessages(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.UnpinAllGeneralForumTopicMessages(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.UnpinAllGeneralForumTopicMessages(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -6158,10 +5884,8 @@ func (ctx *Context) UnpinChatMessage(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.UnpinChatMessage(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.UnpinChatMessage(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -6190,10 +5914,8 @@ func (ctx *Context) UpgradeGift(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.UpgradeGift(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.UpgradeGift(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -6227,10 +5949,8 @@ func (ctx *Context) UploadStickerFile(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.UploadStickerFile(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.UploadStickerFile(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -6257,10 +5977,8 @@ func (ctx *Context) VerifyChat(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.VerifyChat(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.VerifyChat(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -6287,10 +6005,8 @@ func (ctx *Context) VerifyUser(
 
 	params.Option(opts...)
 
-	ctxWithCancel, cancel := context.WithTimeout(context.Background(), ctx.client.options.timeout)
-	defer cancel()
-
-	_, err := ctx.client.VerifyUser(ctxWithCancel, params)
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.VerifyUser(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
