@@ -33,10 +33,16 @@ jobs:
         run: go test -race -failfast ./...
 
       - name: Calculate Next Version
-        uses: caarlos0/svu-action@v2
         id: svu
-        with:
-          command: next
+        run: |
+          go install github.com/caarlos0/svu/v2@latest
+          NEXT=$(svu next)
+          echo "version=$NEXT" >> $GITHUB_OUTPUT
+          if [ "$(svu current)" != "$NEXT" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Push Tag
         if: steps.svu.outputs.changed == 'true'
