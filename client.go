@@ -159,6 +159,7 @@ var defaultOpts = []ClientOption{
 	WithRPS(defaultRPS),
 	WithTimeout(defaultTimeout),
 	WithRouter(NewRouter()),
+	WithHTTPClient(http.DefaultClient),
 }
 
 // Client is a Telegram Bot API client.
