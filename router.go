@@ -156,7 +156,7 @@ func (r *Router) Process(ctx *Context) {
 
 // SetHandlerDefault sets the default handler for updates that don't match any route.
 func (r *Router) SetHandlerDefault(handler HandlerFunc) {
-	r.handlerDefault = handler
+	r.handlerDefault = r.applyMiddlewares(handler)
 }
 
 // SetHandlerErr sets the error handler for the router.
