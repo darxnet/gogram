@@ -4239,7 +4239,7 @@ type InputChecklist struct {
 
 	// Optional.
 	// List of special entities that appear in the title, which can be specified instead of parse_mode.
-	// Currently, only bold, italic, underline, strikethrough, spoiler, and custom_emoji entities are allowed.
+	// Currently, only bold, italic, underline, strikethrough, spoiler, custom_emoji, and date_time entities are allowed.
 	TitleEntities []MessageEntity `json:"title_entities,omitempty"`
 
 	// List of 1-30 tasks in the checklist
@@ -4273,7 +4273,7 @@ type InputChecklistTask struct {
 
 	// Optional.
 	// List of special entities that appear in the text, which can be specified instead of parse_mode.
-	// Currently, only bold, italic, underline, strikethrough, spoiler, and custom_emoji entities are allowed.
+	// Currently, only bold, italic, underline, strikethrough, spoiler, custom_emoji, and date_time entities are allowed.
 	TextEntities []MessageEntity `json:"text_entities,omitempty"`
 }
 
@@ -5389,6 +5389,14 @@ type KeyboardButton struct {
 	RequestChat *KeyboardButtonRequestChat `json:"request_chat,omitempty"`
 
 	// Optional.
+	// If specified, pressing the button will ask the user to create and share a bot that will be managed by the current bot.
+	// Available for bots that enabled management of other bots in the [@BotFather] Mini App.
+	// Available in private chats only.
+	//
+	// [@BotFather]: https://t.me/BotFather
+	RequestManagedBot *KeyboardButtonRequestManagedBot `json:"request_managed_bot,omitempty"`
+
+	// Optional.
 	// If True, the user's phone number will be sent as a contact when the button is pressed.
 	// Available in private chats only.
 	RequestContact bool `json:"request_contact,omitempty"`
@@ -5484,6 +5492,26 @@ type KeyboardButtonRequestChat struct {
 	// Optional.
 	// Pass True to request the chat's photo
 	RequestPhoto bool `json:"request_photo,omitempty"`
+}
+
+// KeyboardButtonRequestManagedBot
+//
+// This object defines the parameters for the creation of a managed bot.
+// Information about the created bot will be shared with the bot using the update managed_bot and a [Message] with the field managed_bot_created.
+//
+// [Message]: https://core.telegram.org/bots/api#message
+type KeyboardButtonRequestManagedBot struct {
+	// Signed 32-bit identifier of the request.
+	// Must be unique within the message
+	RequestID int64 `json:"request_id"`
+
+	// Optional.
+	// Suggested name for the bot
+	SuggestedName string `json:"suggested_name,omitempty"`
+
+	// Optional.
+	// Suggested username for the bot
+	SuggestedUsername string `json:"suggested_username,omitempty"`
 }
 
 // KeyboardButtonRequestUsers
@@ -5658,6 +5686,31 @@ type LoginUrl struct {
 	// Optional.
 	// Pass True to request the permission for your bot to send messages to the user.
 	RequestWriteAccess bool `json:"request_write_access,omitempty"`
+}
+
+// ManagedBotCreated
+//
+// This object contains information about the bot that was created to be managed by the current bot.
+type ManagedBotCreated struct {
+	// Information about the bot.
+	// The bot's token can be fetched using the method [getManagedBotToken].
+	//
+	// [getManagedBotToken]: https://core.telegram.org/bots/api#getmanagedbottoken
+	Bot User `json:"bot"`
+}
+
+// ManagedBotUpdated
+//
+// This object contains information about the creation or token update of a bot that is managed by the current bot.
+type ManagedBotUpdated struct {
+	// User that created the bot
+	User User `json:"user"`
+
+	// Information about the bot.
+	// Token of the bot can be fetched using the method [getManagedBotToken].
+	//
+	// [getManagedBotToken]: https://core.telegram.org/bots/api#getmanagedbottoken
+	Bot User `json:"bot"`
 }
 
 // MaskPosition
@@ -5911,6 +5964,10 @@ type Message struct {
 	// Optional.
 	// Identifier of the specific checklist task that is being replied to
 	ReplyToChecklistTaskID int64 `json:"reply_to_checklist_task_id,omitempty"`
+
+	// Optional.
+	// Persistent identifier of the specific poll option that is being replied to
+	ReplyToPollOptionID string `json:"reply_to_poll_option_id,omitempty"`
 
 	// Optional.
 	// Bot through which the message was sent
@@ -6251,8 +6308,20 @@ type Message struct {
 	GiveawayCompleted *GiveawayCompleted `json:"giveaway_completed,omitempty"`
 
 	// Optional.
+	// Service message: user created a bot that will be managed by the current bot
+	ManagedBotCreated *ManagedBotCreated `json:"managed_bot_created,omitempty"`
+
+	// Optional.
 	// Service message: the price for paid messages has changed in the chat
 	PaidMessagePriceChanged *PaidMessagePriceChanged `json:"paid_message_price_changed,omitempty"`
+
+	// Optional.
+	// Service message: answer option was added to a poll
+	PollOptionAdded *PollOptionAdded `json:"poll_option_added,omitempty"`
+
+	// Optional.
+	// Service message: answer option was deleted from a poll
+	PollOptionDeleted *PollOptionDeleted `json:"poll_option_deleted,omitempty"`
 
 	// Optional.
 	// Service message: a suggested post was approved
@@ -7316,10 +7385,13 @@ type Poll struct {
 	// True, if the poll allows multiple answers
 	AllowsMultipleAnswers bool `json:"allows_multiple_answers"`
 
+	// True, if the poll allows to change the chosen answer options
+	AllowsRevoting bool `json:"allows_revoting"`
+
 	// Optional.
-	// 0-based identifier of the correct answer option.
-	// Available only for polls in the quiz mode, which are closed, or was sent (not forwarded) by the bot or to the private chat with the bot.
-	CorrectOptionID int64 `json:"correct_option_id,omitempty"`
+	// Array of 0-based identifiers of the correct answer options.
+	// Available only for polls in quiz mode which are closed or were sent (not forwarded) by the bot or to the private chat with the bot.
+	CorrectOptionIDs []int64 `json:"correct_option_ids,omitempty"`
 
 	// Optional.
 	// Text that is shown when a user chooses an incorrect answer or taps on the lamp icon in a quiz-style poll, 0-200 characters
@@ -7337,6 +7409,17 @@ type Poll struct {
 	// Optional.
 	// Point in time (Unix timestamp) when the poll will be automatically closed
 	CloseDate int64 `json:"close_date,omitempty"`
+
+	// Optional.
+	// Description of the poll; for polls inside the [Message] object only
+	//
+	// [Message]: https://core.telegram.org/bots/api#message
+	Description string `json:"description,omitempty"`
+
+	// Optional.
+	// Special entities like usernames, URLs, bot commands, etc.
+	// that appear in the description
+	DescriptionEntities []MessageEntity `json:"description_entities,omitempty"`
 }
 
 // PollAnswer
@@ -7357,12 +7440,19 @@ type PollAnswer struct {
 	// 0-based identifiers of chosen answer options.
 	// May be empty if the vote was retracted.
 	OptionIDs []int64 `json:"option_ids"`
+
+	// Persistent identifiers of the chosen answer options.
+	// May be empty if the vote was retracted.
+	OptionPersistentIDs []string `json:"option_persistent_ids"`
 }
 
 // PollOption
 //
 // This object contains information about one answer option in a poll.
 type PollOption struct {
+	// Unique identifier of the option, persistent on option addition and deletion
+	PersistentID string `json:"persistent_id"`
+
 	// Option text, 1-100 characters
 	Text string `json:"text"`
 
@@ -7371,8 +7461,64 @@ type PollOption struct {
 	// Currently, only custom emoji entities are allowed in poll option texts
 	TextEntities []MessageEntity `json:"text_entities,omitempty"`
 
-	// Number of users that voted for this option
+	// Number of users who voted for this option; may be 0 if unknown
 	VoterCount int64 `json:"voter_count"`
+
+	// Optional.
+	// User who added the option; omitted if the option wasn't added by a user after poll creation
+	AddedByUser *User `json:"added_by_user,omitempty"`
+
+	// Optional.
+	// Chat that added the option; omitted if the option wasn't added by a chat after poll creation
+	AddedByChat *Chat `json:"added_by_chat,omitempty"`
+
+	// Optional.
+	// Point in time (Unix timestamp) when the option was added; omitted if the option existed in the original poll
+	AdditionDate int64 `json:"addition_date,omitempty"`
+}
+
+// PollOptionAdded
+//
+// Describes a service message about an option added to a poll.
+type PollOptionAdded struct {
+	// Optional.
+	// Message containing the poll to which the option was added, if known.
+	// Note that the [Message] object in this field will not contain the reply_to_message field even if it itself is a reply.
+	//
+	// [Message]: https://core.telegram.org/bots/api#message
+	PollMessage *MaybeInaccessibleMessage `json:"poll_message,omitempty"`
+
+	// Unique identifier of the added option
+	OptionPersistentID string `json:"option_persistent_id"`
+
+	// Option text
+	OptionText string `json:"option_text"`
+
+	// Optional.
+	// Special entities that appear in the option_text
+	OptionTextEntities []MessageEntity `json:"option_text_entities,omitempty"`
+}
+
+// PollOptionDeleted
+//
+// Describes a service message about an option deleted from a poll.
+type PollOptionDeleted struct {
+	// Optional.
+	// Message containing the poll from which the option was deleted, if known.
+	// Note that the [Message] object in this field will not contain the reply_to_message field even if it itself is a reply.
+	//
+	// [Message]: https://core.telegram.org/bots/api#message
+	PollMessage *MaybeInaccessibleMessage `json:"poll_message,omitempty"`
+
+	// Unique identifier of the deleted option
+	OptionPersistentID string `json:"option_persistent_id"`
+
+	// Option text
+	OptionText string `json:"option_text"`
+
+	// Optional.
+	// Special entities that appear in the option_text
+	OptionTextEntities []MessageEntity `json:"option_text_entities,omitempty"`
 }
 
 // PreCheckoutQuery
@@ -7420,6 +7566,14 @@ type PreparedInlineMessage struct {
 	// Expiration date of the prepared message, in Unix time.
 	// Expired prepared messages can no longer be used
 	ExpirationDate int64 `json:"expiration_date"`
+}
+
+// PreparedKeyboardButton
+//
+// Describes a keyboard button to be used by a user of a Mini App.
+type PreparedKeyboardButton struct {
+	// Unique identifier of the keyboard button
+	ID string `json:"id"`
 }
 
 // ProximityAlertTriggered
@@ -7667,7 +7821,7 @@ type ReplyParameters struct {
 
 	// Optional.
 	// Quoted part of the message to be replied to; 0-1024 characters after entities parsing.
-	// The quote must be an exact substring of the message to be replied to, including bold, italic, underline, strikethrough, spoiler, and custom_emoji entities.
+	// The quote must be an exact substring of the message to be replied to, including bold, italic, underline, strikethrough, spoiler, custom_emoji, and date_time entities.
 	// The message will fail to send if the quote isn't found in the original message.
 	Quote string `json:"quote,omitempty"`
 
@@ -7690,6 +7844,10 @@ type ReplyParameters struct {
 	// Optional.
 	// Identifier of the specific checklist task to be replied to
 	ChecklistTaskID int64 `json:"checklist_task_id,omitempty"`
+
+	// Optional.
+	// Persistent identifier of the specific poll option to be replied to
+	PollOptionID string `json:"poll_option_id,omitempty"`
 }
 
 // ResponseParameters
@@ -8493,7 +8651,7 @@ type TextQuote struct {
 
 	// Optional.
 	// Special entities that appear in the quote.
-	// Currently, only bold, italic, underline, strikethrough, spoiler, and custom_emoji entities are kept in quotes.
+	// Currently, only bold, italic, underline, strikethrough, spoiler, custom_emoji, and date_time entities are kept in quotes.
 	Entities []MessageEntity `json:"entities,omitempty"`
 
 	// Approximate quote position in the original message in UTF-16 code units as specified by the sender
@@ -9042,6 +9200,10 @@ type Update struct {
 	// A boost was removed from a chat.
 	// The bot must be an administrator in the chat to receive these updates.
 	RemovedChatBoost *ChatBoostRemoved `json:"removed_chat_boost,omitempty"`
+
+	// Optional.
+	// A new bot was created to be managed by the bot or token of a bot was changed
+	ManagedBot *ManagedBotUpdated `json:"managed_bot,omitempty"`
 }
 
 // User
@@ -9130,6 +9292,13 @@ type User struct {
 	//
 	// [getMe]: https://core.telegram.org/bots/api#getme
 	AllowsUsersToCreateTopics bool `json:"allows_users_to_create_topics,omitempty"`
+
+	// Optional.
+	// True, if other bots can be created to be controlled by the bot.
+	// Returned only in [getMe].
+	//
+	// [getMe]: https://core.telegram.org/bots/api#getme
+	CanManageBots bool `json:"can_manage_bots,omitempty"`
 }
 
 // UserChatBoosts
