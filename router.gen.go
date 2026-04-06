@@ -29,6 +29,7 @@ const (
 	handleOnChatJoinRequest
 	handleOnChatBoost
 	handleOnRemovedChatBoost
+	handleOnManagedBot
 	handleOnCount
 )
 
@@ -237,4 +238,13 @@ func (rg *RouterGroup) HandleOnRemovedChatBoost(handler func(*Context, *ChatBoos
 	}
 
 	rg.handleOn(handleOnRemovedChatBoost, fn, filters...)
+}
+
+// HandleOnManagedBot registers a handler for updates containing ManagedBot.
+func (rg *RouterGroup) HandleOnManagedBot(handler func(*Context, *ManagedBotUpdated) error, filters ...Filter) {
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().ManagedBot)
+	}
+
+	rg.handleOn(handleOnManagedBot, fn, filters...)
 }
