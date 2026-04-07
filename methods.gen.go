@@ -7271,6 +7271,66 @@ func (c *Client) GetGameHighScores(ctx context.Context, params *GetGameHighScore
 	return ret, err
 }
 
+// GetManagedBotTokenParams contains parameters for Client.GetManagedBotToken.
+type GetManagedBotTokenParams struct {
+	// User identifier of the managed bot whose token will be returned
+	UserID int64 `json:"user_id"`
+}
+
+// GetManagedBotTokenOption configures GetManagedBotTokenParams.
+type GetManagedBotTokenOption func(params *GetManagedBotTokenParams) GetManagedBotTokenOption
+
+// Option applies one or more GetManagedBotTokenOption values and returns the last rollback option.
+func (r *GetManagedBotTokenParams) Option(opts ...GetManagedBotTokenOption) (previous GetManagedBotTokenOption) {
+	for _, opt := range opts {
+		previous = opt(r)
+	}
+	return previous
+}
+
+// WithGetManagedBotTokenUserID sets the UserID field.
+//
+// User identifier of the managed bot whose token will be returned
+func WithGetManagedBotTokenUserID(value int64) GetManagedBotTokenOption {
+	return func(params *GetManagedBotTokenParams) GetManagedBotTokenOption {
+		previous := params.UserID
+		params.UserID = value
+
+		return WithGetManagedBotTokenUserID(previous)
+	}
+}
+
+// GetManagedBotToken calls the getManagedBotToken Telegram Bot API method.
+//
+// Use this method to get the token of a managed bot.
+// Returns the token as String on success.
+func (c *Client) GetManagedBotToken(ctx context.Context, params *GetManagedBotTokenParams) (ret string, err error) {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
+		return
+	}
+
+	reader := bytes.NewReader(buffer.Bytes())
+
+	contentType := "application/json"
+
+	var result json.RawMessage
+
+	result, err = c.Raw(ctx, "getManagedBotToken", reader, contentType)
+	if err != nil {
+		return
+	}
+
+	ref := &ret
+
+	err = json.Unmarshal(result, ref)
+	if err != nil {
+		return
+	}
+
+	return ret, err
+}
+
 // GetMeParams contains parameters for Client.GetMe.
 type GetMeParams struct {
 }
@@ -8536,14 +8596,14 @@ type GiftPremiumSubscriptionParams struct {
 
 	// Mode for parsing entities in the text.
 	// See [formatting options] for more details.
-	// Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, and “custom_emoji” are ignored.
+	// Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, “custom_emoji”, and “date_time” are ignored.
 	//
 	// [formatting options]: https://core.telegram.org/bots/api#formatting-options
 	TextParseMode string `json:"text_parse_mode,omitempty"`
 
 	// A JSON-serialized list of special entities that appear in the gift text.
 	// It can be specified instead of text_parse_mode.
-	// Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, and “custom_emoji” are ignored.
+	// Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, “custom_emoji”, and “date_time” are ignored.
 	TextEntities []MessageEntity `json:"text_entities,omitempty"`
 }
 
@@ -8610,7 +8670,7 @@ func WithGiftPremiumSubscriptionText(value string) GiftPremiumSubscriptionOption
 //
 // Mode for parsing entities in the text.
 // See [formatting options] for more details.
-// Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, and “custom_emoji” are ignored.
+// Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, “custom_emoji”, and “date_time” are ignored.
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithGiftPremiumSubscriptionTextParseMode(value string) GiftPremiumSubscriptionOption {
@@ -8626,7 +8686,7 @@ func WithGiftPremiumSubscriptionTextParseMode(value string) GiftPremiumSubscript
 //
 // A JSON-serialized list of special entities that appear in the gift text.
 // It can be specified instead of text_parse_mode.
-// Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, and “custom_emoji” are ignored.
+// Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, “custom_emoji”, and “date_time” are ignored.
 func WithGiftPremiumSubscriptionTextEntities(value []MessageEntity) GiftPremiumSubscriptionOption {
 	return func(params *GiftPremiumSubscriptionParams) GiftPremiumSubscriptionOption {
 		previous := params.TextEntities
@@ -10032,6 +10092,66 @@ func (c *Client) ReopenGeneralForumTopic(ctx context.Context, params *ReopenGene
 	return ret, err
 }
 
+// ReplaceManagedBotTokenParams contains parameters for Client.ReplaceManagedBotToken.
+type ReplaceManagedBotTokenParams struct {
+	// User identifier of the managed bot whose token will be replaced
+	UserID int64 `json:"user_id"`
+}
+
+// ReplaceManagedBotTokenOption configures ReplaceManagedBotTokenParams.
+type ReplaceManagedBotTokenOption func(params *ReplaceManagedBotTokenParams) ReplaceManagedBotTokenOption
+
+// Option applies one or more ReplaceManagedBotTokenOption values and returns the last rollback option.
+func (r *ReplaceManagedBotTokenParams) Option(opts ...ReplaceManagedBotTokenOption) (previous ReplaceManagedBotTokenOption) {
+	for _, opt := range opts {
+		previous = opt(r)
+	}
+	return previous
+}
+
+// WithReplaceManagedBotTokenUserID sets the UserID field.
+//
+// User identifier of the managed bot whose token will be replaced
+func WithReplaceManagedBotTokenUserID(value int64) ReplaceManagedBotTokenOption {
+	return func(params *ReplaceManagedBotTokenParams) ReplaceManagedBotTokenOption {
+		previous := params.UserID
+		params.UserID = value
+
+		return WithReplaceManagedBotTokenUserID(previous)
+	}
+}
+
+// ReplaceManagedBotToken calls the replaceManagedBotToken Telegram Bot API method.
+//
+// Use this method to revoke the current token of a managed bot and generate a new one.
+// Returns the new token as String on success.
+func (c *Client) ReplaceManagedBotToken(ctx context.Context, params *ReplaceManagedBotTokenParams) (ret string, err error) {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
+		return
+	}
+
+	reader := bytes.NewReader(buffer.Bytes())
+
+	contentType := "application/json"
+
+	var result json.RawMessage
+
+	result, err = c.Raw(ctx, "replaceManagedBotToken", reader, contentType)
+	if err != nil {
+		return
+	}
+
+	ref := &ret
+
+	err = json.Unmarshal(result, ref)
+	if err != nil {
+		return
+	}
+
+	return ret, err
+}
+
 // ReplaceStickerInSetParams contains parameters for Client.ReplaceStickerInSet.
 type ReplaceStickerInSetParams struct {
 	// User identifier of the sticker set owner
@@ -10618,6 +10738,86 @@ func (c *Client) SavePreparedInlineMessage(ctx context.Context, params *SavePrep
 	}
 
 	ret = new(PreparedInlineMessage)
+	ref := ret
+
+	err = json.Unmarshal(result, ref)
+	if err != nil {
+		return
+	}
+
+	return ret, err
+}
+
+// SavePreparedKeyboardButtonParams contains parameters for Client.SavePreparedKeyboardButton.
+type SavePreparedKeyboardButtonParams struct {
+	// Unique identifier of the target user that can use the button
+	UserID int64 `json:"user_id"`
+
+	// A JSON-serialized object describing the button to be saved.
+	// The button must be of the type request_users, request_chat, or request_managed_bot
+	Button KeyboardButton `json:"button"`
+}
+
+// SavePreparedKeyboardButtonOption configures SavePreparedKeyboardButtonParams.
+type SavePreparedKeyboardButtonOption func(params *SavePreparedKeyboardButtonParams) SavePreparedKeyboardButtonOption
+
+// Option applies one or more SavePreparedKeyboardButtonOption values and returns the last rollback option.
+func (r *SavePreparedKeyboardButtonParams) Option(opts ...SavePreparedKeyboardButtonOption) (previous SavePreparedKeyboardButtonOption) {
+	for _, opt := range opts {
+		previous = opt(r)
+	}
+	return previous
+}
+
+// WithSavePreparedKeyboardButtonUserID sets the UserID field.
+//
+// Unique identifier of the target user that can use the button
+func WithSavePreparedKeyboardButtonUserID(value int64) SavePreparedKeyboardButtonOption {
+	return func(params *SavePreparedKeyboardButtonParams) SavePreparedKeyboardButtonOption {
+		previous := params.UserID
+		params.UserID = value
+
+		return WithSavePreparedKeyboardButtonUserID(previous)
+	}
+}
+
+// WithSavePreparedKeyboardButtonButton sets the Button field.
+//
+// A JSON-serialized object describing the button to be saved.
+// The button must be of the type request_users, request_chat, or request_managed_bot
+func WithSavePreparedKeyboardButtonButton(value KeyboardButton) SavePreparedKeyboardButtonOption {
+	return func(params *SavePreparedKeyboardButtonParams) SavePreparedKeyboardButtonOption {
+		previous := params.Button
+		params.Button = value
+
+		return WithSavePreparedKeyboardButtonButton(previous)
+	}
+}
+
+// SavePreparedKeyboardButton calls the savePreparedKeyboardButton Telegram Bot API method.
+//
+// Stores a keyboard button that can be used by a user within a Mini App.
+// Returns a [PreparedKeyboardButton] object.
+//
+// [PreparedKeyboardButton]: https://core.telegram.org/bots/api#preparedkeyboardbutton
+func (c *Client) SavePreparedKeyboardButton(ctx context.Context, params *SavePreparedKeyboardButtonParams) (ret *PreparedKeyboardButton, err error) {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
+		return
+	}
+
+	reader := bytes.NewReader(buffer.Bytes())
+
+	contentType := "application/json"
+
+	var result json.RawMessage
+
+	result, err = c.Raw(ctx, "savePreparedKeyboardButton", reader, contentType)
+	if err != nil {
+		return
+	}
+
+	ret = new(PreparedKeyboardButton)
 	ref := ret
 
 	err = json.Unmarshal(result, ref)
@@ -13524,14 +13724,14 @@ type SendGiftParams struct {
 
 	// Mode for parsing entities in the text.
 	// See [formatting options] for more details.
-	// Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, and “custom_emoji” are ignored.
+	// Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, “custom_emoji”, and “date_time” are ignored.
 	//
 	// [formatting options]: https://core.telegram.org/bots/api#formatting-options
 	TextParseMode string `json:"text_parse_mode,omitempty"`
 
 	// A JSON-serialized list of special entities that appear in the gift text.
 	// It can be specified instead of text_parse_mode.
-	// Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, and “custom_emoji” are ignored.
+	// Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, “custom_emoji”, and “date_time” are ignored.
 	TextEntities []MessageEntity `json:"text_entities,omitempty"`
 }
 
@@ -13612,7 +13812,7 @@ func WithSendGiftText(value string) SendGiftOption {
 //
 // Mode for parsing entities in the text.
 // See [formatting options] for more details.
-// Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, and “custom_emoji” are ignored.
+// Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, “custom_emoji”, and “date_time” are ignored.
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithSendGiftTextParseMode(value string) SendGiftOption {
@@ -13628,7 +13828,7 @@ func WithSendGiftTextParseMode(value string) SendGiftOption {
 //
 // A JSON-serialized list of special entities that appear in the gift text.
 // It can be specified instead of text_parse_mode.
-// Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, and “custom_emoji” are ignored.
+// Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, “custom_emoji”, and “date_time” are ignored.
 func WithSendGiftTextEntities(value []MessageEntity) SendGiftOption {
 	return func(params *SendGiftParams) SendGiftOption {
 		previous := params.TextEntities
@@ -16643,11 +16843,23 @@ type SendPollParams struct {
 	// Poll type, “quiz” or “regular”, defaults to “regular”
 	Type string `json:"type,omitempty"`
 
-	// True, if the poll allows multiple answers, ignored for polls in quiz mode, defaults to False
+	// Pass True, if the poll allows multiple answers, defaults to False
 	AllowsMultipleAnswers bool `json:"allows_multiple_answers,omitempty"`
 
-	// 0-based identifier of the correct answer option, required for polls in quiz mode
-	CorrectOptionID int64 `json:"correct_option_id,omitempty"`
+	// Pass True, if the poll allows to change chosen answer options, defaults to False for quizzes and to True for regular polls
+	AllowsRevoting bool `json:"allows_revoting,omitempty"`
+
+	// Pass True, if the poll options must be shown in random order
+	ShuffleOptions bool `json:"shuffle_options,omitempty"`
+
+	// Pass True, if answer options can be added to the poll after creation; not supported for anonymous polls and quizzes
+	AllowAddingOptions bool `json:"allow_adding_options,omitempty"`
+
+	// Pass True, if poll results must be shown only after the poll closes
+	HideResultsUntilCloses bool `json:"hide_results_until_closes,omitempty"`
+
+	// A JSON-serialized list of monotonically increasing 0-based identifiers of the correct answer options, required for polls in quiz mode
+	CorrectOptionIDs []int64 `json:"correct_option_ids,omitempty"`
 
 	// Text that is shown when a user chooses an incorrect answer or taps on the lamp icon in a quiz-style poll, 0-200 characters with at most 2 line feeds after entities parsing
 	Explanation string `json:"explanation,omitempty"`
@@ -16662,18 +16874,30 @@ type SendPollParams struct {
 	// It can be specified instead of explanation_parse_mode
 	ExplanationEntities []MessageEntity `json:"explanation_entities,omitempty"`
 
-	// Amount of time in seconds the poll will be active after creation, 5-600.
+	// Amount of time in seconds the poll will be active after creation, 5-2628000.
 	// Can't be used together with close_date.
 	OpenPeriod int64 `json:"open_period,omitempty"`
 
 	// Point in time (Unix timestamp) when the poll will be automatically closed.
-	// Must be at least 5 and no more than 600 seconds in the future.
+	// Must be at least 5 and no more than 2628000 seconds in the future.
 	// Can't be used together with open_period.
 	CloseDate int64 `json:"close_date,omitempty"`
 
 	// Pass True if the poll needs to be immediately closed.
 	// This can be useful for poll preview.
 	IsClosed bool `json:"is_closed,omitempty"`
+
+	// Description of the poll to be sent, 0-1024 characters after entities parsing
+	Description string `json:"description,omitempty"`
+
+	// Mode for parsing entities in the poll description.
+	// See [formatting options] for more details.
+	//
+	// [formatting options]: https://core.telegram.org/bots/api#formatting-options
+	DescriptionParseMode string `json:"description_parse_mode,omitempty"`
+
+	// A JSON-serialized list of special entities that appear in the poll description, which can be specified instead of description_parse_mode
+	DescriptionEntities []MessageEntity `json:"description_entities,omitempty"`
 
 	// Sends the message [silently].
 	// Users will receive a notification with no sound.
@@ -16831,7 +17055,7 @@ func WithSendPollType(value string) SendPollOption {
 
 // WithSendPollAllowsMultipleAnswers sets the AllowsMultipleAnswers field.
 //
-// True, if the poll allows multiple answers, ignored for polls in quiz mode, defaults to False
+// Pass True, if the poll allows multiple answers, defaults to False
 func WithSendPollAllowsMultipleAnswers(value bool) SendPollOption {
 	return func(params *SendPollParams) SendPollOption {
 		previous := params.AllowsMultipleAnswers
@@ -16841,15 +17065,63 @@ func WithSendPollAllowsMultipleAnswers(value bool) SendPollOption {
 	}
 }
 
-// WithSendPollCorrectOptionID sets the CorrectOptionID field.
+// WithSendPollAllowsRevoting sets the AllowsRevoting field.
 //
-// 0-based identifier of the correct answer option, required for polls in quiz mode
-func WithSendPollCorrectOptionID(value int64) SendPollOption {
+// Pass True, if the poll allows to change chosen answer options, defaults to False for quizzes and to True for regular polls
+func WithSendPollAllowsRevoting(value bool) SendPollOption {
 	return func(params *SendPollParams) SendPollOption {
-		previous := params.CorrectOptionID
-		params.CorrectOptionID = value
+		previous := params.AllowsRevoting
+		params.AllowsRevoting = value
 
-		return WithSendPollCorrectOptionID(previous)
+		return WithSendPollAllowsRevoting(previous)
+	}
+}
+
+// WithSendPollShuffleOptions sets the ShuffleOptions field.
+//
+// Pass True, if the poll options must be shown in random order
+func WithSendPollShuffleOptions(value bool) SendPollOption {
+	return func(params *SendPollParams) SendPollOption {
+		previous := params.ShuffleOptions
+		params.ShuffleOptions = value
+
+		return WithSendPollShuffleOptions(previous)
+	}
+}
+
+// WithSendPollAllowAddingOptions sets the AllowAddingOptions field.
+//
+// Pass True, if answer options can be added to the poll after creation; not supported for anonymous polls and quizzes
+func WithSendPollAllowAddingOptions(value bool) SendPollOption {
+	return func(params *SendPollParams) SendPollOption {
+		previous := params.AllowAddingOptions
+		params.AllowAddingOptions = value
+
+		return WithSendPollAllowAddingOptions(previous)
+	}
+}
+
+// WithSendPollHideResultsUntilCloses sets the HideResultsUntilCloses field.
+//
+// Pass True, if poll results must be shown only after the poll closes
+func WithSendPollHideResultsUntilCloses(value bool) SendPollOption {
+	return func(params *SendPollParams) SendPollOption {
+		previous := params.HideResultsUntilCloses
+		params.HideResultsUntilCloses = value
+
+		return WithSendPollHideResultsUntilCloses(previous)
+	}
+}
+
+// WithSendPollCorrectOptionIDs sets the CorrectOptionIDs field.
+//
+// A JSON-serialized list of monotonically increasing 0-based identifiers of the correct answer options, required for polls in quiz mode
+func WithSendPollCorrectOptionIDs(value []int64) SendPollOption {
+	return func(params *SendPollParams) SendPollOption {
+		previous := params.CorrectOptionIDs
+		params.CorrectOptionIDs = value
+
+		return WithSendPollCorrectOptionIDs(previous)
 	}
 }
 
@@ -16895,7 +17167,7 @@ func WithSendPollExplanationEntities(value []MessageEntity) SendPollOption {
 
 // WithSendPollOpenPeriod sets the OpenPeriod field.
 //
-// Amount of time in seconds the poll will be active after creation, 5-600.
+// Amount of time in seconds the poll will be active after creation, 5-2628000.
 // Can't be used together with close_date.
 func WithSendPollOpenPeriod(value int64) SendPollOption {
 	return func(params *SendPollParams) SendPollOption {
@@ -16909,7 +17181,7 @@ func WithSendPollOpenPeriod(value int64) SendPollOption {
 // WithSendPollCloseDate sets the CloseDate field.
 //
 // Point in time (Unix timestamp) when the poll will be automatically closed.
-// Must be at least 5 and no more than 600 seconds in the future.
+// Must be at least 5 and no more than 2628000 seconds in the future.
 // Can't be used together with open_period.
 func WithSendPollCloseDate(value int64) SendPollOption {
 	return func(params *SendPollParams) SendPollOption {
@@ -16930,6 +17202,45 @@ func WithSendPollIsClosed(value bool) SendPollOption {
 		params.IsClosed = value
 
 		return WithSendPollIsClosed(previous)
+	}
+}
+
+// WithSendPollDescription sets the Description field.
+//
+// Description of the poll to be sent, 0-1024 characters after entities parsing
+func WithSendPollDescription(value string) SendPollOption {
+	return func(params *SendPollParams) SendPollOption {
+		previous := params.Description
+		params.Description = value
+
+		return WithSendPollDescription(previous)
+	}
+}
+
+// WithSendPollDescriptionParseMode sets the DescriptionParseMode field.
+//
+// Mode for parsing entities in the poll description.
+// See [formatting options] for more details.
+//
+// [formatting options]: https://core.telegram.org/bots/api#formatting-options
+func WithSendPollDescriptionParseMode(value string) SendPollOption {
+	return func(params *SendPollParams) SendPollOption {
+		previous := params.DescriptionParseMode
+		params.DescriptionParseMode = value
+
+		return WithSendPollDescriptionParseMode(previous)
+	}
+}
+
+// WithSendPollDescriptionEntities sets the DescriptionEntities field.
+//
+// A JSON-serialized list of special entities that appear in the poll description, which can be specified instead of description_parse_mode
+func WithSendPollDescriptionEntities(value []MessageEntity) SendPollOption {
+	return func(params *SendPollParams) SendPollOption {
+		previous := params.DescriptionEntities
+		params.DescriptionEntities = value
+
+		return WithSendPollDescriptionEntities(previous)
 	}
 }
 

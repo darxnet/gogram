@@ -58,6 +58,8 @@ func (ctx *Context) findHandlerOn() handleOn {
 		return handleOnChatBoost
 	case ctx.update.RemovedChatBoost != nil:
 		return handleOnRemovedChatBoost
+	case ctx.update.ManagedBot != nil:
+		return handleOnManagedBot
 	}
 
 	return 0
@@ -106,6 +108,8 @@ func (ctx *Context) User() *User {
 		return &ctx.update.ChatMember.From
 	case ctx.update.ChatJoinRequest != nil:
 		return &ctx.update.ChatJoinRequest.From
+	case ctx.update.ManagedBot != nil:
+		return &ctx.update.ManagedBot.User
 	}
 
 	return nil
@@ -2387,6 +2391,32 @@ func (ctx *Context) GetGameHighScores(
 	return err
 }
 
+// GetManagedBotToken calls Client.GetManagedBotToken with context-derived defaults.
+//
+// Use this method to get the token of a managed bot.
+// Returns the token as String on success.
+func (ctx *Context) GetManagedBotToken(
+	opts ...GetManagedBotTokenOption,
+) error {
+	params := &GetManagedBotTokenParams{
+		UserID: func(ctx *Context) int64 {
+			u := ctx.User()
+			if u == nil {
+				return 0
+			}
+
+			return u.ID
+		}(ctx),
+	}
+
+	params.Option(opts...)
+
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetManagedBotToken(context.WithoutCancel(ctx.context), params)
+
+	return err
+}
+
 // GetMe calls Client.GetMe with context-derived defaults.
 //
 // A simple method for testing your bot's authentication token.
@@ -3194,6 +3224,32 @@ func (ctx *Context) ReopenGeneralForumTopic(
 	return err
 }
 
+// ReplaceManagedBotToken calls Client.ReplaceManagedBotToken with context-derived defaults.
+//
+// Use this method to revoke the current token of a managed bot and generate a new one.
+// Returns the new token as String on success.
+func (ctx *Context) ReplaceManagedBotToken(
+	opts ...ReplaceManagedBotTokenOption,
+) error {
+	params := &ReplaceManagedBotTokenParams{
+		UserID: func(ctx *Context) int64 {
+			u := ctx.User()
+			if u == nil {
+				return 0
+			}
+
+			return u.ID
+		}(ctx),
+	}
+
+	params.Option(opts...)
+
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.ReplaceManagedBotToken(context.WithoutCancel(ctx.context), params)
+
+	return err
+}
+
 // ReplaceStickerInSet calls Client.ReplaceStickerInSet with context-derived defaults.
 //
 // Use this method to replace an existing sticker in a sticker set with a new one.
@@ -3363,6 +3419,36 @@ func (ctx *Context) SavePreparedInlineMessage(
 
 	// Detach cancellation while preserving context values for worker-side requests.
 	_, err := ctx.client.SavePreparedInlineMessage(context.WithoutCancel(ctx.context), params)
+
+	return err
+}
+
+// SavePreparedKeyboardButton calls Client.SavePreparedKeyboardButton with context-derived defaults.
+//
+// Stores a keyboard button that can be used by a user within a Mini App.
+// Returns a [PreparedKeyboardButton] object.
+//
+// [PreparedKeyboardButton]: https://core.telegram.org/bots/api#preparedkeyboardbutton
+func (ctx *Context) SavePreparedKeyboardButton(
+	button KeyboardButton,
+	opts ...SavePreparedKeyboardButtonOption,
+) error {
+	params := &SavePreparedKeyboardButtonParams{
+		UserID: func(ctx *Context) int64 {
+			u := ctx.User()
+			if u == nil {
+				return 0
+			}
+
+			return u.ID
+		}(ctx),
+		Button: button,
+	}
+
+	params.Option(opts...)
+
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SavePreparedKeyboardButton(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
