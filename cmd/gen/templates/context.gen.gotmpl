@@ -71,8 +71,9 @@ func (ctx *Context) Chat() *Chat {
             {{- end }}
         {{- end }}
     {{- end }}
+    case ctx.update.CallbackQuery != nil:
+        return ctx.update.CallbackQuery.Message.Chat()
     }
-
     return nil
 }
 
