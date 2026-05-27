@@ -89,8 +89,7 @@ func toType(s string, required bool) string {
 
 		"InlineKeyboardMarkup or ReplyKeyboardMarkup or ReplyKeyboardRemove or ForceReply": "ReplyMarkup",
 		"InputFile or String": "InputFile",
-		"InputMediaAudio, InputMediaDocument, InputMediaPhoto and InputMediaVideo": "InputMedia",
-		"Int": "int64",
+		"Int":                 "int64",
 	}
 
 	arrayDepth := 0
@@ -103,6 +102,8 @@ func toType(s string, required bool) string {
 	v, ok := typeMapping[s]
 	if ok {
 		s = v
+	} else if strings.HasPrefix(s, "InputMedia") {
+		s = "InputMedia"
 	}
 
 	if isTitle(s[0]) && !required && arrayDepth == 0 {

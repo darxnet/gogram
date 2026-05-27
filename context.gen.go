@@ -28,6 +28,8 @@ func (ctx *Context) findHandlerOn() handleOn {
 		return handleOnEditedBusinessMessage
 	case ctx.update.DeletedBusinessMessages != nil:
 		return handleOnDeletedBusinessMessages
+	case ctx.update.GuestMessage != nil:
+		return handleOnGuestMessage
 	case ctx.update.MessageReaction != nil:
 		return handleOnMessageReaction
 	case ctx.update.MessageReactionCount != nil:
@@ -86,6 +88,8 @@ func (ctx *Context) User() *User {
 		return ctx.update.BusinessMessage.From
 	case ctx.update.EditedBusinessMessage != nil:
 		return ctx.update.EditedBusinessMessage.From
+	case ctx.update.GuestMessage != nil:
+		return ctx.update.GuestMessage.From
 	case ctx.update.MessageReaction != nil:
 		return ctx.update.MessageReaction.User
 	case ctx.update.InlineQuery != nil:
@@ -136,6 +140,8 @@ func (ctx *Context) Chat() *Chat {
 		return &ctx.update.EditedBusinessMessage.Chat
 	case ctx.update.DeletedBusinessMessages != nil:
 		return &ctx.update.DeletedBusinessMessages.Chat
+	case ctx.update.GuestMessage != nil:
+		return &ctx.update.GuestMessage.Chat
 	case ctx.update.MessageReaction != nil:
 		return &ctx.update.MessageReaction.Chat
 	case ctx.update.MessageReactionCount != nil:
@@ -177,6 +183,8 @@ func (ctx *Context) Message() *Message {
 		return ctx.update.BusinessMessage
 	case ctx.update.EditedBusinessMessage != nil:
 		return ctx.update.EditedBusinessMessage
+	case ctx.update.GuestMessage != nil:
+		return ctx.update.GuestMessage
 	case ctx.update.CallbackQuery != nil:
 		return ctx.update.CallbackQuery.Message.Message
 	}
@@ -259,6 +267,36 @@ func (ctx *Context) AnswerCallbackQuery(
 
 	// Detach cancellation while preserving context values for worker-side requests.
 	_, err := ctx.client.AnswerCallbackQuery(context.WithoutCancel(ctx.context), params)
+
+	return err
+}
+
+// AnswerGuestQuery calls Client.AnswerGuestQuery with context-derived defaults.
+//
+// Use this method to reply to a received guest message.
+// On success, a [SentGuestMessage] object is returned.
+//
+// [SentGuestMessage]: https://core.telegram.org/bots/api#sentguestmessage
+func (ctx *Context) AnswerGuestQuery(
+	result InlineQueryResult,
+	opts ...AnswerGuestQueryOption,
+) error {
+	params := &AnswerGuestQueryParams{
+		GuestQueryID: func(ctx *Context) string {
+			m := ctx.Message()
+			if m == nil {
+				return ""
+			}
+
+			return m.GuestQueryID
+		}(ctx),
+		Result: result,
+	}
+
+	params.Option(opts...)
+
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.AnswerGuestQuery(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1008,6 +1046,41 @@ func (ctx *Context) DeclineSuggestedPost(
 	return err
 }
 
+// DeleteAllMessageReactions calls Client.DeleteAllMessageReactions with context-derived defaults.
+//
+// Use this method to remove up to 10000 recent reactions in a group or a supergroup chat added by a given user or chat.
+// The bot must have the 'can_delete_messages' administrator right in the chat.
+// Returns True on success.
+func (ctx *Context) DeleteAllMessageReactions(
+	opts ...DeleteAllMessageReactionsOption,
+) error {
+	params := &DeleteAllMessageReactionsParams{
+		ChatID: func(ctx *Context) string {
+			c := ctx.Chat()
+			if c == nil {
+				return ""
+			}
+
+			return c.Identifier()
+		}(ctx),
+		UserID: func(ctx *Context) int64 {
+			u := ctx.User()
+			if u == nil {
+				return 0
+			}
+
+			return u.ID
+		}(ctx),
+	}
+
+	params.Option(opts...)
+
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.DeleteAllMessageReactions(context.WithoutCancel(ctx.context), params)
+
+	return err
+}
+
 // DeleteBusinessMessages calls Client.DeleteBusinessMessages with context-derived defaults.
 //
 // Delete messages on behalf of a business account.
@@ -1169,6 +1242,49 @@ func (ctx *Context) DeleteMessage(
 
 	// Detach cancellation while preserving context values for worker-side requests.
 	_, err := ctx.client.DeleteMessage(context.WithoutCancel(ctx.context), params)
+
+	return err
+}
+
+// DeleteMessageReaction calls Client.DeleteMessageReaction with context-derived defaults.
+//
+// Use this method to remove a reaction from a message in a group or a supergroup chat.
+// The bot must have the 'can_delete_messages' administrator right in the chat.
+// Returns True on success.
+func (ctx *Context) DeleteMessageReaction(
+	opts ...DeleteMessageReactionOption,
+) error {
+	params := &DeleteMessageReactionParams{
+		ChatID: func(ctx *Context) string {
+			c := ctx.Chat()
+			if c == nil {
+				return ""
+			}
+
+			return c.Identifier()
+		}(ctx),
+		MessageID: func(ctx *Context) int64 {
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			return m.MessageID
+		}(ctx),
+		UserID: func(ctx *Context) int64 {
+			u := ctx.User()
+			if u == nil {
+				return 0
+			}
+
+			return u.ID
+		}(ctx),
+	}
+
+	params.Option(opts...)
+
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.DeleteMessageReaction(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -1515,13 +1631,13 @@ func (ctx *Context) EditMessageChecklist(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) int64 {
+		ChatID: func(ctx *Context) string {
 			c := ctx.Chat()
 			if c == nil {
-				return 0
+				return ""
 			}
 
-			return c.ID
+			return c.Identifier()
 		}(ctx),
 		MessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
@@ -1601,8 +1717,8 @@ func (ctx *Context) EditMessageLiveLocation(
 
 // EditMessageMedia calls Client.EditMessageMedia with context-derived defaults.
 //
-// Use this method to edit animation, audio, document, photo, or video messages, or to add media to text messages.
-// If a message is part of a message album, then it can be edited only to an audio for audio albums, only to a document for document albums and to a photo or a video otherwise.
+// Use this method to edit animation, audio, document, live photo, photo, or video messages, or to add media to text messages.
+// If a message is part of a message album, then it can be edited only to an audio for audio albums, only to a document for document albums and to a photo, a live photo, or a video otherwise.
 // When an inline message is edited, a new file can't be uploaded; use a previously uploaded file via its file_id or specify a URL.
 // On success, if the edited message is not an inline message, the edited [Message] is returned, otherwise True is returned.
 // Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within 48 hours from the time they were sent.
@@ -2124,7 +2240,7 @@ func (ctx *Context) GetChat(
 
 // GetChatAdministrators calls Client.GetChatAdministrators with context-derived defaults.
 //
-// Use this method to get a list of administrators in a chat, which aren't bots.
+// Use this method to get a list of administrators in a chat.
 // Returns an Array of [ChatMember] objects.
 //
 // [ChatMember]: https://core.telegram.org/bots/api#chatmember
@@ -2388,6 +2504,34 @@ func (ctx *Context) GetGameHighScores(
 
 	// Detach cancellation while preserving context values for worker-side requests.
 	_, err := ctx.client.GetGameHighScores(context.WithoutCancel(ctx.context), params)
+
+	return err
+}
+
+// GetManagedBotAccessSettings calls Client.GetManagedBotAccessSettings with context-derived defaults.
+//
+// Use this method to get the access settings of a managed bot.
+// Returns a [BotAccessSettings] object on success.
+//
+// [BotAccessSettings]: https://core.telegram.org/bots/api#botaccesssettings
+func (ctx *Context) GetManagedBotAccessSettings(
+	opts ...GetManagedBotAccessSettingsOption,
+) error {
+	params := &GetManagedBotAccessSettingsParams{
+		UserID: func(ctx *Context) int64 {
+			u := ctx.User()
+			if u == nil {
+				return 0
+			}
+
+			return u.ID
+		}(ctx),
+	}
+
+	params.Option(opts...)
+
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetManagedBotAccessSettings(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2676,6 +2820,36 @@ func (ctx *Context) GetUserGifts(
 
 	// Detach cancellation while preserving context values for worker-side requests.
 	_, err := ctx.client.GetUserGifts(context.WithoutCancel(ctx.context), params)
+
+	return err
+}
+
+// GetUserPersonalChatMessages calls Client.GetUserPersonalChatMessages with context-derived defaults.
+//
+// Use this method to get the last messages from the personal chat (i.e., the chat currently added to their profile) of a given user.
+// On success, an array of [Message] objects is returned.
+//
+// [Message]: https://core.telegram.org/bots/api#message
+func (ctx *Context) GetUserPersonalChatMessages(
+	limit int64,
+	opts ...GetUserPersonalChatMessagesOption,
+) error {
+	params := &GetUserPersonalChatMessagesParams{
+		UserID: func(ctx *Context) int64 {
+			u := ctx.User()
+			if u == nil {
+				return 0
+			}
+
+			return u.ID
+		}(ctx),
+		Limit: limit,
+	}
+
+	params.Option(opts...)
+
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.GetUserPersonalChatMessages(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -3656,13 +3830,13 @@ func (ctx *Context) SendChecklist(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) int64 {
+		ChatID: func(ctx *Context) string {
 			c := ctx.Chat()
 			if c == nil {
-				return 0
+				return ""
 			}
 
-			return c.ID
+			return c.Identifier()
 		}(ctx),
 		Checklist: checklist,
 	}
@@ -3877,13 +4051,13 @@ func (ctx *Context) SendGame(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) int64 {
+		ChatID: func(ctx *Context) string {
 			c := ctx.Chat()
 			if c == nil {
-				return 0
+				return ""
 			}
 
-			return c.ID
+			return c.Identifier()
 		}(ctx),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
@@ -4004,6 +4178,74 @@ func (ctx *Context) SendInvoice(
 	return err
 }
 
+// SendLivePhoto calls Client.SendLivePhoto with context-derived defaults.
+//
+// Use this method to send live photos.
+// On success, the sent [Message] is returned.
+//
+// [Message]: https://core.telegram.org/bots/api#message
+func (ctx *Context) SendLivePhoto(
+	livePhoto InputFile,
+	photo InputFile,
+	opts ...SendLivePhotoOption,
+) error {
+	params := &SendLivePhotoParams{
+		BusinessConnectionID: func(ctx *Context) string {
+			m := ctx.Message()
+			if m == nil {
+				return ""
+			}
+
+			return m.BusinessConnectionID
+		}(ctx),
+		ChatID: func(ctx *Context) string {
+			c := ctx.Chat()
+			if c == nil {
+				return ""
+			}
+
+			return c.Identifier()
+		}(ctx),
+		MessageThreadID: func(ctx *Context) int64 {
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			return m.MessageThreadID
+		}(ctx),
+		DirectMessagesTopicID: func(ctx *Context) int64 {
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			if m.DirectMessagesTopic == nil {
+				return 0
+			}
+
+			return m.DirectMessagesTopic.TopicID
+		}(ctx),
+		LivePhoto: livePhoto,
+		Photo:     photo,
+	}
+
+	params.Option(opts...)
+
+	defaultParseMode := ctx.client.defaultParseMode()
+
+	if defaultParseMode != "" {
+		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
+			params.ParseMode = defaultParseMode
+		}
+	}
+
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendLivePhoto(context.WithoutCancel(ctx.context), params)
+
+	return err
+}
+
 // SendLocation calls Client.SendLocation with context-derived defaults.
 //
 // Use this method to send point on the map.
@@ -4066,7 +4308,7 @@ func (ctx *Context) SendLocation(
 
 // SendMediaGroup calls Client.SendMediaGroup with context-derived defaults.
 //
-// Use this method to send a group of photos, videos, documents or audios as an album.
+// Use this method to send a group of photos, live photos, videos, documents or audios as an album.
 // Documents and audio files can be only grouped in an album with messages of the same type.
 // On success, an array of [Message] objects that were sent is returned.
 //
@@ -4200,10 +4442,12 @@ func (ctx *Context) SendMessage(
 // SendMessageDraft calls Client.SendMessageDraft with context-derived defaults.
 //
 // Use this method to stream a partial message to a user while the message is being generated.
+// Note that the streamed draft is ephemeral and acts as a temporary 30-second preview - once the output is finalized, you must call [sendMessage] with the complete message to persist it in the user's chat.
 // Returns True on success.
+//
+// [sendMessage]: https://core.telegram.org/bots/api#sendmessage
 func (ctx *Context) SendMessageDraft(
 	draftID int64,
-	text string,
 	opts ...SendMessageDraftOption,
 ) error {
 	params := &SendMessageDraftParams{
@@ -4224,7 +4468,6 @@ func (ctx *Context) SendMessageDraft(
 			return m.MessageThreadID
 		}(ctx),
 		DraftID: draftID,
-		Text:    text,
 	}
 
 	params.Option(opts...)
@@ -5214,6 +5457,34 @@ func (ctx *Context) SetGameScore(
 	return err
 }
 
+// SetManagedBotAccessSettings calls Client.SetManagedBotAccessSettings with context-derived defaults.
+//
+// Use this method to change the access settings of a managed bot.
+// Returns True on success.
+func (ctx *Context) SetManagedBotAccessSettings(
+	isAccessRestricted bool,
+	opts ...SetManagedBotAccessSettingsOption,
+) error {
+	params := &SetManagedBotAccessSettingsParams{
+		UserID: func(ctx *Context) int64 {
+			u := ctx.User()
+			if u == nil {
+				return 0
+			}
+
+			return u.ID
+		}(ctx),
+		IsAccessRestricted: isAccessRestricted,
+	}
+
+	params.Option(opts...)
+
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SetManagedBotAccessSettings(context.WithoutCancel(ctx.context), params)
+
+	return err
+}
+
 // SetMessageReaction calls Client.SetMessageReaction with context-derived defaults.
 //
 // Use this method to change the chosen reactions on a message.
@@ -6110,14 +6381,19 @@ func defaultParseModeToInputMedia(media *InputMedia, parseMode string) {
 			media.InputMediaAnimation.ParseMode = parseMode
 		}
 
+	case media.InputMediaAudio != nil:
+		if media.InputMediaAudio.ParseMode == "" && len(media.InputMediaAudio.CaptionEntities) == 0 {
+			media.InputMediaAudio.ParseMode = parseMode
+		}
+
 	case media.InputMediaDocument != nil:
 		if media.InputMediaDocument.ParseMode == "" && len(media.InputMediaDocument.CaptionEntities) == 0 {
 			media.InputMediaDocument.ParseMode = parseMode
 		}
 
-	case media.InputMediaAudio != nil:
-		if media.InputMediaAudio.ParseMode == "" && len(media.InputMediaAudio.CaptionEntities) == 0 {
-			media.InputMediaAudio.ParseMode = parseMode
+	case media.InputMediaLivePhoto != nil:
+		if media.InputMediaLivePhoto.ParseMode == "" && len(media.InputMediaLivePhoto.CaptionEntities) == 0 {
+			media.InputMediaLivePhoto.ParseMode = parseMode
 		}
 
 	case media.InputMediaPhoto != nil:

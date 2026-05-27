@@ -14,6 +14,7 @@ const (
 	handleOnBusinessMessage
 	handleOnEditedBusinessMessage
 	handleOnDeletedBusinessMessages
+	handleOnGuestMessage
 	handleOnMessageReaction
 	handleOnMessageReactionCount
 	handleOnInlineQuery
@@ -103,6 +104,15 @@ func (rg *RouterGroup) HandleOnDeletedBusinessMessages(handler func(*Context, *B
 	}
 
 	rg.handleOn(handleOnDeletedBusinessMessages, fn, filters...)
+}
+
+// HandleOnGuestMessage registers a handler for updates containing GuestMessage.
+func (rg *RouterGroup) HandleOnGuestMessage(handler func(*Context, *Message) error, filters ...Filter) {
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().GuestMessage)
+	}
+
+	rg.handleOn(handleOnGuestMessage, fn, filters...)
 }
 
 // HandleOnMessageReaction registers a handler for updates containing MessageReaction.

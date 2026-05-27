@@ -370,7 +370,7 @@ type BackgroundTypePattern struct {
 	// Optional.
 	// True, if the background fill must be applied only to the pattern itself.
 	// All other pixels are black in this case.
-	// For dark themes only
+	// For dark themes only.
 	IsInverted bool `json:"is_inverted,omitempty"`
 
 	// Optional.
@@ -415,6 +415,19 @@ type Birthdate struct {
 	Year int64 `json:"year,omitempty"`
 }
 
+// BotAccessSettings
+//
+// This object describes the access settings of a bot.
+type BotAccessSettings struct {
+	// True, if only selected users can access the bot.
+	// The bot's owner can always access it.
+	IsAccessRestricted bool `json:"is_access_restricted"`
+
+	// Optional.
+	// The list of other users who have access to the bot if the access is restricted
+	AddedUsers []User `json:"added_users,omitempty"`
+}
+
 // BotCommand
 //
 // This object represents a bot command.
@@ -423,7 +436,7 @@ type BotCommand struct {
 	// Can contain only lowercase English letters, digits and underscores.
 	Command string `json:"command"`
 
-	// Description of the command; 1-256 characters.
+	// Description of the command; 1-256 characters
 	Description string `json:"description"`
 }
 
@@ -590,7 +603,7 @@ type BotCommandScopeChat struct {
 	// Scope type, must be chat
 	Type string `json:"type"`
 
-	// Unique identifier for the target chat or username of the target supergroup (in the format @supergroupusername).
+	// Unique identifier for the target chat or username of the target supergroup in the format @username.
 	// Channel direct messages chats and channel chats aren't supported.
 	ChatID string `json:"chat_id"`
 }
@@ -604,7 +617,7 @@ type BotCommandScopeChatAdministrators struct {
 	// Scope type, must be chat_administrators
 	Type string `json:"type"`
 
-	// Unique identifier for the target chat or username of the target supergroup (in the format @supergroupusername).
+	// Unique identifier for the target chat or username of the target supergroup in the format @username.
 	// Channel direct messages chats and channel chats aren't supported.
 	ChatID string `json:"chat_id"`
 }
@@ -618,7 +631,7 @@ type BotCommandScopeChatMember struct {
 	// Scope type, must be chat_member
 	Type string `json:"type"`
 
-	// Unique identifier for the target chat or username of the target supergroup (in the format @supergroupusername).
+	// Unique identifier for the target chat or username of the target supergroup in the format @username.
 	// Channel direct messages chats and channel chats aren't supported.
 	ChatID string `json:"chat_id"`
 
@@ -845,7 +858,7 @@ type CallbackQuery struct {
 	Message *MaybeInaccessibleMessage `json:"message,omitempty"`
 
 	// Optional.
-	// Identifier of the message sent via the bot in inline mode, that originated the query.
+	// Identifier of the message sent via the bot in inline mode, that originated the query
 	InlineMessageID string `json:"inline_message_id,omitempty"`
 
 	// Global identifier, uniquely corresponding to the chat to which the message with the callback button was sent.
@@ -1371,7 +1384,7 @@ type ChatFullInfo struct {
 	UniqueGiftColors *UniqueGiftColors `json:"unique_gift_colors,omitempty"`
 
 	// Optional.
-	// The number of Telegram Stars a general user have to pay to send a message to the chat
+	// The number of Telegram Stars a general user has to pay to send a message to the chat
 	PaidMessageStarCount int64 `json:"paid_message_star_count,omitempty"`
 }
 
@@ -1440,7 +1453,7 @@ type ChatJoinRequest struct {
 	Date int64 `json:"date"`
 
 	// Optional.
-	// Bio of the user.
+	// Bio of the user
 	Bio string `json:"bio,omitempty"`
 
 	// Optional.
@@ -1663,7 +1676,7 @@ type ChatMemberBanned struct {
 	User User `json:"user"`
 
 	// Date when restrictions will be lifted for this user; Unix time.
-	// If 0, then the user is banned forever
+	// If 0, then the user is banned forever.
 	UntilDate int64 `json:"until_date"`
 }
 
@@ -1771,6 +1784,9 @@ type ChatMemberRestricted struct {
 	// True, if the user is allowed to add web page previews to their messages
 	CanAddWebPagePreviews bool `json:"can_add_web_page_previews"`
 
+	// True, if the user is allowed to react to messages
+	CanReactToMessages bool `json:"can_react_to_messages"`
+
 	// True, if the user is allowed to edit their own tag
 	CanEditTag bool `json:"can_edit_tag"`
 
@@ -1787,7 +1803,7 @@ type ChatMemberRestricted struct {
 	CanManageTopics bool `json:"can_manage_topics"`
 
 	// Date when restrictions will be lifted for this user; Unix time.
-	// If 0, then the user is restricted forever
+	// If 0, then the user is restricted forever.
 	UntilDate int64 `json:"until_date"`
 }
 
@@ -1811,7 +1827,7 @@ type ChatMemberUpdated struct {
 	NewChatMember ChatMember `json:"new_chat_member"`
 
 	// Optional.
-	// Chat invite link, which was used by the user to join the chat; for joining by invite link events only.
+	// Chat invite link, which was used by the user to join the chat; for joining by invite link events only
 	InviteLink *ChatInviteLink `json:"invite_link,omitempty"`
 
 	// Optional.
@@ -1836,7 +1852,7 @@ type ChatOwnerChanged struct {
 // Describes a service message about the chat owner leaving the chat.
 type ChatOwnerLeft struct {
 	// Optional.
-	// The user which will be the new owner of the chat if the previous owner does not return to the chat
+	// The user who will become the new owner of the chat if the previous owner does not return to the chat
 	NewOwner *User `json:"new_owner,omitempty"`
 }
 
@@ -1885,12 +1901,18 @@ type ChatPermissions struct {
 	CanAddWebPagePreviews bool `json:"can_add_web_page_previews,omitempty"`
 
 	// Optional.
-	// True, if the user is allowed to edit their own tag
+	// True, if the user is allowed to react to messages.
+	// If omitted, defaults to the value of can_send_messages.
+	CanReactToMessages bool `json:"can_react_to_messages,omitempty"`
+
+	// Optional.
+	// True, if the user is allowed to edit their own tag.
+	// If omitted, defaults to the value of can_pin_messages.
 	CanEditTag bool `json:"can_edit_tag,omitempty"`
 
 	// Optional.
 	// True, if the user is allowed to change the chat title, photo and other settings.
-	// Ignored in public supergroups
+	// Ignored in public supergroups.
 	CanChangeInfo bool `json:"can_change_info,omitempty"`
 
 	// Optional.
@@ -1899,12 +1921,12 @@ type ChatPermissions struct {
 
 	// Optional.
 	// True, if the user is allowed to pin messages.
-	// Ignored in public supergroups
+	// Ignored in public supergroups.
 	CanPinMessages bool `json:"can_pin_messages,omitempty"`
 
 	// Optional.
 	// True, if the user is allowed to create forum topics.
-	// If omitted defaults to the value of can_pin_messages
+	// If omitted defaults to the value of can_pin_messages.
 	CanManageTopics bool `json:"can_manage_topics,omitempty"`
 }
 
@@ -1945,11 +1967,11 @@ type ChatShared struct {
 	ChatID int64 `json:"chat_id"`
 
 	// Optional.
-	// Title of the chat, if the title was requested by the bot.
+	// Title of the chat, if the title was requested by the bot
 	Title string `json:"title,omitempty"`
 
 	// Optional.
-	// Username of the chat, if the username was requested by the bot and available.
+	// Username of the chat, if the username was requested by the bot and available
 	Username string `json:"username,omitempty"`
 
 	// Optional.
@@ -2146,7 +2168,7 @@ type DirectMessagesTopic struct {
 
 	// Optional.
 	// Information about the user that created the topic.
-	// Currently, it is always present
+	// Currently, it is always present.
 	User *User `json:"user,omitempty"`
 }
 
@@ -2302,6 +2324,10 @@ type ExternalReplyInfo struct {
 	Document *Document `json:"document,omitempty"`
 
 	// Optional.
+	// Message is a live photo, information about the live photo
+	LivePhoto *LivePhoto `json:"live_photo,omitempty"`
+
+	// Optional.
 	// Message contains paid media; information about the paid media
 	PaidMedia *PaidMediaInfo `json:"paid_media,omitempty"`
 
@@ -2415,7 +2441,7 @@ type File struct {
 //
 // Upon receiving a message with this object, Telegram clients will display a reply interface to the user (act as if the user has selected the bot's message and tapped 'Reply').
 // This can be extremely useful if you want to create user-friendly step-by-step interfaces without having to sacrifice [privacy mode].
-// Not supported in channels and for messages sent on behalf of a Telegram Business account.
+// Not supported in channels and for messages sent on behalf of a user account.
 //
 // [privacy mode]: https://core.telegram.org/bots/features#privacy-mode
 type ForceReply struct {
@@ -2513,7 +2539,7 @@ type Game struct {
 	// Description of the game
 	Description string `json:"description"`
 
-	// Photo that will be displayed in the game message in chats.
+	// Photo that will be displayed in the game message in chats
 	Photo []PhotoSize `json:"photo"`
 
 	// Optional.
@@ -2531,7 +2557,7 @@ type Game struct {
 
 	// Optional.
 	// Animation that will be displayed in the game message in chats.
-	// Upload via [BotFather]
+	// Upload via [BotFather].
 	//
 	// [BotFather]: https://t.me/botfather
 	Animation *Animation `json:"animation,omitempty"`
@@ -2674,7 +2700,7 @@ type GiftInfo struct {
 
 	// Optional.
 	// Unique number reserved for this gift when upgraded.
-	// See the number field in [UniqueGift]
+	// See the number field in [UniqueGift].
 	//
 	// [UniqueGift]: https://core.telegram.org/bots/api#uniquegift
 	UniqueGiftNumber int64 `json:"unique_gift_number,omitempty"`
@@ -2859,7 +2885,7 @@ type InlineKeyboardButton struct {
 	// Description of the [Web App] that will be launched when the user presses the button.
 	// The Web App will be able to send an arbitrary message on behalf of the user using the method [answerWebAppQuery].
 	// Available only in private chats between a user and the bot.
-	// Not supported for messages sent on behalf of a Telegram Business account.
+	// Not supported for messages sent on behalf of a business account.
 	//
 	// [Web App]: https://core.telegram.org/bots/webapps
 	// [answerWebAppQuery]: https://core.telegram.org/bots/api#answerwebappquery
@@ -2875,7 +2901,7 @@ type InlineKeyboardButton struct {
 	// Optional.
 	// If set, pressing the button will prompt the user to select one of their chats, open that chat and insert the bot's username and the specified inline query in the input field.
 	// May be empty, in which case just the bot's username will be inserted.
-	// Not supported for messages sent in channel direct messages chats and on behalf of a Telegram Business account.
+	// Not supported for messages sent in channel direct messages chats and on behalf of a business account.
 	SwitchInlineQuery string `json:"switch_inline_query,omitempty"`
 
 	// Optional.
@@ -2883,16 +2909,16 @@ type InlineKeyboardButton struct {
 	// May be empty, in which case only the bot's username will be inserted.
 	//
 	// This offers a quick way for the user to open your bot in inline mode in the same chat - good for selecting something from multiple options.
-	// Not supported in channels and for messages sent in channel direct messages chats and on behalf of a Telegram Business account.
+	// Not supported in channels and for messages sent in channel direct messages chats and on behalf of a business account.
 	SwitchInlineQueryCurrentChat string `json:"switch_inline_query_current_chat,omitempty"`
 
 	// Optional.
 	// If set, pressing the button will prompt the user to select one of their chats of the specified type, open that chat and insert the bot's username and the specified inline query in the input field.
-	// Not supported for messages sent in channel direct messages chats and on behalf of a Telegram Business account.
+	// Not supported for messages sent in channel direct messages chats and on behalf of a business account.
 	SwitchInlineQueryChosenChat *SwitchInlineQueryChosenChat `json:"switch_inline_query_chosen_chat,omitempty"`
 
 	// Optional.
-	// Description of the button that copies the specified text to the clipboard.
+	// Description of the button that copies the specified text to the clipboard
 	CopyText *CopyTextButton `json:"copy_text,omitempty"`
 
 	// Optional.
@@ -2943,7 +2969,7 @@ type InlineQuery struct {
 	// Optional.
 	// Type of the chat from which the inline query was sent.
 	// Can be either “sender” for a private chat with the inline query sender, “private”, “group”, “supergroup”, or “channel”.
-	// The chat type should be always known for requests sent from official clients and most third-party clients, unless the request was sent from a secret chat
+	// The chat type should be always known for requests sent from official clients and most third-party clients, unless the request was sent from a secret chat.
 	ChatType string `json:"chat_type,omitempty"`
 
 	// Optional.
@@ -3773,7 +3799,7 @@ type InlineQueryResultGif struct {
 
 	// Optional.
 	// MIME type of the thumbnail, must be one of “image/jpeg”, “image/gif”, or “video/mp4”.
-	// Defaults to “image/jpeg”
+	// Defaults to “image/jpeg”.
 	ThumbnailMimeType string `json:"thumbnail_mime_type,omitempty"`
 
 	// Optional.
@@ -3836,7 +3862,7 @@ type InlineQueryResultLocation struct {
 	HorizontalAccuracy float64 `json:"horizontal_accuracy,omitempty"`
 
 	// Optional.
-	// Period in seconds during which the location can be updated, should be between 60 and 86400, or 0x7FFFFFFF for live locations that can be edited indefinitely.
+	// Period in seconds during which the location can be updated, must be between 60 and 86400, or 0x7FFFFFFF for live locations that can be edited indefinitely
 	LivePeriod int64 `json:"live_period,omitempty"`
 
 	// Optional.
@@ -3904,7 +3930,7 @@ type InlineQueryResultMpeg4Gif struct {
 
 	// Optional.
 	// MIME type of the thumbnail, must be one of “image/jpeg”, “image/gif”, or “video/mp4”.
-	// Defaults to “image/jpeg”
+	// Defaults to “image/jpeg”.
 	ThumbnailMimeType string `json:"thumbnail_mime_type,omitempty"`
 
 	// Optional.
@@ -3955,7 +3981,7 @@ type InlineQueryResultPhoto struct {
 
 	// A valid URL of the photo.
 	// Photo must be in JPEG format.
-	// Photo size must not exceed 5MB
+	// Photo size must not exceed 5MB.
 	PhotoUrl string `json:"photo_url"`
 
 	// URL of the thumbnail for the photo
@@ -4444,7 +4470,7 @@ type InputLocationMessageContent struct {
 	HorizontalAccuracy float64 `json:"horizontal_accuracy,omitempty"`
 
 	// Optional.
-	// Period in seconds during which the location can be updated, should be between 60 and 86400, or 0x7FFFFFFF for live locations that can be edited indefinitely.
+	// Period in seconds during which the location can be updated, must be between 60 and 86400, or 0x7FFFFFFF for live locations that can be edited indefinitely
 	LivePeriod int64 `json:"live_period,omitempty"`
 
 	// Optional.
@@ -4466,9 +4492,11 @@ type InputLocationMessageContent struct {
 //
 // [InputMediaAnimation]
 //
+// [InputMediaAudio]
+//
 // [InputMediaDocument]
 //
-// [InputMediaAudio]
+// [InputMediaLivePhoto]
 //
 // [InputMediaPhoto]
 //
@@ -4476,14 +4504,16 @@ type InputLocationMessageContent struct {
 //
 //
 // [InputMediaAnimation]: https://core.telegram.org/bots/api#inputmediaanimation
-// [InputMediaDocument]: https://core.telegram.org/bots/api#inputmediadocument
 // [InputMediaAudio]: https://core.telegram.org/bots/api#inputmediaaudio
+// [InputMediaDocument]: https://core.telegram.org/bots/api#inputmediadocument
+// [InputMediaLivePhoto]: https://core.telegram.org/bots/api#inputmedialivephoto
 // [InputMediaPhoto]: https://core.telegram.org/bots/api#inputmediaphoto
 // [InputMediaVideo]: https://core.telegram.org/bots/api#inputmediavideo
 type InputMedia struct {
 	*InputMediaAnimation
-	*InputMediaDocument
 	*InputMediaAudio
+	*InputMediaDocument
+	*InputMediaLivePhoto
 	*InputMediaPhoto
 	*InputMediaVideo
 }
@@ -4495,14 +4525,19 @@ func (r *InputMedia) MarshalJSON() ([]byte, error) {
 		return json.Marshal(r.InputMediaAnimation)
 	}
 
+	if r.InputMediaAudio != nil {
+		r.InputMediaAudio.Type = "audio"
+		return json.Marshal(r.InputMediaAudio)
+	}
+
 	if r.InputMediaDocument != nil {
 		r.InputMediaDocument.Type = "document"
 		return json.Marshal(r.InputMediaDocument)
 	}
 
-	if r.InputMediaAudio != nil {
-		r.InputMediaAudio.Type = "audio"
-		return json.Marshal(r.InputMediaAudio)
+	if r.InputMediaLivePhoto != nil {
+		r.InputMediaLivePhoto.Type = "live_photo"
+		return json.Marshal(r.InputMediaLivePhoto)
 	}
 
 	if r.InputMediaPhoto != nil {
@@ -4535,13 +4570,17 @@ func (r *InputMedia) UnmarshalJSON(data []byte) error {
 		r.InputMediaAnimation = new(InputMediaAnimation)
 		return json.Unmarshal(data, r.InputMediaAnimation)
 
+	case "audio":
+		r.InputMediaAudio = new(InputMediaAudio)
+		return json.Unmarshal(data, r.InputMediaAudio)
+
 	case "document":
 		r.InputMediaDocument = new(InputMediaDocument)
 		return json.Unmarshal(data, r.InputMediaDocument)
 
-	case "audio":
-		r.InputMediaAudio = new(InputMediaAudio)
-		return json.Unmarshal(data, r.InputMediaAudio)
+	case "live_photo":
+		r.InputMediaLivePhoto = new(InputMediaLivePhoto)
+		return json.Unmarshal(data, r.InputMediaLivePhoto)
 
 	case "photo":
 		r.InputMediaPhoto = new(InputMediaPhoto)
@@ -4716,6 +4755,71 @@ type InputMediaDocument struct {
 	DisableContentTypeDetection bool `json:"disable_content_type_detection,omitempty"`
 }
 
+// InputMediaLivePhoto
+//
+// Represents a live photo to be sent.
+type InputMediaLivePhoto struct {
+	// Type of the result, must be live_photo
+	Type string `json:"type"`
+
+	// Video of the live photo to send.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
+	// [More information on Sending Files »].
+	// Sending live photos by a URL is currently unsupported.
+	//
+	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
+	Media InputFile `json:"media"`
+
+	// The static photo to send.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
+	// [More information on Sending Files »].
+	// Sending live photos by a URL is currently unsupported.
+	//
+	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
+	Photo InputFile `json:"photo"`
+
+	// Optional.
+	// Caption of the live photo to be sent, 0-1024 characters after entities parsing
+	Caption string `json:"caption,omitempty"`
+
+	// Optional.
+	// Mode for parsing entities in the live photo caption.
+	// See [formatting options] for more details.
+	//
+	// [formatting options]: https://core.telegram.org/bots/api#formatting-options
+	ParseMode string `json:"parse_mode,omitempty"`
+
+	// Optional.
+	// List of special entities that appear in the caption, which can be specified instead of parse_mode
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
+
+	// Optional.
+	// Pass True, if the caption must be shown above the message media
+	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
+
+	// Optional.
+	// Pass True if the live photo needs to be covered with a spoiler animation
+	HasSpoiler bool `json:"has_spoiler,omitempty"`
+}
+
+// InputMediaLocation
+//
+// Represents a location to be sent.
+type InputMediaLocation struct {
+	// Type of the result, must be location
+	Type string `json:"type"`
+
+	// Latitude of the location
+	Latitude float64 `json:"latitude"`
+
+	// Longitude of the location
+	Longitude float64 `json:"longitude"`
+
+	// Optional.
+	// The radius of uncertainty for the location, measured in meters; 0-1500
+	HorizontalAccuracy float64 `json:"horizontal_accuracy,omitempty"`
+}
+
 // InputMediaPhoto
 //
 // Represents a photo to be sent.
@@ -4752,6 +4856,65 @@ type InputMediaPhoto struct {
 	// Optional.
 	// Pass True if the photo needs to be covered with a spoiler animation
 	HasSpoiler bool `json:"has_spoiler,omitempty"`
+}
+
+// InputMediaSticker
+//
+// Represents a sticker file to be sent.
+type InputMediaSticker struct {
+	// Type of the result, must be sticker
+	Type string `json:"type"`
+
+	// File to send.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a .WEBP sticker from the Internet, or pass “attach://<file_attach_name>” to upload a new .WEBP, .TGS, or .WEBM sticker using multipart/form-data under <file_attach_name> name.
+	// [More information on Sending Files »]
+	//
+	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
+	Media InputFile `json:"media"`
+
+	// Optional.
+	// Emoji associated with the sticker; only for just uploaded stickers
+	Emoji string `json:"emoji,omitempty"`
+}
+
+// InputMediaVenue
+//
+// Represents a venue to be sent.
+type InputMediaVenue struct {
+	// Type of the result, must be venue
+	Type string `json:"type"`
+
+	// Latitude of the location
+	Latitude float64 `json:"latitude"`
+
+	// Longitude of the location
+	Longitude float64 `json:"longitude"`
+
+	// Name of the venue
+	Title string `json:"title"`
+
+	// Address of the venue
+	Address string `json:"address"`
+
+	// Optional.
+	// Foursquare identifier of the venue
+	FoursquareID string `json:"foursquare_id,omitempty"`
+
+	// Optional.
+	// Foursquare type of the venue, if known.
+	// (For example, “arts_entertainment/default”, “arts_entertainment/aquarium” or “food/icecream”.)
+	FoursquareType string `json:"foursquare_type,omitempty"`
+
+	// Optional.
+	// Google Places identifier of the venue
+	GooglePlaceID string `json:"google_place_id,omitempty"`
+
+	// Optional.
+	// Google Places type of the venue.
+	// (See [supported types].)
+	//
+	// [supported types]: https://developers.google.com/places/web-service/supported_types
+	GooglePlaceType string `json:"google_place_type,omitempty"`
 }
 
 // InputMediaVideo
@@ -4892,20 +5055,29 @@ func (r *InputMessageContent) MarshalJSON() ([]byte, error) {
 // Currently, it can be one of
 //
 //
+// [InputPaidMediaLivePhoto]
+//
 // [InputPaidMediaPhoto]
 //
 // [InputPaidMediaVideo]
 //
 //
+// [InputPaidMediaLivePhoto]: https://core.telegram.org/bots/api#inputpaidmedialivephoto
 // [InputPaidMediaPhoto]: https://core.telegram.org/bots/api#inputpaidmediaphoto
 // [InputPaidMediaVideo]: https://core.telegram.org/bots/api#inputpaidmediavideo
 type InputPaidMedia struct {
+	*InputPaidMediaLivePhoto
 	*InputPaidMediaPhoto
 	*InputPaidMediaVideo
 }
 
 // MarshalJSON marshals the currently set subtype of InputPaidMedia.
 func (r *InputPaidMedia) MarshalJSON() ([]byte, error) {
+	if r.InputPaidMediaLivePhoto != nil {
+		r.InputPaidMediaLivePhoto.Type = "live_photo"
+		return json.Marshal(r.InputPaidMediaLivePhoto)
+	}
+
 	if r.InputPaidMediaPhoto != nil {
 		r.InputPaidMediaPhoto.Type = "photo"
 		return json.Marshal(r.InputPaidMediaPhoto)
@@ -4932,6 +5104,10 @@ func (r *InputPaidMedia) UnmarshalJSON(data []byte) error {
 	}
 
 	switch v.Discriminator {
+	case "live_photo":
+		r.InputPaidMediaLivePhoto = new(InputPaidMediaLivePhoto)
+		return json.Unmarshal(data, r.InputPaidMediaLivePhoto)
+
 	case "photo":
 		r.InputPaidMediaPhoto = new(InputPaidMediaPhoto)
 		return json.Unmarshal(data, r.InputPaidMediaPhoto)
@@ -4943,6 +5119,30 @@ func (r *InputPaidMedia) UnmarshalJSON(data []byte) error {
 	default:
 		return errors.New("unknown subtype value: " + v.Discriminator)
 	}
+}
+
+// InputPaidMediaLivePhoto
+//
+// The paid media to send is a live photo.
+type InputPaidMediaLivePhoto struct {
+	// Type of the media, must be live_photo
+	Type string `json:"type"`
+
+	// Video of the live photo to send.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
+	// [More information on Sending Files »].
+	// Sending live photos by a URL is currently unsupported.
+	//
+	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
+	Media InputFile `json:"media"`
+
+	// The static photo to send.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
+	// [More information on Sending Files »].
+	// Sending live photos by a URL is currently unsupported.
+	//
+	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
+	Photo InputFile `json:"photo"`
 }
 
 // InputPaidMediaPhoto
@@ -5014,6 +5214,143 @@ type InputPaidMediaVideo struct {
 	SupportsStreaming bool `json:"supports_streaming,omitempty"`
 }
 
+// InputPollMedia
+//
+// This object represents the content of a poll description or a quiz explanation to be sent.
+// It should be one of
+//
+//
+// [InputMediaAnimation]
+//
+// [InputMediaAudio]
+//
+// [InputMediaDocument]
+//
+// [InputMediaLivePhoto]
+//
+// [InputMediaLocation]
+//
+// [InputMediaPhoto]
+//
+// [InputMediaVenue]
+//
+// [InputMediaVideo]
+//
+//
+// [InputMediaAnimation]: https://core.telegram.org/bots/api#inputmediaanimation
+// [InputMediaAudio]: https://core.telegram.org/bots/api#inputmediaaudio
+// [InputMediaDocument]: https://core.telegram.org/bots/api#inputmediadocument
+// [InputMediaLivePhoto]: https://core.telegram.org/bots/api#inputmedialivephoto
+// [InputMediaLocation]: https://core.telegram.org/bots/api#inputmedialocation
+// [InputMediaPhoto]: https://core.telegram.org/bots/api#inputmediaphoto
+// [InputMediaVenue]: https://core.telegram.org/bots/api#inputmediavenue
+// [InputMediaVideo]: https://core.telegram.org/bots/api#inputmediavideo
+type InputPollMedia struct {
+	*InputMediaAnimation
+	*InputMediaAudio
+	*InputMediaDocument
+	*InputMediaLivePhoto
+	*InputMediaLocation
+	*InputMediaPhoto
+	*InputMediaVenue
+	*InputMediaVideo
+}
+
+// MarshalJSON marshals the currently set subtype of InputPollMedia.
+func (r *InputPollMedia) MarshalJSON() ([]byte, error) {
+	if r.InputMediaAnimation != nil {
+		r.InputMediaAnimation.Type = "animation"
+		return json.Marshal(r.InputMediaAnimation)
+	}
+
+	if r.InputMediaAudio != nil {
+		r.InputMediaAudio.Type = "audio"
+		return json.Marshal(r.InputMediaAudio)
+	}
+
+	if r.InputMediaDocument != nil {
+		r.InputMediaDocument.Type = "document"
+		return json.Marshal(r.InputMediaDocument)
+	}
+
+	if r.InputMediaLivePhoto != nil {
+		r.InputMediaLivePhoto.Type = "live_photo"
+		return json.Marshal(r.InputMediaLivePhoto)
+	}
+
+	if r.InputMediaLocation != nil {
+		r.InputMediaLocation.Type = "location"
+		return json.Marshal(r.InputMediaLocation)
+	}
+
+	if r.InputMediaPhoto != nil {
+		r.InputMediaPhoto.Type = "photo"
+		return json.Marshal(r.InputMediaPhoto)
+	}
+
+	if r.InputMediaVenue != nil {
+		r.InputMediaVenue.Type = "venue"
+		return json.Marshal(r.InputMediaVenue)
+	}
+
+	if r.InputMediaVideo != nil {
+		r.InputMediaVideo.Type = "video"
+		return json.Marshal(r.InputMediaVideo)
+	}
+
+	return nil, nil
+}
+
+// UnmarshalJSON unmarshals JSON into the matching InputPollMedia subtype.
+func (r *InputPollMedia) UnmarshalJSON(data []byte) error {
+	type T struct {
+		Discriminator string `json:"type"`
+	}
+
+	v := new(T)
+
+	if err := json.Unmarshal(data, v); err != nil {
+		return err
+	}
+
+	switch v.Discriminator {
+	case "animation":
+		r.InputMediaAnimation = new(InputMediaAnimation)
+		return json.Unmarshal(data, r.InputMediaAnimation)
+
+	case "audio":
+		r.InputMediaAudio = new(InputMediaAudio)
+		return json.Unmarshal(data, r.InputMediaAudio)
+
+	case "document":
+		r.InputMediaDocument = new(InputMediaDocument)
+		return json.Unmarshal(data, r.InputMediaDocument)
+
+	case "live_photo":
+		r.InputMediaLivePhoto = new(InputMediaLivePhoto)
+		return json.Unmarshal(data, r.InputMediaLivePhoto)
+
+	case "location":
+		r.InputMediaLocation = new(InputMediaLocation)
+		return json.Unmarshal(data, r.InputMediaLocation)
+
+	case "photo":
+		r.InputMediaPhoto = new(InputMediaPhoto)
+		return json.Unmarshal(data, r.InputMediaPhoto)
+
+	case "venue":
+		r.InputMediaVenue = new(InputMediaVenue)
+		return json.Unmarshal(data, r.InputMediaVenue)
+
+	case "video":
+		r.InputMediaVideo = new(InputMediaVideo)
+		return json.Unmarshal(data, r.InputMediaVideo)
+
+	default:
+		return errors.New("unknown subtype value: " + v.Discriminator)
+	}
+}
+
 // InputPollOption
 //
 // This object contains information about one answer option in a poll to be sent.
@@ -5024,15 +5361,143 @@ type InputPollOption struct {
 	// Optional.
 	// Mode for parsing entities in the text.
 	// See [formatting options] for more details.
-	// Currently, only custom emoji entities are allowed
+	// Currently, only custom emoji entities are allowed.
 	//
 	// [formatting options]: https://core.telegram.org/bots/api#formatting-options
 	TextParseMode string `json:"text_parse_mode,omitempty"`
 
 	// Optional.
 	// A JSON-serialized list of special entities that appear in the poll option text.
-	// It can be specified instead of text_parse_mode
+	// It can be specified instead of text_parse_mode.
 	TextEntities []MessageEntity `json:"text_entities,omitempty"`
+
+	// Optional.
+	// Media added to the poll option
+	Media *InputPollOptionMedia `json:"media,omitempty"`
+}
+
+// InputPollOptionMedia
+//
+// This object represents the content of a poll option to be sent.
+// It should be one of
+//
+//
+// [InputMediaAnimation]
+//
+// [InputMediaLivePhoto]
+//
+// [InputMediaLocation]
+//
+// [InputMediaPhoto]
+//
+// [InputMediaSticker]
+//
+// [InputMediaVenue]
+//
+// [InputMediaVideo]
+//
+//
+// [InputMediaAnimation]: https://core.telegram.org/bots/api#inputmediaanimation
+// [InputMediaLivePhoto]: https://core.telegram.org/bots/api#inputmedialivephoto
+// [InputMediaLocation]: https://core.telegram.org/bots/api#inputmedialocation
+// [InputMediaPhoto]: https://core.telegram.org/bots/api#inputmediaphoto
+// [InputMediaSticker]: https://core.telegram.org/bots/api#inputmediasticker
+// [InputMediaVenue]: https://core.telegram.org/bots/api#inputmediavenue
+// [InputMediaVideo]: https://core.telegram.org/bots/api#inputmediavideo
+type InputPollOptionMedia struct {
+	*InputMediaAnimation
+	*InputMediaLivePhoto
+	*InputMediaLocation
+	*InputMediaPhoto
+	*InputMediaSticker
+	*InputMediaVenue
+	*InputMediaVideo
+}
+
+// MarshalJSON marshals the currently set subtype of InputPollOptionMedia.
+func (r *InputPollOptionMedia) MarshalJSON() ([]byte, error) {
+	if r.InputMediaAnimation != nil {
+		r.InputMediaAnimation.Type = "animation"
+		return json.Marshal(r.InputMediaAnimation)
+	}
+
+	if r.InputMediaLivePhoto != nil {
+		r.InputMediaLivePhoto.Type = "live_photo"
+		return json.Marshal(r.InputMediaLivePhoto)
+	}
+
+	if r.InputMediaLocation != nil {
+		r.InputMediaLocation.Type = "location"
+		return json.Marshal(r.InputMediaLocation)
+	}
+
+	if r.InputMediaPhoto != nil {
+		r.InputMediaPhoto.Type = "photo"
+		return json.Marshal(r.InputMediaPhoto)
+	}
+
+	if r.InputMediaSticker != nil {
+		r.InputMediaSticker.Type = "sticker"
+		return json.Marshal(r.InputMediaSticker)
+	}
+
+	if r.InputMediaVenue != nil {
+		r.InputMediaVenue.Type = "venue"
+		return json.Marshal(r.InputMediaVenue)
+	}
+
+	if r.InputMediaVideo != nil {
+		r.InputMediaVideo.Type = "video"
+		return json.Marshal(r.InputMediaVideo)
+	}
+
+	return nil, nil
+}
+
+// UnmarshalJSON unmarshals JSON into the matching InputPollOptionMedia subtype.
+func (r *InputPollOptionMedia) UnmarshalJSON(data []byte) error {
+	type T struct {
+		Discriminator string `json:"type"`
+	}
+
+	v := new(T)
+
+	if err := json.Unmarshal(data, v); err != nil {
+		return err
+	}
+
+	switch v.Discriminator {
+	case "animation":
+		r.InputMediaAnimation = new(InputMediaAnimation)
+		return json.Unmarshal(data, r.InputMediaAnimation)
+
+	case "live_photo":
+		r.InputMediaLivePhoto = new(InputMediaLivePhoto)
+		return json.Unmarshal(data, r.InputMediaLivePhoto)
+
+	case "location":
+		r.InputMediaLocation = new(InputMediaLocation)
+		return json.Unmarshal(data, r.InputMediaLocation)
+
+	case "photo":
+		r.InputMediaPhoto = new(InputMediaPhoto)
+		return json.Unmarshal(data, r.InputMediaPhoto)
+
+	case "sticker":
+		r.InputMediaSticker = new(InputMediaSticker)
+		return json.Unmarshal(data, r.InputMediaSticker)
+
+	case "venue":
+		r.InputMediaVenue = new(InputMediaVenue)
+		return json.Unmarshal(data, r.InputMediaVenue)
+
+	case "video":
+		r.InputMediaVideo = new(InputMediaVideo)
+		return json.Unmarshal(data, r.InputMediaVideo)
+
+	default:
+		return errors.New("unknown subtype value: " + v.Discriminator)
+	}
 }
 
 // InputProfilePhoto
@@ -5360,7 +5825,7 @@ type Invoice struct {
 // For simple text buttons, String can be used instead of this object to specify the button text.
 type KeyboardButton struct {
 	// Text of the button.
-	// If none of the fields other than text, icon_custom_emoji_id, and style are used, it will be sent as a message when the button is pressed
+	// If none of the fields other than text, icon_custom_emoji_id, and style are used, it will be sent as a message when the button is pressed.
 	Text string `json:"text"`
 
 	// Optional.
@@ -5441,12 +5906,12 @@ type KeyboardButtonPollType struct {
 // [More about requesting chats »]: https://core.telegram.org/bots/features#chat-and-user-selection
 type KeyboardButtonRequestChat struct {
 	// Signed 32-bit identifier of the request, which will be received back in the [ChatShared] object.
-	// Must be unique within the message
+	// Must be unique within the message.
 	//
 	// [ChatShared]: https://core.telegram.org/bots/api#chatshared
 	RequestID int64 `json:"request_id"`
 
-	// Pass True to request a channel chat, pass False to request a group or a supergroup chat.
+	// Pass True to request a channel chat, pass False to request a group or a supergroup chat
 	ChatIsChannel bool `json:"chat_is_channel"`
 
 	// Optional.
@@ -5502,7 +5967,7 @@ type KeyboardButtonRequestChat struct {
 // [Message]: https://core.telegram.org/bots/api#message
 type KeyboardButtonRequestManagedBot struct {
 	// Signed 32-bit identifier of the request.
-	// Must be unique within the message
+	// Must be unique within the message.
 	RequestID int64 `json:"request_id"`
 
 	// Optional.
@@ -5523,7 +5988,7 @@ type KeyboardButtonRequestManagedBot struct {
 // [More about requesting users »]: https://core.telegram.org/bots/features#chat-and-user-selection
 type KeyboardButtonRequestUsers struct {
 	// Signed 32-bit identifier of the request that will be received back in the [UsersShared] object.
-	// Must be unique within the message
+	// Must be unique within the message.
 	//
 	// [UsersShared]: https://core.telegram.org/bots/api#usersshared
 	RequestID int64 `json:"request_id"`
@@ -5582,7 +6047,7 @@ type LinkPreviewOptions struct {
 
 	// Optional.
 	// URL to use for the link preview.
-	// If empty, then the first URL found in the message text will be used
+	// If empty, then the first URL found in the message text will be used.
 	URL string `json:"url,omitempty"`
 
 	// Optional.
@@ -5596,6 +6061,41 @@ type LinkPreviewOptions struct {
 	// Optional.
 	// True, if the link preview must be shown above the message text; otherwise, the link preview will be shown below the message text
 	ShowAboveText bool `json:"show_above_text,omitempty"`
+}
+
+// LivePhoto
+//
+// This object represents a live photo.
+type LivePhoto struct {
+	// Optional.
+	// Available sizes of the corresponding static photo
+	Photo []PhotoSize `json:"photo,omitempty"`
+
+	// Identifier for the video file which can be used to download or reuse the file
+	FileID string `json:"file_id"`
+
+	// Unique identifier for the video file which is supposed to be the same over time and for different bots.
+	// Can't be used to download or reuse the file.
+	FileUniqueID string `json:"file_unique_id"`
+
+	// Video width as defined by the sender
+	Width int64 `json:"width"`
+
+	// Video height as defined by the sender
+	Height int64 `json:"height"`
+
+	// Duration of the video in seconds as defined by the sender
+	Duration int64 `json:"duration"`
+
+	// Optional.
+	// MIME type of the file as defined by the sender
+	MimeType string `json:"mime_type,omitempty"`
+
+	// Optional.
+	// File size in bytes.
+	// It can be bigger than 2^31 and some programming languages may have difficulty/silent defects in interpreting it.
+	// But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this value.
+	FileSize int64 `json:"file_size,omitempty"`
 }
 
 // Location
@@ -5669,7 +6169,7 @@ type LoginUrl struct {
 	URL string `json:"url"`
 
 	// Optional.
-	// New text of the button in forwarded messages.
+	// New text of the button in forwarded messages
 	ForwardText string `json:"forward_text,omitempty"`
 
 	// Optional.
@@ -5684,7 +6184,7 @@ type LoginUrl struct {
 	BotUsername string `json:"bot_username,omitempty"`
 
 	// Optional.
-	// Pass True to request the permission for your bot to send messages to the user.
+	// Pass True to request the permission for your bot to send messages to the user
 	RequestWriteAccess bool `json:"request_write_access,omitempty"`
 }
 
@@ -5883,7 +6383,7 @@ type MenuButtonWebApp struct {
 type Message struct {
 	// Unique message identifier inside this chat.
 	// In specific instances (e.g., message containing a video sent to a big chat), the server might automatically schedule a message instead of sending it immediately.
-	// In such cases, this field will be 0 and the relevant message will be unusable until it is actually sent
+	// In such cases, this field will be 0 and the relevant message will be unusable until it is actually sent.
 	MessageID int64 `json:"message_id"`
 
 	// Optional.
@@ -5896,7 +6396,7 @@ type Message struct {
 
 	// Optional.
 	// Sender of the message; may be empty for messages sent to channels.
-	// For backward compatibility, if the message was sent on behalf of a chat, the field contains a fake sender user in non-channel chats
+	// For backward compatibility, if the message was sent on behalf of a chat, the field contains a fake sender user in non-channel chats.
 	From *User `json:"from,omitempty"`
 
 	// Optional.
@@ -5921,6 +6421,14 @@ type Message struct {
 	// Date the message was sent in Unix time.
 	// It is always a positive number, representing a valid date.
 	Date int64 `json:"date"`
+
+	// Optional.
+	// The unique identifier for the guest query.
+	// Use this identifier with the method [answerGuestQuery] to send a response message.
+	// If non-empty, the message belongs to the chat where the guest bot was summoned, which may not coincide with other existing bot chats sharing the same identifier.
+	//
+	// [answerGuestQuery]: https://core.telegram.org/bots/api#answerguestquery
+	GuestQueryID string `json:"guest_query_id,omitempty"`
 
 	// Optional.
 	// Unique identifier of the business connection from which the message was received.
@@ -5972,6 +6480,14 @@ type Message struct {
 	// Optional.
 	// Bot through which the message was sent
 	ViaBot *User `json:"via_bot,omitempty"`
+
+	// Optional.
+	// For a message sent by a guest bot, this is the user whose original message triggered the bot's response
+	GuestBotCallerUser *User `json:"guest_bot_caller_user,omitempty"`
+
+	// Optional.
+	// For a message sent by a guest bot, this is the chat whose original message triggered the bot's response
+	GuestBotCallerChat *Chat `json:"guest_bot_caller_chat,omitempty"`
 
 	// Optional.
 	// Date the message was last edited in Unix time
@@ -6026,7 +6542,7 @@ type Message struct {
 
 	// Optional.
 	// Message is an animation, information about the animation.
-	// For backward compatibility, when this field is set, the document field will also be set
+	// For backward compatibility, when this field is set, the document field will also be set.
 	Animation *Animation `json:"animation,omitempty"`
 
 	// Optional.
@@ -6036,6 +6552,11 @@ type Message struct {
 	// Optional.
 	// Message is a general file, information about the file
 	Document *Document `json:"document,omitempty"`
+
+	// Optional.
+	// Message is a live photo, information about the live photo.
+	// For backward compatibility, when this field is set, the photo field will also be set.
+	LivePhoto *LivePhoto `json:"live_photo,omitempty"`
 
 	// Optional.
 	// Message contains paid media; information about the paid media
@@ -6109,7 +6630,7 @@ type Message struct {
 
 	// Optional.
 	// Message is a venue, information about the venue.
-	// For backward compatibility, when this field is set, the location field will also be set
+	// For backward compatibility, when this field is set, the location field will also be set.
 	Venue *Venue `json:"venue,omitempty"`
 
 	// Optional.
@@ -6385,7 +6906,7 @@ type MessageAutoDeleteTimerChanged struct {
 // For example, hashtags, usernames, URLs, etc.
 type MessageEntity struct {
 	// Type of the entity.
-	// Currently, can be “mention” (@username), “hashtag” (#hashtag or #hashtag@chatusername), “cashtag” ($USD or $USD@chatusername), “bot_command” (/start@jobs_bot), “url” (https://telegram.org), “email” (do-not-reply@telegram.org), “phone_number” (+1-212-555-0123), “bold” (bold text), “italic” (italic text), “underline” (underlined text), “strikethrough” (strikethrough text), “spoiler” (spoiler message), “blockquote” (block quotation), “expandable_blockquote” (collapsed-by-default block quotation), “code” (monowidth string), “pre” (monowidth block), “text_link” (for clickable text URLs), “text_mention” (for users [without usernames]), “custom_emoji” (for inline custom emoji stickers), or “date_time” (for formatted date and time)
+	// Currently, can be “mention” (@username), “hashtag” (#hashtag or #hashtag@chatusername), “cashtag” ($USD or $USD@chatusername), “bot_command” (/start@jobs_bot), “url” (https://telegram.org), “email” (do-not-reply@telegram.org), “phone_number” (+1-212-555-0123), “bold” (bold text), “italic” (italic text), “underline” (underlined text), “strikethrough” (strikethrough text), “spoiler” (spoiler message), “blockquote” (block quotation), “expandable_blockquote” (collapsed-by-default block quotation), “code” (monowidth string), “pre” (monowidth block), “text_link” (for clickable text URLs), “text_mention” (for users [without usernames]), “custom_emoji” (for inline custom emoji stickers), or “date_time” (for formatted date and time).
 	//
 	// [without usernames]: https://telegram.org/blog/edit#new-mentions
 	Type string `json:"type"`
@@ -6414,7 +6935,7 @@ type MessageEntity struct {
 
 	// Optional.
 	// For “custom_emoji” only, unique identifier of the custom emoji.
-	// Use [getCustomEmojiStickers] to get full information about the sticker
+	// Use [getCustomEmojiStickers] to get full information about the sticker.
 	//
 	// [getCustomEmojiStickers]: https://core.telegram.org/bots/api#getcustomemojistickers
 	CustomEmojiID string `json:"custom_emoji_id,omitempty"`
@@ -6437,7 +6958,7 @@ type MessageEntity struct {
 type MessageId struct {
 	// Unique message identifier.
 	// In specific instances (e.g., message containing a video sent to a big chat), the server might automatically schedule a message instead of sending it immediately.
-	// In such cases, this field will be 0 and the relevant message will be unusable until it is actually sent
+	// In such cases, this field will be 0 and the relevant message will be unusable until it is actually sent.
 	MessageID int64 `json:"message_id"`
 }
 
@@ -6777,7 +7298,7 @@ type OwnedGiftRegular struct {
 
 	// Optional.
 	// Unique number reserved for this gift when upgraded.
-	// See the number field in [UniqueGift]
+	// See the number field in [UniqueGift].
 	//
 	// [UniqueGift]: https://core.telegram.org/bots/api#uniquegift
 	UniqueGiftNumber int64 `json:"unique_gift_number,omitempty"`
@@ -6818,7 +7339,7 @@ type OwnedGiftUnique struct {
 
 	// Optional.
 	// Point in time (Unix timestamp) when the gift can be transferred.
-	// If it is in the past, then the gift can be transferred now
+	// If it is in the past, then the gift can be transferred now.
 	NextTransferDate int64 `json:"next_transfer_date,omitempty"`
 }
 
@@ -6834,7 +7355,7 @@ type OwnedGifts struct {
 
 	// Optional.
 	// Offset for the next request.
-	// If empty, then there are no more results
+	// If empty, then there are no more results.
 	NextOffset string `json:"next_offset,omitempty"`
 }
 
@@ -6844,32 +7365,41 @@ type OwnedGifts struct {
 // Currently, it can be one of
 //
 //
-// [PaidMediaPreview]
+// [PaidMediaLivePhoto]
 //
 // [PaidMediaPhoto]
+//
+// [PaidMediaPreview]
 //
 // [PaidMediaVideo]
 //
 //
-// [PaidMediaPreview]: https://core.telegram.org/bots/api#paidmediapreview
+// [PaidMediaLivePhoto]: https://core.telegram.org/bots/api#paidmedialivephoto
 // [PaidMediaPhoto]: https://core.telegram.org/bots/api#paidmediaphoto
+// [PaidMediaPreview]: https://core.telegram.org/bots/api#paidmediapreview
 // [PaidMediaVideo]: https://core.telegram.org/bots/api#paidmediavideo
 type PaidMedia struct {
-	*PaidMediaPreview
+	*PaidMediaLivePhoto
 	*PaidMediaPhoto
+	*PaidMediaPreview
 	*PaidMediaVideo
 }
 
 // MarshalJSON marshals the currently set subtype of PaidMedia.
 func (r *PaidMedia) MarshalJSON() ([]byte, error) {
-	if r.PaidMediaPreview != nil {
-		r.PaidMediaPreview.Type = "preview"
-		return json.Marshal(r.PaidMediaPreview)
+	if r.PaidMediaLivePhoto != nil {
+		r.PaidMediaLivePhoto.Type = "live_photo"
+		return json.Marshal(r.PaidMediaLivePhoto)
 	}
 
 	if r.PaidMediaPhoto != nil {
 		r.PaidMediaPhoto.Type = "photo"
 		return json.Marshal(r.PaidMediaPhoto)
+	}
+
+	if r.PaidMediaPreview != nil {
+		r.PaidMediaPreview.Type = "preview"
+		return json.Marshal(r.PaidMediaPreview)
 	}
 
 	if r.PaidMediaVideo != nil {
@@ -6893,13 +7423,17 @@ func (r *PaidMedia) UnmarshalJSON(data []byte) error {
 	}
 
 	switch v.Discriminator {
-	case "preview":
-		r.PaidMediaPreview = new(PaidMediaPreview)
-		return json.Unmarshal(data, r.PaidMediaPreview)
+	case "live_photo":
+		r.PaidMediaLivePhoto = new(PaidMediaLivePhoto)
+		return json.Unmarshal(data, r.PaidMediaLivePhoto)
 
 	case "photo":
 		r.PaidMediaPhoto = new(PaidMediaPhoto)
 		return json.Unmarshal(data, r.PaidMediaPhoto)
+
+	case "preview":
+		r.PaidMediaPreview = new(PaidMediaPreview)
+		return json.Unmarshal(data, r.PaidMediaPreview)
 
 	case "video":
 		r.PaidMediaVideo = new(PaidMediaVideo)
@@ -6919,6 +7453,19 @@ type PaidMediaInfo struct {
 
 	// Information about the paid media
 	PaidMedia []PaidMedia `json:"paid_media"`
+}
+
+// PaidMediaLivePhoto
+//
+// The paid media is a [live photo].
+//
+// [live photo]: https://core.telegram.org/bots/api#livephoto
+type PaidMediaLivePhoto struct {
+	// Type of the paid media, always “live_photo”
+	Type string `json:"type"`
+
+	// The photo
+	LivePhoto LivePhoto `json:"live_photo"`
 }
 
 // PaidMediaPhoto
@@ -7388,6 +7935,17 @@ type Poll struct {
 	// True, if the poll allows to change the chosen answer options
 	AllowsRevoting bool `json:"allows_revoting"`
 
+	// True if voting is limited to users who have been members of the chat where the poll was originally sent for more than 24 hours
+	MembersOnly bool `json:"members_only"`
+
+	// Optional.
+	// A list of two-letter [ISO 3166-1 alpha-2] country codes indicating the countries from which users can vote in the poll.
+	// The country code “FT” is used for users with anonymous numbers.
+	// If omitted, then users from any country can participate in the poll.
+	//
+	// [ISO 3166-1 alpha-2]: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
+	CountryCodes []string `json:"country_codes,omitempty"`
+
 	// Optional.
 	// Array of 0-based identifiers of the correct answer options.
 	// Available only for polls in quiz mode which are closed or were sent (not forwarded) by the bot or to the private chat with the bot.
@@ -7401,6 +7959,10 @@ type Poll struct {
 	// Special entities like usernames, URLs, bot commands, etc.
 	// that appear in the explanation
 	ExplanationEntities []MessageEntity `json:"explanation_entities,omitempty"`
+
+	// Optional.
+	// Media added to the quiz explanation
+	ExplanationMedia *PollMedia `json:"explanation_media,omitempty"`
 
 	// Optional.
 	// Amount of time in seconds the poll will be active after creation
@@ -7420,6 +7982,12 @@ type Poll struct {
 	// Special entities like usernames, URLs, bot commands, etc.
 	// that appear in the description
 	DescriptionEntities []MessageEntity `json:"description_entities,omitempty"`
+
+	// Optional.
+	// Media added to the poll description; for polls inside the [Message] object only
+	//
+	// [Message]: https://core.telegram.org/bots/api#message
+	Media *PollMedia `json:"media,omitempty"`
 }
 
 // PollAnswer
@@ -7446,6 +8014,47 @@ type PollAnswer struct {
 	OptionPersistentIDs []string `json:"option_persistent_ids"`
 }
 
+// PollMedia
+//
+// At most one of the optional fields can be present in any given object.
+type PollMedia struct {
+	// Optional.
+	// Media is an animation, information about the animation
+	Animation *Animation `json:"animation,omitempty"`
+
+	// Optional.
+	// Media is an audio file, information about the file; currently, can't be received in a poll option
+	Audio *Audio `json:"audio,omitempty"`
+
+	// Optional.
+	// Media is a general file, information about the file; currently, can't be received in a poll option
+	Document *Document `json:"document,omitempty"`
+
+	// Optional.
+	// Media is a live photo, information about the live photo
+	LivePhoto *LivePhoto `json:"live_photo,omitempty"`
+
+	// Optional.
+	// Media is a shared location, information about the location
+	Location *Location `json:"location,omitempty"`
+
+	// Optional.
+	// Media is a photo, available sizes of the photo
+	Photo []PhotoSize `json:"photo,omitempty"`
+
+	// Optional.
+	// Media is a sticker, information about the sticker; currently, for poll options only
+	Sticker *Sticker `json:"sticker,omitempty"`
+
+	// Optional.
+	// Media is a venue, information about the venue
+	Venue *Venue `json:"venue,omitempty"`
+
+	// Optional.
+	// Media is a video, information about the video
+	Video *Video `json:"video,omitempty"`
+}
+
 // PollOption
 //
 // This object contains information about one answer option in a poll.
@@ -7460,6 +8069,10 @@ type PollOption struct {
 	// Special entities that appear in the option text.
 	// Currently, only custom emoji entities are allowed in poll option texts
 	TextEntities []MessageEntity `json:"text_entities,omitempty"`
+
+	// Optional.
+	// Media added to the poll option
+	Media *PollMedia `json:"media,omitempty"`
 
 	// Number of users who voted for this option; may be 0 if unknown
 	VoterCount int64 `json:"voter_count"`
@@ -7564,7 +8177,7 @@ type PreparedInlineMessage struct {
 	ID string `json:"id"`
 
 	// Expiration date of the prepared message, in Unix time.
-	// Expired prepared messages can no longer be used
+	// Expired prepared messages can no longer be used.
 	ExpirationDate int64 `json:"expiration_date"`
 }
 
@@ -7692,7 +8305,7 @@ type ReactionTypeEmoji struct {
 	Type string `json:"type"`
 
 	// Reaction emoji.
-	// Currently, it can be one of "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""
+	// Currently, it can be one of "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "".
 	Emoji string `json:"emoji"`
 }
 
@@ -7709,7 +8322,7 @@ type ReactionTypePaid struct {
 // This object contains basic information about a refunded payment.
 type RefundedPayment struct {
 	// Three-letter ISO 4217 [currency] code, or “XTR” for payments in [Telegram Stars].
-	// Currently, always “XTR”
+	// Currently, always “XTR”.
 	//
 	// [currency]: https://core.telegram.org/bots/payments#supported-currencies
 	// [Telegram Stars]: https://t.me/BotNews/90
@@ -7736,7 +8349,7 @@ type RefundedPayment struct {
 // ReplyKeyboardMarkup
 //
 // This object represents a [custom keyboard] with reply options (see [Introduction to bots] for details and examples).
-// Not supported in channels and for messages sent on behalf of a Telegram Business account.
+// Not supported in channels and for messages sent on behalf of a business account.
 //
 // [custom keyboard]: https://core.telegram.org/bots/features#keyboards
 // [Introduction to bots]: https://core.telegram.org/bots/features#keyboards
@@ -7782,7 +8395,7 @@ type ReplyKeyboardMarkup struct {
 // Upon receiving a message with this object, Telegram clients will remove the current custom keyboard and display the default letter-keyboard.
 // By default, custom keyboards are displayed until a new keyboard is sent by a bot.
 // An exception is made for one-time keyboards that are hidden immediately after the user presses a button (see [ReplyKeyboardMarkup]).
-// Not supported in channels and for messages sent on behalf of a Telegram Business account.
+// Not supported in channels and for messages sent on behalf of a business account.
 //
 // [ReplyKeyboardMarkup]: https://core.telegram.org/bots/api#replykeyboardmarkup
 type ReplyKeyboardRemove struct {
@@ -7809,7 +8422,7 @@ type ReplyParameters struct {
 	MessageID int64 `json:"message_id"`
 
 	// Optional.
-	// If the message to be replied to is from a different chat, unique identifier for the chat or username of the channel (in the format @channelusername).
+	// If the message to be replied to is from a different chat, unique identifier for the chat or username of the bot, supergroup or channel in the format @username.
 	// Not supported for messages sent on behalf of a business account and messages from channel direct messages chats.
 	ChatID string `json:"chat_id,omitempty"`
 
@@ -7967,6 +8580,14 @@ type RevenueWithdrawalStateSucceeded struct {
 	URL string `json:"url"`
 }
 
+// SentGuestMessage
+//
+// Describes an inline message sent by a guest bot.
+type SentGuestMessage struct {
+	// Identifier of the sent inline message
+	InlineMessageID string `json:"inline_message_id"`
+}
+
 // SentWebAppMessage
 //
 // Describes an inline message sent by a [Web App] on behalf of a user.
@@ -8101,12 +8722,12 @@ type StarTransaction struct {
 
 	// Optional.
 	// Source of an incoming transaction (e.g., a user purchasing goods or services, Fragment refunding a failed withdrawal).
-	// Only for incoming transactions
+	// Only for incoming transactions.
 	Source *TransactionPartner `json:"source,omitempty"`
 
 	// Optional.
 	// Receiver of an outgoing transaction (e.g., a user for a purchase refund, Fragment for a withdrawal).
-	// Only for outgoing transactions
+	// Only for outgoing transactions.
 	Receiver *TransactionPartner `json:"receiver,omitempty"`
 }
 
@@ -8558,7 +9179,7 @@ type SuggestedPostPaid struct {
 	SuggestedPostMessage *Message `json:"suggested_post_message,omitempty"`
 
 	// Currency in which the payment was made.
-	// Currently, one of “XTR” for Telegram Stars or “TON” for toncoins
+	// Currently, one of “XTR” for Telegram Stars or “TON” for toncoins.
 	Currency string `json:"currency"`
 
 	// Optional.
@@ -8591,7 +9212,7 @@ type SuggestedPostParameters struct {
 // Describes the price of a suggested post.
 type SuggestedPostPrice struct {
 	// Currency in which the post will be paid.
-	// Currently, must be one of “XTR” for Telegram Stars or “TON” for toncoins
+	// Currently, must be one of “XTR” for Telegram Stars or “TON” for toncoins.
 	Currency string `json:"currency"`
 
 	// The amount of the currency that will be paid for the post in the smallest units of the currency, i.e.
@@ -8622,7 +9243,7 @@ type SuggestedPostRefunded struct {
 type SwitchInlineQueryChosenChat struct {
 	// Optional.
 	// The default inline query to be inserted in the input field.
-	// If left empty, only the bot's username will be inserted
+	// If left empty, only the bot's username will be inserted.
 	Query string `json:"query,omitempty"`
 
 	// Optional.
@@ -8915,7 +9536,7 @@ type UniqueGift struct {
 	BaseName string `json:"base_name"`
 
 	// Unique name of the gift.
-	// This name can be used in https://t.me/nft/... links and story areas
+	// This name can be used in https://t.me/nft/... links and story areas.
 	Name string `json:"name"`
 
 	// Unique number of the upgraded gift among gifts upgraded from the same regular gift
@@ -9013,7 +9634,7 @@ type UniqueGiftInfo struct {
 	Gift UniqueGift `json:"gift"`
 
 	// Origin of the gift.
-	// Currently, either “upgrade” for gifts upgraded from regular gifts, “transfer” for gifts transferred from other users or channels, “resale” for gifts bought from other users, “gifted_upgrade” for upgrades purchased after the gift was sent, or “offer” for gifts bought or sold through gift purchase offers
+	// Currently, either “upgrade” for gifts upgraded from regular gifts, “transfer” for gifts transferred from other users or channels, “resale” for gifts bought from other users, “gifted_upgrade” for upgrades purchased after the gift was sent, or “offer” for gifts bought or sold through gift purchase offers.
 	Origin string `json:"origin"`
 
 	// Optional.
@@ -9035,7 +9656,7 @@ type UniqueGiftInfo struct {
 
 	// Optional.
 	// Point in time (Unix timestamp) when the gift can be transferred.
-	// If it is in the past, then the gift can be transferred now
+	// If it is in the past, then the gift can be transferred now.
 	NextTransferDate int64 `json:"next_transfer_date,omitempty"`
 }
 
@@ -9076,7 +9697,7 @@ type UniqueGiftSymbol struct {
 // Update
 //
 // This [object] represents an incoming update.
-// At most one of the optional parameters can be present in any given update.
+// At most one of the optional fields can be present in any given update.
 //
 // [object]: https://core.telegram.org/bots/api#available-types
 type Update struct {
@@ -9123,6 +9744,13 @@ type Update struct {
 	DeletedBusinessMessages *BusinessMessagesDeleted `json:"deleted_business_messages,omitempty"`
 
 	// Optional.
+	// New guest message.
+	// The bot can use the field Message.guest_query_id and the method [answerGuestQuery] to send a message in response.
+	//
+	// [answerGuestQuery]: https://core.telegram.org/bots/api#answerguestquery
+	GuestMessage *Message `json:"guest_message,omitempty"`
+
+	// Optional.
 	// A reaction to a message was changed by a user.
 	// The bot must be an administrator in the chat and must explicitly specify "message_reaction" in the list of allowed_updates to receive these updates.
 	// The update isn't received for reactions set by bots.
@@ -9154,12 +9782,12 @@ type Update struct {
 
 	// Optional.
 	// New incoming shipping query.
-	// Only for invoices with flexible price
+	// Only for invoices with flexible price.
 	ShippingQuery *ShippingQuery `json:"shipping_query,omitempty"`
 
 	// Optional.
 	// New incoming pre-checkout query.
-	// Contains full information about checkout
+	// Contains full information about checkout.
 	PreCheckoutQuery *PreCheckoutQuery `json:"pre_checkout_query,omitempty"`
 
 	// Optional.
@@ -9168,7 +9796,7 @@ type Update struct {
 
 	// Optional.
 	// New poll state.
-	// Bots receive only updates about manually stopped polls and polls, which are sent by the bot
+	// Bots receive only updates about manually stopped polls and polls, which are sent by the bot.
 	Poll *Poll `json:"poll,omitempty"`
 
 	// Optional.
@@ -9259,6 +9887,13 @@ type User struct {
 	CanReadAllGroupMessages bool `json:"can_read_all_group_messages,omitempty"`
 
 	// Optional.
+	// True, if the bot supports guest queries from chats it is not a member of.
+	// Returned only in [getMe].
+	//
+	// [getMe]: https://core.telegram.org/bots/api#getme
+	SupportsGuestQueries bool `json:"supports_guest_queries,omitempty"`
+
+	// Optional.
 	// True, if the bot supports inline queries.
 	// Returned only in [getMe].
 	//
@@ -9266,7 +9901,7 @@ type User struct {
 	SupportsInlineQueries bool `json:"supports_inline_queries,omitempty"`
 
 	// Optional.
-	// True, if the bot can be connected to a Telegram Business account to receive its messages.
+	// True, if the bot can be connected to a user account to manage it.
 	// Returned only in [getMe].
 	//
 	// [getMe]: https://core.telegram.org/bots/api#getme
@@ -9359,7 +9994,7 @@ type UsersShared struct {
 	// Identifier of the request
 	RequestID int64 `json:"request_id"`
 
-	// Information about users shared with the bot.
+	// Information about users shared with the bot
 	Users []SharedUser `json:"users"`
 }
 
@@ -9368,7 +10003,7 @@ type UsersShared struct {
 // This object represents a venue.
 type Venue struct {
 	// Venue location.
-	// Can't be a live location
+	// Can't be a live location.
 	Location Location `json:"location"`
 
 	// Name of the venue
@@ -9623,7 +10258,7 @@ type WebhookInfo struct {
 
 	// Optional.
 	// A list of update types the bot is subscribed to.
-	// Defaults to all update types except chat_member
+	// Defaults to all update types except chat_member, message_reaction, and message_reaction_count.
 	AllowedUpdates []string `json:"allowed_updates,omitempty"`
 }
 
