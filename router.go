@@ -222,7 +222,7 @@ func (rg *RouterGroup) Group(filters ...Filter) *RouterGroup {
 //
 // The command must not contain spaces. A leading slash is added automatically
 // if omitted (e.g. "start" → "/start").
-func (rg *RouterGroup) HandleCommand(command string, handler HandlerFunc) {
+func (rg *RouterGroup) HandleCommand(command string, handler func(*Context, *Message) error) {
 	if command == "" {
 		return
 	}
@@ -235,9 +235,13 @@ func (rg *RouterGroup) HandleCommand(command string, handler HandlerFunc) {
 		command = "/" + command
 	}
 
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().Message)
+	}
+
 	rg.router.handlersCommands[command] = append(rg.router.handlersCommands[command], route{
 		filter:  rg.filter,
-		handler: rg.applyMiddlewares(handler),
+		handler: rg.applyMiddlewares(fn),
 	})
 }
 
