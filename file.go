@@ -121,6 +121,8 @@ func (c *Client) DownloadByFileID(ctx context.Context, fileID, filePath string) 
 // The caller is responsible for closing the reader.
 //
 // Deprecated: use (*Client).ReceiveFileReader.
+//
+//go:fix inline
 func ReceiveFileReader(client *Client, file *File) (io.ReadCloser, error) {
 	return client.ReceiveFileReader(context.Background(), file)
 }
@@ -129,6 +131,8 @@ func ReceiveFileReader(client *Client, file *File) (io.ReadCloser, error) {
 // The caller is responsible for closing the reader.
 //
 // Deprecated: use (*Client).ReceiveFileReaderByFileID.
+//
+//go:fix inline
 func ReceiveFileReaderByFileID(client *Client, fileID string) (io.ReadCloser, error) {
 	return client.ReceiveFileReaderByFileID(context.Background(), fileID)
 }
@@ -136,6 +140,8 @@ func ReceiveFileReaderByFileID(client *Client, fileID string) (io.ReadCloser, er
 // DownloadFile downloads a file from Telegram servers to the specified local path.
 //
 // Deprecated: use (*Client).DownloadFile.
+//
+//go:fix inline
 func DownloadFile(client *Client, file *File, path string) error {
 	return client.DownloadFile(context.Background(), file, path)
 }
@@ -143,6 +149,8 @@ func DownloadFile(client *Client, file *File, path string) error {
 // DownloadByFileID resolves the file path by fileID and downloads the file to the specified local path.
 //
 // Deprecated: use (*Client).DownloadByFileID.
+//
+//go:fix inline
 func DownloadByFileID(client *Client, fileID, filePath string) error {
 	return client.DownloadByFileID(context.Background(), fileID, filePath)
 }
