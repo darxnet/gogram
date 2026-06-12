@@ -271,6 +271,28 @@ func (ctx *Context) AnswerCallbackQuery(
 	return err
 }
 
+// AnswerChatJoinRequestQuery calls Client.AnswerChatJoinRequestQuery with context-derived defaults.
+//
+// Use this method to process a received chat join request query.
+// Returns True on success.
+func (ctx *Context) AnswerChatJoinRequestQuery(
+	chatJoinRequestQueryID string,
+	result string,
+	opts ...AnswerChatJoinRequestQueryOption,
+) error {
+	params := &AnswerChatJoinRequestQueryParams{
+		ChatJoinRequestQueryID: chatJoinRequestQueryID,
+		Result:                 result,
+	}
+
+	params.Option(opts...)
+
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.AnswerChatJoinRequestQuery(context.WithoutCancel(ctx.context), params)
+
+	return err
+}
+
 // AnswerGuestQuery calls Client.AnswerGuestQuery with context-derived defaults.
 //
 // Use this method to reply to a received guest message.
@@ -1717,7 +1739,7 @@ func (ctx *Context) EditMessageLiveLocation(
 
 // EditMessageMedia calls Client.EditMessageMedia with context-derived defaults.
 //
-// Use this method to edit animation, audio, document, live photo, photo, or video messages, or to add media to text messages.
+// Use this method to edit animation, audio, document, live photo, photo, or video messages, or to replace a text or a rich message with a media.
 // If a message is part of a message album, then it can be edited only to an audio for audio albums, only to a document for document albums and to a photo, a live photo, or a video otherwise.
 // When an inline message is edited, a new file can't be uploaded; use a previously uploaded file via its file_id or specify a URL.
 // On success, if the edited message is not an inline message, the edited [Message] is returned, otherwise True is returned.
@@ -1831,14 +1853,13 @@ func (ctx *Context) EditMessageReplyMarkup(
 
 // EditMessageText calls Client.EditMessageText with context-derived defaults.
 //
-// Use this method to edit text and [game] messages.
+// Use this method to edit text, rich and [game] messages.
 // On success, if the edited message is not an inline message, the edited [Message] is returned, otherwise True is returned.
 // Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within 48 hours from the time they were sent.
 //
 // [game]: https://core.telegram.org/bots/api#games
 // [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) EditMessageText(
-	text string,
 	opts ...EditMessageTextOption,
 ) error {
 	params := &EditMessageTextParams{
@@ -1873,7 +1894,6 @@ func (ctx *Context) EditMessageText(
 
 			return ctx.update.CallbackQuery.InlineMessageID
 		}(ctx),
-		Text: text,
 	}
 
 	params.Option(opts...)
@@ -3811,6 +3831,28 @@ func (ctx *Context) SendChatAction(
 	return err
 }
 
+// SendChatJoinRequestWebApp calls Client.SendChatJoinRequestWebApp with context-derived defaults.
+//
+// Use this method to process a received chat join request query by showing a Mini App to the user before deciding the outcome.
+// Returns True on success.
+func (ctx *Context) SendChatJoinRequestWebApp(
+	chatJoinRequestQueryID string,
+	webAppUrl string,
+	opts ...SendChatJoinRequestWebAppOption,
+) error {
+	params := &SendChatJoinRequestWebAppParams{
+		ChatJoinRequestQueryID: chatJoinRequestQueryID,
+		WebAppUrl:              webAppUrl,
+	}
+
+	params.Option(opts...)
+
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendChatJoinRequestWebApp(context.WithoutCancel(ctx.context), params)
+
+	return err
+}
+
 // SendChecklist calls Client.SendChecklist with context-derived defaults.
 //
 // Use this method to send a checklist on behalf of a connected business account.
@@ -4669,6 +4711,106 @@ func (ctx *Context) SendPoll(
 
 	// Detach cancellation while preserving context values for worker-side requests.
 	_, err := ctx.client.SendPoll(context.WithoutCancel(ctx.context), params)
+
+	return err
+}
+
+// SendRichMessage calls Client.SendRichMessage with context-derived defaults.
+//
+// Use this method to send rich messages.
+// If the message contains a block with a media element, then the bot must have the right to send the media to the chat.
+// On success, the sent [Message] is returned.
+//
+// [Message]: https://core.telegram.org/bots/api#message
+func (ctx *Context) SendRichMessage(
+	richMessage InputRichMessage,
+	opts ...SendRichMessageOption,
+) error {
+	params := &SendRichMessageParams{
+		BusinessConnectionID: func(ctx *Context) string {
+			m := ctx.Message()
+			if m == nil {
+				return ""
+			}
+
+			return m.BusinessConnectionID
+		}(ctx),
+		ChatID: func(ctx *Context) string {
+			c := ctx.Chat()
+			if c == nil {
+				return ""
+			}
+
+			return c.Identifier()
+		}(ctx),
+		MessageThreadID: func(ctx *Context) int64 {
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			return m.MessageThreadID
+		}(ctx),
+		DirectMessagesTopicID: func(ctx *Context) int64 {
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			if m.DirectMessagesTopic == nil {
+				return 0
+			}
+
+			return m.DirectMessagesTopic.TopicID
+		}(ctx),
+		RichMessage: richMessage,
+	}
+
+	params.Option(opts...)
+
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendRichMessage(context.WithoutCancel(ctx.context), params)
+
+	return err
+}
+
+// SendRichMessageDraft calls Client.SendRichMessageDraft with context-derived defaults.
+//
+// Use this method to stream a partial rich message to a user while the message is being generated.
+// Note that the streamed draft is ephemeral and acts as a temporary 30-second preview - once the output is finalized, you must call [sendRichMessage] with the complete message to persist it in the user's chat.
+// Returns True on success.
+//
+// [sendRichMessage]: https://core.telegram.org/bots/api#sendrichmessage
+func (ctx *Context) SendRichMessageDraft(
+	draftID int64,
+	richMessage InputRichMessage,
+	opts ...SendRichMessageDraftOption,
+) error {
+	params := &SendRichMessageDraftParams{
+		ChatID: func(ctx *Context) int64 {
+			c := ctx.Chat()
+			if c == nil {
+				return 0
+			}
+
+			return c.ID
+		}(ctx),
+		MessageThreadID: func(ctx *Context) int64 {
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			return m.MessageThreadID
+		}(ctx),
+		DraftID:     draftID,
+		RichMessage: richMessage,
+	}
+
+	params.Option(opts...)
+
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.SendRichMessageDraft(context.WithoutCancel(ctx.context), params)
 
 	return err
 }

@@ -250,6 +250,83 @@ func (c *Client) AnswerCallbackQuery(ctx context.Context, params *AnswerCallback
 	return ret, err
 }
 
+// AnswerChatJoinRequestQueryParams contains parameters for Client.AnswerChatJoinRequestQuery.
+type AnswerChatJoinRequestQueryParams struct {
+	// Unique identifier of the join request query
+	ChatJoinRequestQueryID string `json:"chat_join_request_query_id"`
+
+	// Result of the query.
+	// Must be either “approve” to allow the user to join the chat, “decline” to disallow the user to join the chat, or “queue” to leave the decision to other administrators.
+	Result string `json:"result"`
+}
+
+// AnswerChatJoinRequestQueryOption configures AnswerChatJoinRequestQueryParams.
+type AnswerChatJoinRequestQueryOption func(params *AnswerChatJoinRequestQueryParams) AnswerChatJoinRequestQueryOption
+
+// Option applies one or more AnswerChatJoinRequestQueryOption values and returns the last rollback option.
+func (r *AnswerChatJoinRequestQueryParams) Option(opts ...AnswerChatJoinRequestQueryOption) (previous AnswerChatJoinRequestQueryOption) {
+	for _, opt := range opts {
+		previous = opt(r)
+	}
+	return previous
+}
+
+// WithAnswerChatJoinRequestQueryChatJoinRequestQueryID sets the ChatJoinRequestQueryID field.
+//
+// Unique identifier of the join request query
+func WithAnswerChatJoinRequestQueryChatJoinRequestQueryID(value string) AnswerChatJoinRequestQueryOption {
+	return func(params *AnswerChatJoinRequestQueryParams) AnswerChatJoinRequestQueryOption {
+		previous := params.ChatJoinRequestQueryID
+		params.ChatJoinRequestQueryID = value
+
+		return WithAnswerChatJoinRequestQueryChatJoinRequestQueryID(previous)
+	}
+}
+
+// WithAnswerChatJoinRequestQueryResult sets the Result field.
+//
+// Result of the query.
+// Must be either “approve” to allow the user to join the chat, “decline” to disallow the user to join the chat, or “queue” to leave the decision to other administrators.
+func WithAnswerChatJoinRequestQueryResult(value string) AnswerChatJoinRequestQueryOption {
+	return func(params *AnswerChatJoinRequestQueryParams) AnswerChatJoinRequestQueryOption {
+		previous := params.Result
+		params.Result = value
+
+		return WithAnswerChatJoinRequestQueryResult(previous)
+	}
+}
+
+// AnswerChatJoinRequestQuery calls the answerChatJoinRequestQuery Telegram Bot API method.
+//
+// Use this method to process a received chat join request query.
+// Returns True on success.
+func (c *Client) AnswerChatJoinRequestQuery(ctx context.Context, params *AnswerChatJoinRequestQueryParams) (ret bool, err error) {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
+		return
+	}
+
+	reader := bytes.NewReader(buffer.Bytes())
+
+	contentType := "application/json"
+
+	var result json.RawMessage
+
+	result, err = c.Raw(ctx, "answerChatJoinRequestQuery", reader, contentType)
+	if err != nil {
+		return
+	}
+
+	ref := &ret
+
+	err = json.Unmarshal(result, ref)
+	if err != nil {
+		return
+	}
+
+	return ret, err
+}
+
 // AnswerGuestQueryParams contains parameters for Client.AnswerGuestQuery.
 type AnswerGuestQueryParams struct {
 	// Unique identifier for the query to be answered
@@ -5248,7 +5325,7 @@ func WithEditMessageMediaReplyMarkup(value *InlineKeyboardMarkup) EditMessageMed
 
 // EditMessageMedia calls the editMessageMedia Telegram Bot API method.
 //
-// Use this method to edit animation, audio, document, live photo, photo, or video messages, or to add media to text messages.
+// Use this method to edit animation, audio, document, live photo, photo, or video messages, or to replace a text or a rich message with a media.
 // If a message is part of a message album, then it can be edited only to an audio for audio albums, only to a document for document albums and to a photo, a live photo, or a video otherwise.
 // When an inline message is edited, a new file can't be uploaded; use a previously uploaded file via its file_id or specify a URL.
 // On success, if the edited message is not an inline message, the edited [Message] is returned, otherwise True is returned.
@@ -5434,8 +5511,8 @@ type EditMessageTextParams struct {
 	// Identifier of the inline message.
 	InlineMessageID string `json:"inline_message_id,omitempty"`
 
-	// New text of the message, 1-4096 characters after entities parsing
-	Text string `json:"text"`
+	// New text of the message, 1-4096 characters after entity parsing; required if rich_message isn't specified
+	Text string `json:"text,omitempty"`
 
 	// Mode for parsing entities in the message text.
 	// See [formatting options] for more details.
@@ -5448,6 +5525,9 @@ type EditMessageTextParams struct {
 
 	// Link preview generation options for the message
 	LinkPreviewOptions *LinkPreviewOptions `json:"link_preview_options,omitempty"`
+
+	// New rich content of the message; required if text isn't specified
+	RichMessage *InputRichMessage `json:"rich_message,omitempty"`
 
 	// A JSON-serialized object for an [inline keyboard]
 	//
@@ -5519,7 +5599,7 @@ func WithEditMessageTextInlineMessageID(value string) EditMessageTextOption {
 
 // WithEditMessageTextText sets the Text field.
 //
-// New text of the message, 1-4096 characters after entities parsing
+// New text of the message, 1-4096 characters after entity parsing; required if rich_message isn't specified
 func WithEditMessageTextText(value string) EditMessageTextOption {
 	return func(params *EditMessageTextParams) EditMessageTextOption {
 		previous := params.Text
@@ -5568,6 +5648,18 @@ func WithEditMessageTextLinkPreviewOptions(value *LinkPreviewOptions) EditMessag
 	}
 }
 
+// WithEditMessageTextRichMessage sets the RichMessage field.
+//
+// New rich content of the message; required if text isn't specified
+func WithEditMessageTextRichMessage(value *InputRichMessage) EditMessageTextOption {
+	return func(params *EditMessageTextParams) EditMessageTextOption {
+		previous := params.RichMessage
+		params.RichMessage = value
+
+		return WithEditMessageTextRichMessage(previous)
+	}
+}
+
 // WithEditMessageTextReplyMarkup sets the ReplyMarkup field.
 //
 // A JSON-serialized object for an [inline keyboard]
@@ -5584,7 +5676,7 @@ func WithEditMessageTextReplyMarkup(value *InlineKeyboardMarkup) EditMessageText
 
 // EditMessageText calls the editMessageText Telegram Bot API method.
 //
-// Use this method to edit text and [game] messages.
+// Use this method to edit text, rich and [game] messages.
 // On success, if the edited message is not an inline message, the edited [Message] is returned, otherwise True is returned.
 // Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within 48 hours from the time they were sent.
 //
@@ -12631,6 +12723,81 @@ func (c *Client) SendChatAction(ctx context.Context, params *SendChatActionParam
 	return ret, err
 }
 
+// SendChatJoinRequestWebAppParams contains parameters for Client.SendChatJoinRequestWebApp.
+type SendChatJoinRequestWebAppParams struct {
+	// Unique identifier of the join request query
+	ChatJoinRequestQueryID string `json:"chat_join_request_query_id"`
+
+	// The URL of the Mini App to be opened
+	WebAppUrl string `json:"web_app_url"`
+}
+
+// SendChatJoinRequestWebAppOption configures SendChatJoinRequestWebAppParams.
+type SendChatJoinRequestWebAppOption func(params *SendChatJoinRequestWebAppParams) SendChatJoinRequestWebAppOption
+
+// Option applies one or more SendChatJoinRequestWebAppOption values and returns the last rollback option.
+func (r *SendChatJoinRequestWebAppParams) Option(opts ...SendChatJoinRequestWebAppOption) (previous SendChatJoinRequestWebAppOption) {
+	for _, opt := range opts {
+		previous = opt(r)
+	}
+	return previous
+}
+
+// WithSendChatJoinRequestWebAppChatJoinRequestQueryID sets the ChatJoinRequestQueryID field.
+//
+// Unique identifier of the join request query
+func WithSendChatJoinRequestWebAppChatJoinRequestQueryID(value string) SendChatJoinRequestWebAppOption {
+	return func(params *SendChatJoinRequestWebAppParams) SendChatJoinRequestWebAppOption {
+		previous := params.ChatJoinRequestQueryID
+		params.ChatJoinRequestQueryID = value
+
+		return WithSendChatJoinRequestWebAppChatJoinRequestQueryID(previous)
+	}
+}
+
+// WithSendChatJoinRequestWebAppWebAppUrl sets the WebAppUrl field.
+//
+// The URL of the Mini App to be opened
+func WithSendChatJoinRequestWebAppWebAppUrl(value string) SendChatJoinRequestWebAppOption {
+	return func(params *SendChatJoinRequestWebAppParams) SendChatJoinRequestWebAppOption {
+		previous := params.WebAppUrl
+		params.WebAppUrl = value
+
+		return WithSendChatJoinRequestWebAppWebAppUrl(previous)
+	}
+}
+
+// SendChatJoinRequestWebApp calls the sendChatJoinRequestWebApp Telegram Bot API method.
+//
+// Use this method to process a received chat join request query by showing a Mini App to the user before deciding the outcome.
+// Returns True on success.
+func (c *Client) SendChatJoinRequestWebApp(ctx context.Context, params *SendChatJoinRequestWebAppParams) (ret bool, err error) {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
+		return
+	}
+
+	reader := bytes.NewReader(buffer.Bytes())
+
+	contentType := "application/json"
+
+	var result json.RawMessage
+
+	result, err = c.Raw(ctx, "sendChatJoinRequestWebApp", reader, contentType)
+	if err != nil {
+		return
+	}
+
+	ref := &ret
+
+	err = json.Unmarshal(result, ref)
+	if err != nil {
+		return
+	}
+
+	return ret, err
+}
+
 // SendChecklistParams contains parameters for Client.SendChecklist.
 type SendChecklistParams struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
@@ -16581,7 +16748,7 @@ type SendMessageDraftParams struct {
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
 
 	// Unique identifier of the message draft; must be non-zero.
-	// Changes of drafts with the same identifier are animated.
+	// Changes to drafts with the same identifier are animated.
 	DraftID int64 `json:"draft_id"`
 
 	// Text of the message to be sent, 0-4096 characters after entities parsing.
@@ -16636,7 +16803,7 @@ func WithSendMessageDraftMessageThreadID(value int64) SendMessageDraftOption {
 // WithSendMessageDraftDraftID sets the DraftID field.
 //
 // Unique identifier of the message draft; must be non-zero.
-// Changes of drafts with the same identifier are animated.
+// Changes to drafts with the same identifier are animated.
 func WithSendMessageDraftDraftID(value int64) SendMessageDraftOption {
 	return func(params *SendMessageDraftParams) SendMessageDraftOption {
 		previous := params.DraftID
@@ -18461,6 +18628,367 @@ func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Mes
 
 	ret = new(Message)
 	ref := ret
+
+	err = json.Unmarshal(result, ref)
+	if err != nil {
+		return
+	}
+
+	return ret, err
+}
+
+// SendRichMessageParams contains parameters for Client.SendRichMessage.
+type SendRichMessageParams struct {
+	// Unique identifier of the business connection on behalf of which the message will be sent
+	BusinessConnectionID string `json:"business_connection_id,omitempty"`
+
+	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+	ChatID string `json:"chat_id"`
+
+	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
+	MessageThreadID int64 `json:"message_thread_id,omitempty"`
+
+	// Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
+	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
+
+	// The message to be sent
+	RichMessage InputRichMessage `json:"rich_message"`
+
+	// Sends the message [silently].
+	// Users will receive a notification with no sound.
+	//
+	// [silently]: https://telegram.org/blog/channels-2-0#silent-messages
+	DisableNotification bool `json:"disable_notification,omitempty"`
+
+	// Protects the contents of the sent message from forwarding and saving
+	ProtectContent bool `json:"protect_content,omitempty"`
+
+	// Pass True to allow up to 1000 messages per second, ignoring [broadcasting limits] for a fee of 0.1 Telegram Stars per message.
+	// The relevant Stars will be withdrawn from the bot's balance.
+	//
+	// [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
+	AllowPaidBroadcast bool `json:"allow_paid_broadcast,omitempty"`
+
+	// Unique identifier of the message effect to be added to the message; for private chats only
+	MessageEffectID string `json:"message_effect_id,omitempty"`
+
+	// A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only.
+	// If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
+	SuggestedPostParameters *SuggestedPostParameters `json:"suggested_post_parameters,omitempty"`
+
+	// Description of the message to reply to
+	ReplyParameters *ReplyParameters `json:"reply_parameters,omitempty"`
+
+	// Additional interface options.
+	// A JSON-serialized object for an [inline keyboard], [custom reply keyboard], instructions to remove a reply keyboard or to force a reply from the user.
+	//
+	// [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
+	// [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
+	ReplyMarkup *ReplyMarkup `json:"reply_markup,omitempty"`
+}
+
+// SendRichMessageOption configures SendRichMessageParams.
+type SendRichMessageOption func(params *SendRichMessageParams) SendRichMessageOption
+
+// Option applies one or more SendRichMessageOption values and returns the last rollback option.
+func (r *SendRichMessageParams) Option(opts ...SendRichMessageOption) (previous SendRichMessageOption) {
+	for _, opt := range opts {
+		previous = opt(r)
+	}
+	return previous
+}
+
+// WithSendRichMessageBusinessConnectionID sets the BusinessConnectionID field.
+//
+// Unique identifier of the business connection on behalf of which the message will be sent
+func WithSendRichMessageBusinessConnectionID(value string) SendRichMessageOption {
+	return func(params *SendRichMessageParams) SendRichMessageOption {
+		previous := params.BusinessConnectionID
+		params.BusinessConnectionID = value
+
+		return WithSendRichMessageBusinessConnectionID(previous)
+	}
+}
+
+// WithSendRichMessageChatID sets the ChatID field.
+//
+// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+func WithSendRichMessageChatID(value string) SendRichMessageOption {
+	return func(params *SendRichMessageParams) SendRichMessageOption {
+		previous := params.ChatID
+		params.ChatID = value
+
+		return WithSendRichMessageChatID(previous)
+	}
+}
+
+// WithSendRichMessageMessageThreadID sets the MessageThreadID field.
+//
+// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
+func WithSendRichMessageMessageThreadID(value int64) SendRichMessageOption {
+	return func(params *SendRichMessageParams) SendRichMessageOption {
+		previous := params.MessageThreadID
+		params.MessageThreadID = value
+
+		return WithSendRichMessageMessageThreadID(previous)
+	}
+}
+
+// WithSendRichMessageDirectMessagesTopicID sets the DirectMessagesTopicID field.
+//
+// Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
+func WithSendRichMessageDirectMessagesTopicID(value int64) SendRichMessageOption {
+	return func(params *SendRichMessageParams) SendRichMessageOption {
+		previous := params.DirectMessagesTopicID
+		params.DirectMessagesTopicID = value
+
+		return WithSendRichMessageDirectMessagesTopicID(previous)
+	}
+}
+
+// WithSendRichMessageRichMessage sets the RichMessage field.
+//
+// The message to be sent
+func WithSendRichMessageRichMessage(value InputRichMessage) SendRichMessageOption {
+	return func(params *SendRichMessageParams) SendRichMessageOption {
+		previous := params.RichMessage
+		params.RichMessage = value
+
+		return WithSendRichMessageRichMessage(previous)
+	}
+}
+
+// WithSendRichMessageDisableNotification sets the DisableNotification field.
+//
+// Sends the message [silently].
+// Users will receive a notification with no sound.
+//
+// [silently]: https://telegram.org/blog/channels-2-0#silent-messages
+func WithSendRichMessageDisableNotification(value bool) SendRichMessageOption {
+	return func(params *SendRichMessageParams) SendRichMessageOption {
+		previous := params.DisableNotification
+		params.DisableNotification = value
+
+		return WithSendRichMessageDisableNotification(previous)
+	}
+}
+
+// WithSendRichMessageProtectContent sets the ProtectContent field.
+//
+// Protects the contents of the sent message from forwarding and saving
+func WithSendRichMessageProtectContent(value bool) SendRichMessageOption {
+	return func(params *SendRichMessageParams) SendRichMessageOption {
+		previous := params.ProtectContent
+		params.ProtectContent = value
+
+		return WithSendRichMessageProtectContent(previous)
+	}
+}
+
+// WithSendRichMessageAllowPaidBroadcast sets the AllowPaidBroadcast field.
+//
+// Pass True to allow up to 1000 messages per second, ignoring [broadcasting limits] for a fee of 0.1 Telegram Stars per message.
+// The relevant Stars will be withdrawn from the bot's balance.
+//
+// [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
+func WithSendRichMessageAllowPaidBroadcast(value bool) SendRichMessageOption {
+	return func(params *SendRichMessageParams) SendRichMessageOption {
+		previous := params.AllowPaidBroadcast
+		params.AllowPaidBroadcast = value
+
+		return WithSendRichMessageAllowPaidBroadcast(previous)
+	}
+}
+
+// WithSendRichMessageMessageEffectID sets the MessageEffectID field.
+//
+// Unique identifier of the message effect to be added to the message; for private chats only
+func WithSendRichMessageMessageEffectID(value string) SendRichMessageOption {
+	return func(params *SendRichMessageParams) SendRichMessageOption {
+		previous := params.MessageEffectID
+		params.MessageEffectID = value
+
+		return WithSendRichMessageMessageEffectID(previous)
+	}
+}
+
+// WithSendRichMessageSuggestedPostParameters sets the SuggestedPostParameters field.
+//
+// A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only.
+// If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
+func WithSendRichMessageSuggestedPostParameters(value *SuggestedPostParameters) SendRichMessageOption {
+	return func(params *SendRichMessageParams) SendRichMessageOption {
+		previous := params.SuggestedPostParameters
+		params.SuggestedPostParameters = value
+
+		return WithSendRichMessageSuggestedPostParameters(previous)
+	}
+}
+
+// WithSendRichMessageReplyParameters sets the ReplyParameters field.
+//
+// Description of the message to reply to
+func WithSendRichMessageReplyParameters(value *ReplyParameters) SendRichMessageOption {
+	return func(params *SendRichMessageParams) SendRichMessageOption {
+		previous := params.ReplyParameters
+		params.ReplyParameters = value
+
+		return WithSendRichMessageReplyParameters(previous)
+	}
+}
+
+// WithSendRichMessageReplyMarkup sets the ReplyMarkup field.
+//
+// Additional interface options.
+// A JSON-serialized object for an [inline keyboard], [custom reply keyboard], instructions to remove a reply keyboard or to force a reply from the user.
+//
+// [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
+// [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
+func WithSendRichMessageReplyMarkup(value *ReplyMarkup) SendRichMessageOption {
+	return func(params *SendRichMessageParams) SendRichMessageOption {
+		previous := params.ReplyMarkup
+		params.ReplyMarkup = value
+
+		return WithSendRichMessageReplyMarkup(previous)
+	}
+}
+
+// SendRichMessage calls the sendRichMessage Telegram Bot API method.
+//
+// Use this method to send rich messages.
+// If the message contains a block with a media element, then the bot must have the right to send the media to the chat.
+// On success, the sent [Message] is returned.
+//
+// [Message]: https://core.telegram.org/bots/api#message
+func (c *Client) SendRichMessage(ctx context.Context, params *SendRichMessageParams) (ret *Message, err error) {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
+		return
+	}
+
+	reader := bytes.NewReader(buffer.Bytes())
+
+	contentType := "application/json"
+
+	var result json.RawMessage
+
+	result, err = c.Raw(ctx, "sendRichMessage", reader, contentType)
+	if err != nil {
+		return
+	}
+
+	ret = new(Message)
+	ref := ret
+
+	err = json.Unmarshal(result, ref)
+	if err != nil {
+		return
+	}
+
+	return ret, err
+}
+
+// SendRichMessageDraftParams contains parameters for Client.SendRichMessageDraft.
+type SendRichMessageDraftParams struct {
+	// Unique identifier for the target private chat
+	ChatID int64 `json:"chat_id"`
+
+	// Unique identifier for the target message thread
+	MessageThreadID int64 `json:"message_thread_id,omitempty"`
+
+	// Unique identifier of the message draft; must be non-zero.
+	// Changes to drafts with the same identifier are animated.
+	DraftID int64 `json:"draft_id"`
+
+	// The partial message to be streamed
+	RichMessage InputRichMessage `json:"rich_message"`
+}
+
+// SendRichMessageDraftOption configures SendRichMessageDraftParams.
+type SendRichMessageDraftOption func(params *SendRichMessageDraftParams) SendRichMessageDraftOption
+
+// Option applies one or more SendRichMessageDraftOption values and returns the last rollback option.
+func (r *SendRichMessageDraftParams) Option(opts ...SendRichMessageDraftOption) (previous SendRichMessageDraftOption) {
+	for _, opt := range opts {
+		previous = opt(r)
+	}
+	return previous
+}
+
+// WithSendRichMessageDraftChatID sets the ChatID field.
+//
+// Unique identifier for the target private chat
+func WithSendRichMessageDraftChatID(value int64) SendRichMessageDraftOption {
+	return func(params *SendRichMessageDraftParams) SendRichMessageDraftOption {
+		previous := params.ChatID
+		params.ChatID = value
+
+		return WithSendRichMessageDraftChatID(previous)
+	}
+}
+
+// WithSendRichMessageDraftMessageThreadID sets the MessageThreadID field.
+//
+// Unique identifier for the target message thread
+func WithSendRichMessageDraftMessageThreadID(value int64) SendRichMessageDraftOption {
+	return func(params *SendRichMessageDraftParams) SendRichMessageDraftOption {
+		previous := params.MessageThreadID
+		params.MessageThreadID = value
+
+		return WithSendRichMessageDraftMessageThreadID(previous)
+	}
+}
+
+// WithSendRichMessageDraftDraftID sets the DraftID field.
+//
+// Unique identifier of the message draft; must be non-zero.
+// Changes to drafts with the same identifier are animated.
+func WithSendRichMessageDraftDraftID(value int64) SendRichMessageDraftOption {
+	return func(params *SendRichMessageDraftParams) SendRichMessageDraftOption {
+		previous := params.DraftID
+		params.DraftID = value
+
+		return WithSendRichMessageDraftDraftID(previous)
+	}
+}
+
+// WithSendRichMessageDraftRichMessage sets the RichMessage field.
+//
+// The partial message to be streamed
+func WithSendRichMessageDraftRichMessage(value InputRichMessage) SendRichMessageDraftOption {
+	return func(params *SendRichMessageDraftParams) SendRichMessageDraftOption {
+		previous := params.RichMessage
+		params.RichMessage = value
+
+		return WithSendRichMessageDraftRichMessage(previous)
+	}
+}
+
+// SendRichMessageDraft calls the sendRichMessageDraft Telegram Bot API method.
+//
+// Use this method to stream a partial rich message to a user while the message is being generated.
+// Note that the streamed draft is ephemeral and acts as a temporary 30-second preview - once the output is finalized, you must call [sendRichMessage] with the complete message to persist it in the user's chat.
+// Returns True on success.
+//
+// [sendRichMessage]: https://core.telegram.org/bots/api#sendrichmessage
+func (c *Client) SendRichMessageDraft(ctx context.Context, params *SendRichMessageDraftParams) (ret bool, err error) {
+	buffer := new(bytes.Buffer)
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
+		return
+	}
+
+	reader := bytes.NewReader(buffer.Bytes())
+
+	contentType := "application/json"
+
+	var result json.RawMessage
+
+	result, err = c.Raw(ctx, "sendRichMessageDraft", reader, contentType)
+	if err != nil {
+		return
+	}
+
+	ref := &ret
 
 	err = json.Unmarshal(result, ref)
 	if err != nil {
