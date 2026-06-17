@@ -1386,6 +1386,11 @@ type ChatFullInfo struct {
 	// Optional.
 	// The number of Telegram Stars a general user has to pay to send a message to the chat
 	PaidMessageStarCount int64 `json:"paid_message_star_count,omitempty"`
+
+	// Optional.
+	// The bot that processes join request queries in the chat.
+	// The field is only available to chat administrators.
+	GuardBot *User `json:"guard_bot,omitempty"`
 }
 
 // ChatInviteLink
@@ -1459,6 +1464,14 @@ type ChatJoinRequest struct {
 	// Optional.
 	// Chat invite link that was used by the user to send the join request
 	InviteLink *ChatInviteLink `json:"invite_link,omitempty"`
+
+	// Optional.
+	// Identifier of the join request query.
+	// If present, then the bot must call [sendChatJoinRequestWebApp] or directly call [answerChatJoinRequestQuery] within 10 seconds.
+	//
+	// [sendChatJoinRequestWebApp]: https://core.telegram.org/bots/api#sendchatjoinrequestwebapp
+	// [answerChatJoinRequestQuery]: https://core.telegram.org/bots/api#answerchatjoinrequestquery
+	QueryID string `json:"query_id,omitempty"`
 }
 
 // ChatLocation
@@ -1754,7 +1767,7 @@ type ChatMemberRestricted struct {
 	// True, if the user is a member of the chat at the moment of the request
 	IsMember bool `json:"is_member"`
 
-	// True, if the user is allowed to send text messages, contacts, giveaways, giveaway winners, invoices, locations and venues
+	// True, if the user is allowed to send text messages, rich messages, contacts, giveaways, giveaway winners, invoices, locations and venues
 	CanSendMessages bool `json:"can_send_messages"`
 
 	// True, if the user is allowed to send audios
@@ -1861,7 +1874,7 @@ type ChatOwnerLeft struct {
 // Describes actions that a non-administrator user is allowed to take in a chat.
 type ChatPermissions struct {
 	// Optional.
-	// True, if the user is allowed to send text messages, contacts, giveaways, giveaway winners, invoices, locations and venues
+	// True, if the user is allowed to send text messages, rich messages, contacts, giveaways, giveaway winners, invoices, locations and venues
 	CanSendMessages bool `json:"can_send_messages,omitempty"`
 
 	// Optional.
@@ -4599,7 +4612,7 @@ func (r *InputMedia) UnmarshalJSON(data []byte) error {
 //
 // Represents an animation file (GIF or H.264/MPEG-4 AVC video without sound) to be sent.
 type InputMediaAnimation struct {
-	// Type of the result, must be animation
+	// Type of the media, must be animation
 	Type string `json:"type"`
 
 	// File to send.
@@ -4660,7 +4673,7 @@ type InputMediaAnimation struct {
 //
 // Represents an audio file to be treated as music to be sent.
 type InputMediaAudio struct {
-	// Type of the result, must be audio
+	// Type of the media, must be audio
 	Type string `json:"type"`
 
 	// File to send.
@@ -4713,7 +4726,7 @@ type InputMediaAudio struct {
 //
 // Represents a general file to be sent.
 type InputMediaDocument struct {
-	// Type of the result, must be document
+	// Type of the media, must be document
 	Type string `json:"type"`
 
 	// File to send.
@@ -4755,11 +4768,22 @@ type InputMediaDocument struct {
 	DisableContentTypeDetection bool `json:"disable_content_type_detection,omitempty"`
 }
 
+// InputMediaLink
+//
+// Represents an HTTP link to be sent.
+type InputMediaLink struct {
+	// Type of the media, must be link
+	Type string `json:"type"`
+
+	// HTTP URL of the link
+	URL string `json:"url"`
+}
+
 // InputMediaLivePhoto
 //
 // Represents a live photo to be sent.
 type InputMediaLivePhoto struct {
-	// Type of the result, must be live_photo
+	// Type of the media, must be live_photo
 	Type string `json:"type"`
 
 	// Video of the live photo to send.
@@ -4806,7 +4830,7 @@ type InputMediaLivePhoto struct {
 //
 // Represents a location to be sent.
 type InputMediaLocation struct {
-	// Type of the result, must be location
+	// Type of the media, must be location
 	Type string `json:"type"`
 
 	// Latitude of the location
@@ -4824,7 +4848,7 @@ type InputMediaLocation struct {
 //
 // Represents a photo to be sent.
 type InputMediaPhoto struct {
-	// Type of the result, must be photo
+	// Type of the media, must be photo
 	Type string `json:"type"`
 
 	// File to send.
@@ -4862,7 +4886,7 @@ type InputMediaPhoto struct {
 //
 // Represents a sticker file to be sent.
 type InputMediaSticker struct {
-	// Type of the result, must be sticker
+	// Type of the media, must be sticker
 	Type string `json:"type"`
 
 	// File to send.
@@ -4881,7 +4905,7 @@ type InputMediaSticker struct {
 //
 // Represents a venue to be sent.
 type InputMediaVenue struct {
-	// Type of the result, must be venue
+	// Type of the media, must be venue
 	Type string `json:"type"`
 
 	// Latitude of the location
@@ -4921,7 +4945,7 @@ type InputMediaVenue struct {
 //
 // Represents a video to be sent.
 type InputMediaVideo struct {
-	// Type of the result, must be video
+	// Type of the media, must be video
 	Type string `json:"type"`
 
 	// File to send.
@@ -4997,10 +5021,12 @@ type InputMediaVideo struct {
 // InputMessageContent
 //
 // This object represents the content of a message to be sent as a result of an inline query.
-// Telegram clients currently support the following 5 types:
+// Telegram clients currently support the following types:
 //
 //
 // [InputTextMessageContent]
+//
+// [InputRichMessageContent]
 //
 // [InputLocationMessageContent]
 //
@@ -5012,12 +5038,14 @@ type InputMediaVideo struct {
 //
 //
 // [InputTextMessageContent]: https://core.telegram.org/bots/api#inputtextmessagecontent
+// [InputRichMessageContent]: https://core.telegram.org/bots/api#inputrichmessagecontent
 // [InputLocationMessageContent]: https://core.telegram.org/bots/api#inputlocationmessagecontent
 // [InputVenueMessageContent]: https://core.telegram.org/bots/api#inputvenuemessagecontent
 // [InputContactMessageContent]: https://core.telegram.org/bots/api#inputcontactmessagecontent
 // [InputInvoiceMessageContent]: https://core.telegram.org/bots/api#inputinvoicemessagecontent
 type InputMessageContent struct {
 	*InputTextMessageContent
+	*InputRichMessageContent
 	*InputLocationMessageContent
 	*InputVenueMessageContent
 	*InputContactMessageContent
@@ -5028,6 +5056,10 @@ type InputMessageContent struct {
 func (r *InputMessageContent) MarshalJSON() ([]byte, error) {
 	if r.InputTextMessageContent != nil {
 		return json.Marshal(r.InputTextMessageContent)
+	}
+
+	if r.InputRichMessageContent != nil {
+		return json.Marshal(r.InputRichMessageContent)
 	}
 
 	if r.InputLocationMessageContent != nil {
@@ -5384,6 +5416,8 @@ type InputPollOption struct {
 //
 // [InputMediaAnimation]
 //
+// [InputMediaLink]
+//
 // [InputMediaLivePhoto]
 //
 // [InputMediaLocation]
@@ -5398,6 +5432,7 @@ type InputPollOption struct {
 //
 //
 // [InputMediaAnimation]: https://core.telegram.org/bots/api#inputmediaanimation
+// [InputMediaLink]: https://core.telegram.org/bots/api#inputmedialink
 // [InputMediaLivePhoto]: https://core.telegram.org/bots/api#inputmedialivephoto
 // [InputMediaLocation]: https://core.telegram.org/bots/api#inputmedialocation
 // [InputMediaPhoto]: https://core.telegram.org/bots/api#inputmediaphoto
@@ -5406,6 +5441,7 @@ type InputPollOption struct {
 // [InputMediaVideo]: https://core.telegram.org/bots/api#inputmediavideo
 type InputPollOptionMedia struct {
 	*InputMediaAnimation
+	*InputMediaLink
 	*InputMediaLivePhoto
 	*InputMediaLocation
 	*InputMediaPhoto
@@ -5419,6 +5455,11 @@ func (r *InputPollOptionMedia) MarshalJSON() ([]byte, error) {
 	if r.InputMediaAnimation != nil {
 		r.InputMediaAnimation.Type = "animation"
 		return json.Marshal(r.InputMediaAnimation)
+	}
+
+	if r.InputMediaLink != nil {
+		r.InputMediaLink.Type = "link"
+		return json.Marshal(r.InputMediaLink)
 	}
 
 	if r.InputMediaLivePhoto != nil {
@@ -5470,6 +5511,10 @@ func (r *InputPollOptionMedia) UnmarshalJSON(data []byte) error {
 	case "animation":
 		r.InputMediaAnimation = new(InputMediaAnimation)
 		return json.Unmarshal(data, r.InputMediaAnimation)
+
+	case "link":
+		r.InputMediaLink = new(InputMediaLink)
+		return json.Unmarshal(data, r.InputMediaLink)
 
 	case "live_photo":
 		r.InputMediaLivePhoto = new(InputMediaLivePhoto)
@@ -5592,6 +5637,44 @@ type InputProfilePhotoStatic struct {
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
 	Photo InputFile `json:"photo"`
+}
+
+// InputRichMessage
+//
+// Describes a rich message to be sent.
+// Exactly one of the fields html or markdown must be used.
+type InputRichMessage struct {
+	// Optional.
+	// Content of the rich message to send described using HTML formatting.
+	// See [rich message formatting options] for more details.
+	//
+	// [rich message formatting options]: https://core.telegram.org/bots/api#rich-message-formatting-options
+	Html string `json:"html,omitempty"`
+
+	// Optional.
+	// Content of the rich message to send described using Markdown formatting.
+	// See [rich message formatting options] for more details.
+	//
+	// [rich message formatting options]: https://core.telegram.org/bots/api#rich-message-formatting-options
+	Markdown string `json:"markdown,omitempty"`
+
+	// Optional.
+	// Pass True if the rich message must be shown right-to-left
+	IsRtl bool `json:"is_rtl,omitempty"`
+
+	// Optional.
+	// Pass True to skip automatic detection of entities (e.g., URLs, email addresses, username mentions, hashtags, cashtags, bot commands, or phone numbers) in the text
+	SkipEntityDetection bool `json:"skip_entity_detection,omitempty"`
+}
+
+// InputRichMessageContent
+//
+// Represents the [content] of a rich message to be sent as the result of an inline query.
+//
+// [content]: https://core.telegram.org/bots/api#inputmessagecontent
+type InputRichMessageContent struct {
+	// The message to be sent
+	RichMessage InputRichMessage `json:"rich_message"`
 }
 
 // InputSticker
@@ -6035,6 +6118,14 @@ type LabeledPrice struct {
 	// [currency]: https://core.telegram.org/bots/payments#supported-currencies
 	// [currencies.json]: https://core.telegram.org/bots/payments/currencies.json
 	Amount int64 `json:"amount"`
+}
+
+// Link
+//
+// Represents an HTTP link.
+type Link struct {
+	// URL of the link
+	URL string `json:"url"`
 }
 
 // LinkPreviewOptions
@@ -6539,6 +6630,10 @@ type Message struct {
 	// Optional.
 	// Unique identifier of the message effect added to the message
 	EffectID string `json:"effect_id,omitempty"`
+
+	// Optional.
+	// Message is a rich formatted message
+	RichMessage *RichMessage `json:"rich_message,omitempty"`
 
 	// Optional.
 	// Message is an animation, information about the animation.
@@ -8031,6 +8126,10 @@ type PollMedia struct {
 	Document *Document `json:"document,omitempty"`
 
 	// Optional.
+	// The HTTP link attached to the poll option
+	Link *Link `json:"link,omitempty"`
+
+	// Optional.
 	// Media is a live photo, information about the live photo
 	LivePhoto *LivePhoto `json:"live_photo,omitempty"`
 
@@ -8577,6 +8676,1402 @@ type RevenueWithdrawalStateSucceeded struct {
 	Date int64 `json:"date"`
 
 	// An HTTPS URL that can be used to see transaction details
+	URL string `json:"url"`
+}
+
+// RichBlock
+//
+// This object represents a block in a rich formatted message.
+// Currently, it can be any of the following types:
+//
+//
+// [RichBlockParagraph]
+//
+// [RichBlockSectionHeading]
+//
+// [RichBlockPreformatted]
+//
+// [RichBlockFooter]
+//
+// [RichBlockDivider]
+//
+// [RichBlockMathematicalExpression]
+//
+// [RichBlockAnchor]
+//
+// [RichBlockList]
+//
+// [RichBlockBlockQuotation]
+//
+// [RichBlockPullQuotation]
+//
+// [RichBlockCollage]
+//
+// [RichBlockSlideshow]
+//
+// [RichBlockTable]
+//
+// [RichBlockDetails]
+//
+// [RichBlockMap]
+//
+// [RichBlockAnimation]
+//
+// [RichBlockAudio]
+//
+// [RichBlockPhoto]
+//
+// [RichBlockVideo]
+//
+// [RichBlockVoiceNote]
+//
+// [RichBlockThinking]
+//
+//
+// [RichBlockParagraph]: https://core.telegram.org/bots/api#richblockparagraph
+// [RichBlockSectionHeading]: https://core.telegram.org/bots/api#richblocksectionheading
+// [RichBlockPreformatted]: https://core.telegram.org/bots/api#richblockpreformatted
+// [RichBlockFooter]: https://core.telegram.org/bots/api#richblockfooter
+// [RichBlockDivider]: https://core.telegram.org/bots/api#richblockdivider
+// [RichBlockMathematicalExpression]: https://core.telegram.org/bots/api#richblockmathematicalexpression
+// [RichBlockAnchor]: https://core.telegram.org/bots/api#richblockanchor
+// [RichBlockList]: https://core.telegram.org/bots/api#richblocklist
+// [RichBlockBlockQuotation]: https://core.telegram.org/bots/api#richblockblockquotation
+// [RichBlockPullQuotation]: https://core.telegram.org/bots/api#richblockpullquotation
+// [RichBlockCollage]: https://core.telegram.org/bots/api#richblockcollage
+// [RichBlockSlideshow]: https://core.telegram.org/bots/api#richblockslideshow
+// [RichBlockTable]: https://core.telegram.org/bots/api#richblocktable
+// [RichBlockDetails]: https://core.telegram.org/bots/api#richblockdetails
+// [RichBlockMap]: https://core.telegram.org/bots/api#richblockmap
+// [RichBlockAnimation]: https://core.telegram.org/bots/api#richblockanimation
+// [RichBlockAudio]: https://core.telegram.org/bots/api#richblockaudio
+// [RichBlockPhoto]: https://core.telegram.org/bots/api#richblockphoto
+// [RichBlockVideo]: https://core.telegram.org/bots/api#richblockvideo
+// [RichBlockVoiceNote]: https://core.telegram.org/bots/api#richblockvoicenote
+// [RichBlockThinking]: https://core.telegram.org/bots/api#richblockthinking
+type RichBlock struct {
+	*RichBlockParagraph
+	*RichBlockSectionHeading
+	*RichBlockPreformatted
+	*RichBlockFooter
+	*RichBlockDivider
+	*RichBlockMathematicalExpression
+	*RichBlockAnchor
+	*RichBlockList
+	*RichBlockBlockQuotation
+	*RichBlockPullQuotation
+	*RichBlockCollage
+	*RichBlockSlideshow
+	*RichBlockTable
+	*RichBlockDetails
+	*RichBlockMap
+	*RichBlockAnimation
+	*RichBlockAudio
+	*RichBlockPhoto
+	*RichBlockVideo
+	*RichBlockVoiceNote
+	*RichBlockThinking
+}
+
+// MarshalJSON marshals the currently set subtype of RichBlock.
+func (r *RichBlock) MarshalJSON() ([]byte, error) {
+	if r.RichBlockParagraph != nil {
+		r.RichBlockParagraph.Type = "paragraph"
+		return json.Marshal(r.RichBlockParagraph)
+	}
+
+	if r.RichBlockSectionHeading != nil {
+		r.RichBlockSectionHeading.Type = "heading"
+		return json.Marshal(r.RichBlockSectionHeading)
+	}
+
+	if r.RichBlockPreformatted != nil {
+		r.RichBlockPreformatted.Type = "pre"
+		return json.Marshal(r.RichBlockPreformatted)
+	}
+
+	if r.RichBlockFooter != nil {
+		r.RichBlockFooter.Type = "footer"
+		return json.Marshal(r.RichBlockFooter)
+	}
+
+	if r.RichBlockDivider != nil {
+		r.RichBlockDivider.Type = "divider"
+		return json.Marshal(r.RichBlockDivider)
+	}
+
+	if r.RichBlockMathematicalExpression != nil {
+		r.RichBlockMathematicalExpression.Type = "mathematical_expression"
+		return json.Marshal(r.RichBlockMathematicalExpression)
+	}
+
+	if r.RichBlockAnchor != nil {
+		r.RichBlockAnchor.Type = "anchor"
+		return json.Marshal(r.RichBlockAnchor)
+	}
+
+	if r.RichBlockList != nil {
+		r.RichBlockList.Type = "list"
+		return json.Marshal(r.RichBlockList)
+	}
+
+	if r.RichBlockBlockQuotation != nil {
+		r.RichBlockBlockQuotation.Type = "blockquote"
+		return json.Marshal(r.RichBlockBlockQuotation)
+	}
+
+	if r.RichBlockPullQuotation != nil {
+		r.RichBlockPullQuotation.Type = "pullquote"
+		return json.Marshal(r.RichBlockPullQuotation)
+	}
+
+	if r.RichBlockCollage != nil {
+		r.RichBlockCollage.Type = "collage"
+		return json.Marshal(r.RichBlockCollage)
+	}
+
+	if r.RichBlockSlideshow != nil {
+		r.RichBlockSlideshow.Type = "slideshow"
+		return json.Marshal(r.RichBlockSlideshow)
+	}
+
+	if r.RichBlockTable != nil {
+		r.RichBlockTable.Type = "table"
+		return json.Marshal(r.RichBlockTable)
+	}
+
+	if r.RichBlockDetails != nil {
+		r.RichBlockDetails.Type = "details"
+		return json.Marshal(r.RichBlockDetails)
+	}
+
+	if r.RichBlockMap != nil {
+		r.RichBlockMap.Type = "map"
+		return json.Marshal(r.RichBlockMap)
+	}
+
+	if r.RichBlockAnimation != nil {
+		r.RichBlockAnimation.Type = "animation"
+		return json.Marshal(r.RichBlockAnimation)
+	}
+
+	if r.RichBlockAudio != nil {
+		r.RichBlockAudio.Type = "audio"
+		return json.Marshal(r.RichBlockAudio)
+	}
+
+	if r.RichBlockPhoto != nil {
+		r.RichBlockPhoto.Type = "photo"
+		return json.Marshal(r.RichBlockPhoto)
+	}
+
+	if r.RichBlockVideo != nil {
+		r.RichBlockVideo.Type = "video"
+		return json.Marshal(r.RichBlockVideo)
+	}
+
+	if r.RichBlockVoiceNote != nil {
+		r.RichBlockVoiceNote.Type = "voice_note"
+		return json.Marshal(r.RichBlockVoiceNote)
+	}
+
+	if r.RichBlockThinking != nil {
+		r.RichBlockThinking.Type = "thinking"
+		return json.Marshal(r.RichBlockThinking)
+	}
+
+	return nil, nil
+}
+
+// UnmarshalJSON unmarshals JSON into the matching RichBlock subtype.
+func (r *RichBlock) UnmarshalJSON(data []byte) error {
+	type T struct {
+		Discriminator string `json:"type"`
+	}
+
+	v := new(T)
+
+	if err := json.Unmarshal(data, v); err != nil {
+		return err
+	}
+
+	switch v.Discriminator {
+	case "paragraph":
+		r.RichBlockParagraph = new(RichBlockParagraph)
+		return json.Unmarshal(data, r.RichBlockParagraph)
+
+	case "heading":
+		r.RichBlockSectionHeading = new(RichBlockSectionHeading)
+		return json.Unmarshal(data, r.RichBlockSectionHeading)
+
+	case "pre":
+		r.RichBlockPreformatted = new(RichBlockPreformatted)
+		return json.Unmarshal(data, r.RichBlockPreformatted)
+
+	case "footer":
+		r.RichBlockFooter = new(RichBlockFooter)
+		return json.Unmarshal(data, r.RichBlockFooter)
+
+	case "divider":
+		r.RichBlockDivider = new(RichBlockDivider)
+		return json.Unmarshal(data, r.RichBlockDivider)
+
+	case "mathematical_expression":
+		r.RichBlockMathematicalExpression = new(RichBlockMathematicalExpression)
+		return json.Unmarshal(data, r.RichBlockMathematicalExpression)
+
+	case "anchor":
+		r.RichBlockAnchor = new(RichBlockAnchor)
+		return json.Unmarshal(data, r.RichBlockAnchor)
+
+	case "list":
+		r.RichBlockList = new(RichBlockList)
+		return json.Unmarshal(data, r.RichBlockList)
+
+	case "blockquote":
+		r.RichBlockBlockQuotation = new(RichBlockBlockQuotation)
+		return json.Unmarshal(data, r.RichBlockBlockQuotation)
+
+	case "pullquote":
+		r.RichBlockPullQuotation = new(RichBlockPullQuotation)
+		return json.Unmarshal(data, r.RichBlockPullQuotation)
+
+	case "collage":
+		r.RichBlockCollage = new(RichBlockCollage)
+		return json.Unmarshal(data, r.RichBlockCollage)
+
+	case "slideshow":
+		r.RichBlockSlideshow = new(RichBlockSlideshow)
+		return json.Unmarshal(data, r.RichBlockSlideshow)
+
+	case "table":
+		r.RichBlockTable = new(RichBlockTable)
+		return json.Unmarshal(data, r.RichBlockTable)
+
+	case "details":
+		r.RichBlockDetails = new(RichBlockDetails)
+		return json.Unmarshal(data, r.RichBlockDetails)
+
+	case "map":
+		r.RichBlockMap = new(RichBlockMap)
+		return json.Unmarshal(data, r.RichBlockMap)
+
+	case "animation":
+		r.RichBlockAnimation = new(RichBlockAnimation)
+		return json.Unmarshal(data, r.RichBlockAnimation)
+
+	case "audio":
+		r.RichBlockAudio = new(RichBlockAudio)
+		return json.Unmarshal(data, r.RichBlockAudio)
+
+	case "photo":
+		r.RichBlockPhoto = new(RichBlockPhoto)
+		return json.Unmarshal(data, r.RichBlockPhoto)
+
+	case "video":
+		r.RichBlockVideo = new(RichBlockVideo)
+		return json.Unmarshal(data, r.RichBlockVideo)
+
+	case "voice_note":
+		r.RichBlockVoiceNote = new(RichBlockVoiceNote)
+		return json.Unmarshal(data, r.RichBlockVoiceNote)
+
+	case "thinking":
+		r.RichBlockThinking = new(RichBlockThinking)
+		return json.Unmarshal(data, r.RichBlockThinking)
+
+	default:
+		return errors.New("unknown subtype value: " + v.Discriminator)
+	}
+}
+
+// RichBlockAnchor
+//
+// A block with an anchor, corresponding to the HTML tag <a> with the attribute name.
+type RichBlockAnchor struct {
+	// Type of the block, always “anchor”
+	Type string `json:"type"`
+
+	// The name of the anchor
+	Name string `json:"name"`
+}
+
+// RichBlockAnimation
+//
+// A block with an animation, corresponding to the HTML tag <video>.
+type RichBlockAnimation struct {
+	// Type of the block, always “animation”
+	Type string `json:"type"`
+
+	// The animation
+	Animation Animation `json:"animation"`
+
+	// Optional.
+	// True, if the media preview is covered by a spoiler animation
+	HasSpoiler bool `json:"has_spoiler,omitempty"`
+
+	// Optional.
+	// Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// RichBlockAudio
+//
+// A block with a music file, corresponding to the HTML tag <audio>.
+type RichBlockAudio struct {
+	// Type of the block, always “audio”
+	Type string `json:"type"`
+
+	// The audio
+	Audio Audio `json:"audio"`
+
+	// Optional.
+	// Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// RichBlockBlockQuotation
+//
+// A block quotation, corresponding to the HTML tag <blockquote>.
+type RichBlockBlockQuotation struct {
+	// Type of the block, always “blockquote”
+	Type string `json:"type"`
+
+	// Content of the block
+	Blocks []RichBlock `json:"blocks"`
+
+	// Optional.
+	// Credit of the block
+	Credit *RichText `json:"credit,omitempty"`
+}
+
+// RichBlockCaption
+//
+// Caption of a rich formatted block.
+type RichBlockCaption struct {
+	// Block caption
+	Text RichText `json:"text"`
+
+	// Optional.
+	// Block credit which corresponds to the HTML tag <cite>
+	Credit *RichText `json:"credit,omitempty"`
+}
+
+// RichBlockCollage
+//
+// A collage, corresponding to the custom HTML tag <tg-collage>.
+type RichBlockCollage struct {
+	// Type of the block, always “collage”
+	Type string `json:"type"`
+
+	// Elements of the collage
+	Blocks []RichBlock `json:"blocks"`
+
+	// Optional.
+	// Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// RichBlockDetails
+//
+// An expandable block for details disclosure, corresponding to the HTML tag <details>.
+type RichBlockDetails struct {
+	// Type of the block, always “details”
+	Type string `json:"type"`
+
+	// Always shown summary of the block
+	Summary RichText `json:"summary"`
+
+	// Content of the block
+	Blocks []RichBlock `json:"blocks"`
+
+	// Optional.
+	// True, if the content of the block is visible by default
+	IsOpen bool `json:"is_open,omitempty"`
+}
+
+// RichBlockDivider
+//
+// A divider, corresponding to the HTML tag <hr/>.
+type RichBlockDivider struct {
+	// Type of the block, always “divider”
+	Type string `json:"type"`
+}
+
+// RichBlockFooter
+//
+// A footer, corresponding to the HTML tag <footer>.
+type RichBlockFooter struct {
+	// Type of the block, always “footer”
+	Type string `json:"type"`
+
+	// Text of the block
+	Text RichText `json:"text"`
+}
+
+// RichBlockList
+//
+// A list of blocks, corresponding to the HTML tag <ul> or <ol> with multiple nested tags <li>.
+type RichBlockList struct {
+	// Type of the block, always “list”
+	Type string `json:"type"`
+
+	// Items of the list
+	Items []RichBlockListItem `json:"items"`
+}
+
+// RichBlockListItem
+//
+// An item of a list.
+type RichBlockListItem struct {
+	// Label of the item
+	Label string `json:"label"`
+
+	// The content of the item
+	Blocks []RichBlock `json:"blocks"`
+
+	// Optional.
+	// True, if the item has a checkbox
+	HasCheckbox bool `json:"has_checkbox,omitempty"`
+
+	// Optional.
+	// True, if the item has a checked checkbox
+	IsChecked bool `json:"is_checked,omitempty"`
+
+	// Optional.
+	// For ordered lists, the numeric value of the item label
+	Value int64 `json:"value,omitempty"`
+
+	// Optional.
+	// For ordered lists, the type of the item label; must be one of “a” for lowercase letters, “A” for uppercase letters, “i” for lowercase Roman numerals, “I” for uppercase Roman numerals, or “1” for decimal numbers
+	Type string `json:"type,omitempty"`
+}
+
+// RichBlockMap
+//
+// A block with a map, corresponding to the custom HTML tag <tg-map>.
+type RichBlockMap struct {
+	// Type of the block, always “map”
+	Type string `json:"type"`
+
+	// Location of the center of the map
+	Location Location `json:"location"`
+
+	// Map zoom level; 13-20
+	Zoom int64 `json:"zoom"`
+
+	// Expected width of the map
+	Width int64 `json:"width"`
+
+	// Expected height of the map
+	Height int64 `json:"height"`
+
+	// Optional.
+	// Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// RichBlockMathematicalExpression
+//
+// A block with a mathematical expression in LaTeX format, corresponding to the custom HTML tag <tg-math-block>.
+type RichBlockMathematicalExpression struct {
+	// Type of the block, always “mathematical_expression”
+	Type string `json:"type"`
+
+	// The mathematical expression in LaTeX format
+	Expression string `json:"expression"`
+}
+
+// RichBlockParagraph
+//
+// A text paragraph, corresponding to the HTML tag <p>.
+type RichBlockParagraph struct {
+	// Type of the block, always “paragraph”
+	Type string `json:"type"`
+
+	// Text of the block
+	Text RichText `json:"text"`
+}
+
+// RichBlockPhoto
+//
+// A block with a photo, corresponding to the HTML tag <photo>.
+type RichBlockPhoto struct {
+	// Type of the block, always “photo”
+	Type string `json:"type"`
+
+	// Available sizes of the photo
+	Photo []PhotoSize `json:"photo"`
+
+	// Optional.
+	// True, if the media preview is covered by a spoiler animation
+	HasSpoiler bool `json:"has_spoiler,omitempty"`
+
+	// Optional.
+	// Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// RichBlockPreformatted
+//
+// A preformatted text block, corresponding to the nested HTML tags <pre> and <code>.
+type RichBlockPreformatted struct {
+	// Type of the block, always “pre”
+	Type string `json:"type"`
+
+	// Text of the block
+	Text RichText `json:"text"`
+
+	// Optional.
+	// The programming language of the text
+	Language string `json:"language,omitempty"`
+}
+
+// RichBlockPullQuotation
+//
+// A quotation with centered text, loosely corresponding to the HTML tag <aside>.
+type RichBlockPullQuotation struct {
+	// Type of the block, always “pullquote”
+	Type string `json:"type"`
+
+	// Text of the block
+	Text RichText `json:"text"`
+
+	// Optional.
+	// Credit of the block
+	Credit *RichText `json:"credit,omitempty"`
+}
+
+// RichBlockSectionHeading
+//
+// A section heading, corresponding to the HTML tags <h1>, <h2>, <h3>, <h4>, <h5>, or <h6>.
+type RichBlockSectionHeading struct {
+	// Type of the block, always “heading”
+	Type string `json:"type"`
+
+	// Text of the block
+	Text RichText `json:"text"`
+
+	// Relative size of the text font; 1-6, 1 is the largest, 6 is the smallest
+	Size int64 `json:"size"`
+}
+
+// RichBlockSlideshow
+//
+// A slideshow, corresponding to the custom HTML tag <tg-slideshow>.
+type RichBlockSlideshow struct {
+	// Type of the block, always “slideshow”
+	Type string `json:"type"`
+
+	// Elements of the slideshow
+	Blocks []RichBlock `json:"blocks"`
+
+	// Optional.
+	// Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// RichBlockTable
+//
+// A table, corresponding to the HTML tag <table>.
+type RichBlockTable struct {
+	// Type of the block, always “table”
+	Type string `json:"type"`
+
+	// Cells of the table
+	Cells [][]RichBlockTableCell `json:"cells"`
+
+	// Optional.
+	// True, if the table has borders
+	IsBordered bool `json:"is_bordered,omitempty"`
+
+	// Optional.
+	// True, if the table is striped
+	IsStriped bool `json:"is_striped,omitempty"`
+
+	// Optional.
+	// Caption of the table
+	Caption *RichText `json:"caption,omitempty"`
+}
+
+// RichBlockTableCell
+//
+// Cell in a table.
+type RichBlockTableCell struct {
+	// Optional.
+	// Text in the cell.
+	// If omitted, then the cell is invisible.
+	Text *RichText `json:"text,omitempty"`
+
+	// Optional.
+	// True, if the cell is a header cell
+	IsHeader bool `json:"is_header,omitempty"`
+
+	// Optional.
+	// The number of columns the cell spans if it is bigger than 1
+	Colspan int64 `json:"colspan,omitempty"`
+
+	// Optional.
+	// The number of rows the cell spans if it is bigger than 1
+	Rowspan int64 `json:"rowspan,omitempty"`
+
+	// Horizontal cell content alignment.
+	// Currently, must be one of “left”, “center”, or “right”.
+	Align string `json:"align"`
+
+	// Vertical cell content alignment.
+	// Currently, must be one of “top”, “middle”, or “bottom”.
+	Valign string `json:"valign"`
+}
+
+// RichBlockThinking
+//
+// A block with a “Thinking…” placeholder, corresponding to the custom HTML tag <tg-thinking>.
+// The block may be used only in [sendRichMessageDraft], therefore it can't be received in messages.
+// See [https://t.me/addemoji/AIActions] for examples of custom emoji, which are recommended for usage in the block.
+//
+// [sendRichMessageDraft]: https://core.telegram.org/bots/api#sendrichmessagedraft
+// [https://t.me/addemoji/AIActions]: https://t.me/addemoji/AIActions
+type RichBlockThinking struct {
+	// Type of the block, always “thinking”
+	Type string `json:"type"`
+
+	// Text of the block.
+	// See [https://t.me/addemoji/AIActions] for examples of custom emoji, which are recommended for usage in the block.
+	//
+	// [https://t.me/addemoji/AIActions]: https://t.me/addemoji/AIActions
+	Text RichText `json:"text"`
+}
+
+// RichBlockVideo
+//
+// A block with a video, corresponding to the HTML tag <video>.
+type RichBlockVideo struct {
+	// Type of the block, always “video”
+	Type string `json:"type"`
+
+	// The video
+	Video Video `json:"video"`
+
+	// Optional.
+	// True, if the media preview is covered by a spoiler animation
+	HasSpoiler bool `json:"has_spoiler,omitempty"`
+
+	// Optional.
+	// Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// RichBlockVoiceNote
+//
+// A block with a voice note, corresponding to the HTML tag <audio>.
+type RichBlockVoiceNote struct {
+	// Type of the block, always “voice_note”
+	Type string `json:"type"`
+
+	// The voice note
+	VoiceNote Voice `json:"voice_note"`
+
+	// Optional.
+	// Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// RichMessage
+//
+// Rich formatted message.
+type RichMessage struct {
+	// Content of the message
+	Blocks []RichBlock `json:"blocks"`
+
+	// Optional.
+	// True, if the rich message must be shown right-to-left
+	IsRtl bool `json:"is_rtl,omitempty"`
+}
+
+// RichText
+//
+// This object represents a rich formatted text.
+// Currently, it can be either a String for plain text, an Array of [RichText], or any of the following types:
+//
+//
+// [RichTextBold]
+//
+// [RichTextItalic]
+//
+// [RichTextUnderline]
+//
+// [RichTextStrikethrough]
+//
+// [RichTextSpoiler]
+//
+// [RichTextDateTime]
+//
+// [RichTextTextMention]
+//
+// [RichTextSubscript]
+//
+// [RichTextSuperscript]
+//
+// [RichTextMarked]
+//
+// [RichTextCode]
+//
+// [RichTextCustomEmoji]
+//
+// [RichTextMathematicalExpression]
+//
+// [RichTextUrl]
+//
+// [RichTextEmailAddress]
+//
+// [RichTextPhoneNumber]
+//
+// [RichTextBankCardNumber]
+//
+// [RichTextMention]
+//
+// [RichTextHashtag]
+//
+// [RichTextCashtag]
+//
+// [RichTextBotCommand]
+//
+// [RichTextAnchor]
+//
+// [RichTextAnchorLink]
+//
+// [RichTextReference]
+//
+// [RichTextReferenceLink]
+//
+//
+// [RichText]: https://core.telegram.org/bots/api#richtext
+// [RichTextBold]: https://core.telegram.org/bots/api#richtextbold
+// [RichTextItalic]: https://core.telegram.org/bots/api#richtextitalic
+// [RichTextUnderline]: https://core.telegram.org/bots/api#richtextunderline
+// [RichTextStrikethrough]: https://core.telegram.org/bots/api#richtextstrikethrough
+// [RichTextSpoiler]: https://core.telegram.org/bots/api#richtextspoiler
+// [RichTextDateTime]: https://core.telegram.org/bots/api#richtextdatetime
+// [RichTextTextMention]: https://core.telegram.org/bots/api#richtexttextmention
+// [RichTextSubscript]: https://core.telegram.org/bots/api#richtextsubscript
+// [RichTextSuperscript]: https://core.telegram.org/bots/api#richtextsuperscript
+// [RichTextMarked]: https://core.telegram.org/bots/api#richtextmarked
+// [RichTextCode]: https://core.telegram.org/bots/api#richtextcode
+// [RichTextCustomEmoji]: https://core.telegram.org/bots/api#richtextcustomemoji
+// [RichTextMathematicalExpression]: https://core.telegram.org/bots/api#richtextmathematicalexpression
+// [RichTextUrl]: https://core.telegram.org/bots/api#richtexturl
+// [RichTextEmailAddress]: https://core.telegram.org/bots/api#richtextemailaddress
+// [RichTextPhoneNumber]: https://core.telegram.org/bots/api#richtextphonenumber
+// [RichTextBankCardNumber]: https://core.telegram.org/bots/api#richtextbankcardnumber
+// [RichTextMention]: https://core.telegram.org/bots/api#richtextmention
+// [RichTextHashtag]: https://core.telegram.org/bots/api#richtexthashtag
+// [RichTextCashtag]: https://core.telegram.org/bots/api#richtextcashtag
+// [RichTextBotCommand]: https://core.telegram.org/bots/api#richtextbotcommand
+// [RichTextAnchor]: https://core.telegram.org/bots/api#richtextanchor
+// [RichTextAnchorLink]: https://core.telegram.org/bots/api#richtextanchorlink
+// [RichTextReference]: https://core.telegram.org/bots/api#richtextreference
+// [RichTextReferenceLink]: https://core.telegram.org/bots/api#richtextreferencelink
+type RichText struct {
+	*RichTextBold
+	*RichTextItalic
+	*RichTextUnderline
+	*RichTextStrikethrough
+	*RichTextSpoiler
+	*RichTextDateTime
+	*RichTextTextMention
+	*RichTextSubscript
+	*RichTextSuperscript
+	*RichTextMarked
+	*RichTextCode
+	*RichTextCustomEmoji
+	*RichTextMathematicalExpression
+	*RichTextUrl
+	*RichTextEmailAddress
+	*RichTextPhoneNumber
+	*RichTextBankCardNumber
+	*RichTextMention
+	*RichTextHashtag
+	*RichTextCashtag
+	*RichTextBotCommand
+	*RichTextAnchor
+	*RichTextAnchorLink
+	*RichTextReference
+	*RichTextReferenceLink
+}
+
+// MarshalJSON marshals the currently set subtype of RichText.
+func (r *RichText) MarshalJSON() ([]byte, error) {
+	if r.RichTextBold != nil {
+		r.RichTextBold.Type = "bold"
+		return json.Marshal(r.RichTextBold)
+	}
+
+	if r.RichTextItalic != nil {
+		r.RichTextItalic.Type = "italic"
+		return json.Marshal(r.RichTextItalic)
+	}
+
+	if r.RichTextUnderline != nil {
+		r.RichTextUnderline.Type = "underline"
+		return json.Marshal(r.RichTextUnderline)
+	}
+
+	if r.RichTextStrikethrough != nil {
+		r.RichTextStrikethrough.Type = "strikethrough"
+		return json.Marshal(r.RichTextStrikethrough)
+	}
+
+	if r.RichTextSpoiler != nil {
+		r.RichTextSpoiler.Type = "spoiler"
+		return json.Marshal(r.RichTextSpoiler)
+	}
+
+	if r.RichTextDateTime != nil {
+		r.RichTextDateTime.Type = "date_time"
+		return json.Marshal(r.RichTextDateTime)
+	}
+
+	if r.RichTextTextMention != nil {
+		r.RichTextTextMention.Type = "text_mention"
+		return json.Marshal(r.RichTextTextMention)
+	}
+
+	if r.RichTextSubscript != nil {
+		r.RichTextSubscript.Type = "subscript"
+		return json.Marshal(r.RichTextSubscript)
+	}
+
+	if r.RichTextSuperscript != nil {
+		r.RichTextSuperscript.Type = "superscript"
+		return json.Marshal(r.RichTextSuperscript)
+	}
+
+	if r.RichTextMarked != nil {
+		r.RichTextMarked.Type = "marked"
+		return json.Marshal(r.RichTextMarked)
+	}
+
+	if r.RichTextCode != nil {
+		r.RichTextCode.Type = "code"
+		return json.Marshal(r.RichTextCode)
+	}
+
+	if r.RichTextCustomEmoji != nil {
+		r.RichTextCustomEmoji.Type = "custom_emoji"
+		return json.Marshal(r.RichTextCustomEmoji)
+	}
+
+	if r.RichTextMathematicalExpression != nil {
+		r.RichTextMathematicalExpression.Type = "mathematical_expression"
+		return json.Marshal(r.RichTextMathematicalExpression)
+	}
+
+	if r.RichTextUrl != nil {
+		r.RichTextUrl.Type = "url"
+		return json.Marshal(r.RichTextUrl)
+	}
+
+	if r.RichTextEmailAddress != nil {
+		r.RichTextEmailAddress.Type = "email_address"
+		return json.Marshal(r.RichTextEmailAddress)
+	}
+
+	if r.RichTextPhoneNumber != nil {
+		r.RichTextPhoneNumber.Type = "phone_number"
+		return json.Marshal(r.RichTextPhoneNumber)
+	}
+
+	if r.RichTextBankCardNumber != nil {
+		r.RichTextBankCardNumber.Type = "bank_card_number"
+		return json.Marshal(r.RichTextBankCardNumber)
+	}
+
+	if r.RichTextMention != nil {
+		r.RichTextMention.Type = "mention"
+		return json.Marshal(r.RichTextMention)
+	}
+
+	if r.RichTextHashtag != nil {
+		r.RichTextHashtag.Type = "hashtag"
+		return json.Marshal(r.RichTextHashtag)
+	}
+
+	if r.RichTextCashtag != nil {
+		r.RichTextCashtag.Type = "cashtag"
+		return json.Marshal(r.RichTextCashtag)
+	}
+
+	if r.RichTextBotCommand != nil {
+		r.RichTextBotCommand.Type = "bot_command"
+		return json.Marshal(r.RichTextBotCommand)
+	}
+
+	if r.RichTextAnchor != nil {
+		r.RichTextAnchor.Type = "anchor"
+		return json.Marshal(r.RichTextAnchor)
+	}
+
+	if r.RichTextAnchorLink != nil {
+		r.RichTextAnchorLink.Type = "anchor_link"
+		return json.Marshal(r.RichTextAnchorLink)
+	}
+
+	if r.RichTextReference != nil {
+		r.RichTextReference.Type = "reference"
+		return json.Marshal(r.RichTextReference)
+	}
+
+	if r.RichTextReferenceLink != nil {
+		r.RichTextReferenceLink.Type = "reference_link"
+		return json.Marshal(r.RichTextReferenceLink)
+	}
+
+	return nil, nil
+}
+
+// UnmarshalJSON unmarshals JSON into the matching RichText subtype.
+func (r *RichText) UnmarshalJSON(data []byte) error {
+	type T struct {
+		Discriminator string `json:"type"`
+	}
+
+	v := new(T)
+
+	if err := json.Unmarshal(data, v); err != nil {
+		return err
+	}
+
+	switch v.Discriminator {
+	case "bold":
+		r.RichTextBold = new(RichTextBold)
+		return json.Unmarshal(data, r.RichTextBold)
+
+	case "italic":
+		r.RichTextItalic = new(RichTextItalic)
+		return json.Unmarshal(data, r.RichTextItalic)
+
+	case "underline":
+		r.RichTextUnderline = new(RichTextUnderline)
+		return json.Unmarshal(data, r.RichTextUnderline)
+
+	case "strikethrough":
+		r.RichTextStrikethrough = new(RichTextStrikethrough)
+		return json.Unmarshal(data, r.RichTextStrikethrough)
+
+	case "spoiler":
+		r.RichTextSpoiler = new(RichTextSpoiler)
+		return json.Unmarshal(data, r.RichTextSpoiler)
+
+	case "date_time":
+		r.RichTextDateTime = new(RichTextDateTime)
+		return json.Unmarshal(data, r.RichTextDateTime)
+
+	case "text_mention":
+		r.RichTextTextMention = new(RichTextTextMention)
+		return json.Unmarshal(data, r.RichTextTextMention)
+
+	case "subscript":
+		r.RichTextSubscript = new(RichTextSubscript)
+		return json.Unmarshal(data, r.RichTextSubscript)
+
+	case "superscript":
+		r.RichTextSuperscript = new(RichTextSuperscript)
+		return json.Unmarshal(data, r.RichTextSuperscript)
+
+	case "marked":
+		r.RichTextMarked = new(RichTextMarked)
+		return json.Unmarshal(data, r.RichTextMarked)
+
+	case "code":
+		r.RichTextCode = new(RichTextCode)
+		return json.Unmarshal(data, r.RichTextCode)
+
+	case "custom_emoji":
+		r.RichTextCustomEmoji = new(RichTextCustomEmoji)
+		return json.Unmarshal(data, r.RichTextCustomEmoji)
+
+	case "mathematical_expression":
+		r.RichTextMathematicalExpression = new(RichTextMathematicalExpression)
+		return json.Unmarshal(data, r.RichTextMathematicalExpression)
+
+	case "url":
+		r.RichTextUrl = new(RichTextUrl)
+		return json.Unmarshal(data, r.RichTextUrl)
+
+	case "email_address":
+		r.RichTextEmailAddress = new(RichTextEmailAddress)
+		return json.Unmarshal(data, r.RichTextEmailAddress)
+
+	case "phone_number":
+		r.RichTextPhoneNumber = new(RichTextPhoneNumber)
+		return json.Unmarshal(data, r.RichTextPhoneNumber)
+
+	case "bank_card_number":
+		r.RichTextBankCardNumber = new(RichTextBankCardNumber)
+		return json.Unmarshal(data, r.RichTextBankCardNumber)
+
+	case "mention":
+		r.RichTextMention = new(RichTextMention)
+		return json.Unmarshal(data, r.RichTextMention)
+
+	case "hashtag":
+		r.RichTextHashtag = new(RichTextHashtag)
+		return json.Unmarshal(data, r.RichTextHashtag)
+
+	case "cashtag":
+		r.RichTextCashtag = new(RichTextCashtag)
+		return json.Unmarshal(data, r.RichTextCashtag)
+
+	case "bot_command":
+		r.RichTextBotCommand = new(RichTextBotCommand)
+		return json.Unmarshal(data, r.RichTextBotCommand)
+
+	case "anchor":
+		r.RichTextAnchor = new(RichTextAnchor)
+		return json.Unmarshal(data, r.RichTextAnchor)
+
+	case "anchor_link":
+		r.RichTextAnchorLink = new(RichTextAnchorLink)
+		return json.Unmarshal(data, r.RichTextAnchorLink)
+
+	case "reference":
+		r.RichTextReference = new(RichTextReference)
+		return json.Unmarshal(data, r.RichTextReference)
+
+	case "reference_link":
+		r.RichTextReferenceLink = new(RichTextReferenceLink)
+		return json.Unmarshal(data, r.RichTextReferenceLink)
+
+	default:
+		return errors.New("unknown subtype value: " + v.Discriminator)
+	}
+}
+
+// RichTextAnchor
+//
+// An anchor.
+type RichTextAnchor struct {
+	// Type of the rich text, always “anchor”
+	Type string `json:"type"`
+
+	// The name of the anchor
+	Name string `json:"name"`
+}
+
+// RichTextAnchorLink
+//
+// A link to an anchor.
+type RichTextAnchorLink struct {
+	// Type of the rich text, always “anchor_link”
+	Type string `json:"type"`
+
+	// The link text
+	Text RichText `json:"text"`
+
+	// The name of the anchor.
+	// If the name is empty, then the link brings back to the top of the message.
+	AnchorName string `json:"anchor_name"`
+}
+
+// RichTextBankCardNumber
+//
+// A text with a bank card number.
+type RichTextBankCardNumber struct {
+	// Type of the rich text, always “bank_card_number”
+	Type string `json:"type"`
+
+	// The text
+	Text RichText `json:"text"`
+
+	// The bank card number
+	BankCardNumber string `json:"bank_card_number"`
+}
+
+// RichTextBold
+//
+// A bold text.
+type RichTextBold struct {
+	// Type of the rich text, always “bold”
+	Type string `json:"type"`
+
+	// The text
+	Text RichText `json:"text"`
+}
+
+// RichTextBotCommand
+//
+// A bot command.
+type RichTextBotCommand struct {
+	// Type of the rich text, always “bot_command”
+	Type string `json:"type"`
+
+	// The text
+	Text RichText `json:"text"`
+
+	// The bot command
+	BotCommand string `json:"bot_command"`
+}
+
+// RichTextCashtag
+//
+// A cashtag.
+type RichTextCashtag struct {
+	// Type of the rich text, always “cashtag”
+	Type string `json:"type"`
+
+	// The text
+	Text RichText `json:"text"`
+
+	// The cashtag
+	Cashtag string `json:"cashtag"`
+}
+
+// RichTextCode
+//
+// A monowidth text.
+type RichTextCode struct {
+	// Type of the rich text, always “code”
+	Type string `json:"type"`
+
+	// The text
+	Text RichText `json:"text"`
+}
+
+// RichTextCustomEmoji
+//
+// A custom emoji.
+type RichTextCustomEmoji struct {
+	// Type of the rich text, always “custom_emoji”
+	Type string `json:"type"`
+
+	// Unique identifier of the custom emoji.
+	// Use [getCustomEmojiStickers] to get full information about the sticker.
+	//
+	// [getCustomEmojiStickers]: https://core.telegram.org/bots/api#getcustomemojistickers
+	CustomEmojiID string `json:"custom_emoji_id"`
+
+	// Alternative emoji for the custom emoji
+	AlternativeText string `json:"alternative_text"`
+}
+
+// RichTextDateTime
+//
+// Formatted date and time.
+type RichTextDateTime struct {
+	// Type of the rich text, always “date_time”
+	Type string `json:"type"`
+
+	// The text
+	Text RichText `json:"text"`
+
+	// The Unix time associated with the entity
+	UnixTime int64 `json:"unix_time"`
+
+	// The string that defines the formatting of the date and time.
+	// See [date-time entity formatting] for more details.
+	//
+	// [date-time entity formatting]: https://core.telegram.org/bots/api#date-time-entity-formatting
+	DateTimeFormat string `json:"date_time_format"`
+}
+
+// RichTextEmailAddress
+//
+// A text with an email address.
+type RichTextEmailAddress struct {
+	// Type of the rich text, always “email_address”
+	Type string `json:"type"`
+
+	// The text
+	Text RichText `json:"text"`
+
+	// The email address
+	EmailAddress string `json:"email_address"`
+}
+
+// RichTextHashtag
+//
+// A hashtag.
+type RichTextHashtag struct {
+	// Type of the rich text, always “hashtag”
+	Type string `json:"type"`
+
+	// The text
+	Text RichText `json:"text"`
+
+	// The hashtag
+	Hashtag string `json:"hashtag"`
+}
+
+// RichTextItalic
+//
+// An italicized text.
+type RichTextItalic struct {
+	// Type of the rich text, always “italic”
+	Type string `json:"type"`
+
+	// The text
+	Text RichText `json:"text"`
+}
+
+// RichTextMarked
+//
+// A marked text.
+type RichTextMarked struct {
+	// Type of the rich text, always “marked”
+	Type string `json:"type"`
+
+	// The text
+	Text RichText `json:"text"`
+}
+
+// RichTextMathematicalExpression
+//
+// A mathematical expression.
+type RichTextMathematicalExpression struct {
+	// Type of the rich text, always “mathematical_expression”
+	Type string `json:"type"`
+
+	// The expression in LaTeX format
+	Expression string `json:"expression"`
+}
+
+// RichTextMention
+//
+// A mention by a username.
+type RichTextMention struct {
+	// Type of the rich text, always “mention”
+	Type string `json:"type"`
+
+	// The text
+	Text RichText `json:"text"`
+
+	// The username
+	Username string `json:"username"`
+}
+
+// RichTextPhoneNumber
+//
+// A text with a phone number.
+type RichTextPhoneNumber struct {
+	// Type of the rich text, always “phone_number”
+	Type string `json:"type"`
+
+	// The text
+	Text RichText `json:"text"`
+
+	// The phone number
+	PhoneNumber string `json:"phone_number"`
+}
+
+// RichTextReference
+//
+// A reference.
+type RichTextReference struct {
+	// Type of the rich text, always “reference”
+	Type string `json:"type"`
+
+	// Text of the reference
+	Text RichText `json:"text"`
+
+	// The name of the reference
+	Name string `json:"name"`
+}
+
+// RichTextReferenceLink
+//
+// A link to a reference.
+type RichTextReferenceLink struct {
+	// Type of the rich text, always “reference_link”
+	Type string `json:"type"`
+
+	// The link text
+	Text RichText `json:"text"`
+
+	// The name of the reference
+	ReferenceName string `json:"reference_name"`
+}
+
+// RichTextSpoiler
+//
+// A text covered by a spoiler.
+type RichTextSpoiler struct {
+	// Type of the rich text, always “spoiler”
+	Type string `json:"type"`
+
+	// The text
+	Text RichText `json:"text"`
+}
+
+// RichTextStrikethrough
+//
+// A strikethrough text.
+type RichTextStrikethrough struct {
+	// Type of the rich text, always “strikethrough”
+	Type string `json:"type"`
+
+	// The text
+	Text RichText `json:"text"`
+}
+
+// RichTextSubscript
+//
+// A subscript text.
+type RichTextSubscript struct {
+	// Type of the rich text, always “subscript”
+	Type string `json:"type"`
+
+	// The text
+	Text RichText `json:"text"`
+}
+
+// RichTextSuperscript
+//
+// A superscript text.
+type RichTextSuperscript struct {
+	// Type of the rich text, always “superscript”
+	Type string `json:"type"`
+
+	// The text
+	Text RichText `json:"text"`
+}
+
+// RichTextTextMention
+//
+// A mention of a Telegram user by their identifier.
+type RichTextTextMention struct {
+	// Type of the rich text, always “text_mention”
+	Type string `json:"type"`
+
+	// The text
+	Text RichText `json:"text"`
+
+	// The mentioned user
+	User User `json:"user"`
+}
+
+// RichTextUnderline
+//
+// An underlined text.
+type RichTextUnderline struct {
+	// Type of the rich text, always “underline”
+	Type string `json:"type"`
+
+	// The text
+	Text RichText `json:"text"`
+}
+
+// RichTextUrl
+//
+// A text with a link.
+type RichTextUrl struct {
+	// Type of the rich text, always “url”
+	Type string `json:"type"`
+
+	// The text
+	Text RichText `json:"text"`
+
+	// URL of the link
 	URL string `json:"url"`
 }
 
@@ -9934,6 +11429,13 @@ type User struct {
 	//
 	// [getMe]: https://core.telegram.org/bots/api#getme
 	CanManageBots bool `json:"can_manage_bots,omitempty"`
+
+	// Optional.
+	// True, if the bot supports join request queries and can be assigned to process them.
+	// Returned only in [getMe].
+	//
+	// [getMe]: https://core.telegram.org/bots/api#getme
+	SupportsJoinRequestQueries bool `json:"supports_join_request_queries,omitempty"`
 }
 
 // UserChatBoosts
