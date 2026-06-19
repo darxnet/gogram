@@ -29,8 +29,7 @@ func detectVariants(paragraphs []*html.Node) (canBeString bool, canBeArray strin
 			canBeString = true
 		}
 		const arrayOf = "Array of "
-		if idx := strings.Index(text, arrayOf); idx != -1 {
-			rest := text[idx+len(arrayOf):]
+		if _, rest, ok := strings.Cut(text, arrayOf); ok {
 			if end := strings.IndexAny(rest, " ,\n"); end != -1 {
 				canBeArray = rest[:end]
 			} else {

@@ -14,7 +14,7 @@ func TestRouter_HandleCommand_FastPath(t *testing.T) {
 	var handled bool
 
 	// Register via fast path
-	r.HandleCommand("/start", func(_ *gogram.Context, m *gogram.Message) error {
+	r.HandleCommand("/start", func(_ *gogram.Context, _ *gogram.Message) error {
 		handled = true
 		return nil
 	})
@@ -102,7 +102,7 @@ func TestRouter_HandleCommand_Spaces(t *testing.T) {
 				t.Error("HandleCommand should panic if command contains spaces")
 			}
 		}()
-		r.HandleCommand("/start game", func(_ *gogram.Context, m *gogram.Message) error { return nil })
+		r.HandleCommand("/start game", func(_ *gogram.Context, _ *gogram.Message) error { return nil })
 	}()
 }
 
@@ -116,13 +116,13 @@ func TestRouter_HandleCommand_MultipleHandlers(t *testing.T) {
 	adminGroup := r.Group(func(ctx *gogram.Context) bool {
 		return ctx.Text() == "/secret admin_token"
 	})
-	adminGroup.HandleCommand("/secret", func(_ *gogram.Context, m *gogram.Message) error {
+	adminGroup.HandleCommand("/secret", func(_ *gogram.Context, _ *gogram.Message) error {
 		events = append(events, "admin")
 		return nil
 	})
 
 	// General handler
-	r.HandleCommand("/secret", func(_ *gogram.Context, m *gogram.Message) error {
+	r.HandleCommand("/secret", func(_ *gogram.Context, _ *gogram.Message) error {
 		events = append(events, "general")
 		return nil
 	})
@@ -159,7 +159,7 @@ func TestRouter_HandleCommand_FallbackToSlowPath(t *testing.T) {
 
 	// Register a command handler with a filter that will fail
 	failGroup := r.Group(func(_ *gogram.Context) bool { return false })
-	failGroup.HandleCommand("/try", func(_ *gogram.Context, m *gogram.Message) error {
+	failGroup.HandleCommand("/try", func(_ *gogram.Context, _ *gogram.Message) error {
 		events = append(events, "fast")
 		return nil
 	})

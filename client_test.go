@@ -238,7 +238,7 @@ func TestContextMethod_PropagatesHandlerContext(t *testing.T) {
 				Result: json.RawMessage(`{}`),
 			}
 
-			return jsonHTTPResponse(t, http.StatusOK, &resp), nil
+			return jsonHTTPResponse(t, &resp), nil
 		}),
 	}
 
@@ -292,7 +292,7 @@ func TestContextMethod_WithoutCancel_PreservesValuesAfterParentCancel(t *testing
 				Result: json.RawMessage(`{}`),
 			}
 
-			return jsonHTTPResponse(t, http.StatusOK, &resp), nil
+			return jsonHTTPResponse(t, &resp), nil
 		}),
 	}
 
@@ -402,12 +402,12 @@ func (r *failingReadCloser) Read(p []byte) (int, error) {
 
 func (*failingReadCloser) Close() error { return nil }
 
-func jsonHTTPResponse(t *testing.T, statusCode int, payload any) *http.Response {
+func jsonHTTPResponse(t *testing.T, payload any) *http.Response {
 	t.Helper()
 
 	return &http.Response{
-		StatusCode: statusCode,
-		Status:     http.StatusText(statusCode),
+		StatusCode: http.StatusOK,
+		Status:     http.StatusText(http.StatusOK),
 		Header:     make(http.Header),
 		Body:       io.NopCloser(bytes.NewReader(mustMarshal(t, payload))),
 	}
