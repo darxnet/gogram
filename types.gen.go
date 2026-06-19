@@ -174,6 +174,10 @@ func (r *BackgroundFill) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unmarshals JSON into the matching BackgroundFill subtype.
 func (r *BackgroundFill) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+
 	type T struct {
 		Discriminator string `json:"type"`
 	}
@@ -294,6 +298,10 @@ func (r *BackgroundType) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unmarshals JSON into the matching BackgroundType subtype.
 func (r *BackgroundType) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+
 	type T struct {
 		Discriminator string `json:"type"`
 	}
@@ -520,6 +528,10 @@ func (r *BotCommandScope) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unmarshals JSON into the matching BotCommandScope subtype.
 func (r *BotCommandScope) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+
 	type T struct {
 		Discriminator string `json:"type"`
 	}
@@ -1076,6 +1088,10 @@ func (r *ChatBoostSource) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unmarshals JSON into the matching ChatBoostSource subtype.
 func (r *ChatBoostSource) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+
 	type T struct {
 		Discriminator string `json:"source"`
 	}
@@ -1557,6 +1573,10 @@ func (r *ChatMember) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unmarshals JSON into the matching ChatMember subtype.
 func (r *ChatMember) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+
 	type T struct {
 		Discriminator string `json:"status"`
 	}
@@ -4568,6 +4588,10 @@ func (r *InputMedia) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unmarshals JSON into the matching InputMedia subtype.
 func (r *InputMedia) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+
 	type T struct {
 		Discriminator string `json:"type"`
 	}
@@ -5125,6 +5149,10 @@ func (r *InputPaidMedia) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unmarshals JSON into the matching InputPaidMedia subtype.
 func (r *InputPaidMedia) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+
 	type T struct {
 		Discriminator string `json:"type"`
 	}
@@ -5335,6 +5363,10 @@ func (r *InputPollMedia) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unmarshals JSON into the matching InputPollMedia subtype.
 func (r *InputPollMedia) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+
 	type T struct {
 		Discriminator string `json:"type"`
 	}
@@ -5497,6 +5529,10 @@ func (r *InputPollOptionMedia) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unmarshals JSON into the matching InputPollOptionMedia subtype.
 func (r *InputPollOptionMedia) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+
 	type T struct {
 		Discriminator string `json:"type"`
 	}
@@ -5580,6 +5616,10 @@ func (r *InputProfilePhoto) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unmarshals JSON into the matching InputProfilePhoto subtype.
 func (r *InputProfilePhoto) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+
 	type T struct {
 		Discriminator string `json:"type"`
 	}
@@ -5741,6 +5781,10 @@ func (r *InputStoryContent) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unmarshals JSON into the matching InputStoryContent subtype.
 func (r *InputStoryContent) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+
 	type T struct {
 		Discriminator string `json:"type"`
 	}
@@ -6404,6 +6448,10 @@ func (r *MenuButton) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unmarshals JSON into the matching MenuButton subtype.
 func (r *MenuButton) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+
 	type T struct {
 		Discriminator string `json:"type"`
 	}
@@ -7110,6 +7158,10 @@ func (r *MessageOrigin) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unmarshals JSON into the matching MessageOrigin subtype.
 func (r *MessageOrigin) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+
 	type T struct {
 		Discriminator string `json:"type"`
 	}
@@ -7310,6 +7362,10 @@ func (r *OwnedGift) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unmarshals JSON into the matching OwnedGift subtype.
 func (r *OwnedGift) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+
 	type T struct {
 		Discriminator string `json:"type"`
 	}
@@ -7507,6 +7563,10 @@ func (r *PaidMedia) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unmarshals JSON into the matching PaidMedia subtype.
 func (r *PaidMedia) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+
 	type T struct {
 		Discriminator string `json:"type"`
 	}
@@ -7733,6 +7793,10 @@ func (r *PassportElementError) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unmarshals JSON into the matching PassportElementError subtype.
 func (r *PassportElementError) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+
 	type T struct {
 		Discriminator string `json:"source"`
 	}
@@ -8357,6 +8421,10 @@ func (r *ReactionType) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unmarshals JSON into the matching ReactionType subtype.
 func (r *ReactionType) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+
 	type T struct {
 		Discriminator string `json:"type"`
 	}
@@ -8621,6 +8689,10 @@ func (r *RevenueWithdrawalState) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unmarshals JSON into the matching RevenueWithdrawalState subtype.
 func (r *RevenueWithdrawalState) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+
 	type T struct {
 		Discriminator string `json:"type"`
 	}
@@ -8885,6 +8957,10 @@ func (r *RichBlock) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unmarshals JSON into the matching RichBlock subtype.
 func (r *RichBlock) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+
 	type T struct {
 		Discriminator string `json:"type"`
 	}
@@ -9473,6 +9549,10 @@ type RichMessage struct {
 // [RichTextReference]: https://core.telegram.org/bots/api#richtextreference
 // [RichTextReferenceLink]: https://core.telegram.org/bots/api#richtextreferencelink
 type RichText struct {
+	// Plain holds the value when RichText is represented as a plain string.
+	Plain string
+	// Slice holds the value when RichText is represented as a JSON array.
+	Slice []RichText
 	*RichTextBold
 	*RichTextItalic
 	*RichTextUnderline
@@ -9502,6 +9582,12 @@ type RichText struct {
 
 // MarshalJSON marshals the currently set subtype of RichText.
 func (r *RichText) MarshalJSON() ([]byte, error) {
+	if r.Plain != "" {
+		return json.Marshal(r.Plain)
+	}
+	if r.Slice != nil {
+		return json.Marshal(r.Slice)
+	}
 	if r.RichTextBold != nil {
 		r.RichTextBold.Type = "bold"
 		return json.Marshal(r.RichTextBold)
@@ -9631,7 +9717,18 @@ func (r *RichText) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON unmarshals JSON into the matching RichText subtype.
+// RichText can also be a plain string or an array of RichText.
 func (r *RichText) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+	switch data[0] {
+	case '"':
+		return json.Unmarshal(data, &r.Plain)
+	case '[':
+		return json.Unmarshal(data, &r.Slice)
+	}
+
 	type T struct {
 		Discriminator string `json:"type"`
 	}
@@ -10426,6 +10523,10 @@ func (r *StoryAreaType) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unmarshals JSON into the matching StoryAreaType subtype.
 func (r *StoryAreaType) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+
 	type T struct {
 		Discriminator string `json:"type"`
 	}
@@ -10859,6 +10960,10 @@ func (r *TransactionPartner) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON unmarshals JSON into the matching TransactionPartner subtype.
 func (r *TransactionPartner) UnmarshalJSON(data []byte) error {
+	if len(data) == 0 {
+		return nil
+	}
+
 	type T struct {
 		Discriminator string `json:"type"`
 	}

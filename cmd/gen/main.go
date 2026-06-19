@@ -41,7 +41,10 @@ func (field Field) FileUploadCode(types map[string]Type) string {
 	}
 
 	var isArray bool
-	_, fieldType, isArray = strings.Cut(fieldType, "[]")
+	if _, after, found := strings.Cut(fieldType, "[]"); found {
+		fieldType = after
+		isArray = true
+	}
 
 	parent, ok := types[fieldType]
 	if !ok {
@@ -206,9 +209,11 @@ func (field Field) AutoFillCode(types map[string]Type) string {
 
 // Type describes a Telegram API type for code generation.
 type Type struct {
-	Name, Desc string
-	Fields     []Field
-	Subtypes   []string
+	Name, Desc  string
+	Fields      []Field
+	Subtypes    []string
+	CanBeString bool   // value can be represented as a plain string
+	CanBeArray  string // element type name when value can be a JSON array (e.g. "RichText")
 }
 
 // Param is a method parameter descriptor.

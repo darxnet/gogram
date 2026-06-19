@@ -79,19 +79,66 @@ func WithAddStickerToSetSticker(value InputSticker) AddStickerToSetOption {
 // Other sticker sets can have up to 120 stickers.
 // Returns True on success.
 func (c *Client) AddStickerToSet(ctx context.Context, params *AddStickerToSetParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
-	if err = json.NewEncoder(buffer).Encode(params); err != nil {
-		return
-	}
+	reader, pw := io.Pipe()
+	writer := multipart.NewWriter(pw)
 
-	reader := bytes.NewReader(buffer.Bytes())
+	go func() {
+		defer pw.Close()
+		defer writer.Close()
 
-	contentType := "application/json"
+		{
+			v := strconv.FormatInt(params.UserID, 10)
+			if err := writer.WriteField("user_id", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		{
+			v := params.Name
+			if err := writer.WriteField("name", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		{
+			err = createFormFileFromInputFile(
+				writer,
+				&params.Sticker.Sticker,
+				"sticker__sticker",
+			)
+			if err != nil {
+				return
+			}
+
+			bs, err := json.Marshal(&params.Sticker)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			p, err := writer.CreateFormField("sticker")
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			_, err = p.Write(bs)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+	}()
+
+	contentType := writer.FormDataContentType()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "addStickerToSet", reader, contentType)
 	if err != nil {
+		_ = reader.CloseWithError(err)
 		return
 	}
 
@@ -3000,7 +3047,7 @@ func (c *Client) CreateNewStickerSet(ctx context.Context, params *CreateNewStick
 				}
 			}
 
-			bs, err := json.Marshal(params.Stickers)
+			bs, err := json.Marshal(&params.Stickers)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -5333,19 +5380,208 @@ func WithEditMessageMediaReplyMarkup(value *InlineKeyboardMarkup) EditMessageMed
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) EditMessageMedia(ctx context.Context, params *EditMessageMediaParams) (ret *Message, err error) {
-	buffer := new(bytes.Buffer)
-	if err = json.NewEncoder(buffer).Encode(params); err != nil {
-		return
-	}
+	reader, pw := io.Pipe()
+	writer := multipart.NewWriter(pw)
 
-	reader := bytes.NewReader(buffer.Bytes())
+	go func() {
+		defer pw.Close()
+		defer writer.Close()
 
-	contentType := "application/json"
+		if params.BusinessConnectionID != "" {
+			v := params.BusinessConnectionID
+			if err := writer.WriteField("business_connection_id", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.ChatID != "" {
+			v := params.ChatID
+			if err := writer.WriteField("chat_id", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.MessageID != 0 {
+			v := strconv.FormatInt(params.MessageID, 10)
+			if err := writer.WriteField("message_id", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.InlineMessageID != "" {
+			v := params.InlineMessageID
+			if err := writer.WriteField("inline_message_id", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		{
+			switch {
+			case params.Media.InputMediaAnimation != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.Media.InputMediaAnimation.Media,
+					"media_animation_media",
+				)
+				if err != nil {
+					return
+				}
+				if params.Media.InputMediaAnimation.Thumbnail != nil {
+					err = createFormFileFromInputFile(
+						writer,
+						params.Media.InputMediaAnimation.Thumbnail,
+						"media_animation_thumbnail",
+					)
+					if err != nil {
+						return
+					}
+				}
+			case params.Media.InputMediaAudio != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.Media.InputMediaAudio.Media,
+					"media_audio_media",
+				)
+				if err != nil {
+					return
+				}
+				if params.Media.InputMediaAudio.Thumbnail != nil {
+					err = createFormFileFromInputFile(
+						writer,
+						params.Media.InputMediaAudio.Thumbnail,
+						"media_audio_thumbnail",
+					)
+					if err != nil {
+						return
+					}
+				}
+			case params.Media.InputMediaDocument != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.Media.InputMediaDocument.Media,
+					"media_document_media",
+				)
+				if err != nil {
+					return
+				}
+				if params.Media.InputMediaDocument.Thumbnail != nil {
+					err = createFormFileFromInputFile(
+						writer,
+						params.Media.InputMediaDocument.Thumbnail,
+						"media_document_thumbnail",
+					)
+					if err != nil {
+						return
+					}
+				}
+			case params.Media.InputMediaLivePhoto != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.Media.InputMediaLivePhoto.Media,
+					"media_live_photo_media",
+				)
+				if err != nil {
+					return
+				}
+				err = createFormFileFromInputFile(
+					writer,
+					&params.Media.InputMediaLivePhoto.Photo,
+					"media_live_photo_photo",
+				)
+				if err != nil {
+					return
+				}
+			case params.Media.InputMediaPhoto != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.Media.InputMediaPhoto.Media,
+					"media_photo_media",
+				)
+				if err != nil {
+					return
+				}
+			case params.Media.InputMediaVideo != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.Media.InputMediaVideo.Media,
+					"media_video_media",
+				)
+				if err != nil {
+					return
+				}
+				if params.Media.InputMediaVideo.Thumbnail != nil {
+					err = createFormFileFromInputFile(
+						writer,
+						params.Media.InputMediaVideo.Thumbnail,
+						"media_video_thumbnail",
+					)
+					if err != nil {
+						return
+					}
+				}
+				if params.Media.InputMediaVideo.Cover != nil {
+					err = createFormFileFromInputFile(
+						writer,
+						params.Media.InputMediaVideo.Cover,
+						"media_video_cover",
+					)
+					if err != nil {
+						return
+					}
+				}
+			}
+
+			bs, err := json.Marshal(&params.Media)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			p, err := writer.CreateFormField("media")
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			_, err = p.Write(bs)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.ReplyMarkup != nil {
+			bs, err := json.Marshal(&params.ReplyMarkup)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			p, err := writer.CreateFormField("reply_markup")
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			_, err = p.Write(bs)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+	}()
+
+	contentType := writer.FormDataContentType()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "editMessageMedia", reader, contentType)
 	if err != nil {
+		_ = reader.CloseWithError(err)
 		return
 	}
 
@@ -5843,19 +6079,134 @@ func WithEditStoryAreas(value []StoryArea) EditStoryOption {
 //
 // [Story]: https://core.telegram.org/bots/api#story
 func (c *Client) EditStory(ctx context.Context, params *EditStoryParams) (ret *Story, err error) {
-	buffer := new(bytes.Buffer)
-	if err = json.NewEncoder(buffer).Encode(params); err != nil {
-		return
-	}
+	reader, pw := io.Pipe()
+	writer := multipart.NewWriter(pw)
 
-	reader := bytes.NewReader(buffer.Bytes())
+	go func() {
+		defer pw.Close()
+		defer writer.Close()
 
-	contentType := "application/json"
+		{
+			v := params.BusinessConnectionID
+			if err := writer.WriteField("business_connection_id", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		{
+			v := strconv.FormatInt(params.StoryID, 10)
+			if err := writer.WriteField("story_id", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		{
+			switch {
+			case params.Content.InputStoryContentPhoto != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.Content.InputStoryContentPhoto.Photo,
+					"content_photo_photo",
+				)
+				if err != nil {
+					return
+				}
+			case params.Content.InputStoryContentVideo != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.Content.InputStoryContentVideo.Video,
+					"content_video_video",
+				)
+				if err != nil {
+					return
+				}
+			}
+
+			bs, err := json.Marshal(&params.Content)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			p, err := writer.CreateFormField("content")
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			_, err = p.Write(bs)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.Caption != "" {
+			v := params.Caption
+			if err := writer.WriteField("caption", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.ParseMode != "" {
+			v := params.ParseMode
+			if err := writer.WriteField("parse_mode", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if len(params.CaptionEntities) != 0 {
+			bs, err := json.Marshal(&params.CaptionEntities)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			p, err := writer.CreateFormField("caption_entities")
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			_, err = p.Write(bs)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if len(params.Areas) != 0 {
+			bs, err := json.Marshal(&params.Areas)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			p, err := writer.CreateFormField("areas")
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			_, err = p.Write(bs)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+	}()
+
+	contentType := writer.FormDataContentType()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "editStory", reader, contentType)
 	if err != nil {
+		_ = reader.CloseWithError(err)
 		return
 	}
 
@@ -9697,19 +10048,150 @@ func WithPostStoryProtectContent(value bool) PostStoryOption {
 //
 // [Story]: https://core.telegram.org/bots/api#story
 func (c *Client) PostStory(ctx context.Context, params *PostStoryParams) (ret *Story, err error) {
-	buffer := new(bytes.Buffer)
-	if err = json.NewEncoder(buffer).Encode(params); err != nil {
-		return
-	}
+	reader, pw := io.Pipe()
+	writer := multipart.NewWriter(pw)
 
-	reader := bytes.NewReader(buffer.Bytes())
+	go func() {
+		defer pw.Close()
+		defer writer.Close()
 
-	contentType := "application/json"
+		{
+			v := params.BusinessConnectionID
+			if err := writer.WriteField("business_connection_id", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		{
+			switch {
+			case params.Content.InputStoryContentPhoto != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.Content.InputStoryContentPhoto.Photo,
+					"content_photo_photo",
+				)
+				if err != nil {
+					return
+				}
+			case params.Content.InputStoryContentVideo != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.Content.InputStoryContentVideo.Video,
+					"content_video_video",
+				)
+				if err != nil {
+					return
+				}
+			}
+
+			bs, err := json.Marshal(&params.Content)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			p, err := writer.CreateFormField("content")
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			_, err = p.Write(bs)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		{
+			v := strconv.FormatInt(params.ActivePeriod, 10)
+			if err := writer.WriteField("active_period", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.Caption != "" {
+			v := params.Caption
+			if err := writer.WriteField("caption", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.ParseMode != "" {
+			v := params.ParseMode
+			if err := writer.WriteField("parse_mode", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if len(params.CaptionEntities) != 0 {
+			bs, err := json.Marshal(&params.CaptionEntities)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			p, err := writer.CreateFormField("caption_entities")
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			_, err = p.Write(bs)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if len(params.Areas) != 0 {
+			bs, err := json.Marshal(&params.Areas)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			p, err := writer.CreateFormField("areas")
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			_, err = p.Write(bs)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.PostToChatPage {
+			v := strconv.FormatBool(params.PostToChatPage)
+			if err := writer.WriteField("post_to_chat_page", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.ProtectContent {
+			v := strconv.FormatBool(params.ProtectContent)
+			if err := writer.WriteField("protect_content", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+	}()
+
+	contentType := writer.FormDataContentType()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "postStory", reader, contentType)
 	if err != nil {
+		_ = reader.CloseWithError(err)
 		return
 	}
 
@@ -10763,19 +11245,74 @@ func WithReplaceStickerInSetSticker(value InputSticker) ReplaceStickerInSetOptio
 // [addStickerToSet]: https://core.telegram.org/bots/api#addstickertoset
 // [setStickerPositionInSet]: https://core.telegram.org/bots/api#setstickerpositioninset
 func (c *Client) ReplaceStickerInSet(ctx context.Context, params *ReplaceStickerInSetParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
-	if err = json.NewEncoder(buffer).Encode(params); err != nil {
-		return
-	}
+	reader, pw := io.Pipe()
+	writer := multipart.NewWriter(pw)
 
-	reader := bytes.NewReader(buffer.Bytes())
+	go func() {
+		defer pw.Close()
+		defer writer.Close()
 
-	contentType := "application/json"
+		{
+			v := strconv.FormatInt(params.UserID, 10)
+			if err := writer.WriteField("user_id", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		{
+			v := params.Name
+			if err := writer.WriteField("name", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		{
+			v := params.OldSticker
+			if err := writer.WriteField("old_sticker", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		{
+			err = createFormFileFromInputFile(
+				writer,
+				&params.Sticker.Sticker,
+				"sticker__sticker",
+			)
+			if err != nil {
+				return
+			}
+
+			bs, err := json.Marshal(&params.Sticker)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			p, err := writer.CreateFormField("sticker")
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			_, err = p.Write(bs)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+	}()
+
+	contentType := writer.FormDataContentType()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "replaceStickerInSet", reader, contentType)
 	if err != nil {
+		_ = reader.CloseWithError(err)
 		return
 	}
 
@@ -11846,7 +12383,7 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			bs, err := json.Marshal(params.CaptionEntities)
+			bs, err := json.Marshal(&params.CaptionEntities)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -11914,7 +12451,7 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 		}
 
 		if params.SuggestedPostParameters != nil {
-			bs, err := json.Marshal(params.SuggestedPostParameters)
+			bs, err := json.Marshal(&params.SuggestedPostParameters)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -11934,7 +12471,7 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 		}
 
 		if params.ReplyParameters != nil {
-			bs, err := json.Marshal(params.ReplyParameters)
+			bs, err := json.Marshal(&params.ReplyParameters)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -11954,7 +12491,7 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 		}
 
 		if params.ReplyMarkup != nil {
-			bs, err := json.Marshal(params.ReplyMarkup)
+			bs, err := json.Marshal(&params.ReplyMarkup)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -12423,7 +12960,7 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			bs, err := json.Marshal(params.CaptionEntities)
+			bs, err := json.Marshal(&params.CaptionEntities)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -12513,7 +13050,7 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 		}
 
 		if params.SuggestedPostParameters != nil {
-			bs, err := json.Marshal(params.SuggestedPostParameters)
+			bs, err := json.Marshal(&params.SuggestedPostParameters)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -12533,7 +13070,7 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 		}
 
 		if params.ReplyParameters != nil {
-			bs, err := json.Marshal(params.ReplyParameters)
+			bs, err := json.Marshal(&params.ReplyParameters)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -12553,7 +13090,7 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 		}
 
 		if params.ReplyMarkup != nil {
-			bs, err := json.Marshal(params.ReplyMarkup)
+			bs, err := json.Marshal(&params.ReplyMarkup)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -13939,7 +14476,7 @@ func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			bs, err := json.Marshal(params.CaptionEntities)
+			bs, err := json.Marshal(&params.CaptionEntities)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -13999,7 +14536,7 @@ func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (
 		}
 
 		if params.SuggestedPostParameters != nil {
-			bs, err := json.Marshal(params.SuggestedPostParameters)
+			bs, err := json.Marshal(&params.SuggestedPostParameters)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -14019,7 +14556,7 @@ func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (
 		}
 
 		if params.ReplyParameters != nil {
-			bs, err := json.Marshal(params.ReplyParameters)
+			bs, err := json.Marshal(&params.ReplyParameters)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -14039,7 +14576,7 @@ func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (
 		}
 
 		if params.ReplyMarkup != nil {
-			bs, err := json.Marshal(params.ReplyMarkup)
+			bs, err := json.Marshal(&params.ReplyMarkup)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -15525,7 +16062,7 @@ func (c *Client) SendLivePhoto(ctx context.Context, params *SendLivePhotoParams)
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			bs, err := json.Marshal(params.CaptionEntities)
+			bs, err := json.Marshal(&params.CaptionEntities)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -15593,7 +16130,7 @@ func (c *Client) SendLivePhoto(ctx context.Context, params *SendLivePhotoParams)
 		}
 
 		if params.SuggestedPostParameters != nil {
-			bs, err := json.Marshal(params.SuggestedPostParameters)
+			bs, err := json.Marshal(&params.SuggestedPostParameters)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -15613,7 +16150,7 @@ func (c *Client) SendLivePhoto(ctx context.Context, params *SendLivePhotoParams)
 		}
 
 		if params.ReplyParameters != nil {
-			bs, err := json.Marshal(params.ReplyParameters)
+			bs, err := json.Marshal(&params.ReplyParameters)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -15633,7 +16170,7 @@ func (c *Client) SendLivePhoto(ctx context.Context, params *SendLivePhotoParams)
 		}
 
 		if params.ReplyMarkup != nil {
-			bs, err := json.Marshal(params.ReplyMarkup)
+			bs, err := json.Marshal(&params.ReplyMarkup)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -16348,7 +16885,7 @@ func (c *Client) SendMediaGroup(ctx context.Context, params *SendMediaGroupParam
 				}
 			}
 
-			bs, err := json.Marshal(params.Media)
+			bs, err := json.Marshal(&params.Media)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -16400,7 +16937,7 @@ func (c *Client) SendMediaGroup(ctx context.Context, params *SendMediaGroupParam
 		}
 
 		if params.ReplyParameters != nil {
-			bs, err := json.Marshal(params.ReplyParameters)
+			bs, err := json.Marshal(&params.ReplyParameters)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -17308,7 +17845,7 @@ func (c *Client) SendPaidMedia(ctx context.Context, params *SendPaidMediaParams)
 				}
 			}
 
-			bs, err := json.Marshal(params.Media)
+			bs, err := json.Marshal(&params.Media)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -17352,7 +17889,7 @@ func (c *Client) SendPaidMedia(ctx context.Context, params *SendPaidMediaParams)
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			bs, err := json.Marshal(params.CaptionEntities)
+			bs, err := json.Marshal(&params.CaptionEntities)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -17404,7 +17941,7 @@ func (c *Client) SendPaidMedia(ctx context.Context, params *SendPaidMediaParams)
 		}
 
 		if params.SuggestedPostParameters != nil {
-			bs, err := json.Marshal(params.SuggestedPostParameters)
+			bs, err := json.Marshal(&params.SuggestedPostParameters)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -17424,7 +17961,7 @@ func (c *Client) SendPaidMedia(ctx context.Context, params *SendPaidMediaParams)
 		}
 
 		if params.ReplyParameters != nil {
-			bs, err := json.Marshal(params.ReplyParameters)
+			bs, err := json.Marshal(&params.ReplyParameters)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -17444,7 +17981,7 @@ func (c *Client) SendPaidMedia(ctx context.Context, params *SendPaidMediaParams)
 		}
 
 		if params.ReplyMarkup != nil {
-			bs, err := json.Marshal(params.ReplyMarkup)
+			bs, err := json.Marshal(&params.ReplyMarkup)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -17871,7 +18408,7 @@ func (c *Client) SendPhoto(ctx context.Context, params *SendPhotoParams) (ret *M
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			bs, err := json.Marshal(params.CaptionEntities)
+			bs, err := json.Marshal(&params.CaptionEntities)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -17939,7 +18476,7 @@ func (c *Client) SendPhoto(ctx context.Context, params *SendPhotoParams) (ret *M
 		}
 
 		if params.SuggestedPostParameters != nil {
-			bs, err := json.Marshal(params.SuggestedPostParameters)
+			bs, err := json.Marshal(&params.SuggestedPostParameters)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -17959,7 +18496,7 @@ func (c *Client) SendPhoto(ctx context.Context, params *SendPhotoParams) (ret *M
 		}
 
 		if params.ReplyParameters != nil {
-			bs, err := json.Marshal(params.ReplyParameters)
+			bs, err := json.Marshal(&params.ReplyParameters)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -17979,7 +18516,7 @@ func (c *Client) SendPhoto(ctx context.Context, params *SendPhotoParams) (ret *M
 		}
 
 		if params.ReplyMarkup != nil {
-			bs, err := json.Marshal(params.ReplyMarkup)
+			bs, err := json.Marshal(&params.ReplyMarkup)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -18613,19 +19150,647 @@ func WithSendPollReplyMarkup(value *ReplyMarkup) SendPollOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Message, err error) {
-	buffer := new(bytes.Buffer)
-	if err = json.NewEncoder(buffer).Encode(params); err != nil {
-		return
-	}
+	reader, pw := io.Pipe()
+	writer := multipart.NewWriter(pw)
 
-	reader := bytes.NewReader(buffer.Bytes())
+	go func() {
+		defer pw.Close()
+		defer writer.Close()
 
-	contentType := "application/json"
+		if params.BusinessConnectionID != "" {
+			v := params.BusinessConnectionID
+			if err := writer.WriteField("business_connection_id", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		{
+			v := params.ChatID
+			if err := writer.WriteField("chat_id", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.MessageThreadID != 0 {
+			v := strconv.FormatInt(params.MessageThreadID, 10)
+			if err := writer.WriteField("message_thread_id", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		{
+			v := params.Question
+			if err := writer.WriteField("question", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.QuestionParseMode != "" {
+			v := params.QuestionParseMode
+			if err := writer.WriteField("question_parse_mode", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if len(params.QuestionEntities) != 0 {
+			bs, err := json.Marshal(&params.QuestionEntities)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			p, err := writer.CreateFormField("question_entities")
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			_, err = p.Write(bs)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		{
+			bs, err := json.Marshal(&params.Options)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			p, err := writer.CreateFormField("options")
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			_, err = p.Write(bs)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.IsAnonymous {
+			v := strconv.FormatBool(params.IsAnonymous)
+			if err := writer.WriteField("is_anonymous", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.Type != "" {
+			v := params.Type
+			if err := writer.WriteField("type", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.AllowsMultipleAnswers {
+			v := strconv.FormatBool(params.AllowsMultipleAnswers)
+			if err := writer.WriteField("allows_multiple_answers", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.AllowsRevoting {
+			v := strconv.FormatBool(params.AllowsRevoting)
+			if err := writer.WriteField("allows_revoting", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.ShuffleOptions {
+			v := strconv.FormatBool(params.ShuffleOptions)
+			if err := writer.WriteField("shuffle_options", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.AllowAddingOptions {
+			v := strconv.FormatBool(params.AllowAddingOptions)
+			if err := writer.WriteField("allow_adding_options", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.HideResultsUntilCloses {
+			v := strconv.FormatBool(params.HideResultsUntilCloses)
+			if err := writer.WriteField("hide_results_until_closes", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.MembersOnly {
+			v := strconv.FormatBool(params.MembersOnly)
+			if err := writer.WriteField("members_only", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if len(params.CountryCodes) != 0 {
+			bs, err := json.Marshal(&params.CountryCodes)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			p, err := writer.CreateFormField("country_codes")
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			_, err = p.Write(bs)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if len(params.CorrectOptionIDs) != 0 {
+			bs, err := json.Marshal(&params.CorrectOptionIDs)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			p, err := writer.CreateFormField("correct_option_ids")
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			_, err = p.Write(bs)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.Explanation != "" {
+			v := params.Explanation
+			if err := writer.WriteField("explanation", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.ExplanationParseMode != "" {
+			v := params.ExplanationParseMode
+			if err := writer.WriteField("explanation_parse_mode", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if len(params.ExplanationEntities) != 0 {
+			bs, err := json.Marshal(&params.ExplanationEntities)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			p, err := writer.CreateFormField("explanation_entities")
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			_, err = p.Write(bs)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		{
+			switch {
+			case params.ExplanationMedia.InputMediaAnimation != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.ExplanationMedia.InputMediaAnimation.Media,
+					"explanation_media_animation_media",
+				)
+				if err != nil {
+					return
+				}
+				if params.ExplanationMedia.InputMediaAnimation.Thumbnail != nil {
+					err = createFormFileFromInputFile(
+						writer,
+						params.ExplanationMedia.InputMediaAnimation.Thumbnail,
+						"explanation_media_animation_thumbnail",
+					)
+					if err != nil {
+						return
+					}
+				}
+			case params.ExplanationMedia.InputMediaAudio != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.ExplanationMedia.InputMediaAudio.Media,
+					"explanation_media_audio_media",
+				)
+				if err != nil {
+					return
+				}
+				if params.ExplanationMedia.InputMediaAudio.Thumbnail != nil {
+					err = createFormFileFromInputFile(
+						writer,
+						params.ExplanationMedia.InputMediaAudio.Thumbnail,
+						"explanation_media_audio_thumbnail",
+					)
+					if err != nil {
+						return
+					}
+				}
+			case params.ExplanationMedia.InputMediaDocument != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.ExplanationMedia.InputMediaDocument.Media,
+					"explanation_media_document_media",
+				)
+				if err != nil {
+					return
+				}
+				if params.ExplanationMedia.InputMediaDocument.Thumbnail != nil {
+					err = createFormFileFromInputFile(
+						writer,
+						params.ExplanationMedia.InputMediaDocument.Thumbnail,
+						"explanation_media_document_thumbnail",
+					)
+					if err != nil {
+						return
+					}
+				}
+			case params.ExplanationMedia.InputMediaLivePhoto != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.ExplanationMedia.InputMediaLivePhoto.Media,
+					"explanation_media_live_photo_media",
+				)
+				if err != nil {
+					return
+				}
+				err = createFormFileFromInputFile(
+					writer,
+					&params.ExplanationMedia.InputMediaLivePhoto.Photo,
+					"explanation_media_live_photo_photo",
+				)
+				if err != nil {
+					return
+				}
+			case params.ExplanationMedia.InputMediaLocation != nil:
+			case params.ExplanationMedia.InputMediaPhoto != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.ExplanationMedia.InputMediaPhoto.Media,
+					"explanation_media_photo_media",
+				)
+				if err != nil {
+					return
+				}
+			case params.ExplanationMedia.InputMediaVenue != nil:
+			case params.ExplanationMedia.InputMediaVideo != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.ExplanationMedia.InputMediaVideo.Media,
+					"explanation_media_video_media",
+				)
+				if err != nil {
+					return
+				}
+				if params.ExplanationMedia.InputMediaVideo.Thumbnail != nil {
+					err = createFormFileFromInputFile(
+						writer,
+						params.ExplanationMedia.InputMediaVideo.Thumbnail,
+						"explanation_media_video_thumbnail",
+					)
+					if err != nil {
+						return
+					}
+				}
+				if params.ExplanationMedia.InputMediaVideo.Cover != nil {
+					err = createFormFileFromInputFile(
+						writer,
+						params.ExplanationMedia.InputMediaVideo.Cover,
+						"explanation_media_video_cover",
+					)
+					if err != nil {
+						return
+					}
+				}
+			}
+
+			bs, err := json.Marshal(&params.ExplanationMedia)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			p, err := writer.CreateFormField("explanation_media")
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			_, err = p.Write(bs)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.OpenPeriod != 0 {
+			v := strconv.FormatInt(params.OpenPeriod, 10)
+			if err := writer.WriteField("open_period", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.CloseDate != 0 {
+			v := strconv.FormatInt(params.CloseDate, 10)
+			if err := writer.WriteField("close_date", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.IsClosed {
+			v := strconv.FormatBool(params.IsClosed)
+			if err := writer.WriteField("is_closed", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.Description != "" {
+			v := params.Description
+			if err := writer.WriteField("description", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.DescriptionParseMode != "" {
+			v := params.DescriptionParseMode
+			if err := writer.WriteField("description_parse_mode", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if len(params.DescriptionEntities) != 0 {
+			bs, err := json.Marshal(&params.DescriptionEntities)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			p, err := writer.CreateFormField("description_entities")
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			_, err = p.Write(bs)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		{
+			switch {
+			case params.Media.InputMediaAnimation != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.Media.InputMediaAnimation.Media,
+					"media_animation_media",
+				)
+				if err != nil {
+					return
+				}
+				if params.Media.InputMediaAnimation.Thumbnail != nil {
+					err = createFormFileFromInputFile(
+						writer,
+						params.Media.InputMediaAnimation.Thumbnail,
+						"media_animation_thumbnail",
+					)
+					if err != nil {
+						return
+					}
+				}
+			case params.Media.InputMediaAudio != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.Media.InputMediaAudio.Media,
+					"media_audio_media",
+				)
+				if err != nil {
+					return
+				}
+				if params.Media.InputMediaAudio.Thumbnail != nil {
+					err = createFormFileFromInputFile(
+						writer,
+						params.Media.InputMediaAudio.Thumbnail,
+						"media_audio_thumbnail",
+					)
+					if err != nil {
+						return
+					}
+				}
+			case params.Media.InputMediaDocument != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.Media.InputMediaDocument.Media,
+					"media_document_media",
+				)
+				if err != nil {
+					return
+				}
+				if params.Media.InputMediaDocument.Thumbnail != nil {
+					err = createFormFileFromInputFile(
+						writer,
+						params.Media.InputMediaDocument.Thumbnail,
+						"media_document_thumbnail",
+					)
+					if err != nil {
+						return
+					}
+				}
+			case params.Media.InputMediaLivePhoto != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.Media.InputMediaLivePhoto.Media,
+					"media_live_photo_media",
+				)
+				if err != nil {
+					return
+				}
+				err = createFormFileFromInputFile(
+					writer,
+					&params.Media.InputMediaLivePhoto.Photo,
+					"media_live_photo_photo",
+				)
+				if err != nil {
+					return
+				}
+			case params.Media.InputMediaLocation != nil:
+			case params.Media.InputMediaPhoto != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.Media.InputMediaPhoto.Media,
+					"media_photo_media",
+				)
+				if err != nil {
+					return
+				}
+			case params.Media.InputMediaVenue != nil:
+			case params.Media.InputMediaVideo != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.Media.InputMediaVideo.Media,
+					"media_video_media",
+				)
+				if err != nil {
+					return
+				}
+				if params.Media.InputMediaVideo.Thumbnail != nil {
+					err = createFormFileFromInputFile(
+						writer,
+						params.Media.InputMediaVideo.Thumbnail,
+						"media_video_thumbnail",
+					)
+					if err != nil {
+						return
+					}
+				}
+				if params.Media.InputMediaVideo.Cover != nil {
+					err = createFormFileFromInputFile(
+						writer,
+						params.Media.InputMediaVideo.Cover,
+						"media_video_cover",
+					)
+					if err != nil {
+						return
+					}
+				}
+			}
+
+			bs, err := json.Marshal(&params.Media)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			p, err := writer.CreateFormField("media")
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			_, err = p.Write(bs)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.DisableNotification {
+			v := strconv.FormatBool(params.DisableNotification)
+			if err := writer.WriteField("disable_notification", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.ProtectContent {
+			v := strconv.FormatBool(params.ProtectContent)
+			if err := writer.WriteField("protect_content", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.AllowPaidBroadcast {
+			v := strconv.FormatBool(params.AllowPaidBroadcast)
+			if err := writer.WriteField("allow_paid_broadcast", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.MessageEffectID != "" {
+			v := params.MessageEffectID
+			if err := writer.WriteField("message_effect_id", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.ReplyParameters != nil {
+			bs, err := json.Marshal(&params.ReplyParameters)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			p, err := writer.CreateFormField("reply_parameters")
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			_, err = p.Write(bs)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.ReplyMarkup != nil {
+			bs, err := json.Marshal(&params.ReplyMarkup)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			p, err := writer.CreateFormField("reply_markup")
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			_, err = p.Write(bs)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+	}()
+
+	contentType := writer.FormDataContentType()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "sendPoll", reader, contentType)
 	if err != nil {
+		_ = reader.CloseWithError(err)
 		return
 	}
 
@@ -19345,7 +20510,7 @@ func (c *Client) SendSticker(ctx context.Context, params *SendStickerParams) (re
 		}
 
 		if params.SuggestedPostParameters != nil {
-			bs, err := json.Marshal(params.SuggestedPostParameters)
+			bs, err := json.Marshal(&params.SuggestedPostParameters)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -19365,7 +20530,7 @@ func (c *Client) SendSticker(ctx context.Context, params *SendStickerParams) (re
 		}
 
 		if params.ReplyParameters != nil {
-			bs, err := json.Marshal(params.ReplyParameters)
+			bs, err := json.Marshal(&params.ReplyParameters)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -19385,7 +20550,7 @@ func (c *Client) SendSticker(ctx context.Context, params *SendStickerParams) (re
 		}
 
 		if params.ReplyMarkup != nil {
-			bs, err := json.Marshal(params.ReplyMarkup)
+			bs, err := json.Marshal(&params.ReplyMarkup)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -20358,7 +21523,7 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			bs, err := json.Marshal(params.CaptionEntities)
+			bs, err := json.Marshal(&params.CaptionEntities)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -20434,7 +21599,7 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 		}
 
 		if params.SuggestedPostParameters != nil {
-			bs, err := json.Marshal(params.SuggestedPostParameters)
+			bs, err := json.Marshal(&params.SuggestedPostParameters)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -20454,7 +21619,7 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 		}
 
 		if params.ReplyParameters != nil {
-			bs, err := json.Marshal(params.ReplyParameters)
+			bs, err := json.Marshal(&params.ReplyParameters)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -20474,7 +21639,7 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 		}
 
 		if params.ReplyMarkup != nil {
-			bs, err := json.Marshal(params.ReplyMarkup)
+			bs, err := json.Marshal(&params.ReplyMarkup)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -20925,7 +22090,7 @@ func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams)
 		}
 
 		if params.SuggestedPostParameters != nil {
-			bs, err := json.Marshal(params.SuggestedPostParameters)
+			bs, err := json.Marshal(&params.SuggestedPostParameters)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -20945,7 +22110,7 @@ func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams)
 		}
 
 		if params.ReplyParameters != nil {
-			bs, err := json.Marshal(params.ReplyParameters)
+			bs, err := json.Marshal(&params.ReplyParameters)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -20965,7 +22130,7 @@ func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams)
 		}
 
 		if params.ReplyMarkup != nil {
-			bs, err := json.Marshal(params.ReplyMarkup)
+			bs, err := json.Marshal(&params.ReplyMarkup)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -21375,7 +22540,7 @@ func (c *Client) SendVoice(ctx context.Context, params *SendVoiceParams) (ret *M
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			bs, err := json.Marshal(params.CaptionEntities)
+			bs, err := json.Marshal(&params.CaptionEntities)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -21435,7 +22600,7 @@ func (c *Client) SendVoice(ctx context.Context, params *SendVoiceParams) (ret *M
 		}
 
 		if params.SuggestedPostParameters != nil {
-			bs, err := json.Marshal(params.SuggestedPostParameters)
+			bs, err := json.Marshal(&params.SuggestedPostParameters)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -21455,7 +22620,7 @@ func (c *Client) SendVoice(ctx context.Context, params *SendVoiceParams) (ret *M
 		}
 
 		if params.ReplyParameters != nil {
-			bs, err := json.Marshal(params.ReplyParameters)
+			bs, err := json.Marshal(&params.ReplyParameters)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -21475,7 +22640,7 @@ func (c *Client) SendVoice(ctx context.Context, params *SendVoiceParams) (ret *M
 		}
 
 		if params.ReplyMarkup != nil {
-			bs, err := json.Marshal(params.ReplyMarkup)
+			bs, err := json.Marshal(&params.ReplyMarkup)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return
@@ -21841,19 +23006,78 @@ func WithSetBusinessAccountProfilePhotoIsPublic(value bool) SetBusinessAccountPr
 // Requires the can_edit_profile_photo business bot right.
 // Returns True on success.
 func (c *Client) SetBusinessAccountProfilePhoto(ctx context.Context, params *SetBusinessAccountProfilePhotoParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
-	if err = json.NewEncoder(buffer).Encode(params); err != nil {
-		return
-	}
+	reader, pw := io.Pipe()
+	writer := multipart.NewWriter(pw)
 
-	reader := bytes.NewReader(buffer.Bytes())
+	go func() {
+		defer pw.Close()
+		defer writer.Close()
 
-	contentType := "application/json"
+		{
+			v := params.BusinessConnectionID
+			if err := writer.WriteField("business_connection_id", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		{
+			switch {
+			case params.Photo.InputProfilePhotoStatic != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.Photo.InputProfilePhotoStatic.Photo,
+					"photo_static_photo",
+				)
+				if err != nil {
+					return
+				}
+			case params.Photo.InputProfilePhotoAnimated != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.Photo.InputProfilePhotoAnimated.Animation,
+					"photo_animated_animation",
+				)
+				if err != nil {
+					return
+				}
+			}
+
+			bs, err := json.Marshal(&params.Photo)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			p, err := writer.CreateFormField("photo")
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			_, err = p.Write(bs)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+
+		if params.IsPublic {
+			v := strconv.FormatBool(params.IsPublic)
+			if err := writer.WriteField("is_public", v); err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+	}()
+
+	contentType := writer.FormDataContentType()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "setBusinessAccountProfilePhoto", reader, contentType)
 	if err != nil {
+		_ = reader.CloseWithError(err)
 		return
 	}
 
@@ -23453,19 +24677,62 @@ func WithSetMyProfilePhotoPhoto(value InputProfilePhoto) SetMyProfilePhotoOption
 // Changes the profile photo of the bot.
 // Returns True on success.
 func (c *Client) SetMyProfilePhoto(ctx context.Context, params *SetMyProfilePhotoParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
-	if err = json.NewEncoder(buffer).Encode(params); err != nil {
-		return
-	}
+	reader, pw := io.Pipe()
+	writer := multipart.NewWriter(pw)
 
-	reader := bytes.NewReader(buffer.Bytes())
+	go func() {
+		defer pw.Close()
+		defer writer.Close()
 
-	contentType := "application/json"
+		{
+			switch {
+			case params.Photo.InputProfilePhotoStatic != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.Photo.InputProfilePhotoStatic.Photo,
+					"photo_static_photo",
+				)
+				if err != nil {
+					return
+				}
+			case params.Photo.InputProfilePhotoAnimated != nil:
+				err = createFormFileFromInputFile(
+					writer,
+					&params.Photo.InputProfilePhotoAnimated.Animation,
+					"photo_animated_animation",
+				)
+				if err != nil {
+					return
+				}
+			}
+
+			bs, err := json.Marshal(&params.Photo)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			p, err := writer.CreateFormField("photo")
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+
+			_, err = p.Write(bs)
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				return
+			}
+		}
+	}()
+
+	contentType := writer.FormDataContentType()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "setMyProfilePhoto", reader, contentType)
 	if err != nil {
+		_ = reader.CloseWithError(err)
 		return
 	}
 
@@ -24482,7 +25749,7 @@ func (c *Client) SetWebhook(ctx context.Context, params *SetWebhookParams) (ret 
 		}
 
 		if len(params.AllowedUpdates) != 0 {
-			bs, err := json.Marshal(params.AllowedUpdates)
+			bs, err := json.Marshal(&params.AllowedUpdates)
 			if err != nil {
 				_ = pw.CloseWithError(err)
 				return

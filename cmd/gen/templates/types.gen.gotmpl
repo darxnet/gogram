@@ -13,6 +13,14 @@ import (
     // {{ .Name }}
     // {{ .Desc }}
     type {{ .Name }} struct {
+        {{- if .CanBeString }}
+            // Plain holds the value when {{ .Name }} is represented as a plain string.
+            Plain string
+        {{- end }}
+        {{- if .CanBeArray }}
+            // Slice holds the value when {{ .Name }} is represented as a JSON array.
+            Slice []{{ .CanBeArray }}
+        {{- end }}
         {{- range .Subtypes }}
             *{{ . }}
         {{- end }}
@@ -24,6 +32,16 @@ import (
         {{- $hasDiscriminator := false }}
         // MarshalJSON marshals the currently set subtype of {{ .Name }}.
         func (r *{{ .Name }}) MarshalJSON() ([]byte, error) {
+            {{- if .CanBeString }}
+            if r.Plain != "" {
+                return json.Marshal(r.Plain)
+            }
+            {{- end }}
+            {{- if .CanBeArray }}
+            if r.Slice != nil {
+                return json.Marshal(r.Slice)
+            }
+            {{- end }}
             {{- range .Subtypes }}
                 {{- $subtype := index $root.Types . }}
                 if r.{{ $subtype.Name }} != nil {
@@ -41,7 +59,26 @@ import (
 
         {{ if and $hasDiscriminator (ne .Name "InlineQueryResult") }}
             // UnmarshalJSON unmarshals JSON into the matching {{ .Name }} subtype.
+            {{- if or .CanBeString .CanBeArray }}
+            // {{ .Name }} can also be a plain string{{ if .CanBeArray }} or an array of {{ .CanBeArray }}{{ end }}.
+            {{- end }}
             func (r *{{ .Name }}) UnmarshalJSON(data []byte) error {
+                if len(data) == 0 {
+                    return nil
+                }
+                {{- if or .CanBeString .CanBeArray }}
+                switch data[0] {
+                    {{- if .CanBeString }}
+                    case '"':
+                        return json.Unmarshal(data, &r.Plain)
+                    {{- end }}
+                    {{- if .CanBeArray }}
+                    case '[':
+                        return json.Unmarshal(data, &r.Slice)
+                    {{- end }}
+                }
+                {{- end }}
+
                 type T struct {
                     {{- range .Subtypes }}
                         {{ $subtype := index $root.Types . }}

@@ -12,6 +12,35 @@ const prefixArrayOf = "Array of "
 
 var replacerDescription = strings.NewReplacer("\n", "\n// ", ". ", ".\n// ")
 
+// detectVariants inspects the raw text of a type's description paragraphs to
+// determine whether the type can also be encoded as a plain string or as
+// a JSON array. The Telegram Bot API uses this convention for RichText:
+//
+//	"Currently, it can be either a String for plain text, an Array of RichText,
+//	or any of the following types:"
+//
+// canBeString is true when any paragraph contains "String for plain text".
+// canBeArray is the element type name (e.g. "RichText") when any paragraph
+// contains the pattern "Array of <TypeName>".
+func detectVariants(paragraphs []*html.Node) (canBeString bool, canBeArray string) {
+	for _, p := range paragraphs {
+		text := findText(p)
+		if strings.Contains(text, "String for plain text") {
+			canBeString = true
+		}
+		const arrayOf = "Array of "
+		if idx := strings.Index(text, arrayOf); idx != -1 {
+			rest := text[idx+len(arrayOf):]
+			if end := strings.IndexAny(rest, " ,\n"); end != -1 {
+				canBeArray = rest[:end]
+			} else {
+				canBeArray = strings.TrimSpace(rest)
+			}
+		}
+	}
+	return
+}
+
 func parseInfo(root *html.Node) *Info {
 	nodesH4 := findNodes(root, "h4")
 
@@ -39,6 +68,7 @@ func parseInfo(root *html.Node) *Info {
 			v.Desc = desc
 			v.Subtypes = parseSubtypes(lists)
 			v.Fields = parseFields(tables)
+			v.CanBeString, v.CanBeArray = detectVariants(paragraphs)
 
 			info.Types[name] = v
 		} else { // method

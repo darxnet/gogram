@@ -108,7 +108,8 @@ import (
                         {{- $uploadCode }}
                     {{- end }}
                     {{- if ne $goType "InputFile" }}
-                        bs, err := json.Marshal(params.{{ $goTitle }})
+                        {{- /* Use pointer to trigger pointer-receiver MarshalJSON on union types. */}}
+                        bs, err := json.Marshal(&params.{{ $goTitle }})
                         if err != nil {
                             _ = pw.CloseWithError(err)
                             return
