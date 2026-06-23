@@ -15,11 +15,7 @@ import (
 var ErrFileIsNil = errors.New("gogram: file is nil")
 
 func (c *Client) fileLink(filePath string) string {
-	c.cfg.rw.RLock()
-	linkFilePrefix := c.cfg.linkFilePrefix
-	c.cfg.rw.RUnlock()
-
-	return linkFilePrefix + strings.TrimPrefix(filePath, "/")
+	return c.cfg.linkFilePrefix + strings.TrimPrefix(filePath, "/")
 }
 
 // ReceiveFileReader returns a reader for the file content from Telegram servers.

@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"unsafe"
 )
 
 // JSONWrapper is a generic wrapper for handling JSON serialization/deserialization in SQL databases.
@@ -28,7 +29,7 @@ func (w JSONWrapper[T]) Scan(src any) error {
 	case []byte:
 		buf = v
 	case string:
-		buf = []byte(v)
+		buf = unsafe.Slice(unsafe.StringData(v), len(v)) //nolint:gosec // G103 unsafe.StringData is safe here
 	default:
 		//nolint:err113
 		return fmt.Errorf("unexpected type: %T", src)

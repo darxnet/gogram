@@ -8,9 +8,7 @@ import (
 
 var contextPool = sync.Pool{
 	New: func() any {
-		return &Context{
-			values: make(map[any]any, 32<<(^uint(0)>>63)),
-		}
+		return &Context{}
 	},
 }
 
@@ -31,7 +29,7 @@ func (c *Client) releaseContext(ctx *Context) {
 	ctx.context = nil
 	ctx.client = nil
 	ctx.update = nil
-	clear(ctx.values)
+	ctx.values = nil
 	contextPool.Put(ctx)
 }
 
@@ -62,6 +60,9 @@ func (ctx *Context) Err() error {
 
 // SetValue sets a value in the context.
 func (ctx *Context) SetValue(key, value any) {
+	if ctx.values == nil {
+		ctx.values = make(map[any]any, 1)
+	}
 	ctx.values[key] = value
 }
 

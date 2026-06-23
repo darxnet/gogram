@@ -146,7 +146,7 @@ import (
 
         var result json.RawMessage
 
-        result, err = c.Raw(ctx, "{{ .Name }}", reader, contentType)
+        result, err = c.Raw(ctx, "{{ .Name }}", reader, contentType, nil)
         if err != nil {
             {{- if $multipart }} _ = reader.CloseWithError(err) {{ end }}
             return

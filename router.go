@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+const commandHandlersMask = 1<<handleOnMessage | 1<<handleOnChannelPost | 1<<handleOnBusinessMessage
+
 type (
 	// HandlerFunc is a function that handles a request.
 	HandlerFunc func(ctx *Context) error
@@ -31,8 +33,10 @@ var _ Processor = (*Router)(nil)
 type Router struct {
 	*RouterGroup
 
-	handlersCommands map[string][]route
-	handlersOn       [handleOnCount][]route
+	handlersCommands  map[string][]route
+	handlersCallbacks map[string][]route
+
+	handlersOn [handleOnCount][]route
 
 	handlerDefault HandlerFunc
 	handlerErr     HandlerFuncErr
@@ -42,7 +46,8 @@ type Router struct {
 // NewRouter creates a new Router.
 func NewRouter() *Router {
 	r := &Router{
-		handlersCommands: make(map[string][]route),
+		handlersCommands:  make(map[string][]route),
+		handlersCallbacks: make(map[string][]route),
 	}
 
 	r.RouterGroup = &RouterGroup{
@@ -77,63 +82,53 @@ func (r *Router) retrieveCommand(text string) string {
 		return ""
 	}
 
-	end := len(text)
-
-	for i := 1; i < end; i++ {
-		if text[i] == ' ' {
-			end = i
-			break
+	for i := 1; i < len(text); i++ {
+		if c := text[i]; c == ' ' || c == '@' {
+			return text[:i]
 		}
 	}
 
-	for i := 1; i < end; i++ {
-		if text[i] == '@' {
-			end = i
-			break
-		}
-	}
-
-	return text[:end]
-}
-
-// eventsMessages lists the update kinds that may carry a bot command.
-var eventsMessages = []handleOn{
-	handleOnMessage,
-	handleOnChannelPost,
-	handleOnBusinessMessage,
+	return text
 }
 
 // Process processes an update.
 func (r *Router) Process(ctx *Context) {
+	defer r.handlePanic(ctx)
+
 	on := ctx.findHandlerOn()
 
-	var command string
-	if len(r.handlersCommands) != 0 && slices.Contains(eventsMessages, on) {
-		command = r.retrieveCommand(ctx.Text())
-	}
-
-	defer func() {
-		if v := recover(); v != nil {
-			if r.handlerPanic != nil {
-				r.handlerPanic(ctx, v)
-			} else {
-				log.Println("gogram: recovered panic:", v)
+	// fast path: command map lookup.
+	if len(r.handlersCommands) != 0 && (1<<on)&commandHandlersMask != 0 {
+		if command := r.retrieveCommand(ctx.Text()); command != "" {
+			if routes, ok := r.handlersCommands[command]; ok {
+				for i := range routes {
+					if routes[i].filter(ctx) {
+						r.handleErr(ctx, routes[i].handler(ctx))
+						return
+					}
+				}
 			}
 		}
-	}()
-
-	handleErr := func(ctx *Context, err error) {
-		if err != nil && r.handlerErr != nil {
-			r.handlerErr(ctx, err)
-		}
 	}
 
-	// fast path: command map lookup.
-	if command != "" {
-		if routes, ok := r.handlersCommands[command]; ok {
+	// fast path: callback data map lookup.
+	if len(r.handlersCallbacks) != 0 && on == handleOnCallbackQuery {
+		cq := ctx.Update().CallbackQuery
+
+		if routes, ok := r.handlersCallbacks[cq.Data]; ok {
 			for i := range routes {
 				if routes[i].filter(ctx) {
-					handleErr(ctx, routes[i].handler(ctx))
+					r.handleErr(ctx, routes[i].handler(ctx))
+					return
+				}
+			}
+		}
+
+		key, _, _ := strings.Cut(cq.Data, " ")
+		if routes, ok := r.handlersCallbacks[key]; ok {
+			for i := range routes {
+				if routes[i].filter(ctx) {
+					r.handleErr(ctx, routes[i].handler(ctx))
 					return
 				}
 			}
@@ -143,14 +138,30 @@ func (r *Router) Process(ctx *Context) {
 	// slow path: linear filter scan.
 	for i := range r.handlersOn[on] {
 		if r.handlersOn[on][i].filter(ctx) {
-			handleErr(ctx, r.handlersOn[on][i].handler(ctx))
+			r.handleErr(ctx, r.handlersOn[on][i].handler(ctx))
 			return
 		}
 	}
 
 	// fallback.
 	if r.handlerDefault != nil {
-		handleErr(ctx, r.handlerDefault(ctx))
+		r.handleErr(ctx, r.handlerDefault(ctx))
+	}
+}
+
+func (r *Router) handleErr(ctx *Context, err error) {
+	if err != nil && r.handlerErr != nil {
+		r.handlerErr(ctx, err)
+	}
+}
+
+func (r *Router) handlePanic(ctx *Context) {
+	if v := recover(); v != nil {
+		if r.handlerPanic != nil {
+			r.handlerPanic(ctx, v)
+		} else {
+			log.Println("gogram: recovered panic:", v)
+		}
 	}
 }
 
@@ -218,6 +229,25 @@ func (rg *RouterGroup) Group(filters ...Filter) *RouterGroup {
 	}
 }
 
+func (rg *RouterGroup) handleOn(on handleOn, handler HandlerFunc, filters ...Filter) {
+	combined := func(ctx *Context) bool {
+		if !rg.filter(ctx) {
+			return false
+		}
+		for _, fn := range filters {
+			if !fn(ctx) {
+				return false
+			}
+		}
+		return true
+	}
+
+	rg.router.handlersOn[on] = append(rg.router.handlersOn[on], route{
+		filter:  combined,
+		handler: rg.applyMiddlewares(handler),
+	})
+}
+
 // HandleCommand registers a command handler using an O(1) map lookup.
 //
 // The command must not contain spaces. A leading slash is added automatically
@@ -245,30 +275,16 @@ func (rg *RouterGroup) HandleCommand(command string, handler func(*Context, *Mes
 	})
 }
 
-func (rg *RouterGroup) handleOn(on handleOn, handler HandlerFunc, filters ...Filter) {
-	combined := func(ctx *Context) bool {
-		if !rg.filter(ctx) {
-			return false
-		}
-		for _, fn := range filters {
-			if !fn(ctx) {
-				return false
-			}
-		}
-		return true
-	}
-
-	rg.router.handlersOn[on] = append(rg.router.handlersOn[on], route{
-		filter:  combined,
-		handler: rg.applyMiddlewares(handler),
-	})
-}
-
 // HandleKeyboardButton registers a handler triggered by a reply-keyboard button text.
 func (rg *RouterGroup) HandleKeyboardButton(
 	b *KeyboardButton,
 	handler func(ctx *Context, m *Message) error,
 ) {
+	if command := rg.router.retrieveCommand(b.Text); command != "" {
+		rg.HandleCommand(command, handler)
+		return
+	}
+
 	rg.HandleOnMessage(handler, FilterText(b.Text))
 }
 
@@ -280,15 +296,12 @@ func (rg *RouterGroup) HandleInlineKeyboardButton(
 	b *InlineKeyboardButton,
 	handler func(ctx *Context, cq *CallbackQuery) error,
 ) {
-	filter := func(ctx *Context) bool {
-		cq := ctx.Update().CallbackQuery
-		if cq == nil {
-			return false
-		}
-
-		before, _, _ := strings.Cut(cq.Data, " ")
-		return before == b.CallbackData || cq.Data == b.CallbackData
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().CallbackQuery)
 	}
 
-	rg.HandleOnCallbackQuery(handler, filter)
+	rg.router.handlersCallbacks[b.CallbackData] = append(rg.router.handlersCallbacks[b.CallbackData], route{
+		filter:  rg.filter,
+		handler: rg.applyMiddlewares(fn),
+	})
 }

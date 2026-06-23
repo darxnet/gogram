@@ -136,7 +136,7 @@ func (c *Client) AddStickerToSet(ctx context.Context, params *AddStickerToSetPar
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "addStickerToSet", reader, contentType)
+	result, err = c.Raw(ctx, "addStickerToSet", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -282,7 +282,7 @@ func (c *Client) AnswerCallbackQuery(ctx context.Context, params *AnswerCallback
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "answerCallbackQuery", reader, contentType)
+	result, err = c.Raw(ctx, "answerCallbackQuery", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -359,7 +359,7 @@ func (c *Client) AnswerChatJoinRequestQuery(ctx context.Context, params *AnswerC
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "answerChatJoinRequestQuery", reader, contentType)
+	result, err = c.Raw(ctx, "answerChatJoinRequestQuery", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -436,7 +436,7 @@ func (c *Client) AnswerGuestQuery(ctx context.Context, params *AnswerGuestQueryP
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "answerGuestQuery", reader, contentType)
+	result, err = c.Raw(ctx, "answerGuestQuery", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -581,7 +581,7 @@ func (c *Client) AnswerInlineQuery(ctx context.Context, params *AnswerInlineQuer
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "answerInlineQuery", reader, contentType)
+	result, err = c.Raw(ctx, "answerInlineQuery", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -685,7 +685,7 @@ func (c *Client) AnswerPreCheckoutQuery(ctx context.Context, params *AnswerPreCh
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "answerPreCheckoutQuery", reader, contentType)
+	result, err = c.Raw(ctx, "answerPreCheckoutQuery", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -801,7 +801,7 @@ func (c *Client) AnswerShippingQuery(ctx context.Context, params *AnswerShipping
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "answerShippingQuery", reader, contentType)
+	result, err = c.Raw(ctx, "answerShippingQuery", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -879,7 +879,7 @@ func (c *Client) AnswerWebAppQuery(ctx context.Context, params *AnswerWebAppQuer
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "answerWebAppQuery", reader, contentType)
+	result, err = c.Raw(ctx, "answerWebAppQuery", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -956,7 +956,7 @@ func (c *Client) ApproveChatJoinRequest(ctx context.Context, params *ApproveChat
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "approveChatJoinRequest", reader, contentType)
+	result, err = c.Raw(ctx, "approveChatJoinRequest", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -1049,7 +1049,7 @@ func (c *Client) ApproveSuggestedPost(ctx context.Context, params *ApproveSugges
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "approveSuggestedPost", reader, contentType)
+	result, err = c.Raw(ctx, "approveSuggestedPost", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -1166,7 +1166,7 @@ func (c *Client) BanChatMember(ctx context.Context, params *BanChatMemberParams)
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "banChatMember", reader, contentType)
+	result, err = c.Raw(ctx, "banChatMember", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -1245,7 +1245,7 @@ func (c *Client) BanChatSenderChat(ctx context.Context, params *BanChatSenderCha
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "banChatSenderChat", reader, contentType)
+	result, err = c.Raw(ctx, "banChatSenderChat", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -1294,7 +1294,7 @@ func (c *Client) Close(ctx context.Context, params *CloseParams) (ret bool, err 
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "close", reader, contentType)
+	result, err = c.Raw(ctx, "close", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -1370,7 +1370,7 @@ func (c *Client) CloseForumTopic(ctx context.Context, params *CloseForumTopicPar
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "closeForumTopic", reader, contentType)
+	result, err = c.Raw(ctx, "closeForumTopic", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -1431,7 +1431,7 @@ func (c *Client) CloseGeneralForumTopic(ctx context.Context, params *CloseGenera
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "closeGeneralForumTopic", reader, contentType)
+	result, err = c.Raw(ctx, "closeGeneralForumTopic", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -1507,7 +1507,7 @@ func (c *Client) ConvertGiftToStars(ctx context.Context, params *ConvertGiftToSt
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "convertGiftToStars", reader, contentType)
+	result, err = c.Raw(ctx, "convertGiftToStars", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -1846,7 +1846,7 @@ func (c *Client) CopyMessage(ctx context.Context, params *CopyMessageParams) (re
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "copyMessage", reader, contentType)
+	result, err = c.Raw(ctx, "copyMessage", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -2029,7 +2029,7 @@ func (c *Client) CopyMessages(ctx context.Context, params *CopyMessagesParams) (
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "copyMessages", reader, contentType)
+	result, err = c.Raw(ctx, "copyMessages", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -2157,7 +2157,7 @@ func (c *Client) CreateChatInviteLink(ctx context.Context, params *CreateChatInv
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "createChatInviteLink", reader, contentType)
+	result, err = c.Raw(ctx, "createChatInviteLink", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -2272,7 +2272,7 @@ func (c *Client) CreateChatSubscriptionInviteLink(ctx context.Context, params *C
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "createChatSubscriptionInviteLink", reader, contentType)
+	result, err = c.Raw(ctx, "createChatSubscriptionInviteLink", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -2389,7 +2389,7 @@ func (c *Client) CreateForumTopic(ctx context.Context, params *CreateForumTopicP
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "createForumTopic", reader, contentType)
+	result, err = c.Raw(ctx, "createForumTopic", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -2869,7 +2869,7 @@ func (c *Client) CreateInvoiceLink(ctx context.Context, params *CreateInvoiceLin
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "createInvoiceLink", reader, contentType)
+	result, err = c.Raw(ctx, "createInvoiceLink", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -3087,7 +3087,7 @@ func (c *Client) CreateNewStickerSet(ctx context.Context, params *CreateNewStick
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "createNewStickerSet", reader, contentType)
+	result, err = c.Raw(ctx, "createNewStickerSet", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -3164,7 +3164,7 @@ func (c *Client) DeclineChatJoinRequest(ctx context.Context, params *DeclineChat
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "declineChatJoinRequest", reader, contentType)
+	result, err = c.Raw(ctx, "declineChatJoinRequest", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -3255,7 +3255,7 @@ func (c *Client) DeclineSuggestedPost(ctx context.Context, params *DeclineSugges
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "declineSuggestedPost", reader, contentType)
+	result, err = c.Raw(ctx, "declineSuggestedPost", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -3346,7 +3346,7 @@ func (c *Client) DeleteAllMessageReactions(ctx context.Context, params *DeleteAl
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "deleteAllMessageReactions", reader, contentType)
+	result, err = c.Raw(ctx, "deleteAllMessageReactions", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -3430,7 +3430,7 @@ func (c *Client) DeleteBusinessMessages(ctx context.Context, params *DeleteBusin
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "deleteBusinessMessages", reader, contentType)
+	result, err = c.Raw(ctx, "deleteBusinessMessages", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -3492,7 +3492,7 @@ func (c *Client) DeleteChatPhoto(ctx context.Context, params *DeleteChatPhotoPar
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "deleteChatPhoto", reader, contentType)
+	result, err = c.Raw(ctx, "deleteChatPhoto", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -3556,7 +3556,7 @@ func (c *Client) DeleteChatStickerSet(ctx context.Context, params *DeleteChatSti
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "deleteChatStickerSet", reader, contentType)
+	result, err = c.Raw(ctx, "deleteChatStickerSet", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -3632,7 +3632,7 @@ func (c *Client) DeleteForumTopic(ctx context.Context, params *DeleteForumTopicP
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "deleteForumTopic", reader, contentType)
+	result, err = c.Raw(ctx, "deleteForumTopic", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -3716,7 +3716,7 @@ func (c *Client) DeleteMessage(ctx context.Context, params *DeleteMessageParams)
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "deleteMessage", reader, contentType)
+	result, err = c.Raw(ctx, "deleteMessage", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -3822,7 +3822,7 @@ func (c *Client) DeleteMessageReaction(ctx context.Context, params *DeleteMessag
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "deleteMessageReaction", reader, contentType)
+	result, err = c.Raw(ctx, "deleteMessageReaction", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -3904,7 +3904,7 @@ func (c *Client) DeleteMessages(ctx context.Context, params *DeleteMessagesParam
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "deleteMessages", reader, contentType)
+	result, err = c.Raw(ctx, "deleteMessages", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -3990,7 +3990,7 @@ func (c *Client) DeleteMyCommands(ctx context.Context, params *DeleteMyCommandsP
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "deleteMyCommands", reader, contentType)
+	result, err = c.Raw(ctx, "deleteMyCommands", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -4050,7 +4050,7 @@ func (c *Client) DeleteStickerFromSet(ctx context.Context, params *DeleteSticker
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "deleteStickerFromSet", reader, contentType)
+	result, err = c.Raw(ctx, "deleteStickerFromSet", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -4110,7 +4110,7 @@ func (c *Client) DeleteStickerSet(ctx context.Context, params *DeleteStickerSetP
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "deleteStickerSet", reader, contentType)
+	result, err = c.Raw(ctx, "deleteStickerSet", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -4186,7 +4186,7 @@ func (c *Client) DeleteStory(ctx context.Context, params *DeleteStoryParams) (re
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "deleteStory", reader, contentType)
+	result, err = c.Raw(ctx, "deleteStory", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -4248,7 +4248,7 @@ func (c *Client) DeleteWebhook(ctx context.Context, params *DeleteWebhookParams)
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "deleteWebhook", reader, contentType)
+	result, err = c.Raw(ctx, "deleteWebhook", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -4388,7 +4388,7 @@ func (c *Client) EditChatInviteLink(ctx context.Context, params *EditChatInviteL
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "editChatInviteLink", reader, contentType)
+	result, err = c.Raw(ctx, "editChatInviteLink", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -4482,7 +4482,7 @@ func (c *Client) EditChatSubscriptionInviteLink(ctx context.Context, params *Edi
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "editChatSubscriptionInviteLink", reader, contentType)
+	result, err = c.Raw(ctx, "editChatSubscriptionInviteLink", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -4601,7 +4601,7 @@ func (c *Client) EditForumTopic(ctx context.Context, params *EditForumTopicParam
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "editForumTopic", reader, contentType)
+	result, err = c.Raw(ctx, "editForumTopic", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -4677,7 +4677,7 @@ func (c *Client) EditGeneralForumTopic(ctx context.Context, params *EditGeneralF
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "editGeneralForumTopic", reader, contentType)
+	result, err = c.Raw(ctx, "editGeneralForumTopic", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -4878,7 +4878,7 @@ func (c *Client) EditMessageCaption(ctx context.Context, params *EditMessageCapt
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "editMessageCaption", reader, contentType)
+	result, err = c.Raw(ctx, "editMessageCaption", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -5005,7 +5005,7 @@ func (c *Client) EditMessageChecklist(ctx context.Context, params *EditMessageCh
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "editMessageChecklist", reader, contentType)
+	result, err = c.Raw(ctx, "editMessageChecklist", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -5240,7 +5240,7 @@ func (c *Client) EditMessageLiveLocation(ctx context.Context, params *EditMessag
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "editMessageLiveLocation", reader, contentType)
+	result, err = c.Raw(ctx, "editMessageLiveLocation", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -5579,7 +5579,7 @@ func (c *Client) EditMessageMedia(ctx context.Context, params *EditMessageMediaP
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "editMessageMedia", reader, contentType)
+	result, err = c.Raw(ctx, "editMessageMedia", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -5714,7 +5714,7 @@ func (c *Client) EditMessageReplyMarkup(ctx context.Context, params *EditMessage
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "editMessageReplyMarkup", reader, contentType)
+	result, err = c.Raw(ctx, "editMessageReplyMarkup", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -5930,7 +5930,7 @@ func (c *Client) EditMessageText(ctx context.Context, params *EditMessageTextPar
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "editMessageText", reader, contentType)
+	result, err = c.Raw(ctx, "editMessageText", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -6204,7 +6204,7 @@ func (c *Client) EditStory(ctx context.Context, params *EditStoryParams) (ret *S
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "editStory", reader, contentType)
+	result, err = c.Raw(ctx, "editStory", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -6298,7 +6298,7 @@ func (c *Client) EditUserStarSubscription(ctx context.Context, params *EditUserS
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "editUserStarSubscription", reader, contentType)
+	result, err = c.Raw(ctx, "editUserStarSubscription", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -6359,7 +6359,7 @@ func (c *Client) ExportChatInviteLink(ctx context.Context, params *ExportChatInv
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "exportChatInviteLink", reader, contentType)
+	result, err = c.Raw(ctx, "exportChatInviteLink", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -6563,7 +6563,7 @@ func (c *Client) ForwardMessage(ctx context.Context, params *ForwardMessageParam
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "forwardMessage", reader, contentType)
+	result, err = c.Raw(ctx, "forwardMessage", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -6727,7 +6727,7 @@ func (c *Client) ForwardMessages(ctx context.Context, params *ForwardMessagesPar
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "forwardMessages", reader, contentType)
+	result, err = c.Raw(ctx, "forwardMessages", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -6777,7 +6777,7 @@ func (c *Client) GetAvailableGifts(ctx context.Context, params *GetAvailableGift
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getAvailableGifts", reader, contentType)
+	result, err = c.Raw(ctx, "getAvailableGifts", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -6995,7 +6995,7 @@ func (c *Client) GetBusinessAccountGifts(ctx context.Context, params *GetBusines
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getBusinessAccountGifts", reader, contentType)
+	result, err = c.Raw(ctx, "getBusinessAccountGifts", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -7059,7 +7059,7 @@ func (c *Client) GetBusinessAccountStarBalance(ctx context.Context, params *GetB
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getBusinessAccountStarBalance", reader, contentType)
+	result, err = c.Raw(ctx, "getBusinessAccountStarBalance", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -7122,7 +7122,7 @@ func (c *Client) GetBusinessConnection(ctx context.Context, params *GetBusinessC
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getBusinessConnection", reader, contentType)
+	result, err = c.Raw(ctx, "getBusinessConnection", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -7185,7 +7185,7 @@ func (c *Client) GetChat(ctx context.Context, params *GetChatParams) (ret *ChatF
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getChat", reader, contentType)
+	result, err = c.Raw(ctx, "getChat", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -7265,7 +7265,7 @@ func (c *Client) GetChatAdministrators(ctx context.Context, params *GetChatAdmin
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getChatAdministrators", reader, contentType)
+	result, err = c.Raw(ctx, "getChatAdministrators", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -7486,7 +7486,7 @@ func (c *Client) GetChatGifts(ctx context.Context, params *GetChatGiftsParams) (
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getChatGifts", reader, contentType)
+	result, err = c.Raw(ctx, "getChatGifts", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -7565,7 +7565,7 @@ func (c *Client) GetChatMember(ctx context.Context, params *GetChatMemberParams)
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getChatMember", reader, contentType)
+	result, err = c.Raw(ctx, "getChatMember", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -7626,7 +7626,7 @@ func (c *Client) GetChatMemberCount(ctx context.Context, params *GetChatMemberCo
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getChatMemberCount", reader, contentType)
+	result, err = c.Raw(ctx, "getChatMemberCount", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -7690,7 +7690,7 @@ func (c *Client) GetChatMenuButton(ctx context.Context, params *GetChatMenuButto
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getChatMenuButton", reader, contentType)
+	result, err = c.Raw(ctx, "getChatMenuButton", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -7755,7 +7755,7 @@ func (c *Client) GetCustomEmojiStickers(ctx context.Context, params *GetCustomEm
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getCustomEmojiStickers", reader, contentType)
+	result, err = c.Raw(ctx, "getCustomEmojiStickers", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -7825,7 +7825,7 @@ func (c *Client) GetFile(ctx context.Context, params *GetFileParams) (ret *File,
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getFile", reader, contentType)
+	result, err = c.Raw(ctx, "getFile", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -7875,7 +7875,7 @@ func (c *Client) GetForumTopicIconStickers(ctx context.Context, params *GetForum
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getForumTopicIconStickers", reader, contentType)
+	result, err = c.Raw(ctx, "getForumTopicIconStickers", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -7990,7 +7990,7 @@ func (c *Client) GetGameHighScores(ctx context.Context, params *GetGameHighScore
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getGameHighScores", reader, contentType)
+	result, err = c.Raw(ctx, "getGameHighScores", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -8053,7 +8053,7 @@ func (c *Client) GetManagedBotAccessSettings(ctx context.Context, params *GetMan
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getManagedBotAccessSettings", reader, contentType)
+	result, err = c.Raw(ctx, "getManagedBotAccessSettings", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -8114,7 +8114,7 @@ func (c *Client) GetManagedBotToken(ctx context.Context, params *GetManagedBotTo
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getManagedBotToken", reader, contentType)
+	result, err = c.Raw(ctx, "getManagedBotToken", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -8163,7 +8163,7 @@ func (c *Client) GetMe(ctx context.Context, params *GetMeParams) (ret *User, err
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getMe", reader, contentType)
+	result, err = c.Raw(ctx, "getMe", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -8248,7 +8248,7 @@ func (c *Client) GetMyCommands(ctx context.Context, params *GetMyCommandsParams)
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getMyCommands", reader, contentType)
+	result, err = c.Raw(ctx, "getMyCommands", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -8313,7 +8313,7 @@ func (c *Client) GetMyDefaultAdministratorRights(ctx context.Context, params *Ge
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getMyDefaultAdministratorRights", reader, contentType)
+	result, err = c.Raw(ctx, "getMyDefaultAdministratorRights", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -8376,7 +8376,7 @@ func (c *Client) GetMyDescription(ctx context.Context, params *GetMyDescriptionP
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getMyDescription", reader, contentType)
+	result, err = c.Raw(ctx, "getMyDescription", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -8439,7 +8439,7 @@ func (c *Client) GetMyName(ctx context.Context, params *GetMyNameParams) (ret *B
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getMyName", reader, contentType)
+	result, err = c.Raw(ctx, "getMyName", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -8502,7 +8502,7 @@ func (c *Client) GetMyShortDescription(ctx context.Context, params *GetMyShortDe
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getMyShortDescription", reader, contentType)
+	result, err = c.Raw(ctx, "getMyShortDescription", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -8552,7 +8552,7 @@ func (c *Client) GetMyStarBalance(ctx context.Context, params *GetMyStarBalanceP
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getMyStarBalance", reader, contentType)
+	result, err = c.Raw(ctx, "getMyStarBalance", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -8634,7 +8634,7 @@ func (c *Client) GetStarTransactions(ctx context.Context, params *GetStarTransac
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getStarTransactions", reader, contentType)
+	result, err = c.Raw(ctx, "getStarTransactions", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -8697,7 +8697,7 @@ func (c *Client) GetStickerSet(ctx context.Context, params *GetStickerSetParams)
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getStickerSet", reader, contentType)
+	result, err = c.Raw(ctx, "getStickerSet", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -8846,7 +8846,7 @@ func (c *Client) GetUpdates(ctx context.Context, params *GetUpdatesParams) (ret 
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getUpdates", reader, contentType)
+	result, err = c.Raw(ctx, "getUpdates", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -8925,7 +8925,7 @@ func (c *Client) GetUserChatBoosts(ctx context.Context, params *GetUserChatBoost
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getUserChatBoosts", reader, contentType)
+	result, err = c.Raw(ctx, "getUserChatBoosts", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -9112,7 +9112,7 @@ func (c *Client) GetUserGifts(ctx context.Context, params *GetUserGiftsParams) (
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getUserGifts", reader, contentType)
+	result, err = c.Raw(ctx, "getUserGifts", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -9190,7 +9190,7 @@ func (c *Client) GetUserPersonalChatMessages(ctx context.Context, params *GetUse
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getUserPersonalChatMessages", reader, contentType)
+	result, err = c.Raw(ctx, "getUserPersonalChatMessages", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -9289,7 +9289,7 @@ func (c *Client) GetUserProfileAudios(ctx context.Context, params *GetUserProfil
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getUserProfileAudios", reader, contentType)
+	result, err = c.Raw(ctx, "getUserProfileAudios", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -9388,7 +9388,7 @@ func (c *Client) GetUserProfilePhotos(ctx context.Context, params *GetUserProfil
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getUserProfilePhotos", reader, contentType)
+	result, err = c.Raw(ctx, "getUserProfilePhotos", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -9440,7 +9440,7 @@ func (c *Client) GetWebhookInfo(ctx context.Context, params *GetWebhookInfoParam
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "getWebhookInfo", reader, contentType)
+	result, err = c.Raw(ctx, "getWebhookInfo", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -9588,7 +9588,7 @@ func (c *Client) GiftPremiumSubscription(ctx context.Context, params *GiftPremiu
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "giftPremiumSubscription", reader, contentType)
+	result, err = c.Raw(ctx, "giftPremiumSubscription", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -9650,7 +9650,7 @@ func (c *Client) HideGeneralForumTopic(ctx context.Context, params *HideGeneralF
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "hideGeneralForumTopic", reader, contentType)
+	result, err = c.Raw(ctx, "hideGeneralForumTopic", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -9712,7 +9712,7 @@ func (c *Client) LeaveChat(ctx context.Context, params *LeaveChatParams) (ret bo
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "leaveChat", reader, contentType)
+	result, err = c.Raw(ctx, "leaveChat", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -9761,7 +9761,7 @@ func (c *Client) LogOut(ctx context.Context, params *LogOutParams) (ret bool, er
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "logOut", reader, contentType)
+	result, err = c.Raw(ctx, "logOut", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -9870,7 +9870,7 @@ func (c *Client) PinChatMessage(ctx context.Context, params *PinChatMessageParam
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "pinChatMessage", reader, contentType)
+	result, err = c.Raw(ctx, "pinChatMessage", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -10189,7 +10189,7 @@ func (c *Client) PostStory(ctx context.Context, params *PostStoryParams) (ret *S
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "postStory", reader, contentType)
+	result, err = c.Raw(ctx, "postStory", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -10527,7 +10527,7 @@ func (c *Client) PromoteChatMember(ctx context.Context, params *PromoteChatMembe
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "promoteChatMember", reader, contentType)
+	result, err = c.Raw(ctx, "promoteChatMember", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -10620,7 +10620,7 @@ func (c *Client) ReadBusinessMessage(ctx context.Context, params *ReadBusinessMe
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "readBusinessMessage", reader, contentType)
+	result, err = c.Raw(ctx, "readBusinessMessage", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -10697,7 +10697,7 @@ func (c *Client) RefundStarPayment(ctx context.Context, params *RefundStarPaymen
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "refundStarPayment", reader, contentType)
+	result, err = c.Raw(ctx, "refundStarPayment", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -10775,7 +10775,7 @@ func (c *Client) RemoveBusinessAccountProfilePhoto(ctx context.Context, params *
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "removeBusinessAccountProfilePhoto", reader, contentType)
+	result, err = c.Raw(ctx, "removeBusinessAccountProfilePhoto", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -10837,7 +10837,7 @@ func (c *Client) RemoveChatVerification(ctx context.Context, params *RemoveChatV
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "removeChatVerification", reader, contentType)
+	result, err = c.Raw(ctx, "removeChatVerification", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -10884,7 +10884,7 @@ func (c *Client) RemoveMyProfilePhoto(ctx context.Context, params *RemoveMyProfi
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "removeMyProfilePhoto", reader, contentType)
+	result, err = c.Raw(ctx, "removeMyProfilePhoto", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -10946,7 +10946,7 @@ func (c *Client) RemoveUserVerification(ctx context.Context, params *RemoveUserV
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "removeUserVerification", reader, contentType)
+	result, err = c.Raw(ctx, "removeUserVerification", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -11022,7 +11022,7 @@ func (c *Client) ReopenForumTopic(ctx context.Context, params *ReopenForumTopicP
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "reopenForumTopic", reader, contentType)
+	result, err = c.Raw(ctx, "reopenForumTopic", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -11084,7 +11084,7 @@ func (c *Client) ReopenGeneralForumTopic(ctx context.Context, params *ReopenGene
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "reopenGeneralForumTopic", reader, contentType)
+	result, err = c.Raw(ctx, "reopenGeneralForumTopic", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -11144,7 +11144,7 @@ func (c *Client) ReplaceManagedBotToken(ctx context.Context, params *ReplaceMana
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "replaceManagedBotToken", reader, contentType)
+	result, err = c.Raw(ctx, "replaceManagedBotToken", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -11310,7 +11310,7 @@ func (c *Client) ReplaceStickerInSet(ctx context.Context, params *ReplaceSticker
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "replaceStickerInSet", reader, contentType)
+	result, err = c.Raw(ctx, "replaceStickerInSet", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -11450,7 +11450,7 @@ func (c *Client) RepostStory(ctx context.Context, params *RepostStoryParams) (re
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "repostStory", reader, contentType)
+	result, err = c.Raw(ctx, "repostStory", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -11577,7 +11577,7 @@ func (c *Client) RestrictChatMember(ctx context.Context, params *RestrictChatMem
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "restrictChatMember", reader, contentType)
+	result, err = c.Raw(ctx, "restrictChatMember", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -11656,7 +11656,7 @@ func (c *Client) RevokeChatInviteLink(ctx context.Context, params *RevokeChatInv
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "revokeChatInviteLink", reader, contentType)
+	result, err = c.Raw(ctx, "revokeChatInviteLink", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -11794,7 +11794,7 @@ func (c *Client) SavePreparedInlineMessage(ctx context.Context, params *SavePrep
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "savePreparedInlineMessage", reader, contentType)
+	result, err = c.Raw(ctx, "savePreparedInlineMessage", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -11874,7 +11874,7 @@ func (c *Client) SavePreparedKeyboardButton(ctx context.Context, params *SavePre
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "savePreparedKeyboardButton", reader, contentType)
+	result, err = c.Raw(ctx, "savePreparedKeyboardButton", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -12515,7 +12515,7 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendAnimation", reader, contentType)
+	result, err = c.Raw(ctx, "sendAnimation", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -13114,7 +13114,7 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendAudio", reader, contentType)
+	result, err = c.Raw(ctx, "sendAudio", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -13245,7 +13245,7 @@ func (c *Client) SendChatAction(ctx context.Context, params *SendChatActionParam
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendChatAction", reader, contentType)
+	result, err = c.Raw(ctx, "sendChatAction", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -13323,7 +13323,7 @@ func (c *Client) SendChatJoinRequestWebApp(ctx context.Context, params *SendChat
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendChatJoinRequestWebApp", reader, contentType)
+	result, err = c.Raw(ctx, "sendChatJoinRequestWebApp", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -13496,7 +13496,7 @@ func (c *Client) SendChecklist(ctx context.Context, params *SendChecklistParams)
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendChecklist", reader, contentType)
+	result, err = c.Raw(ctx, "sendChecklist", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -13795,7 +13795,7 @@ func (c *Client) SendContact(ctx context.Context, params *SendContactParams) (re
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendContact", reader, contentType)
+	result, err = c.Raw(ctx, "sendContact", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -14051,7 +14051,7 @@ func (c *Client) SendDice(ctx context.Context, params *SendDiceParams) (ret *Mes
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendDice", reader, contentType)
+	result, err = c.Raw(ctx, "sendDice", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -14600,7 +14600,7 @@ func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendDocument", reader, contentType)
+	result, err = c.Raw(ctx, "sendDocument", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -14827,7 +14827,7 @@ func (c *Client) SendGame(ctx context.Context, params *SendGameParams) (ret *Mes
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendGame", reader, contentType)
+	result, err = c.Raw(ctx, "sendGame", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -14995,7 +14995,7 @@ func (c *Client) SendGift(ctx context.Context, params *SendGiftParams) (ret bool
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendGift", reader, contentType)
+	result, err = c.Raw(ctx, "sendGift", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -15625,7 +15625,7 @@ func (c *Client) SendInvoice(ctx context.Context, params *SendInvoiceParams) (re
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendInvoice", reader, contentType)
+	result, err = c.Raw(ctx, "sendInvoice", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -16194,7 +16194,7 @@ func (c *Client) SendLivePhoto(ctx context.Context, params *SendLivePhotoParams)
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendLivePhoto", reader, contentType)
+	result, err = c.Raw(ctx, "sendLivePhoto", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -16528,7 +16528,7 @@ func (c *Client) SendLocation(ctx context.Context, params *SendLocationParams) (
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendLocation", reader, contentType)
+	result, err = c.Raw(ctx, "sendLocation", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -16961,7 +16961,7 @@ func (c *Client) SendMediaGroup(ctx context.Context, params *SendMediaGroupParam
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendMediaGroup", reader, contentType)
+	result, err = c.Raw(ctx, "sendMediaGroup", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -17263,7 +17263,7 @@ func (c *Client) SendMessage(ctx context.Context, params *SendMessageParams) (re
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendMessage", reader, contentType)
+	result, err = c.Raw(ctx, "sendMessage", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -17412,7 +17412,7 @@ func (c *Client) SendMessageDraft(ctx context.Context, params *SendMessageDraftP
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendMessageDraft", reader, contentType)
+	result, err = c.Raw(ctx, "sendMessageDraft", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -18005,7 +18005,7 @@ func (c *Client) SendPaidMedia(ctx context.Context, params *SendPaidMediaParams)
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendPaidMedia", reader, contentType)
+	result, err = c.Raw(ctx, "sendPaidMedia", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -18540,7 +18540,7 @@ func (c *Client) SendPhoto(ctx context.Context, params *SendPhotoParams) (ret *M
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendPhoto", reader, contentType)
+	result, err = c.Raw(ctx, "sendPhoto", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -19788,7 +19788,7 @@ func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Mes
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendPoll", reader, contentType)
+	result, err = c.Raw(ctx, "sendPoll", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -20042,7 +20042,7 @@ func (c *Client) SendRichMessage(ctx context.Context, params *SendRichMessagePar
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendRichMessage", reader, contentType)
+	result, err = c.Raw(ctx, "sendRichMessage", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -20153,7 +20153,7 @@ func (c *Client) SendRichMessageDraft(ctx context.Context, params *SendRichMessa
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendRichMessageDraft", reader, contentType)
+	result, err = c.Raw(ctx, "sendRichMessageDraft", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -20574,7 +20574,7 @@ func (c *Client) SendSticker(ctx context.Context, params *SendStickerParams) (re
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendSticker", reader, contentType)
+	result, err = c.Raw(ctx, "sendSticker", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -20938,7 +20938,7 @@ func (c *Client) SendVenue(ctx context.Context, params *SendVenueParams) (ret *M
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendVenue", reader, contentType)
+	result, err = c.Raw(ctx, "sendVenue", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -21663,7 +21663,7 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendVideo", reader, contentType)
+	result, err = c.Raw(ctx, "sendVideo", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -22154,7 +22154,7 @@ func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams)
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendVideoNote", reader, contentType)
+	result, err = c.Raw(ctx, "sendVideoNote", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -22664,7 +22664,7 @@ func (c *Client) SendVoice(ctx context.Context, params *SendVoiceParams) (ret *M
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "sendVoice", reader, contentType)
+	result, err = c.Raw(ctx, "sendVoice", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -22742,7 +22742,7 @@ func (c *Client) SetBusinessAccountBio(ctx context.Context, params *SetBusinessA
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setBusinessAccountBio", reader, contentType)
+	result, err = c.Raw(ctx, "setBusinessAccountBio", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -22833,7 +22833,7 @@ func (c *Client) SetBusinessAccountGiftSettings(ctx context.Context, params *Set
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setBusinessAccountGiftSettings", reader, contentType)
+	result, err = c.Raw(ctx, "setBusinessAccountGiftSettings", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -22924,7 +22924,7 @@ func (c *Client) SetBusinessAccountName(ctx context.Context, params *SetBusiness
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setBusinessAccountName", reader, contentType)
+	result, err = c.Raw(ctx, "setBusinessAccountName", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -23075,7 +23075,7 @@ func (c *Client) SetBusinessAccountProfilePhoto(ctx context.Context, params *Set
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setBusinessAccountProfilePhoto", reader, contentType)
+	result, err = c.Raw(ctx, "setBusinessAccountProfilePhoto", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -23152,7 +23152,7 @@ func (c *Client) SetBusinessAccountUsername(ctx context.Context, params *SetBusi
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setBusinessAccountUsername", reader, contentType)
+	result, err = c.Raw(ctx, "setBusinessAccountUsername", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -23242,7 +23242,7 @@ func (c *Client) SetChatAdministratorCustomTitle(ctx context.Context, params *Se
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setChatAdministratorCustomTitle", reader, contentType)
+	result, err = c.Raw(ctx, "setChatAdministratorCustomTitle", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -23318,7 +23318,7 @@ func (c *Client) SetChatDescription(ctx context.Context, params *SetChatDescript
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setChatDescription", reader, contentType)
+	result, err = c.Raw(ctx, "setChatDescription", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -23409,7 +23409,7 @@ func (c *Client) SetChatMemberTag(ctx context.Context, params *SetChatMemberTagP
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setChatMemberTag", reader, contentType)
+	result, err = c.Raw(ctx, "setChatMemberTag", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -23492,7 +23492,7 @@ func (c *Client) SetChatMenuButton(ctx context.Context, params *SetChatMenuButto
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setChatMenuButton", reader, contentType)
+	result, err = c.Raw(ctx, "setChatMenuButton", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -23585,7 +23585,7 @@ func (c *Client) SetChatPermissions(ctx context.Context, params *SetChatPermissi
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setChatPermissions", reader, contentType)
+	result, err = c.Raw(ctx, "setChatPermissions", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -23683,7 +23683,7 @@ func (c *Client) SetChatPhoto(ctx context.Context, params *SetChatPhotoParams) (
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setChatPhoto", reader, contentType)
+	result, err = c.Raw(ctx, "setChatPhoto", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -23763,7 +23763,7 @@ func (c *Client) SetChatStickerSet(ctx context.Context, params *SetChatStickerSe
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setChatStickerSet", reader, contentType)
+	result, err = c.Raw(ctx, "setChatStickerSet", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -23840,7 +23840,7 @@ func (c *Client) SetChatTitle(ctx context.Context, params *SetChatTitleParams) (
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setChatTitle", reader, contentType)
+	result, err = c.Raw(ctx, "setChatTitle", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -23915,7 +23915,7 @@ func (c *Client) SetCustomEmojiStickerSetThumbnail(ctx context.Context, params *
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setCustomEmojiStickerSetThumbnail", reader, contentType)
+	result, err = c.Raw(ctx, "setCustomEmojiStickerSetThumbnail", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -24076,7 +24076,7 @@ func (c *Client) SetGameScore(ctx context.Context, params *SetGameScoreParams) (
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setGameScore", reader, contentType)
+	result, err = c.Raw(ctx, "setGameScore", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -24171,7 +24171,7 @@ func (c *Client) SetManagedBotAccessSettings(ctx context.Context, params *SetMan
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setManagedBotAccessSettings", reader, contentType)
+	result, err = c.Raw(ctx, "setManagedBotAccessSettings", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -24287,7 +24287,7 @@ func (c *Client) SetMessageReaction(ctx context.Context, params *SetMessageReact
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setMessageReaction", reader, contentType)
+	result, err = c.Raw(ctx, "setMessageReaction", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -24390,7 +24390,7 @@ func (c *Client) SetMyCommands(ctx context.Context, params *SetMyCommandsParams)
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setMyCommands", reader, contentType)
+	result, err = c.Raw(ctx, "setMyCommands", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -24470,7 +24470,7 @@ func (c *Client) SetMyDefaultAdministratorRights(ctx context.Context, params *Se
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setMyDefaultAdministratorRights", reader, contentType)
+	result, err = c.Raw(ctx, "setMyDefaultAdministratorRights", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -24549,7 +24549,7 @@ func (c *Client) SetMyDescription(ctx context.Context, params *SetMyDescriptionP
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setMyDescription", reader, contentType)
+	result, err = c.Raw(ctx, "setMyDescription", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -24628,7 +24628,7 @@ func (c *Client) SetMyName(ctx context.Context, params *SetMyNameParams) (ret bo
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setMyName", reader, contentType)
+	result, err = c.Raw(ctx, "setMyName", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -24730,7 +24730,7 @@ func (c *Client) SetMyProfilePhoto(ctx context.Context, params *SetMyProfilePhot
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setMyProfilePhoto", reader, contentType)
+	result, err = c.Raw(ctx, "setMyProfilePhoto", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -24810,7 +24810,7 @@ func (c *Client) SetMyShortDescription(ctx context.Context, params *SetMyShortDe
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setMyShortDescription", reader, contentType)
+	result, err = c.Raw(ctx, "setMyShortDescription", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -24889,7 +24889,7 @@ func (c *Client) SetPassportDataErrors(ctx context.Context, params *SetPassportD
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setPassportDataErrors", reader, contentType)
+	result, err = c.Raw(ctx, "setPassportDataErrors", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -24965,7 +24965,7 @@ func (c *Client) SetStickerEmojiList(ctx context.Context, params *SetStickerEmoj
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setStickerEmojiList", reader, contentType)
+	result, err = c.Raw(ctx, "setStickerEmojiList", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -25041,7 +25041,7 @@ func (c *Client) SetStickerKeywords(ctx context.Context, params *SetStickerKeywo
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setStickerKeywords", reader, contentType)
+	result, err = c.Raw(ctx, "setStickerKeywords", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -25121,7 +25121,7 @@ func (c *Client) SetStickerMaskPosition(ctx context.Context, params *SetStickerM
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setStickerMaskPosition", reader, contentType)
+	result, err = c.Raw(ctx, "setStickerMaskPosition", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -25196,7 +25196,7 @@ func (c *Client) SetStickerPositionInSet(ctx context.Context, params *SetSticker
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setStickerPositionInSet", reader, contentType)
+	result, err = c.Raw(ctx, "setStickerPositionInSet", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -25357,7 +25357,7 @@ func (c *Client) SetStickerSetThumbnail(ctx context.Context, params *SetStickerS
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setStickerSetThumbnail", reader, contentType)
+	result, err = c.Raw(ctx, "setStickerSetThumbnail", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -25433,7 +25433,7 @@ func (c *Client) SetStickerSetTitle(ctx context.Context, params *SetStickerSetTi
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setStickerSetTitle", reader, contentType)
+	result, err = c.Raw(ctx, "setStickerSetTitle", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -25527,7 +25527,7 @@ func (c *Client) SetUserEmojiStatus(ctx context.Context, params *SetUserEmojiSta
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setUserEmojiStatus", reader, contentType)
+	result, err = c.Raw(ctx, "setUserEmojiStatus", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -25789,7 +25789,7 @@ func (c *Client) SetWebhook(ctx context.Context, params *SetWebhookParams) (ret 
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "setWebhook", reader, contentType)
+	result, err = c.Raw(ctx, "setWebhook", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -25922,7 +25922,7 @@ func (c *Client) StopMessageLiveLocation(ctx context.Context, params *StopMessag
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "stopMessageLiveLocation", reader, contentType)
+	result, err = c.Raw(ctx, "stopMessageLiveLocation", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -26034,7 +26034,7 @@ func (c *Client) StopPoll(ctx context.Context, params *StopPollParams) (ret *Pol
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "stopPoll", reader, contentType)
+	result, err = c.Raw(ctx, "stopPoll", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -26111,7 +26111,7 @@ func (c *Client) TransferBusinessAccountStars(ctx context.Context, params *Trans
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "transferBusinessAccountStars", reader, contentType)
+	result, err = c.Raw(ctx, "transferBusinessAccountStars", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -26222,7 +26222,7 @@ func (c *Client) TransferGift(ctx context.Context, params *TransferGiftParams) (
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "transferGift", reader, contentType)
+	result, err = c.Raw(ctx, "transferGift", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -26317,7 +26317,7 @@ func (c *Client) UnbanChatMember(ctx context.Context, params *UnbanChatMemberPar
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "unbanChatMember", reader, contentType)
+	result, err = c.Raw(ctx, "unbanChatMember", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -26393,7 +26393,7 @@ func (c *Client) UnbanChatSenderChat(ctx context.Context, params *UnbanChatSende
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "unbanChatSenderChat", reader, contentType)
+	result, err = c.Raw(ctx, "unbanChatSenderChat", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -26454,7 +26454,7 @@ func (c *Client) UnhideGeneralForumTopic(ctx context.Context, params *UnhideGene
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "unhideGeneralForumTopic", reader, contentType)
+	result, err = c.Raw(ctx, "unhideGeneralForumTopic", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -26516,7 +26516,7 @@ func (c *Client) UnpinAllChatMessages(ctx context.Context, params *UnpinAllChatM
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "unpinAllChatMessages", reader, contentType)
+	result, err = c.Raw(ctx, "unpinAllChatMessages", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -26592,7 +26592,7 @@ func (c *Client) UnpinAllForumTopicMessages(ctx context.Context, params *UnpinAl
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "unpinAllForumTopicMessages", reader, contentType)
+	result, err = c.Raw(ctx, "unpinAllForumTopicMessages", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -26653,7 +26653,7 @@ func (c *Client) UnpinAllGeneralForumTopicMessages(ctx context.Context, params *
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "unpinAllGeneralForumTopicMessages", reader, contentType)
+	result, err = c.Raw(ctx, "unpinAllGeneralForumTopicMessages", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -26749,7 +26749,7 @@ func (c *Client) UnpinChatMessage(ctx context.Context, params *UnpinChatMessageP
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "unpinChatMessage", reader, contentType)
+	result, err = c.Raw(ctx, "unpinChatMessage", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -26858,7 +26858,7 @@ func (c *Client) UpgradeGift(ctx context.Context, params *UpgradeGiftParams) (re
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "upgradeGift", reader, contentType)
+	result, err = c.Raw(ctx, "upgradeGift", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -26992,7 +26992,7 @@ func (c *Client) UploadStickerFile(ctx context.Context, params *UploadStickerFil
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "uploadStickerFile", reader, contentType)
+	result, err = c.Raw(ctx, "uploadStickerFile", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		return
@@ -27075,7 +27075,7 @@ func (c *Client) VerifyChat(ctx context.Context, params *VerifyChatParams) (ret 
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "verifyChat", reader, contentType)
+	result, err = c.Raw(ctx, "verifyChat", reader, contentType, nil)
 	if err != nil {
 		return
 	}
@@ -27154,7 +27154,7 @@ func (c *Client) VerifyUser(ctx context.Context, params *VerifyUserParams) (ret 
 
 	var result json.RawMessage
 
-	result, err = c.Raw(ctx, "verifyUser", reader, contentType)
+	result, err = c.Raw(ctx, "verifyUser", reader, contentType, nil)
 	if err != nil {
 		return
 	}
