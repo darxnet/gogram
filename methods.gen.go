@@ -11387,7 +11387,7 @@ type SendAnimationParams struct {
 	// The thumbnail should be in JPEG format and less than 200 kB in size.
 	// A thumbnail's width and height should not exceed 320.
 	// Ignored if the file is not uploaded using multipart/form-data.
-	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass "attach://<file_attach_name>" if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -11561,7 +11561,7 @@ func WithSendAnimationHeight(value int64) SendAnimationOption {
 // The thumbnail should be in JPEG format and less than 200 kB in size.
 // A thumbnail's width and height should not exceed 320.
 // Ignored if the file is not uploaded using multipart/form-data.
-// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass "attach://<file_attach_name>" if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 // [More information on Sending Files »]
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -12041,7 +12041,7 @@ type SendAudioParams struct {
 	// The thumbnail should be in JPEG format and less than 200 kB in size.
 	// A thumbnail's width and height should not exceed 320.
 	// Ignored if the file is not uploaded using multipart/form-data.
-	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass "attach://<file_attach_name>" if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -12236,7 +12236,7 @@ func WithSendAudioTitle(value string) SendAudioOption {
 // The thumbnail should be in JPEG format and less than 200 kB in size.
 // A thumbnail's width and height should not exceed 320.
 // Ignored if the file is not uploaded using multipart/form-data.
-// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass "attach://<file_attach_name>" if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 // [More information on Sending Files »]
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -12770,7 +12770,10 @@ func WithSendChatJoinRequestWebAppWebAppUrl(value string) SendChatJoinRequestWeb
 // SendChatJoinRequestWebApp calls the sendChatJoinRequestWebApp Telegram Bot API method.
 //
 // Use this method to process a received chat join request query by showing a Mini App to the user before deciding the outcome.
+// Call [answerChatJoinRequestQuery] to resolve the join request query based on the user interaction with the Mini App.
 // Returns True on success.
+//
+// [answerChatJoinRequestQuery]: https://core.telegram.org/bots/api#answerchatjoinrequestquery
 func (c *Client) SendChatJoinRequestWebApp(ctx context.Context, params *SendChatJoinRequestWebAppParams) (ret bool, err error) {
 	buffer := new(bytes.Buffer)
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
@@ -13552,7 +13555,7 @@ type SendDocumentParams struct {
 	// The thumbnail should be in JPEG format and less than 200 kB in size.
 	// A thumbnail's width and height should not exceed 320.
 	// Ignored if the file is not uploaded using multipart/form-data.
-	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass "attach://<file_attach_name>" if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -13687,7 +13690,7 @@ func WithSendDocumentDocument(value InputFile) SendDocumentOption {
 // The thumbnail should be in JPEG format and less than 200 kB in size.
 // A thumbnail's width and height should not exceed 320.
 // Ignored if the file is not uploaded using multipart/form-data.
-// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass "attach://<file_attach_name>" if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 // [More information on Sending Files »]
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -18639,7 +18642,8 @@ func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Mes
 
 // SendRichMessageParams contains parameters for Client.SendRichMessage.
 type SendRichMessageParams struct {
-	// Unique identifier of the business connection on behalf of which the message will be sent
+	// Unique identifier of the business connection on behalf of which the message will be sent.
+	// Bot can send rich messages on behalf of a business account only if the corresponding user can send rich messages.
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
@@ -18700,7 +18704,8 @@ func (r *SendRichMessageParams) Option(opts ...SendRichMessageOption) (previous 
 
 // WithSendRichMessageBusinessConnectionID sets the BusinessConnectionID field.
 //
-// Unique identifier of the business connection on behalf of which the message will be sent
+// Unique identifier of the business connection on behalf of which the message will be sent.
+// Bot can send rich messages on behalf of a business account only if the corresponding user can send rich messages.
 func WithSendRichMessageBusinessConnectionID(value string) SendRichMessageOption {
 	return func(params *SendRichMessageParams) SendRichMessageOption {
 		previous := params.BusinessConnectionID
@@ -19818,14 +19823,14 @@ type SendVideoParams struct {
 	// The thumbnail should be in JPEG format and less than 200 kB in size.
 	// A thumbnail's width and height should not exceed 320.
 	// Ignored if the file is not uploaded using multipart/form-data.
-	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass "attach://<file_attach_name>" if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
 	Thumbnail *InputFile `json:"thumbnail,omitempty"`
 
 	// Cover for the video in the message.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -20005,7 +20010,7 @@ func WithSendVideoHeight(value int64) SendVideoOption {
 // The thumbnail should be in JPEG format and less than 200 kB in size.
 // A thumbnail's width and height should not exceed 320.
 // Ignored if the file is not uploaded using multipart/form-data.
-// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass "attach://<file_attach_name>" if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 // [More information on Sending Files »]
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -20021,7 +20026,7 @@ func WithSendVideoThumbnail(value *InputFile) SendVideoOption {
 // WithSendVideoCover sets the Cover field.
 //
 // Cover for the video in the message.
-// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
+// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
 // [More information on Sending Files »]
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -20543,7 +20548,7 @@ type SendVideoNoteParams struct {
 	// The thumbnail should be in JPEG format and less than 200 kB in size.
 	// A thumbnail's width and height should not exceed 320.
 	// Ignored if the file is not uploaded using multipart/form-data.
-	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass "attach://<file_attach_name>" if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -20689,7 +20694,7 @@ func WithSendVideoNoteLength(value int64) SendVideoNoteOption {
 // The thumbnail should be in JPEG format and less than 200 kB in size.
 // A thumbnail's width and height should not exceed 320.
 // Ignored if the file is not uploaded using multipart/form-data.
-// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass "attach://<file_attach_name>" if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 // [More information on Sending Files »]
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
