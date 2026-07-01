@@ -3834,7 +3834,10 @@ func (ctx *Context) SendChatAction(
 // SendChatJoinRequestWebApp calls Client.SendChatJoinRequestWebApp with context-derived defaults.
 //
 // Use this method to process a received chat join request query by showing a Mini App to the user before deciding the outcome.
+// Call [answerChatJoinRequestQuery] to resolve the join request query based on the user interaction with the Mini App.
 // Returns True on success.
+//
+// [answerChatJoinRequestQuery]: https://core.telegram.org/bots/api#answerchatjoinrequestquery
 func (ctx *Context) SendChatJoinRequestWebApp(
 	chatJoinRequestQueryID string,
 	webAppUrl string,

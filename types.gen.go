@@ -1466,7 +1466,7 @@ type ChatJoinRequest struct {
 	InviteLink *ChatInviteLink `json:"invite_link,omitempty"`
 
 	// Optional.
-	// Identifier of the join request query.
+	// Identifier of the join request query; for bots assigned to process join request only.
 	// If present, then the bot must call [sendChatJoinRequestWebApp] or directly call [answerChatJoinRequestQuery] within 10 seconds.
 	//
 	// [sendChatJoinRequestWebApp]: https://core.telegram.org/bots/api#sendchatjoinrequestwebapp
@@ -4616,7 +4616,7 @@ type InputMediaAnimation struct {
 	Type string `json:"type"`
 
 	// File to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -4627,7 +4627,7 @@ type InputMediaAnimation struct {
 	// The thumbnail should be in JPEG format and less than 200 kB in size.
 	// A thumbnail's width and height should not exceed 320.
 	// Ignored if the file is not uploaded using multipart/form-data.
-	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass "attach://<file_attach_name>" if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -4677,7 +4677,7 @@ type InputMediaAudio struct {
 	Type string `json:"type"`
 
 	// File to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -4688,7 +4688,7 @@ type InputMediaAudio struct {
 	// The thumbnail should be in JPEG format and less than 200 kB in size.
 	// A thumbnail's width and height should not exceed 320.
 	// Ignored if the file is not uploaded using multipart/form-data.
-	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass "attach://<file_attach_name>" if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -4730,7 +4730,7 @@ type InputMediaDocument struct {
 	Type string `json:"type"`
 
 	// File to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -4741,7 +4741,7 @@ type InputMediaDocument struct {
 	// The thumbnail should be in JPEG format and less than 200 kB in size.
 	// A thumbnail's width and height should not exceed 320.
 	// Ignored if the file is not uploaded using multipart/form-data.
-	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass "attach://<file_attach_name>" if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -4787,7 +4787,7 @@ type InputMediaLivePhoto struct {
 	Type string `json:"type"`
 
 	// Video of the live photo to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »].
 	// Sending live photos by a URL is currently unsupported.
 	//
@@ -4795,7 +4795,7 @@ type InputMediaLivePhoto struct {
 	Media InputFile `json:"media"`
 
 	// The static photo to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »].
 	// Sending live photos by a URL is currently unsupported.
 	//
@@ -4852,7 +4852,7 @@ type InputMediaPhoto struct {
 	Type string `json:"type"`
 
 	// File to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -4890,7 +4890,7 @@ type InputMediaSticker struct {
 	Type string `json:"type"`
 
 	// File to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a .WEBP sticker from the Internet, or pass “attach://<file_attach_name>” to upload a new .WEBP, .TGS, or .WEBM sticker using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a .WEBP sticker from the Internet, or pass "attach://<file_attach_name>" to upload a new .WEBP, .TGS, or .WEBM sticker using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -4949,7 +4949,7 @@ type InputMediaVideo struct {
 	Type string `json:"type"`
 
 	// File to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -4960,7 +4960,7 @@ type InputMediaVideo struct {
 	// The thumbnail should be in JPEG format and less than 200 kB in size.
 	// A thumbnail's width and height should not exceed 320.
 	// Ignored if the file is not uploaded using multipart/form-data.
-	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass "attach://<file_attach_name>" if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -4968,7 +4968,7 @@ type InputMediaVideo struct {
 
 	// Optional.
 	// Cover for the video in the message.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -5161,7 +5161,7 @@ type InputPaidMediaLivePhoto struct {
 	Type string `json:"type"`
 
 	// Video of the live photo to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »].
 	// Sending live photos by a URL is currently unsupported.
 	//
@@ -5169,7 +5169,7 @@ type InputPaidMediaLivePhoto struct {
 	Media InputFile `json:"media"`
 
 	// The static photo to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »].
 	// Sending live photos by a URL is currently unsupported.
 	//
@@ -5185,7 +5185,7 @@ type InputPaidMediaPhoto struct {
 	Type string `json:"type"`
 
 	// File to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -5200,7 +5200,7 @@ type InputPaidMediaVideo struct {
 	Type string `json:"type"`
 
 	// File to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -5211,7 +5211,7 @@ type InputPaidMediaVideo struct {
 	// The thumbnail should be in JPEG format and less than 200 kB in size.
 	// A thumbnail's width and height should not exceed 320.
 	// Ignored if the file is not uploaded using multipart/form-data.
-	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass "attach://<file_attach_name>" if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -5219,7 +5219,7 @@ type InputPaidMediaVideo struct {
 
 	// Optional.
 	// Cover for the video in the message.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -5612,7 +5612,7 @@ type InputProfilePhotoAnimated struct {
 	Type string `json:"type"`
 
 	// The animated profile photo.
-	// Profile photos can't be reused and can only be uploaded as a new file, so you can pass “attach://<file_attach_name>” if the photo was uploaded using multipart/form-data under <file_attach_name>.
+	// Profile photos can't be reused and can only be uploaded as a new file, so you can pass "attach://<file_attach_name>" if the photo was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -5632,7 +5632,7 @@ type InputProfilePhotoStatic struct {
 	Type string `json:"type"`
 
 	// The static profile photo.
-	// Profile photos can't be reused and can only be uploaded as a new file, so you can pass “attach://<file_attach_name>” if the photo was uploaded using multipart/form-data under <file_attach_name>.
+	// Profile photos can't be reused and can only be uploaded as a new file, so you can pass "attach://<file_attach_name>" if the photo was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -5682,7 +5682,7 @@ type InputRichMessageContent struct {
 // This object describes a sticker to be added to a sticker set.
 type InputSticker struct {
 	// The added sticker.
-	// Pass a file_id as a String to send a file that already exists on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from the Internet, or pass “attach://<file_attach_name>” to upload a new file using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id as a String to send a file that already exists on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new file using multipart/form-data under <file_attach_name> name.
 	// Animated and video stickers can't be uploaded via HTTP URL.
 	// [More information on Sending Files »]
 	//
@@ -5774,7 +5774,7 @@ type InputStoryContentPhoto struct {
 
 	// The photo to post as a story.
 	// The photo must be of the size 1080x1920 and must not exceed 10 MB.
-	// The photo can't be reused and can only be uploaded as a new file, so you can pass “attach://<file_attach_name>” if the photo was uploaded using multipart/form-data under <file_attach_name>.
+	// The photo can't be reused and can only be uploaded as a new file, so you can pass "attach://<file_attach_name>" if the photo was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -5790,7 +5790,7 @@ type InputStoryContentVideo struct {
 
 	// The video to post as a story.
 	// The video must be of the size 720x1280, streamable, encoded with H.265 codec, with key frames added each second in the MPEG4 format, and must not exceed 30 MB.
-	// The video can't be reused and can only be uploaded as a new file, so you can pass “attach://<file_attach_name>” if the video was uploaded using multipart/form-data under <file_attach_name>.
+	// The video can't be reused and can only be uploaded as a new file, so you can pass "attach://<file_attach_name>" if the video was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -9195,7 +9195,7 @@ type RichBlockParagraph struct {
 
 // RichBlockPhoto
 //
-// A block with a photo, corresponding to the HTML tag <photo>.
+// A block with a photo, corresponding to the HTML tag <img>.
 type RichBlockPhoto struct {
 	// Type of the block, always “photo”
 	Type string `json:"type"`
