@@ -438,6 +438,10 @@ type BotCommand struct {
 
 	// Description of the command; 1-256 characters
 	Description string `json:"description"`
+
+	// Optional.
+	// True, if the command sends an ephemeral message, which can be seen only by the sender of the message and the bot
+	IsEphemeral bool `json:"is_ephemeral,omitempty"`
 }
 
 // BotCommandScope
@@ -673,6 +677,21 @@ type BotName struct {
 type BotShortDescription struct {
 	// The bot's short description
 	ShortDescription string `json:"short_description"`
+}
+
+// BotSubscriptionUpdated
+//
+// This object contains information about changes to a user payment subscription toward the current bot.
+type BotSubscriptionUpdated struct {
+	// User who subscribed for payments toward the bot
+	User User `json:"user"`
+
+	// Bot-specified invoice payload
+	InvoicePayload string `json:"invoice_payload"`
+
+	// The new state of the subscription.
+	// Currently, it can be one of “canceled” if the user canceled the subscription, “active” if the user re-enabled a previously canceled subscription, or “failed” if payment for the subscription failed.
+	State string `json:"state"`
 }
 
 // BusinessBotRights
@@ -978,7 +997,7 @@ type ChatAdministratorRights struct {
 
 	// Optional.
 	// True, if the administrator can edit the tags of regular members; for groups and supergroups only.
-	// If omitted defaults to the value of can_pin_messages.
+	// If omitted, defaults to the value of can_pin_messages.
 	CanManageTags bool `json:"can_manage_tags,omitempty"`
 }
 
@@ -1391,6 +1410,12 @@ type ChatFullInfo struct {
 	// The bot that processes join request queries in the chat.
 	// The field is only available to chat administrators.
 	GuardBot *User `json:"guard_bot,omitempty"`
+
+	// Optional.
+	// The [Community] to which the chat belongs
+	//
+	// [Community]: https://core.telegram.org/bots/api#community
+	Community *Community `json:"community,omitempty"`
 }
 
 // ChatInviteLink
@@ -1466,7 +1491,7 @@ type ChatJoinRequest struct {
 	InviteLink *ChatInviteLink `json:"invite_link,omitempty"`
 
 	// Optional.
-	// Identifier of the join request query; for bots assigned to process join request only.
+	// Identifier of the join request query; for bots assigned to process join requests only.
 	// If present, then the bot must call [sendChatJoinRequestWebApp] or directly call [answerChatJoinRequestQuery] within 10 seconds.
 	//
 	// [sendChatJoinRequestWebApp]: https://core.telegram.org/bots/api#sendchatjoinrequestwebapp
@@ -1668,7 +1693,7 @@ type ChatMemberAdministrator struct {
 
 	// Optional.
 	// True, if the administrator can edit the tags of regular members; for groups and supergroups only.
-	// If omitted defaults to the value of can_pin_messages.
+	// If omitted, defaults to the value of can_pin_messages.
 	CanManageTags bool `json:"can_manage_tags,omitempty"`
 
 	// Optional.
@@ -1939,7 +1964,7 @@ type ChatPermissions struct {
 
 	// Optional.
 	// True, if the user is allowed to create forum topics.
-	// If omitted defaults to the value of can_pin_messages.
+	// If omitted, defaults to the value of can_pin_messages.
 	CanManageTopics bool `json:"can_manage_topics,omitempty"`
 }
 
@@ -2110,6 +2135,34 @@ type ChosenInlineResult struct {
 	Query string `json:"query"`
 }
 
+// Community
+//
+// Represents a community (a group of chats).
+type Community struct {
+	// Unique identifier for this community.
+	// This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it.
+	// But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this identifier.
+	ID int64 `json:"id"`
+
+	// Name of the community
+	Name string `json:"name"`
+}
+
+// CommunityChatAdded
+//
+// Describes a service message about a chat being added to a community.
+type CommunityChatAdded struct {
+	// The new community to which the chat belongs
+	Community Community `json:"community"`
+}
+
+// CommunityChatRemoved
+//
+// Describes a service message about a chat being removed from a community.
+// Currently holds no information.
+type CommunityChatRemoved struct {
+}
+
 // Contact
 //
 // This object represents a phone contact.
@@ -2160,7 +2213,7 @@ type Dice struct {
 //
 // Describes a service message about a change in the price of direct messages sent to a channel chat.
 type DirectMessagePriceChanged struct {
-	// True, if direct messages are enabled for the channel chat; false otherwise
+	// True, if direct messages are enabled for the channel chat; False otherwise
 	AreDirectMessagesEnabled bool `json:"are_direct_messages_enabled"`
 
 	// Optional.
@@ -3405,7 +3458,7 @@ type InlineQueryResultCachedGif struct {
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 
 	// Optional.
-	// Pass True, if the caption must be shown above the message media
+	// Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 
 	// Optional.
@@ -3454,7 +3507,7 @@ type InlineQueryResultCachedMpeg4Gif struct {
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 
 	// Optional.
-	// Pass True, if the caption must be shown above the message media
+	// Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 
 	// Optional.
@@ -3507,7 +3560,7 @@ type InlineQueryResultCachedPhoto struct {
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 
 	// Optional.
-	// Pass True, if the caption must be shown above the message media
+	// Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 
 	// Optional.
@@ -3585,7 +3638,7 @@ type InlineQueryResultCachedVideo struct {
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 
 	// Optional.
-	// Pass True, if the caption must be shown above the message media
+	// Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 
 	// Optional.
@@ -3835,7 +3888,7 @@ type InlineQueryResultGif struct {
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 
 	// Optional.
-	// Pass True, if the caption must be shown above the message media
+	// Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 
 	// Optional.
@@ -3966,7 +4019,7 @@ type InlineQueryResultMpeg4Gif struct {
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 
 	// Optional.
-	// Pass True, if the caption must be shown above the message media
+	// Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 
 	// Optional.
@@ -4032,7 +4085,7 @@ type InlineQueryResultPhoto struct {
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 
 	// Optional.
-	// Pass True, if the caption must be shown above the message media
+	// Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 
 	// Optional.
@@ -4153,7 +4206,7 @@ type InlineQueryResultVideo struct {
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 
 	// Optional.
-	// Pass True, if the caption must be shown above the message media
+	// Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 
 	// Optional.
@@ -4389,7 +4442,7 @@ type InputInvoiceMessageContent struct {
 	MaxTipAmount int64 `json:"max_tip_amount,omitempty"`
 
 	// Optional.
-	// A JSON-serialized array of suggested amounts of tip in the smallest units of the currency (integer, not float/double).
+	// A JSON-serialized Array of suggested amounts of tip in the smallest units of the currency (integer, not float/double).
 	// At most 4 suggested tip amounts can be specified.
 	// The suggested tip amounts must be positive, passed in a strictly increased order and must not exceed max_tip_amount.
 	SuggestedTipAmounts []int64 `json:"suggested_tip_amounts,omitempty"`
@@ -4616,7 +4669,7 @@ type InputMediaAnimation struct {
 	Type string `json:"type"`
 
 	// File to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -4627,7 +4680,7 @@ type InputMediaAnimation struct {
 	// The thumbnail should be in JPEG format and less than 200 kB in size.
 	// A thumbnail's width and height should not exceed 320.
 	// Ignored if the file is not uploaded using multipart/form-data.
-	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass "attach://<file_attach_name>" if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -4649,7 +4702,7 @@ type InputMediaAnimation struct {
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 
 	// Optional.
-	// Pass True, if the caption must be shown above the message media
+	// Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 
 	// Optional.
@@ -4677,7 +4730,7 @@ type InputMediaAudio struct {
 	Type string `json:"type"`
 
 	// File to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -4688,7 +4741,7 @@ type InputMediaAudio struct {
 	// The thumbnail should be in JPEG format and less than 200 kB in size.
 	// A thumbnail's width and height should not exceed 320.
 	// Ignored if the file is not uploaded using multipart/form-data.
-	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass "attach://<file_attach_name>" if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -4730,7 +4783,7 @@ type InputMediaDocument struct {
 	Type string `json:"type"`
 
 	// File to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -4741,7 +4794,7 @@ type InputMediaDocument struct {
 	// The thumbnail should be in JPEG format and less than 200 kB in size.
 	// A thumbnail's width and height should not exceed 320.
 	// Ignored if the file is not uploaded using multipart/form-data.
-	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass "attach://<file_attach_name>" if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -4787,7 +4840,7 @@ type InputMediaLivePhoto struct {
 	Type string `json:"type"`
 
 	// Video of the live photo to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »].
 	// Sending live photos by a URL is currently unsupported.
 	//
@@ -4795,7 +4848,7 @@ type InputMediaLivePhoto struct {
 	Media InputFile `json:"media"`
 
 	// The static photo to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »].
 	// Sending live photos by a URL is currently unsupported.
 	//
@@ -4818,7 +4871,7 @@ type InputMediaLivePhoto struct {
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 
 	// Optional.
-	// Pass True, if the caption must be shown above the message media
+	// Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 
 	// Optional.
@@ -4852,7 +4905,7 @@ type InputMediaPhoto struct {
 	Type string `json:"type"`
 
 	// File to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -4874,7 +4927,7 @@ type InputMediaPhoto struct {
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 
 	// Optional.
-	// Pass True, if the caption must be shown above the message media
+	// Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 
 	// Optional.
@@ -4890,7 +4943,7 @@ type InputMediaSticker struct {
 	Type string `json:"type"`
 
 	// File to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a .WEBP sticker from the Internet, or pass "attach://<file_attach_name>" to upload a new .WEBP, .TGS, or .WEBM sticker using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a .WEBP sticker from the Internet, or pass “attach://<file_attach_name>” to upload a new .WEBP, .TGS, or .WEBM sticker using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -4949,7 +5002,7 @@ type InputMediaVideo struct {
 	Type string `json:"type"`
 
 	// File to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -4960,7 +5013,7 @@ type InputMediaVideo struct {
 	// The thumbnail should be in JPEG format and less than 200 kB in size.
 	// A thumbnail's width and height should not exceed 320.
 	// Ignored if the file is not uploaded using multipart/form-data.
-	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass "attach://<file_attach_name>" if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -4968,7 +5021,7 @@ type InputMediaVideo struct {
 
 	// Optional.
 	// Cover for the video in the message.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -4994,7 +5047,7 @@ type InputMediaVideo struct {
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 
 	// Optional.
-	// Pass True, if the caption must be shown above the message media
+	// Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 
 	// Optional.
@@ -5016,6 +5069,40 @@ type InputMediaVideo struct {
 	// Optional.
 	// Pass True if the video needs to be covered with a spoiler animation
 	HasSpoiler bool `json:"has_spoiler,omitempty"`
+}
+
+// InputMediaVoiceNote
+//
+// Represents a voice message file to be sent.
+type InputMediaVoiceNote struct {
+	// Type of the media, must be voice_note
+	Type string `json:"type"`
+
+	// File to send.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
+	// [More information on Sending Files »]
+	//
+	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
+	Media InputFile `json:"media"`
+
+	// Optional.
+	// Caption of the voice message to be sent, 0-1024 characters after entities parsing
+	Caption string `json:"caption,omitempty"`
+
+	// Optional.
+	// Mode for parsing entities in the voice message caption.
+	// See [formatting options] for more details.
+	//
+	// [formatting options]: https://core.telegram.org/bots/api#formatting-options
+	ParseMode string `json:"parse_mode,omitempty"`
+
+	// Optional.
+	// List of special entities that appear in the caption, which can be specified instead of parse_mode
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
+
+	// Optional.
+	// Duration of the voice message in seconds
+	Duration int64 `json:"duration,omitempty"`
 }
 
 // InputMessageContent
@@ -5161,7 +5248,7 @@ type InputPaidMediaLivePhoto struct {
 	Type string `json:"type"`
 
 	// Video of the live photo to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »].
 	// Sending live photos by a URL is currently unsupported.
 	//
@@ -5169,7 +5256,7 @@ type InputPaidMediaLivePhoto struct {
 	Media InputFile `json:"media"`
 
 	// The static photo to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »].
 	// Sending live photos by a URL is currently unsupported.
 	//
@@ -5185,7 +5272,7 @@ type InputPaidMediaPhoto struct {
 	Type string `json:"type"`
 
 	// File to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -5200,7 +5287,7 @@ type InputPaidMediaVideo struct {
 	Type string `json:"type"`
 
 	// File to send.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -5211,7 +5298,7 @@ type InputPaidMediaVideo struct {
 	// The thumbnail should be in JPEG format and less than 200 kB in size.
 	// A thumbnail's width and height should not exceed 320.
 	// Ignored if the file is not uploaded using multipart/form-data.
-	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass "attach://<file_attach_name>" if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -5219,7 +5306,7 @@ type InputPaidMediaVideo struct {
 
 	// Optional.
 	// Cover for the video in the message.
-	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new one using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach://<file_attach_name>” to upload a new one using multipart/form-data under <file_attach_name> name.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -5612,7 +5699,7 @@ type InputProfilePhotoAnimated struct {
 	Type string `json:"type"`
 
 	// The animated profile photo.
-	// Profile photos can't be reused and can only be uploaded as a new file, so you can pass "attach://<file_attach_name>" if the photo was uploaded using multipart/form-data under <file_attach_name>.
+	// Profile photos can't be reused and can only be uploaded as a new file, so you can pass “attach://<file_attach_name>” if the photo was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -5632,21 +5719,674 @@ type InputProfilePhotoStatic struct {
 	Type string `json:"type"`
 
 	// The static profile photo.
-	// Profile photos can't be reused and can only be uploaded as a new file, so you can pass "attach://<file_attach_name>" if the photo was uploaded using multipart/form-data under <file_attach_name>.
+	// Profile photos can't be reused and can only be uploaded as a new file, so you can pass “attach://<file_attach_name>” if the photo was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
 	Photo InputFile `json:"photo"`
 }
 
+// InputRichBlock
+//
+// This object represents a block in a rich formatted message to be sent.
+// Currently, it can be any of the following types:
+//
+//
+// [InputRichBlockParagraph]
+//
+// [InputRichBlockSectionHeading]
+//
+// [InputRichBlockPreformatted]
+//
+// [InputRichBlockFooter]
+//
+// [InputRichBlockDivider]
+//
+// [InputRichBlockMathematicalExpression]
+//
+// [InputRichBlockAnchor]
+//
+// [InputRichBlockList]
+//
+// [InputRichBlockBlockQuotation]
+//
+// [InputRichBlockPullQuotation]
+//
+// [InputRichBlockCollage]
+//
+// [InputRichBlockSlideshow]
+//
+// [InputRichBlockTable]
+//
+// [InputRichBlockDetails]
+//
+// [InputRichBlockMap]
+//
+// [InputRichBlockAnimation]
+//
+// [InputRichBlockAudio]
+//
+// [InputRichBlockPhoto]
+//
+// [InputRichBlockVideo]
+//
+// [InputRichBlockVoiceNote]
+//
+// [InputRichBlockThinking]
+//
+//
+// [InputRichBlockParagraph]: https://core.telegram.org/bots/api#inputrichblockparagraph
+// [InputRichBlockSectionHeading]: https://core.telegram.org/bots/api#inputrichblocksectionheading
+// [InputRichBlockPreformatted]: https://core.telegram.org/bots/api#inputrichblockpreformatted
+// [InputRichBlockFooter]: https://core.telegram.org/bots/api#inputrichblockfooter
+// [InputRichBlockDivider]: https://core.telegram.org/bots/api#inputrichblockdivider
+// [InputRichBlockMathematicalExpression]: https://core.telegram.org/bots/api#inputrichblockmathematicalexpression
+// [InputRichBlockAnchor]: https://core.telegram.org/bots/api#inputrichblockanchor
+// [InputRichBlockList]: https://core.telegram.org/bots/api#inputrichblocklist
+// [InputRichBlockBlockQuotation]: https://core.telegram.org/bots/api#inputrichblockblockquotation
+// [InputRichBlockPullQuotation]: https://core.telegram.org/bots/api#inputrichblockpullquotation
+// [InputRichBlockCollage]: https://core.telegram.org/bots/api#inputrichblockcollage
+// [InputRichBlockSlideshow]: https://core.telegram.org/bots/api#inputrichblockslideshow
+// [InputRichBlockTable]: https://core.telegram.org/bots/api#inputrichblocktable
+// [InputRichBlockDetails]: https://core.telegram.org/bots/api#inputrichblockdetails
+// [InputRichBlockMap]: https://core.telegram.org/bots/api#inputrichblockmap
+// [InputRichBlockAnimation]: https://core.telegram.org/bots/api#inputrichblockanimation
+// [InputRichBlockAudio]: https://core.telegram.org/bots/api#inputrichblockaudio
+// [InputRichBlockPhoto]: https://core.telegram.org/bots/api#inputrichblockphoto
+// [InputRichBlockVideo]: https://core.telegram.org/bots/api#inputrichblockvideo
+// [InputRichBlockVoiceNote]: https://core.telegram.org/bots/api#inputrichblockvoicenote
+// [InputRichBlockThinking]: https://core.telegram.org/bots/api#inputrichblockthinking
+type InputRichBlock struct {
+	*InputRichBlockParagraph
+	*InputRichBlockSectionHeading
+	*InputRichBlockPreformatted
+	*InputRichBlockFooter
+	*InputRichBlockDivider
+	*InputRichBlockMathematicalExpression
+	*InputRichBlockAnchor
+	*InputRichBlockList
+	*InputRichBlockBlockQuotation
+	*InputRichBlockPullQuotation
+	*InputRichBlockCollage
+	*InputRichBlockSlideshow
+	*InputRichBlockTable
+	*InputRichBlockDetails
+	*InputRichBlockMap
+	*InputRichBlockAnimation
+	*InputRichBlockAudio
+	*InputRichBlockPhoto
+	*InputRichBlockVideo
+	*InputRichBlockVoiceNote
+	*InputRichBlockThinking
+}
+
+// MarshalJSON marshals the currently set subtype of InputRichBlock.
+func (r *InputRichBlock) MarshalJSON() ([]byte, error) {
+	if r.InputRichBlockParagraph != nil {
+		r.InputRichBlockParagraph.Type = "paragraph"
+		return json.Marshal(r.InputRichBlockParagraph)
+	}
+
+	if r.InputRichBlockSectionHeading != nil {
+		r.InputRichBlockSectionHeading.Type = "heading"
+		return json.Marshal(r.InputRichBlockSectionHeading)
+	}
+
+	if r.InputRichBlockPreformatted != nil {
+		r.InputRichBlockPreformatted.Type = "pre"
+		return json.Marshal(r.InputRichBlockPreformatted)
+	}
+
+	if r.InputRichBlockFooter != nil {
+		r.InputRichBlockFooter.Type = "footer"
+		return json.Marshal(r.InputRichBlockFooter)
+	}
+
+	if r.InputRichBlockDivider != nil {
+		r.InputRichBlockDivider.Type = "divider"
+		return json.Marshal(r.InputRichBlockDivider)
+	}
+
+	if r.InputRichBlockMathematicalExpression != nil {
+		r.InputRichBlockMathematicalExpression.Type = "mathematical_expression"
+		return json.Marshal(r.InputRichBlockMathematicalExpression)
+	}
+
+	if r.InputRichBlockAnchor != nil {
+		r.InputRichBlockAnchor.Type = "anchor"
+		return json.Marshal(r.InputRichBlockAnchor)
+	}
+
+	if r.InputRichBlockList != nil {
+		r.InputRichBlockList.Type = "list"
+		return json.Marshal(r.InputRichBlockList)
+	}
+
+	if r.InputRichBlockBlockQuotation != nil {
+		r.InputRichBlockBlockQuotation.Type = "blockquote"
+		return json.Marshal(r.InputRichBlockBlockQuotation)
+	}
+
+	if r.InputRichBlockPullQuotation != nil {
+		r.InputRichBlockPullQuotation.Type = "pullquote"
+		return json.Marshal(r.InputRichBlockPullQuotation)
+	}
+
+	if r.InputRichBlockCollage != nil {
+		r.InputRichBlockCollage.Type = "collage"
+		return json.Marshal(r.InputRichBlockCollage)
+	}
+
+	if r.InputRichBlockSlideshow != nil {
+		r.InputRichBlockSlideshow.Type = "slideshow"
+		return json.Marshal(r.InputRichBlockSlideshow)
+	}
+
+	if r.InputRichBlockTable != nil {
+		r.InputRichBlockTable.Type = "table"
+		return json.Marshal(r.InputRichBlockTable)
+	}
+
+	if r.InputRichBlockDetails != nil {
+		r.InputRichBlockDetails.Type = "details"
+		return json.Marshal(r.InputRichBlockDetails)
+	}
+
+	if r.InputRichBlockMap != nil {
+		r.InputRichBlockMap.Type = "map"
+		return json.Marshal(r.InputRichBlockMap)
+	}
+
+	if r.InputRichBlockAnimation != nil {
+		r.InputRichBlockAnimation.Type = "animation"
+		return json.Marshal(r.InputRichBlockAnimation)
+	}
+
+	if r.InputRichBlockAudio != nil {
+		r.InputRichBlockAudio.Type = "audio"
+		return json.Marshal(r.InputRichBlockAudio)
+	}
+
+	if r.InputRichBlockPhoto != nil {
+		r.InputRichBlockPhoto.Type = "photo"
+		return json.Marshal(r.InputRichBlockPhoto)
+	}
+
+	if r.InputRichBlockVideo != nil {
+		r.InputRichBlockVideo.Type = "video"
+		return json.Marshal(r.InputRichBlockVideo)
+	}
+
+	if r.InputRichBlockVoiceNote != nil {
+		r.InputRichBlockVoiceNote.Type = "voice_note"
+		return json.Marshal(r.InputRichBlockVoiceNote)
+	}
+
+	if r.InputRichBlockThinking != nil {
+		r.InputRichBlockThinking.Type = "thinking"
+		return json.Marshal(r.InputRichBlockThinking)
+	}
+
+	return nil, nil
+}
+
+// UnmarshalJSON unmarshals JSON into the matching InputRichBlock subtype.
+func (r *InputRichBlock) UnmarshalJSON(data []byte) error {
+	type T struct {
+		Discriminator string `json:"type"`
+	}
+
+	v := new(T)
+
+	if err := json.Unmarshal(data, v); err != nil {
+		return err
+	}
+
+	switch v.Discriminator {
+	case "paragraph":
+		r.InputRichBlockParagraph = new(InputRichBlockParagraph)
+		return json.Unmarshal(data, r.InputRichBlockParagraph)
+
+	case "heading":
+		r.InputRichBlockSectionHeading = new(InputRichBlockSectionHeading)
+		return json.Unmarshal(data, r.InputRichBlockSectionHeading)
+
+	case "pre":
+		r.InputRichBlockPreformatted = new(InputRichBlockPreformatted)
+		return json.Unmarshal(data, r.InputRichBlockPreformatted)
+
+	case "footer":
+		r.InputRichBlockFooter = new(InputRichBlockFooter)
+		return json.Unmarshal(data, r.InputRichBlockFooter)
+
+	case "divider":
+		r.InputRichBlockDivider = new(InputRichBlockDivider)
+		return json.Unmarshal(data, r.InputRichBlockDivider)
+
+	case "mathematical_expression":
+		r.InputRichBlockMathematicalExpression = new(InputRichBlockMathematicalExpression)
+		return json.Unmarshal(data, r.InputRichBlockMathematicalExpression)
+
+	case "anchor":
+		r.InputRichBlockAnchor = new(InputRichBlockAnchor)
+		return json.Unmarshal(data, r.InputRichBlockAnchor)
+
+	case "list":
+		r.InputRichBlockList = new(InputRichBlockList)
+		return json.Unmarshal(data, r.InputRichBlockList)
+
+	case "blockquote":
+		r.InputRichBlockBlockQuotation = new(InputRichBlockBlockQuotation)
+		return json.Unmarshal(data, r.InputRichBlockBlockQuotation)
+
+	case "pullquote":
+		r.InputRichBlockPullQuotation = new(InputRichBlockPullQuotation)
+		return json.Unmarshal(data, r.InputRichBlockPullQuotation)
+
+	case "collage":
+		r.InputRichBlockCollage = new(InputRichBlockCollage)
+		return json.Unmarshal(data, r.InputRichBlockCollage)
+
+	case "slideshow":
+		r.InputRichBlockSlideshow = new(InputRichBlockSlideshow)
+		return json.Unmarshal(data, r.InputRichBlockSlideshow)
+
+	case "table":
+		r.InputRichBlockTable = new(InputRichBlockTable)
+		return json.Unmarshal(data, r.InputRichBlockTable)
+
+	case "details":
+		r.InputRichBlockDetails = new(InputRichBlockDetails)
+		return json.Unmarshal(data, r.InputRichBlockDetails)
+
+	case "map":
+		r.InputRichBlockMap = new(InputRichBlockMap)
+		return json.Unmarshal(data, r.InputRichBlockMap)
+
+	case "animation":
+		r.InputRichBlockAnimation = new(InputRichBlockAnimation)
+		return json.Unmarshal(data, r.InputRichBlockAnimation)
+
+	case "audio":
+		r.InputRichBlockAudio = new(InputRichBlockAudio)
+		return json.Unmarshal(data, r.InputRichBlockAudio)
+
+	case "photo":
+		r.InputRichBlockPhoto = new(InputRichBlockPhoto)
+		return json.Unmarshal(data, r.InputRichBlockPhoto)
+
+	case "video":
+		r.InputRichBlockVideo = new(InputRichBlockVideo)
+		return json.Unmarshal(data, r.InputRichBlockVideo)
+
+	case "voice_note":
+		r.InputRichBlockVoiceNote = new(InputRichBlockVoiceNote)
+		return json.Unmarshal(data, r.InputRichBlockVoiceNote)
+
+	case "thinking":
+		r.InputRichBlockThinking = new(InputRichBlockThinking)
+		return json.Unmarshal(data, r.InputRichBlockThinking)
+
+	default:
+		return errors.New("unknown subtype value: " + v.Discriminator)
+	}
+}
+
+// InputRichBlockAnchor
+//
+// A block with an anchor, corresponding to the HTML tag <a> with the attribute name.
+type InputRichBlockAnchor struct {
+	// Type of the block, always “anchor”
+	Type string `json:"type"`
+
+	// The name of the anchor
+	Name string `json:"name"`
+}
+
+// InputRichBlockAnimation
+//
+// A block with an animation, corresponding to the HTML tag <video>.
+type InputRichBlockAnimation struct {
+	// Type of the block, always “animation”
+	Type string `json:"type"`
+
+	// The animation.
+	// Caption is ignored.
+	Animation InputMedia `json:"animation"`
+
+	// Optional.
+	// Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// InputRichBlockAudio
+//
+// A block with a music file, corresponding to the HTML tag <audio>.
+type InputRichBlockAudio struct {
+	// Type of the block, always “audio”
+	Type string `json:"type"`
+
+	// The audio.
+	// Caption is ignored.
+	Audio InputMedia `json:"audio"`
+
+	// Optional.
+	// Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// InputRichBlockBlockQuotation
+//
+// A block quotation, corresponding to the HTML tag <blockquote>.
+type InputRichBlockBlockQuotation struct {
+	// Type of the block, always “blockquote”
+	Type string `json:"type"`
+
+	// Content of the block
+	Blocks []InputRichBlock `json:"blocks"`
+
+	// Optional.
+	// Credit of the block
+	Credit *RichText `json:"credit,omitempty"`
+}
+
+// InputRichBlockCollage
+//
+// A collage, corresponding to the custom HTML tag <tg-collage>.
+type InputRichBlockCollage struct {
+	// Type of the block, always “collage”
+	Type string `json:"type"`
+
+	// Elements of the collage
+	Blocks []InputRichBlock `json:"blocks"`
+
+	// Optional.
+	// Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// InputRichBlockDetails
+//
+// An expandable block for details disclosure, corresponding to the HTML tag <details>.
+type InputRichBlockDetails struct {
+	// Type of the block, always “details”
+	Type string `json:"type"`
+
+	// Always shown summary of the block
+	Summary RichText `json:"summary"`
+
+	// Content of the block
+	Blocks []InputRichBlock `json:"blocks"`
+
+	// Optional.
+	// Pass True if the content of the block is visible by default
+	IsOpen bool `json:"is_open,omitempty"`
+}
+
+// InputRichBlockDivider
+//
+// A divider, corresponding to the HTML tag <hr/>.
+type InputRichBlockDivider struct {
+	// Type of the block, always “divider”
+	Type string `json:"type"`
+}
+
+// InputRichBlockFooter
+//
+// A footer, corresponding to the HTML tag <footer>.
+type InputRichBlockFooter struct {
+	// Type of the block, always “footer”
+	Type string `json:"type"`
+
+	// Text of the block
+	Text RichText `json:"text"`
+}
+
+// InputRichBlockList
+//
+// A list of blocks, corresponding to the HTML tag <ul> or <ol> with multiple nested tags <li>.
+type InputRichBlockList struct {
+	// Type of the block, always “list”
+	Type string `json:"type"`
+
+	// Items of the list
+	Items []InputRichBlockListItem `json:"items"`
+}
+
+// InputRichBlockListItem
+//
+// An item of a list to be sent.
+type InputRichBlockListItem struct {
+	// The content of the item
+	Blocks []InputRichBlock `json:"blocks"`
+
+	// Optional.
+	// Pass True if the item has a checkbox
+	HasCheckbox bool `json:"has_checkbox,omitempty"`
+
+	// Optional.
+	// Pass True if the item has a checked checkbox
+	IsChecked bool `json:"is_checked,omitempty"`
+
+	// Optional.
+	// For ordered lists, the numeric value of the item label
+	Value int64 `json:"value,omitempty"`
+
+	// Optional.
+	// For ordered lists, the type of the item label; must be one of “a” for lowercase letters, “A” for uppercase letters, “i” for lowercase Roman numerals, “I” for uppercase Roman numerals, or “1” for decimal numbers
+	Type string `json:"type,omitempty"`
+}
+
+// InputRichBlockMap
+//
+// A block with a map, corresponding to the custom HTML tag <tg-map>.
+// The map's width and height must not exceed 10000 in total.
+// The width and height ratio must be at most 20.
+type InputRichBlockMap struct {
+	// Type of the block, always “map”
+	Type string `json:"type"`
+
+	// Location of the center of the map
+	Location Location `json:"location"`
+
+	// Map zoom level; 0-24
+	Zoom int64 `json:"zoom"`
+
+	// Map width; 0-10000
+	Width int64 `json:"width"`
+
+	// Map height; 0-10000
+	Height int64 `json:"height"`
+
+	// Optional.
+	// Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// InputRichBlockMathematicalExpression
+//
+// A block with a mathematical expression in LaTeX format, corresponding to the custom HTML tag <tg-math-block>.
+type InputRichBlockMathematicalExpression struct {
+	// Type of the block, always “mathematical_expression”
+	Type string `json:"type"`
+
+	// The mathematical expression in LaTeX format
+	Expression string `json:"expression"`
+}
+
+// InputRichBlockParagraph
+//
+// A text paragraph, corresponding to the HTML tag <p>.
+type InputRichBlockParagraph struct {
+	// Type of the block, always “paragraph”
+	Type string `json:"type"`
+
+	// Text of the block
+	Text RichText `json:"text"`
+}
+
+// InputRichBlockPhoto
+//
+// A block with a photo, corresponding to the HTML tag <img>.
+type InputRichBlockPhoto struct {
+	// Type of the block, always “photo”
+	Type string `json:"type"`
+
+	// The photo.
+	// Caption is ignored.
+	Photo InputMedia `json:"photo"`
+
+	// Optional.
+	// Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// InputRichBlockPreformatted
+//
+// A preformatted text block, corresponding to the nested HTML tags <pre> and <code>.
+type InputRichBlockPreformatted struct {
+	// Type of the block, always “pre”
+	Type string `json:"type"`
+
+	// Text of the block
+	Text RichText `json:"text"`
+
+	// Optional.
+	// The programming language of the text
+	Language string `json:"language,omitempty"`
+}
+
+// InputRichBlockPullQuotation
+//
+// A quotation with centered text, loosely corresponding to the HTML tag <aside>.
+type InputRichBlockPullQuotation struct {
+	// Type of the block, always “pullquote”
+	Type string `json:"type"`
+
+	// Text of the block
+	Text RichText `json:"text"`
+
+	// Optional.
+	// Credit of the block
+	Credit *RichText `json:"credit,omitempty"`
+}
+
+// InputRichBlockSectionHeading
+//
+// A section heading, corresponding to the HTML tags <h1>, <h2>, <h3>, <h4>, <h5>, or <h6>.
+type InputRichBlockSectionHeading struct {
+	// Type of the block, always “heading”
+	Type string `json:"type"`
+
+	// Text of the block
+	Text RichText `json:"text"`
+
+	// Relative size of the text font; 1-6, 1 is the largest, 6 is the smallest
+	Size int64 `json:"size"`
+}
+
+// InputRichBlockSlideshow
+//
+// A slideshow, corresponding to the custom HTML tag <tg-slideshow>.
+type InputRichBlockSlideshow struct {
+	// Type of the block, always “slideshow”
+	Type string `json:"type"`
+
+	// Elements of the slideshow
+	Blocks []InputRichBlock `json:"blocks"`
+
+	// Optional.
+	// Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// InputRichBlockTable
+//
+// A table, corresponding to the HTML tag <table>.
+type InputRichBlockTable struct {
+	// Type of the block, always “table”
+	Type string `json:"type"`
+
+	// Cells of the table
+	Cells [][]RichBlockTableCell `json:"cells"`
+
+	// Optional.
+	// Pass True if the table has borders
+	IsBordered bool `json:"is_bordered,omitempty"`
+
+	// Optional.
+	// Pass True if the table is striped
+	IsStriped bool `json:"is_striped,omitempty"`
+
+	// Optional.
+	// Caption of the table
+	Caption *RichText `json:"caption,omitempty"`
+}
+
+// InputRichBlockThinking
+//
+// A block with a “Thinking…” placeholder, corresponding to the custom HTML tag <tg-thinking>.
+// The block may be used only in [sendRichMessageDraft], therefore it can't be received in messages.
+// See [https://t.me/addemoji/AIActions] for examples of custom emoji that are recommended for usage in the block.
+//
+// [sendRichMessageDraft]: https://core.telegram.org/bots/api#sendrichmessagedraft
+// [https://t.me/addemoji/AIActions]: https://t.me/addemoji/AIActions
+type InputRichBlockThinking struct {
+	// Type of the block, always “thinking”
+	Type string `json:"type"`
+
+	// Text of the block.
+	// See [https://t.me/addemoji/AIActions] for examples of custom emoji that are recommended for usage in the block.
+	//
+	// [https://t.me/addemoji/AIActions]: https://t.me/addemoji/AIActions
+	Text RichText `json:"text"`
+}
+
+// InputRichBlockVideo
+//
+// A block with a video, corresponding to the HTML tag <video>.
+type InputRichBlockVideo struct {
+	// Type of the block, always “video”
+	Type string `json:"type"`
+
+	// The video.
+	// Caption is ignored.
+	Video InputMedia `json:"video"`
+
+	// Optional.
+	// Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// InputRichBlockVoiceNote
+//
+// A block with a voice note, corresponding to the HTML tag <audio>.
+type InputRichBlockVoiceNote struct {
+	// Type of the block, always “voice_note”
+	Type string `json:"type"`
+
+	// The voice note.
+	// Caption is ignored.
+	VoiceNote InputMedia `json:"voice_note"`
+
+	// Optional.
+	// Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
 // InputRichMessage
 //
 // Describes a rich message to be sent.
-// Exactly one of the fields html or markdown must be used.
+// Exactly one of the fields html, markdown, or blocks must be used.
 type InputRichMessage struct {
+	// Optional.
+	// Content of the rich message to send described as a list of blocks
+	Blocks []InputRichBlock `json:"blocks,omitempty"`
+
 	// Optional.
 	// Content of the rich message to send described using HTML formatting.
 	// See [rich message formatting options] for more details.
+	// Use media field to specify the media used in the message.
 	//
 	// [rich message formatting options]: https://core.telegram.org/bots/api#rich-message-formatting-options
 	Html string `json:"html,omitempty"`
@@ -5654,9 +6394,14 @@ type InputRichMessage struct {
 	// Optional.
 	// Content of the rich message to send described using Markdown formatting.
 	// See [rich message formatting options] for more details.
+	// Use media field to specify the media used in the message.
 	//
 	// [rich message formatting options]: https://core.telegram.org/bots/api#rich-message-formatting-options
 	Markdown string `json:"markdown,omitempty"`
+
+	// Optional.
+	// List of media that are specified in the markdown or html fields using tg://photo?id=, tg://video?id=, and tg://audio?id= links
+	Media []InputRichMessageMedia `json:"media,omitempty"`
 
 	// Optional.
 	// Pass True if the rich message must be shown right-to-left
@@ -5677,12 +6422,25 @@ type InputRichMessageContent struct {
 	RichMessage InputRichMessage `json:"rich_message"`
 }
 
+// InputRichMessageMedia
+//
+// Describes a media element embedded in an outgoing rich message.
+type InputRichMessageMedia struct {
+	// Unique identifier of the media used in a tg://photo?id=, tg://video?id=, or tg://audio?id= link.
+	// 1-64 characters, only A-Z, a-z, 0-9, _ and - are allowed.
+	ID string `json:"id"`
+
+	// The media to be sent.
+	// Everything except the media itself and its properties is ignored.
+	Media InputMedia `json:"media"`
+}
+
 // InputSticker
 //
 // This object describes a sticker to be added to a sticker set.
 type InputSticker struct {
 	// The added sticker.
-	// Pass a file_id as a String to send a file that already exists on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from the Internet, or pass "attach://<file_attach_name>" to upload a new file using multipart/form-data under <file_attach_name> name.
+	// Pass a file_id as a String to send a file that already exists on the Telegram servers, pass an HTTP URL as a String for Telegram to get a file from the Internet, or pass “attach://<file_attach_name>” to upload a new file using multipart/form-data under <file_attach_name> name.
 	// Animated and video stickers can't be uploaded via HTTP URL.
 	// [More information on Sending Files »]
 	//
@@ -5774,7 +6532,7 @@ type InputStoryContentPhoto struct {
 
 	// The photo to post as a story.
 	// The photo must be of the size 1080x1920 and must not exceed 10 MB.
-	// The photo can't be reused and can only be uploaded as a new file, so you can pass "attach://<file_attach_name>" if the photo was uploaded using multipart/form-data under <file_attach_name>.
+	// The photo can't be reused and can only be uploaded as a new file, so you can pass “attach://<file_attach_name>” if the photo was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -5790,7 +6548,7 @@ type InputStoryContentVideo struct {
 
 	// The video to post as a story.
 	// The video must be of the size 720x1280, streamable, encoded with H.265 codec, with key frames added each second in the MPEG4 format, and must not exceed 30 MB.
-	// The video can't be reused and can only be uploaded as a new file, so you can pass "attach://<file_attach_name>" if the video was uploaded using multipart/form-data under <file_attach_name>.
+	// The video can't be reused and can only be uploaded as a new file, so you can pass “attach://<file_attach_name>” if the video was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -6472,8 +7230,8 @@ type MenuButtonWebApp struct {
 //
 // This object represents a message.
 type Message struct {
-	// Unique message identifier inside this chat.
-	// In specific instances (e.g., message containing a video sent to a big chat), the server might automatically schedule a message instead of sending it immediately.
+	// Unique message identifier inside this chat; 0 for ephemeral messages.
+	// In specific instances (e.g., a message containing a video sent to a big chat), the server might automatically schedule a message instead of sending it immediately.
 	// In such cases, this field will be 0 and the relevant message will be unusable until it is actually sent.
 	MessageID int64 `json:"message_id"`
 
@@ -6508,6 +7266,15 @@ type Message struct {
 	// Optional.
 	// Tag or custom title of the sender of the message; for supergroups only
 	SenderTag string `json:"sender_tag,omitempty"`
+
+	// Optional.
+	// For ephemeral messages, the user who received the message
+	ReceiverUser *User `json:"receiver_user,omitempty"`
+
+	// Optional.
+	// For ephemeral messages, identifier of the ephemeral message inside this chat.
+	// The identifier may be reused for another ephemeral message after the message is deleted or expires.
+	EphemeralMessageID int64 `json:"ephemeral_message_id,omitempty"`
 
 	// Date the message was sent in Unix time.
 	// It is always a positive number, representing a valid date.
@@ -6544,6 +7311,7 @@ type Message struct {
 	// Optional.
 	// For replies in the same chat and message thread, the original message.
 	// Note that the [Message] object in this field will not contain further reply_to_message fields even if it itself is a reply.
+	// If the message is a reply to an ephemeral message, then this field may be omitted.
 	//
 	// [Message]: https://core.telegram.org/bots/api#message
 	ReplyToMessage *Message `json:"reply_to_message,omitempty"`
@@ -6859,8 +7627,7 @@ type Message struct {
 	PassportData *PassportData `json:"passport_data,omitempty"`
 
 	// Optional.
-	// Service message.
-	// A user in the chat triggered another user's proximity alert while sharing Live Location.
+	// Service message: a user in the chat triggered another user's proximity alert while sharing Live Location
 	ProximityAlertTriggered *ProximityAlertTriggered `json:"proximity_alert_triggered,omitempty"`
 
 	// Optional.
@@ -6878,6 +7645,18 @@ type Message struct {
 	// Optional.
 	// Service message: tasks were added to a checklist
 	ChecklistTasksAdded *ChecklistTasksAdded `json:"checklist_tasks_added,omitempty"`
+
+	// Optional.
+	// Service message: chat added to a [Community]
+	//
+	// [Community]: https://core.telegram.org/bots/api#community
+	CommunityChatAdded *CommunityChatAdded `json:"community_chat_added,omitempty"`
+
+	// Optional.
+	// Service message: chat removed from a [Community]
+	//
+	// [Community]: https://core.telegram.org/bots/api#community
+	CommunityChatRemoved *CommunityChatRemoved `json:"community_chat_removed,omitempty"`
 
 	// Optional.
 	// Service message: the price for paid messages in the corresponding direct messages chat of a channel has changed
@@ -8460,18 +9239,18 @@ type ReplyKeyboardMarkup struct {
 
 	// Optional.
 	// Requests clients to always show the keyboard when the regular keyboard is hidden.
-	// Defaults to false, in which case the custom keyboard can be hidden and opened with a keyboard icon.
+	// Defaults to False, in which case the custom keyboard can be hidden and opened with a keyboard icon.
 	IsPersistent bool `json:"is_persistent,omitempty"`
 
 	// Optional.
 	// Requests clients to resize the keyboard vertically for optimal fit (e.g., make the keyboard smaller if there are just two rows of buttons).
-	// Defaults to false, in which case the custom keyboard is always of the same height as the app's standard keyboard.
+	// Defaults to False, in which case the custom keyboard is always of the same height as the app's standard keyboard.
 	ResizeKeyboard bool `json:"resize_keyboard,omitempty"`
 
 	// Optional.
 	// Requests clients to hide the keyboard as soon as it's been used.
 	// The keyboard will still be available, but clients will automatically display the usual letter-keyboard in the chat - the user can press a special button in the input field to see the custom keyboard again.
-	// Defaults to false.
+	// Defaults to False.
 	OneTimeKeyboard bool `json:"one_time_keyboard,omitempty"`
 
 	// Optional.
@@ -8517,17 +9296,26 @@ type ReplyKeyboardRemove struct {
 //
 // Describes reply parameters for the message that is being sent.
 type ReplyParameters struct {
-	// Identifier of the message that will be replied to in the current chat, or in the chat chat_id if it is specified
-	MessageID int64 `json:"message_id"`
+	// Optional.
+	// Identifier of the message that will be replied to in the current chat, or in the chat chat_id if it is specified.
+	// Required if ephemeral_message_id isn't specified.
+	MessageID int64 `json:"message_id,omitempty"`
 
 	// Optional.
 	// If the message to be replied to is from a different chat, unique identifier for the chat or username of the bot, supergroup or channel in the format @username.
-	// Not supported for messages sent on behalf of a business account and messages from channel direct messages chats.
+	// Not supported for messages sent on behalf of a business account, messages from channel direct messages chats and ephemeral messages.
 	ChatID string `json:"chat_id,omitempty"`
 
 	// Optional.
+	// Identifier of the incoming ephemeral message that will be replied to in the current chat.
+	// A reply to an ephemeral message must itself be an ephemeral message.
+	// An ephemeral message may only be replied to within 15 seconds of being sent.
+	// Required if message_id isn't specified.
+	EphemeralMessageID int64 `json:"ephemeral_message_id,omitempty"`
+
+	// Optional.
 	// Pass True if the message should be sent even if the specified message to be replied to is not found.
-	// Always False for replies in another chat or forum topic.
+	// Always False for replies in another chat or forum topic, and sent ephemeral messages.
 	// Always True for messages sent on behalf of a business account.
 	AllowSendingWithoutReply bool `json:"allow_sending_without_reply,omitempty"`
 
@@ -8535,6 +9323,7 @@ type ReplyParameters struct {
 	// Quoted part of the message to be replied to; 0-1024 characters after entities parsing.
 	// The quote must be an exact substring of the message to be replied to, including bold, italic, underline, strikethrough, spoiler, custom_emoji, and date_time entities.
 	// The message will fail to send if the quote isn't found in the original message.
+	// Ignored for ephemeral messages.
 	Quote string `json:"quote,omitempty"`
 
 	// Optional.
@@ -9328,7 +10117,7 @@ type RichBlockTableCell struct {
 //
 // A block with a “Thinking…” placeholder, corresponding to the custom HTML tag <tg-thinking>.
 // The block may be used only in [sendRichMessageDraft], therefore it can't be received in messages.
-// See [https://t.me/addemoji/AIActions] for examples of custom emoji, which are recommended for usage in the block.
+// See [https://t.me/addemoji/AIActions] for examples of custom emoji that are recommended for usage in the block.
 //
 // [sendRichMessageDraft]: https://core.telegram.org/bots/api#sendrichmessagedraft
 // [https://t.me/addemoji/AIActions]: https://t.me/addemoji/AIActions
@@ -9337,7 +10126,7 @@ type RichBlockThinking struct {
 	Type string `json:"type"`
 
 	// Text of the block.
-	// See [https://t.me/addemoji/AIActions] for examples of custom emoji, which are recommended for usage in the block.
+	// See [https://t.me/addemoji/AIActions] for examples of custom emoji that are recommended for usage in the block.
 	//
 	// [https://t.me/addemoji/AIActions]: https://t.me/addemoji/AIActions
 	Text RichText `json:"text"`
@@ -10674,11 +11463,11 @@ type SuggestedPostPaid struct {
 	SuggestedPostMessage *Message `json:"suggested_post_message,omitempty"`
 
 	// Currency in which the payment was made.
-	// Currently, one of “XTR” for Telegram Stars or “TON” for toncoins.
+	// Currently, one of “XTR” for Telegram Stars or “TON” for TON grams.
 	Currency string `json:"currency"`
 
 	// Optional.
-	// The amount of the currency that was received by the channel in nanotoncoins; for payments in toncoins only
+	// The amount of the currency that was received by the channel in nanograms; for payments in TON grams only
 	Amount int64 `json:"amount,omitempty"`
 
 	// Optional.
@@ -10707,12 +11496,12 @@ type SuggestedPostParameters struct {
 // Describes the price of a suggested post.
 type SuggestedPostPrice struct {
 	// Currency in which the post will be paid.
-	// Currently, must be one of “XTR” for Telegram Stars or “TON” for toncoins.
+	// Currently, must be one of “XTR” for Telegram Stars or “TON” for TON grams.
 	Currency string `json:"currency"`
 
 	// The amount of the currency that will be paid for the post in the smallest units of the currency, i.e.
-	// Telegram Stars or nanotoncoins.
-	// Currently, price in Telegram Stars must be between 5 and 100000, and price in nanotoncoins must be between 10000000 and 10000000000000.
+	// Telegram Stars or nanograms.
+	// Currently, price in Telegram Stars must be between 5 and 100000, and price in nanograms must be between 10000000 and 10000000000000.
 	Amount int64 `json:"amount"`
 }
 
@@ -11134,11 +11923,11 @@ type UniqueGiftInfo struct {
 
 	// Optional.
 	// For gifts bought from other users, the currency in which the payment for the gift was done.
-	// Currently, one of “XTR” for Telegram Stars or “TON” for toncoins.
+	// Currently, one of “XTR” for Telegram Stars or “TON” for TON grams.
 	LastResaleCurrency string `json:"last_resale_currency,omitempty"`
 
 	// Optional.
-	// For gifts bought from other users, the price paid for the gift in either Telegram Stars or nanotoncoins
+	// For gifts bought from other users, the price paid for the gift in either Telegram Stars or nanograms
 	LastResaleAmount int64 `json:"last_resale_amount,omitempty"`
 
 	// Optional.
@@ -11327,6 +12116,10 @@ type Update struct {
 	// Optional.
 	// A new bot was created to be managed by the bot, or token or owner of a managed bot was changed
 	ManagedBot *ManagedBotUpdated `json:"managed_bot,omitempty"`
+
+	// Optional.
+	// User payment subscription has changed
+	Subscription *BotSubscriptionUpdated `json:"subscription,omitempty"`
 }
 
 // User

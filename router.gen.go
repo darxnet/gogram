@@ -31,6 +31,7 @@ const (
 	handleOnChatBoost
 	handleOnRemovedChatBoost
 	handleOnManagedBot
+	handleOnSubscription
 	handleOnCount
 )
 
@@ -257,4 +258,13 @@ func (rg *RouterGroup) HandleOnManagedBot(handler func(*Context, *ManagedBotUpda
 	}
 
 	rg.handleOn(handleOnManagedBot, fn, filters...)
+}
+
+// HandleOnSubscription registers a handler for updates containing Subscription.
+func (rg *RouterGroup) HandleOnSubscription(handler func(*Context, *BotSubscriptionUpdated) error, filters ...Filter) {
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().Subscription)
+	}
+
+	rg.handleOn(handleOnSubscription, fn, filters...)
 }
