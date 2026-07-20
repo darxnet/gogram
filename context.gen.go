@@ -62,6 +62,8 @@ func (ctx *Context) findHandlerOn() handleOn {
 		return handleOnRemovedChatBoost
 	case ctx.update.ManagedBot != nil:
 		return handleOnManagedBot
+	case ctx.update.Subscription != nil:
+		return handleOnSubscription
 	}
 
 	return 0
@@ -114,6 +116,8 @@ func (ctx *Context) User() *User {
 		return &ctx.update.ChatJoinRequest.From
 	case ctx.update.ManagedBot != nil:
 		return &ctx.update.ManagedBot.User
+	case ctx.update.Subscription != nil:
+		return &ctx.update.Subscription.User
 	}
 
 	return nil
@@ -704,7 +708,7 @@ func (ctx *Context) ConvertGiftToStars(
 //
 // Use this method to copy messages of any kind.
 // Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied.
-// A quiz [poll] can be copied only if the value of the field correct_option_id is known to the bot.
+// A quiz [poll] can be copied only if the value of the field correct_option_ids is known to the bot.
 // The method is analogous to the method [forwardMessage], but the copied message doesn't have a link to the original message.
 // Returns the [MessageId] of the sent message on success.
 //
@@ -776,10 +780,10 @@ func (ctx *Context) CopyMessage(
 // Use this method to copy messages of any kind.
 // If some of the specified messages can't be found or copied, they are skipped.
 // Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied.
-// A quiz [poll] can be copied only if the value of the field correct_option_id is known to the bot.
+// A quiz [poll] can be copied only if the value of the field correct_option_ids is known to the bot.
 // The method is analogous to the method [forwardMessages], but the copied messages don't have a link to the original message.
 // Album grouping is kept for copied messages.
-// On success, an array of [MessageId] of the sent messages is returned.
+// On success, an Array of [MessageId] of the sent messages is returned.
 //
 // [poll]: https://core.telegram.org/bots/api#poll
 // [forwardMessages]: https://core.telegram.org/bots/api#forwardmessages
@@ -1190,6 +1194,43 @@ func (ctx *Context) DeleteChatStickerSet(
 	return err
 }
 
+// DeleteEphemeralMessage calls Client.DeleteEphemeralMessage with context-derived defaults.
+//
+// Use this method to delete an ephemeral message.
+// Note that it is not guaranteed that the user will receive the message deletion event, especially if they are offline.
+// Returns True on success.
+func (ctx *Context) DeleteEphemeralMessage(
+	receiverUserID int64,
+	opts ...DeleteEphemeralMessageOption,
+) error {
+	params := &DeleteEphemeralMessageParams{
+		ChatID: func(ctx *Context) string {
+			c := ctx.Chat()
+			if c == nil {
+				return ""
+			}
+
+			return c.Identifier()
+		}(ctx),
+		ReceiverUserID: receiverUserID,
+		EphemeralMessageID: func(ctx *Context) int64 {
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			return m.EphemeralMessageID
+		}(ctx),
+	}
+
+	params.Option(opts...)
+
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.DeleteEphemeralMessage(context.WithoutCancel(ctx.context), params)
+
+	return err
+}
+
 // DeleteForumTopic calls Client.DeleteForumTopic with context-derived defaults.
 //
 // Use this method to delete a forum topic along with all its messages in a forum supergroup chat or a private chat with a user.
@@ -1506,6 +1547,180 @@ func (ctx *Context) EditChatSubscriptionInviteLink(
 
 	// Detach cancellation while preserving context values for worker-side requests.
 	_, err := ctx.client.EditChatSubscriptionInviteLink(context.WithoutCancel(ctx.context), params)
+
+	return err
+}
+
+// EditEphemeralMessageCaption calls Client.EditEphemeralMessageCaption with context-derived defaults.
+//
+// Use this method to edit the caption of an ephemeral message.
+// Note that it is not guaranteed that the user will receive the message edit event, especially if they are offline.
+// On success, True is returned.
+func (ctx *Context) EditEphemeralMessageCaption(
+	receiverUserID int64,
+	opts ...EditEphemeralMessageCaptionOption,
+) error {
+	params := &EditEphemeralMessageCaptionParams{
+		ChatID: func(ctx *Context) string {
+			c := ctx.Chat()
+			if c == nil {
+				return ""
+			}
+
+			return c.Identifier()
+		}(ctx),
+		ReceiverUserID: receiverUserID,
+		EphemeralMessageID: func(ctx *Context) int64 {
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			return m.EphemeralMessageID
+		}(ctx),
+	}
+
+	params.Option(opts...)
+
+	defaultParseMode := ctx.client.defaultParseMode()
+
+	if defaultParseMode != "" {
+		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
+			params.ParseMode = defaultParseMode
+		}
+	}
+
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.EditEphemeralMessageCaption(context.WithoutCancel(ctx.context), params)
+
+	return err
+}
+
+// EditEphemeralMessageMedia calls Client.EditEphemeralMessageMedia with context-derived defaults.
+//
+// Use this method to edit the media of an ephemeral message.
+// Note that it is not guaranteed that the user will receive the message edit event, especially if they are offline.
+// On success, True is returned.
+func (ctx *Context) EditEphemeralMessageMedia(
+	receiverUserID int64,
+	media InputMedia,
+	opts ...EditEphemeralMessageMediaOption,
+) error {
+	params := &EditEphemeralMessageMediaParams{
+		ChatID: func(ctx *Context) string {
+			c := ctx.Chat()
+			if c == nil {
+				return ""
+			}
+
+			return c.Identifier()
+		}(ctx),
+		ReceiverUserID: receiverUserID,
+		EphemeralMessageID: func(ctx *Context) int64 {
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			return m.EphemeralMessageID
+		}(ctx),
+		Media: media,
+	}
+
+	params.Option(opts...)
+
+	defaultParseMode := ctx.client.defaultParseMode()
+
+	if defaultParseMode != "" {
+		defaultParseModeToInputMedia(&params.Media, defaultParseMode)
+	}
+
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.EditEphemeralMessageMedia(context.WithoutCancel(ctx.context), params)
+
+	return err
+}
+
+// EditEphemeralMessageReplyMarkup calls Client.EditEphemeralMessageReplyMarkup with context-derived defaults.
+//
+// Use this method to edit only the reply markup of an ephemeral message.
+// Note that it is not guaranteed that the user will receive the message edit event, especially if they are offline.
+// On success, True is returned.
+func (ctx *Context) EditEphemeralMessageReplyMarkup(
+	receiverUserID int64,
+	opts ...EditEphemeralMessageReplyMarkupOption,
+) error {
+	params := &EditEphemeralMessageReplyMarkupParams{
+		ChatID: func(ctx *Context) string {
+			c := ctx.Chat()
+			if c == nil {
+				return ""
+			}
+
+			return c.Identifier()
+		}(ctx),
+		ReceiverUserID: receiverUserID,
+		EphemeralMessageID: func(ctx *Context) int64 {
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			return m.EphemeralMessageID
+		}(ctx),
+	}
+
+	params.Option(opts...)
+
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.EditEphemeralMessageReplyMarkup(context.WithoutCancel(ctx.context), params)
+
+	return err
+}
+
+// EditEphemeralMessageText calls Client.EditEphemeralMessageText with context-derived defaults.
+//
+// Use this method to edit an ephemeral text message.
+// Note that it is not guaranteed that the user will receive the message edit event, especially if they are offline.
+// On success, True is returned.
+func (ctx *Context) EditEphemeralMessageText(
+	receiverUserID int64,
+	text string,
+	opts ...EditEphemeralMessageTextOption,
+) error {
+	params := &EditEphemeralMessageTextParams{
+		ChatID: func(ctx *Context) string {
+			c := ctx.Chat()
+			if c == nil {
+				return ""
+			}
+
+			return c.Identifier()
+		}(ctx),
+		ReceiverUserID: receiverUserID,
+		EphemeralMessageID: func(ctx *Context) int64 {
+			m := ctx.Message()
+			if m == nil {
+				return 0
+			}
+
+			return m.EphemeralMessageID
+		}(ctx),
+		Text: text,
+	}
+
+	params.Option(opts...)
+
+	defaultParseMode := ctx.client.defaultParseMode()
+
+	if defaultParseMode != "" {
+		if params.ParseMode == "" && len(params.Entities) == 0 {
+			params.ParseMode = defaultParseMode
+		}
+	}
+
+	// Detach cancellation while preserving context values for worker-side requests.
+	_, err := ctx.client.EditEphemeralMessageText(context.WithoutCancel(ctx.context), params)
 
 	return err
 }
@@ -2075,7 +2290,7 @@ func (ctx *Context) ForwardMessage(
 // If some of the specified messages can't be found or forwarded, they are skipped.
 // Service messages and messages with protected content can't be forwarded.
 // Album grouping is kept for forwarded messages.
-// On success, an array of [MessageId] of the sent messages is returned.
+// On success, an Array of [MessageId] of the sent messages is returned.
 //
 // [MessageId]: https://core.telegram.org/bots/api#messageid
 func (ctx *Context) ForwardMessages(
@@ -2354,7 +2569,7 @@ func (ctx *Context) GetChatMember(
 // GetChatMemberCount calls Client.GetChatMemberCount with context-derived defaults.
 //
 // Use this method to get the number of members in a chat.
-// Returns Int on success.
+// Returns Integer on success.
 func (ctx *Context) GetChatMemberCount(
 	opts ...GetChatMemberCountOption,
 ) error {
@@ -2847,7 +3062,7 @@ func (ctx *Context) GetUserGifts(
 // GetUserPersonalChatMessages calls Client.GetUserPersonalChatMessages with context-derived defaults.
 //
 // Use this method to get the last messages from the personal chat (i.e., the chat currently added to their profile) of a given user.
-// On success, an array of [Message] objects is returned.
+// On success, an Array of [Message] objects is returned.
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) GetUserPersonalChatMessages(
@@ -3696,6 +3911,17 @@ func (ctx *Context) SendAnimation(
 
 			return m.DirectMessagesTopic.TopicID
 		}(ctx),
+		CallbackQueryID: func(ctx *Context) string {
+			if ctx.update == nil {
+				return ""
+			}
+
+			if ctx.update.CallbackQuery == nil {
+				return ""
+			}
+
+			return ctx.update.CallbackQuery.ID
+		}(ctx),
 		Animation: animation,
 	}
 
@@ -3765,6 +3991,17 @@ func (ctx *Context) SendAudio(
 			}
 
 			return m.DirectMessagesTopic.TopicID
+		}(ctx),
+		CallbackQueryID: func(ctx *Context) string {
+			if ctx.update == nil {
+				return ""
+			}
+
+			if ctx.update.CallbackQuery == nil {
+				return ""
+			}
+
+			return ctx.update.CallbackQuery.ID
 		}(ctx),
 		Audio: audio,
 	}
@@ -3942,6 +4179,17 @@ func (ctx *Context) SendContact(
 
 			return m.DirectMessagesTopic.TopicID
 		}(ctx),
+		CallbackQueryID: func(ctx *Context) string {
+			if ctx.update == nil {
+				return ""
+			}
+
+			if ctx.update.CallbackQuery == nil {
+				return ""
+			}
+
+			return ctx.update.CallbackQuery.ID
+		}(ctx),
 		PhoneNumber: phoneNumber,
 		FirstName:   firstName,
 	}
@@ -4057,6 +4305,17 @@ func (ctx *Context) SendDocument(
 			}
 
 			return m.DirectMessagesTopic.TopicID
+		}(ctx),
+		CallbackQueryID: func(ctx *Context) string {
+			if ctx.update == nil {
+				return ""
+			}
+
+			if ctx.update.CallbackQuery == nil {
+				return ""
+			}
+
+			return ctx.update.CallbackQuery.ID
 		}(ctx),
 		Document: document,
 	}
@@ -4271,6 +4530,17 @@ func (ctx *Context) SendLivePhoto(
 
 			return m.DirectMessagesTopic.TopicID
 		}(ctx),
+		CallbackQueryID: func(ctx *Context) string {
+			if ctx.update == nil {
+				return ""
+			}
+
+			if ctx.update.CallbackQuery == nil {
+				return ""
+			}
+
+			return ctx.update.CallbackQuery.ID
+		}(ctx),
 		LivePhoto: livePhoto,
 		Photo:     photo,
 	}
@@ -4339,6 +4609,17 @@ func (ctx *Context) SendLocation(
 
 			return m.DirectMessagesTopic.TopicID
 		}(ctx),
+		CallbackQueryID: func(ctx *Context) string {
+			if ctx.update == nil {
+				return ""
+			}
+
+			if ctx.update.CallbackQuery == nil {
+				return ""
+			}
+
+			return ctx.update.CallbackQuery.ID
+		}(ctx),
 		Latitude:  latitude,
 		Longitude: longitude,
 	}
@@ -4355,7 +4636,7 @@ func (ctx *Context) SendLocation(
 //
 // Use this method to send a group of photos, live photos, videos, documents or audios as an album.
 // Documents and audio files can be only grouped in an album with messages of the same type.
-// On success, an array of [Message] objects that were sent is returned.
+// On success, an Array of [Message] objects that were sent is returned.
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SendMediaGroup(
@@ -4464,6 +4745,17 @@ func (ctx *Context) SendMessage(
 			}
 
 			return m.DirectMessagesTopic.TopicID
+		}(ctx),
+		CallbackQueryID: func(ctx *Context) string {
+			if ctx.update == nil {
+				return ""
+			}
+
+			if ctx.update.CallbackQuery == nil {
+				return ""
+			}
+
+			return ctx.update.CallbackQuery.ID
 		}(ctx),
 		Text: text,
 	}
@@ -4645,6 +4937,17 @@ func (ctx *Context) SendPhoto(
 			}
 
 			return m.DirectMessagesTopic.TopicID
+		}(ctx),
+		CallbackQueryID: func(ctx *Context) string {
+			if ctx.update == nil {
+				return ""
+			}
+
+			if ctx.update.CallbackQuery == nil {
+				return ""
+			}
+
+			return ctx.update.CallbackQuery.ID
 		}(ctx),
 		Photo: photo,
 	}
@@ -4867,6 +5170,17 @@ func (ctx *Context) SendSticker(
 
 			return m.DirectMessagesTopic.TopicID
 		}(ctx),
+		CallbackQueryID: func(ctx *Context) string {
+			if ctx.update == nil {
+				return ""
+			}
+
+			if ctx.update.CallbackQuery == nil {
+				return ""
+			}
+
+			return ctx.update.CallbackQuery.ID
+		}(ctx),
 		Sticker: sticker,
 	}
 
@@ -4927,6 +5241,17 @@ func (ctx *Context) SendVenue(
 			}
 
 			return m.DirectMessagesTopic.TopicID
+		}(ctx),
+		CallbackQueryID: func(ctx *Context) string {
+			if ctx.update == nil {
+				return ""
+			}
+
+			if ctx.update.CallbackQuery == nil {
+				return ""
+			}
+
+			return ctx.update.CallbackQuery.ID
 		}(ctx),
 		Latitude:  latitude,
 		Longitude: longitude,
@@ -4990,6 +5315,17 @@ func (ctx *Context) SendVideo(
 			}
 
 			return m.DirectMessagesTopic.TopicID
+		}(ctx),
+		CallbackQueryID: func(ctx *Context) string {
+			if ctx.update == nil {
+				return ""
+			}
+
+			if ctx.update.CallbackQuery == nil {
+				return ""
+			}
+
+			return ctx.update.CallbackQuery.ID
 		}(ctx),
 		Video: video,
 	}
@@ -5059,6 +5395,17 @@ func (ctx *Context) SendVideoNote(
 
 			return m.DirectMessagesTopic.TopicID
 		}(ctx),
+		CallbackQueryID: func(ctx *Context) string {
+			if ctx.update == nil {
+				return ""
+			}
+
+			if ctx.update.CallbackQuery == nil {
+				return ""
+			}
+
+			return ctx.update.CallbackQuery.ID
+		}(ctx),
 		VideoNote: videoNote,
 	}
 
@@ -5120,6 +5467,17 @@ func (ctx *Context) SendVoice(
 			}
 
 			return m.DirectMessagesTopic.TopicID
+		}(ctx),
+		CallbackQueryID: func(ctx *Context) string {
+			if ctx.update == nil {
+				return ""
+			}
+
+			if ctx.update.CallbackQuery == nil {
+				return ""
+			}
+
+			return ctx.update.CallbackQuery.ID
 		}(ctx),
 		Voice: voice,
 	}
