@@ -72,7 +72,7 @@ func (c *Client) DownloadFile(ctx context.Context, file *File, path string) erro
 	dir := filepath.Dir(path)
 	isRenamed := false
 
-	tmpFile, err := os.CreateTemp(dir, path+".*.tmp")
+	tmpFile, err := os.CreateTemp(dir, "*.gogram.tmp")
 	if err != nil {
 		return fmt.Errorf("gogram: failed to create temporary file: %w", err)
 	}
