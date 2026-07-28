@@ -92,6 +92,8 @@ func (r *Router) retrieveCommand(text string) string {
 }
 
 // Process processes an update.
+//
+//nolint:gocognit // Dispatching Telegram's mutually exclusive update variants requires one explicit decision chain.
 func (r *Router) Process(ctx *Context) {
 	defer r.handlePanic(ctx)
 

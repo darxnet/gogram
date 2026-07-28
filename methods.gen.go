@@ -81,23 +81,40 @@ func WithAddStickerToSetSticker(value InputSticker) AddStickerToSetOption {
 func (c *Client) AddStickerToSet(ctx context.Context, params *AddStickerToSetParams) (ret bool, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		{
 			v := strconv.FormatInt(params.UserID, 10)
-			if err := writer.WriteField("user_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("user_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		{
 			v := params.Name
-			if err := writer.WriteField("name", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("name", v)
+			if err != nil {
 				return
 			}
 		}
@@ -112,33 +129,35 @@ func (c *Client) AddStickerToSet(ctx context.Context, params *AddStickerToSetPar
 				return
 			}
 
-			bs, err := json.Marshal(&params.Sticker)
+			var bs []byte
+			bs, err = json.Marshal(&params.Sticker)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("sticker")
+			var p io.Writer
+			p, err = writer.CreateFormField("sticker")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "addStickerToSet", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 
@@ -3006,31 +3025,48 @@ func WithCreateNewStickerSetNeedsRepainting(value bool) CreateNewStickerSetOptio
 func (c *Client) CreateNewStickerSet(ctx context.Context, params *CreateNewStickerSetParams) (ret bool, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		{
 			v := strconv.FormatInt(params.UserID, 10)
-			if err := writer.WriteField("user_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("user_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		{
 			v := params.Name
-			if err := writer.WriteField("name", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("name", v)
+			if err != nil {
 				return
 			}
 		}
 
 		{
 			v := params.Title
-			if err := writer.WriteField("title", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("title", v)
+			if err != nil {
 				return
 			}
 		}
@@ -3047,49 +3083,51 @@ func (c *Client) CreateNewStickerSet(ctx context.Context, params *CreateNewStick
 				}
 			}
 
-			bs, err := json.Marshal(&params.Stickers)
+			var bs []byte
+			bs, err = json.Marshal(&params.Stickers)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("stickers")
+			var p io.Writer
+			p, err = writer.CreateFormField("stickers")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.StickerType != "" {
 			v := params.StickerType
-			if err := writer.WriteField("sticker_type", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("sticker_type", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.NeedsRepainting {
 			v := strconv.FormatBool(params.NeedsRepainting)
-			if err := writer.WriteField("needs_repainting", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("needs_repainting", v)
+			if err != nil {
 				return
 			}
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "createNewStickerSet", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 
@@ -5382,39 +5420,56 @@ func WithEditMessageMediaReplyMarkup(value *InlineKeyboardMarkup) EditMessageMed
 func (c *Client) EditMessageMedia(ctx context.Context, params *EditMessageMediaParams) (ret *Message, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
-			if err := writer.WriteField("business_connection_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("business_connection_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ChatID != "" {
 			v := params.ChatID
-			if err := writer.WriteField("chat_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("chat_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageID != 0 {
 			v := strconv.FormatInt(params.MessageID, 10)
-			if err := writer.WriteField("message_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.InlineMessageID != "" {
 			v := params.InlineMessageID
-			if err := writer.WriteField("inline_message_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("inline_message_id", v)
+			if err != nil {
 				return
 			}
 		}
@@ -5535,53 +5590,54 @@ func (c *Client) EditMessageMedia(ctx context.Context, params *EditMessageMediaP
 				}
 			}
 
-			bs, err := json.Marshal(&params.Media)
+			var bs []byte
+			bs, err = json.Marshal(&params.Media)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("media")
+			var p io.Writer
+			p, err = writer.CreateFormField("media")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			bs, err := json.Marshal(&params.ReplyMarkup)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyMarkup)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_markup")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "editMessageMedia", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 
@@ -6081,23 +6137,40 @@ func WithEditStoryAreas(value []StoryArea) EditStoryOption {
 func (c *Client) EditStory(ctx context.Context, params *EditStoryParams) (ret *Story, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		{
 			v := params.BusinessConnectionID
-			if err := writer.WriteField("business_connection_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("business_connection_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		{
 			v := strconv.FormatInt(params.StoryID, 10)
-			if err := writer.WriteField("story_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("story_id", v)
+			if err != nil {
 				return
 			}
 		}
@@ -6124,89 +6197,89 @@ func (c *Client) EditStory(ctx context.Context, params *EditStoryParams) (ret *S
 				}
 			}
 
-			bs, err := json.Marshal(&params.Content)
+			var bs []byte
+			bs, err = json.Marshal(&params.Content)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("content")
+			var p io.Writer
+			p, err = writer.CreateFormField("content")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.Caption != "" {
 			v := params.Caption
-			if err := writer.WriteField("caption", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("caption", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ParseMode != "" {
 			v := params.ParseMode
-			if err := writer.WriteField("parse_mode", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("parse_mode", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			bs, err := json.Marshal(&params.CaptionEntities)
+			var bs []byte
+			bs, err = json.Marshal(&params.CaptionEntities)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("caption_entities")
+			var p io.Writer
+			p, err = writer.CreateFormField("caption_entities")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if len(params.Areas) != 0 {
-			bs, err := json.Marshal(&params.Areas)
+			var bs []byte
+			bs, err = json.Marshal(&params.Areas)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("areas")
+			var p io.Writer
+			p, err = writer.CreateFormField("areas")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "editStory", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 
@@ -10050,15 +10123,32 @@ func WithPostStoryProtectContent(value bool) PostStoryOption {
 func (c *Client) PostStory(ctx context.Context, params *PostStoryParams) (ret *Story, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		{
 			v := params.BusinessConnectionID
-			if err := writer.WriteField("business_connection_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("business_connection_id", v)
+			if err != nil {
 				return
 			}
 		}
@@ -10085,113 +10175,113 @@ func (c *Client) PostStory(ctx context.Context, params *PostStoryParams) (ret *S
 				}
 			}
 
-			bs, err := json.Marshal(&params.Content)
+			var bs []byte
+			bs, err = json.Marshal(&params.Content)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("content")
+			var p io.Writer
+			p, err = writer.CreateFormField("content")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		{
 			v := strconv.FormatInt(params.ActivePeriod, 10)
-			if err := writer.WriteField("active_period", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("active_period", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.Caption != "" {
 			v := params.Caption
-			if err := writer.WriteField("caption", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("caption", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ParseMode != "" {
 			v := params.ParseMode
-			if err := writer.WriteField("parse_mode", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("parse_mode", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			bs, err := json.Marshal(&params.CaptionEntities)
+			var bs []byte
+			bs, err = json.Marshal(&params.CaptionEntities)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("caption_entities")
+			var p io.Writer
+			p, err = writer.CreateFormField("caption_entities")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if len(params.Areas) != 0 {
-			bs, err := json.Marshal(&params.Areas)
+			var bs []byte
+			bs, err = json.Marshal(&params.Areas)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("areas")
+			var p io.Writer
+			p, err = writer.CreateFormField("areas")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.PostToChatPage {
 			v := strconv.FormatBool(params.PostToChatPage)
-			if err := writer.WriteField("post_to_chat_page", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("post_to_chat_page", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ProtectContent {
 			v := strconv.FormatBool(params.ProtectContent)
-			if err := writer.WriteField("protect_content", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("protect_content", v)
+			if err != nil {
 				return
 			}
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "postStory", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 
@@ -11247,31 +11337,48 @@ func WithReplaceStickerInSetSticker(value InputSticker) ReplaceStickerInSetOptio
 func (c *Client) ReplaceStickerInSet(ctx context.Context, params *ReplaceStickerInSetParams) (ret bool, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		{
 			v := strconv.FormatInt(params.UserID, 10)
-			if err := writer.WriteField("user_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("user_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		{
 			v := params.Name
-			if err := writer.WriteField("name", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("name", v)
+			if err != nil {
 				return
 			}
 		}
 
 		{
 			v := params.OldSticker
-			if err := writer.WriteField("old_sticker", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("old_sticker", v)
+			if err != nil {
 				return
 			}
 		}
@@ -11286,33 +11393,35 @@ func (c *Client) ReplaceStickerInSet(ctx context.Context, params *ReplaceSticker
 				return
 			}
 
-			bs, err := json.Marshal(&params.Sticker)
+			var bs []byte
+			bs, err = json.Marshal(&params.Sticker)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("sticker")
+			var p io.Writer
+			p, err = writer.CreateFormField("sticker")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "replaceStickerInSet", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 
@@ -12279,39 +12388,56 @@ func WithSendAnimationReplyMarkup(value *ReplyMarkup) SendAnimationOption {
 func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams) (ret *Message, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
-			if err := writer.WriteField("business_connection_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("business_connection_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		{
 			v := params.ChatID
-			if err := writer.WriteField("chat_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("chat_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageThreadID != 0 {
 			v := strconv.FormatInt(params.MessageThreadID, 10)
-			if err := writer.WriteField("message_thread_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_thread_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.DirectMessagesTopicID != 0 {
 			v := strconv.FormatInt(params.DirectMessagesTopicID, 10)
-			if err := writer.WriteField("direct_messages_topic_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("direct_messages_topic_id", v)
+			if err != nil {
 				return
 			}
 		}
@@ -12330,24 +12456,24 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 
 		if params.Duration != 0 {
 			v := strconv.FormatInt(params.Duration, 10)
-			if err := writer.WriteField("duration", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("duration", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.Width != 0 {
 			v := strconv.FormatInt(params.Width, 10)
-			if err := writer.WriteField("width", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("width", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.Height != 0 {
 			v := strconv.FormatInt(params.Height, 10)
-			if err := writer.WriteField("height", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("height", v)
+			if err != nil {
 				return
 			}
 		}
@@ -12368,156 +12494,155 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 
 		if params.Caption != "" {
 			v := params.Caption
-			if err := writer.WriteField("caption", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("caption", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ParseMode != "" {
 			v := params.ParseMode
-			if err := writer.WriteField("parse_mode", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("parse_mode", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			bs, err := json.Marshal(&params.CaptionEntities)
+			var bs []byte
+			bs, err = json.Marshal(&params.CaptionEntities)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("caption_entities")
+			var p io.Writer
+			p, err = writer.CreateFormField("caption_entities")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ShowCaptionAboveMedia {
 			v := strconv.FormatBool(params.ShowCaptionAboveMedia)
-			if err := writer.WriteField("show_caption_above_media", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("show_caption_above_media", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.HasSpoiler {
 			v := strconv.FormatBool(params.HasSpoiler)
-			if err := writer.WriteField("has_spoiler", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("has_spoiler", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.DisableNotification {
 			v := strconv.FormatBool(params.DisableNotification)
-			if err := writer.WriteField("disable_notification", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("disable_notification", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ProtectContent {
 			v := strconv.FormatBool(params.ProtectContent)
-			if err := writer.WriteField("protect_content", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("protect_content", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.AllowPaidBroadcast {
 			v := strconv.FormatBool(params.AllowPaidBroadcast)
-			if err := writer.WriteField("allow_paid_broadcast", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("allow_paid_broadcast", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageEffectID != "" {
 			v := params.MessageEffectID
-			if err := writer.WriteField("message_effect_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_effect_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.SuggestedPostParameters != nil {
-			bs, err := json.Marshal(&params.SuggestedPostParameters)
+			var bs []byte
+			bs, err = json.Marshal(&params.SuggestedPostParameters)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("suggested_post_parameters")
+			var p io.Writer
+			p, err = writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			bs, err := json.Marshal(&params.ReplyParameters)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyParameters)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_parameters")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			bs, err := json.Marshal(&params.ReplyMarkup)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyMarkup)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_markup")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "sendAnimation", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 
@@ -12894,39 +13019,56 @@ func WithSendAudioReplyMarkup(value *ReplyMarkup) SendAudioOption {
 func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *Message, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
-			if err := writer.WriteField("business_connection_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("business_connection_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		{
 			v := params.ChatID
-			if err := writer.WriteField("chat_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("chat_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageThreadID != 0 {
 			v := strconv.FormatInt(params.MessageThreadID, 10)
-			if err := writer.WriteField("message_thread_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_thread_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.DirectMessagesTopicID != 0 {
 			v := strconv.FormatInt(params.DirectMessagesTopicID, 10)
-			if err := writer.WriteField("direct_messages_topic_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("direct_messages_topic_id", v)
+			if err != nil {
 				return
 			}
 		}
@@ -12945,60 +13087,59 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 
 		if params.Caption != "" {
 			v := params.Caption
-			if err := writer.WriteField("caption", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("caption", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ParseMode != "" {
 			v := params.ParseMode
-			if err := writer.WriteField("parse_mode", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("parse_mode", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			bs, err := json.Marshal(&params.CaptionEntities)
+			var bs []byte
+			bs, err = json.Marshal(&params.CaptionEntities)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("caption_entities")
+			var p io.Writer
+			p, err = writer.CreateFormField("caption_entities")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.Duration != 0 {
 			v := strconv.FormatInt(params.Duration, 10)
-			if err := writer.WriteField("duration", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("duration", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.Performer != "" {
 			v := params.Performer
-			if err := writer.WriteField("performer", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("performer", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.Title != "" {
 			v := params.Title
-			if err := writer.WriteField("title", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("title", v)
+			if err != nil {
 				return
 			}
 		}
@@ -13019,104 +13160,104 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 
 		if params.DisableNotification {
 			v := strconv.FormatBool(params.DisableNotification)
-			if err := writer.WriteField("disable_notification", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("disable_notification", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ProtectContent {
 			v := strconv.FormatBool(params.ProtectContent)
-			if err := writer.WriteField("protect_content", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("protect_content", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.AllowPaidBroadcast {
 			v := strconv.FormatBool(params.AllowPaidBroadcast)
-			if err := writer.WriteField("allow_paid_broadcast", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("allow_paid_broadcast", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageEffectID != "" {
 			v := params.MessageEffectID
-			if err := writer.WriteField("message_effect_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_effect_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.SuggestedPostParameters != nil {
-			bs, err := json.Marshal(&params.SuggestedPostParameters)
+			var bs []byte
+			bs, err = json.Marshal(&params.SuggestedPostParameters)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("suggested_post_parameters")
+			var p io.Writer
+			p, err = writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			bs, err := json.Marshal(&params.ReplyParameters)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyParameters)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_parameters")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			bs, err := json.Marshal(&params.ReplyMarkup)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyMarkup)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_markup")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "sendAudio", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 
@@ -14396,39 +14537,56 @@ func WithSendDocumentReplyMarkup(value *ReplyMarkup) SendDocumentOption {
 func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (ret *Message, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
-			if err := writer.WriteField("business_connection_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("business_connection_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		{
 			v := params.ChatID
-			if err := writer.WriteField("chat_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("chat_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageThreadID != 0 {
 			v := strconv.FormatInt(params.MessageThreadID, 10)
-			if err := writer.WriteField("message_thread_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_thread_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.DirectMessagesTopicID != 0 {
 			v := strconv.FormatInt(params.DirectMessagesTopicID, 10)
-			if err := writer.WriteField("direct_messages_topic_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("direct_messages_topic_id", v)
+			if err != nil {
 				return
 			}
 		}
@@ -14461,148 +14619,147 @@ func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (
 
 		if params.Caption != "" {
 			v := params.Caption
-			if err := writer.WriteField("caption", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("caption", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ParseMode != "" {
 			v := params.ParseMode
-			if err := writer.WriteField("parse_mode", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("parse_mode", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			bs, err := json.Marshal(&params.CaptionEntities)
+			var bs []byte
+			bs, err = json.Marshal(&params.CaptionEntities)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("caption_entities")
+			var p io.Writer
+			p, err = writer.CreateFormField("caption_entities")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DisableContentTypeDetection {
 			v := strconv.FormatBool(params.DisableContentTypeDetection)
-			if err := writer.WriteField("disable_content_type_detection", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("disable_content_type_detection", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.DisableNotification {
 			v := strconv.FormatBool(params.DisableNotification)
-			if err := writer.WriteField("disable_notification", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("disable_notification", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ProtectContent {
 			v := strconv.FormatBool(params.ProtectContent)
-			if err := writer.WriteField("protect_content", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("protect_content", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.AllowPaidBroadcast {
 			v := strconv.FormatBool(params.AllowPaidBroadcast)
-			if err := writer.WriteField("allow_paid_broadcast", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("allow_paid_broadcast", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageEffectID != "" {
 			v := params.MessageEffectID
-			if err := writer.WriteField("message_effect_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_effect_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.SuggestedPostParameters != nil {
-			bs, err := json.Marshal(&params.SuggestedPostParameters)
+			var bs []byte
+			bs, err = json.Marshal(&params.SuggestedPostParameters)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("suggested_post_parameters")
+			var p io.Writer
+			p, err = writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			bs, err := json.Marshal(&params.ReplyParameters)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyParameters)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_parameters")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			bs, err := json.Marshal(&params.ReplyMarkup)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyMarkup)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_markup")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "sendDocument", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 
@@ -15984,39 +16141,56 @@ func WithSendLivePhotoReplyMarkup(value *ReplyMarkup) SendLivePhotoOption {
 func (c *Client) SendLivePhoto(ctx context.Context, params *SendLivePhotoParams) (ret *Message, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
-			if err := writer.WriteField("business_connection_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("business_connection_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		{
 			v := params.ChatID
-			if err := writer.WriteField("chat_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("chat_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageThreadID != 0 {
 			v := strconv.FormatInt(params.MessageThreadID, 10)
-			if err := writer.WriteField("message_thread_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_thread_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.DirectMessagesTopicID != 0 {
 			v := strconv.FormatInt(params.DirectMessagesTopicID, 10)
-			if err := writer.WriteField("direct_messages_topic_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("direct_messages_topic_id", v)
+			if err != nil {
 				return
 			}
 		}
@@ -16047,156 +16221,155 @@ func (c *Client) SendLivePhoto(ctx context.Context, params *SendLivePhotoParams)
 
 		if params.Caption != "" {
 			v := params.Caption
-			if err := writer.WriteField("caption", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("caption", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ParseMode != "" {
 			v := params.ParseMode
-			if err := writer.WriteField("parse_mode", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("parse_mode", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			bs, err := json.Marshal(&params.CaptionEntities)
+			var bs []byte
+			bs, err = json.Marshal(&params.CaptionEntities)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("caption_entities")
+			var p io.Writer
+			p, err = writer.CreateFormField("caption_entities")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ShowCaptionAboveMedia {
 			v := strconv.FormatBool(params.ShowCaptionAboveMedia)
-			if err := writer.WriteField("show_caption_above_media", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("show_caption_above_media", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.HasSpoiler {
 			v := strconv.FormatBool(params.HasSpoiler)
-			if err := writer.WriteField("has_spoiler", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("has_spoiler", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.DisableNotification {
 			v := strconv.FormatBool(params.DisableNotification)
-			if err := writer.WriteField("disable_notification", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("disable_notification", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ProtectContent {
 			v := strconv.FormatBool(params.ProtectContent)
-			if err := writer.WriteField("protect_content", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("protect_content", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.AllowPaidBroadcast {
 			v := strconv.FormatBool(params.AllowPaidBroadcast)
-			if err := writer.WriteField("allow_paid_broadcast", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("allow_paid_broadcast", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageEffectID != "" {
 			v := params.MessageEffectID
-			if err := writer.WriteField("message_effect_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_effect_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.SuggestedPostParameters != nil {
-			bs, err := json.Marshal(&params.SuggestedPostParameters)
+			var bs []byte
+			bs, err = json.Marshal(&params.SuggestedPostParameters)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("suggested_post_parameters")
+			var p io.Writer
+			p, err = writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			bs, err := json.Marshal(&params.ReplyParameters)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyParameters)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_parameters")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			bs, err := json.Marshal(&params.ReplyMarkup)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyMarkup)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_markup")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "sendLivePhoto", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 
@@ -16730,39 +16903,56 @@ func WithSendMediaGroupReplyParameters(value *ReplyParameters) SendMediaGroupOpt
 func (c *Client) SendMediaGroup(ctx context.Context, params *SendMediaGroupParams) (ret []Message, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
-			if err := writer.WriteField("business_connection_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("business_connection_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		{
 			v := params.ChatID
-			if err := writer.WriteField("chat_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("chat_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageThreadID != 0 {
 			v := strconv.FormatInt(params.MessageThreadID, 10)
-			if err := writer.WriteField("message_thread_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_thread_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.DirectMessagesTopicID != 0 {
 			v := strconv.FormatInt(params.DirectMessagesTopicID, 10)
-			if err := writer.WriteField("direct_messages_topic_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("direct_messages_topic_id", v)
+			if err != nil {
 				return
 			}
 		}
@@ -16885,85 +17075,86 @@ func (c *Client) SendMediaGroup(ctx context.Context, params *SendMediaGroupParam
 				}
 			}
 
-			bs, err := json.Marshal(&params.Media)
+			var bs []byte
+			bs, err = json.Marshal(&params.Media)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("media")
+			var p io.Writer
+			p, err = writer.CreateFormField("media")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DisableNotification {
 			v := strconv.FormatBool(params.DisableNotification)
-			if err := writer.WriteField("disable_notification", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("disable_notification", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ProtectContent {
 			v := strconv.FormatBool(params.ProtectContent)
-			if err := writer.WriteField("protect_content", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("protect_content", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.AllowPaidBroadcast {
 			v := strconv.FormatBool(params.AllowPaidBroadcast)
-			if err := writer.WriteField("allow_paid_broadcast", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("allow_paid_broadcast", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageEffectID != "" {
 			v := params.MessageEffectID
-			if err := writer.WriteField("message_effect_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_effect_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			bs, err := json.Marshal(&params.ReplyParameters)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyParameters)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_parameters")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "sendMediaGroup", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 
@@ -17739,47 +17930,64 @@ func WithSendPaidMediaReplyMarkup(value *ReplyMarkup) SendPaidMediaOption {
 func (c *Client) SendPaidMedia(ctx context.Context, params *SendPaidMediaParams) (ret *Message, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
-			if err := writer.WriteField("business_connection_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("business_connection_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		{
 			v := params.ChatID
-			if err := writer.WriteField("chat_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("chat_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageThreadID != 0 {
 			v := strconv.FormatInt(params.MessageThreadID, 10)
-			if err := writer.WriteField("message_thread_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_thread_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.DirectMessagesTopicID != 0 {
 			v := strconv.FormatInt(params.DirectMessagesTopicID, 10)
-			if err := writer.WriteField("direct_messages_topic_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("direct_messages_topic_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		{
 			v := strconv.FormatInt(params.StarCount, 10)
-			if err := writer.WriteField("star_count", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("star_count", v)
+			if err != nil {
 				return
 			}
 		}
@@ -17845,169 +18053,167 @@ func (c *Client) SendPaidMedia(ctx context.Context, params *SendPaidMediaParams)
 				}
 			}
 
-			bs, err := json.Marshal(&params.Media)
+			var bs []byte
+			bs, err = json.Marshal(&params.Media)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("media")
+			var p io.Writer
+			p, err = writer.CreateFormField("media")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.Payload != "" {
 			v := params.Payload
-			if err := writer.WriteField("payload", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("payload", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.Caption != "" {
 			v := params.Caption
-			if err := writer.WriteField("caption", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("caption", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ParseMode != "" {
 			v := params.ParseMode
-			if err := writer.WriteField("parse_mode", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("parse_mode", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			bs, err := json.Marshal(&params.CaptionEntities)
+			var bs []byte
+			bs, err = json.Marshal(&params.CaptionEntities)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("caption_entities")
+			var p io.Writer
+			p, err = writer.CreateFormField("caption_entities")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ShowCaptionAboveMedia {
 			v := strconv.FormatBool(params.ShowCaptionAboveMedia)
-			if err := writer.WriteField("show_caption_above_media", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("show_caption_above_media", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.DisableNotification {
 			v := strconv.FormatBool(params.DisableNotification)
-			if err := writer.WriteField("disable_notification", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("disable_notification", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ProtectContent {
 			v := strconv.FormatBool(params.ProtectContent)
-			if err := writer.WriteField("protect_content", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("protect_content", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.AllowPaidBroadcast {
 			v := strconv.FormatBool(params.AllowPaidBroadcast)
-			if err := writer.WriteField("allow_paid_broadcast", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("allow_paid_broadcast", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.SuggestedPostParameters != nil {
-			bs, err := json.Marshal(&params.SuggestedPostParameters)
+			var bs []byte
+			bs, err = json.Marshal(&params.SuggestedPostParameters)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("suggested_post_parameters")
+			var p io.Writer
+			p, err = writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			bs, err := json.Marshal(&params.ReplyParameters)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyParameters)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_parameters")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			bs, err := json.Marshal(&params.ReplyMarkup)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyMarkup)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_markup")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "sendPaidMedia", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 
@@ -18342,39 +18548,56 @@ func WithSendPhotoReplyMarkup(value *ReplyMarkup) SendPhotoOption {
 func (c *Client) SendPhoto(ctx context.Context, params *SendPhotoParams) (ret *Message, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
-			if err := writer.WriteField("business_connection_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("business_connection_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		{
 			v := params.ChatID
-			if err := writer.WriteField("chat_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("chat_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageThreadID != 0 {
 			v := strconv.FormatInt(params.MessageThreadID, 10)
-			if err := writer.WriteField("message_thread_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_thread_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.DirectMessagesTopicID != 0 {
 			v := strconv.FormatInt(params.DirectMessagesTopicID, 10)
-			if err := writer.WriteField("direct_messages_topic_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("direct_messages_topic_id", v)
+			if err != nil {
 				return
 			}
 		}
@@ -18393,156 +18616,155 @@ func (c *Client) SendPhoto(ctx context.Context, params *SendPhotoParams) (ret *M
 
 		if params.Caption != "" {
 			v := params.Caption
-			if err := writer.WriteField("caption", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("caption", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ParseMode != "" {
 			v := params.ParseMode
-			if err := writer.WriteField("parse_mode", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("parse_mode", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			bs, err := json.Marshal(&params.CaptionEntities)
+			var bs []byte
+			bs, err = json.Marshal(&params.CaptionEntities)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("caption_entities")
+			var p io.Writer
+			p, err = writer.CreateFormField("caption_entities")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ShowCaptionAboveMedia {
 			v := strconv.FormatBool(params.ShowCaptionAboveMedia)
-			if err := writer.WriteField("show_caption_above_media", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("show_caption_above_media", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.HasSpoiler {
 			v := strconv.FormatBool(params.HasSpoiler)
-			if err := writer.WriteField("has_spoiler", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("has_spoiler", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.DisableNotification {
 			v := strconv.FormatBool(params.DisableNotification)
-			if err := writer.WriteField("disable_notification", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("disable_notification", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ProtectContent {
 			v := strconv.FormatBool(params.ProtectContent)
-			if err := writer.WriteField("protect_content", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("protect_content", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.AllowPaidBroadcast {
 			v := strconv.FormatBool(params.AllowPaidBroadcast)
-			if err := writer.WriteField("allow_paid_broadcast", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("allow_paid_broadcast", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageEffectID != "" {
 			v := params.MessageEffectID
-			if err := writer.WriteField("message_effect_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_effect_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.SuggestedPostParameters != nil {
-			bs, err := json.Marshal(&params.SuggestedPostParameters)
+			var bs []byte
+			bs, err = json.Marshal(&params.SuggestedPostParameters)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("suggested_post_parameters")
+			var p io.Writer
+			p, err = writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			bs, err := json.Marshal(&params.ReplyParameters)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyParameters)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_parameters")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			bs, err := json.Marshal(&params.ReplyMarkup)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyMarkup)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_markup")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "sendPhoto", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 
@@ -19152,227 +19374,239 @@ func WithSendPollReplyMarkup(value *ReplyMarkup) SendPollOption {
 func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Message, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
-			if err := writer.WriteField("business_connection_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("business_connection_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		{
 			v := params.ChatID
-			if err := writer.WriteField("chat_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("chat_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageThreadID != 0 {
 			v := strconv.FormatInt(params.MessageThreadID, 10)
-			if err := writer.WriteField("message_thread_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_thread_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		{
 			v := params.Question
-			if err := writer.WriteField("question", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("question", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.QuestionParseMode != "" {
 			v := params.QuestionParseMode
-			if err := writer.WriteField("question_parse_mode", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("question_parse_mode", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if len(params.QuestionEntities) != 0 {
-			bs, err := json.Marshal(&params.QuestionEntities)
+			var bs []byte
+			bs, err = json.Marshal(&params.QuestionEntities)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("question_entities")
+			var p io.Writer
+			p, err = writer.CreateFormField("question_entities")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		{
-			bs, err := json.Marshal(&params.Options)
+			var bs []byte
+			bs, err = json.Marshal(&params.Options)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("options")
+			var p io.Writer
+			p, err = writer.CreateFormField("options")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.IsAnonymous {
 			v := strconv.FormatBool(params.IsAnonymous)
-			if err := writer.WriteField("is_anonymous", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("is_anonymous", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.Type != "" {
 			v := params.Type
-			if err := writer.WriteField("type", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("type", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.AllowsMultipleAnswers {
 			v := strconv.FormatBool(params.AllowsMultipleAnswers)
-			if err := writer.WriteField("allows_multiple_answers", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("allows_multiple_answers", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.AllowsRevoting {
 			v := strconv.FormatBool(params.AllowsRevoting)
-			if err := writer.WriteField("allows_revoting", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("allows_revoting", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ShuffleOptions {
 			v := strconv.FormatBool(params.ShuffleOptions)
-			if err := writer.WriteField("shuffle_options", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("shuffle_options", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.AllowAddingOptions {
 			v := strconv.FormatBool(params.AllowAddingOptions)
-			if err := writer.WriteField("allow_adding_options", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("allow_adding_options", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.HideResultsUntilCloses {
 			v := strconv.FormatBool(params.HideResultsUntilCloses)
-			if err := writer.WriteField("hide_results_until_closes", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("hide_results_until_closes", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MembersOnly {
 			v := strconv.FormatBool(params.MembersOnly)
-			if err := writer.WriteField("members_only", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("members_only", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if len(params.CountryCodes) != 0 {
-			bs, err := json.Marshal(&params.CountryCodes)
+			var bs []byte
+			bs, err = json.Marshal(&params.CountryCodes)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("country_codes")
+			var p io.Writer
+			p, err = writer.CreateFormField("country_codes")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if len(params.CorrectOptionIDs) != 0 {
-			bs, err := json.Marshal(&params.CorrectOptionIDs)
+			var bs []byte
+			bs, err = json.Marshal(&params.CorrectOptionIDs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("correct_option_ids")
+			var p io.Writer
+			p, err = writer.CreateFormField("correct_option_ids")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.Explanation != "" {
 			v := params.Explanation
-			if err := writer.WriteField("explanation", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("explanation", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ExplanationParseMode != "" {
 			v := params.ExplanationParseMode
-			if err := writer.WriteField("explanation_parse_mode", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("explanation_parse_mode", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if len(params.ExplanationEntities) != 0 {
-			bs, err := json.Marshal(&params.ExplanationEntities)
+			var bs []byte
+			bs, err = json.Marshal(&params.ExplanationEntities)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("explanation_entities")
+			var p io.Writer
+			p, err = writer.CreateFormField("explanation_entities")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -19495,81 +19729,79 @@ func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Mes
 				}
 			}
 
-			bs, err := json.Marshal(&params.ExplanationMedia)
+			var bs []byte
+			bs, err = json.Marshal(&params.ExplanationMedia)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("explanation_media")
+			var p io.Writer
+			p, err = writer.CreateFormField("explanation_media")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.OpenPeriod != 0 {
 			v := strconv.FormatInt(params.OpenPeriod, 10)
-			if err := writer.WriteField("open_period", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("open_period", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.CloseDate != 0 {
 			v := strconv.FormatInt(params.CloseDate, 10)
-			if err := writer.WriteField("close_date", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("close_date", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.IsClosed {
 			v := strconv.FormatBool(params.IsClosed)
-			if err := writer.WriteField("is_closed", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("is_closed", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.Description != "" {
 			v := params.Description
-			if err := writer.WriteField("description", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("description", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.DescriptionParseMode != "" {
 			v := params.DescriptionParseMode
-			if err := writer.WriteField("description_parse_mode", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("description_parse_mode", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if len(params.DescriptionEntities) != 0 {
-			bs, err := json.Marshal(&params.DescriptionEntities)
+			var bs []byte
+			bs, err = json.Marshal(&params.DescriptionEntities)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("description_entities")
+			var p io.Writer
+			p, err = writer.CreateFormField("description_entities")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
@@ -19692,105 +19924,105 @@ func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Mes
 				}
 			}
 
-			bs, err := json.Marshal(&params.Media)
+			var bs []byte
+			bs, err = json.Marshal(&params.Media)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("media")
+			var p io.Writer
+			p, err = writer.CreateFormField("media")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DisableNotification {
 			v := strconv.FormatBool(params.DisableNotification)
-			if err := writer.WriteField("disable_notification", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("disable_notification", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ProtectContent {
 			v := strconv.FormatBool(params.ProtectContent)
-			if err := writer.WriteField("protect_content", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("protect_content", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.AllowPaidBroadcast {
 			v := strconv.FormatBool(params.AllowPaidBroadcast)
-			if err := writer.WriteField("allow_paid_broadcast", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("allow_paid_broadcast", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageEffectID != "" {
 			v := params.MessageEffectID
-			if err := writer.WriteField("message_effect_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_effect_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			bs, err := json.Marshal(&params.ReplyParameters)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyParameters)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_parameters")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			bs, err := json.Marshal(&params.ReplyMarkup)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyMarkup)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_markup")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "sendPoll", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 
@@ -20420,39 +20652,56 @@ func WithSendStickerReplyMarkup(value *ReplyMarkup) SendStickerOption {
 func (c *Client) SendSticker(ctx context.Context, params *SendStickerParams) (ret *Message, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
-			if err := writer.WriteField("business_connection_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("business_connection_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		{
 			v := params.ChatID
-			if err := writer.WriteField("chat_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("chat_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageThreadID != 0 {
 			v := strconv.FormatInt(params.MessageThreadID, 10)
-			if err := writer.WriteField("message_thread_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_thread_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.DirectMessagesTopicID != 0 {
 			v := strconv.FormatInt(params.DirectMessagesTopicID, 10)
-			if err := writer.WriteField("direct_messages_topic_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("direct_messages_topic_id", v)
+			if err != nil {
 				return
 			}
 		}
@@ -20471,112 +20720,112 @@ func (c *Client) SendSticker(ctx context.Context, params *SendStickerParams) (re
 
 		if params.Emoji != "" {
 			v := params.Emoji
-			if err := writer.WriteField("emoji", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("emoji", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.DisableNotification {
 			v := strconv.FormatBool(params.DisableNotification)
-			if err := writer.WriteField("disable_notification", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("disable_notification", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ProtectContent {
 			v := strconv.FormatBool(params.ProtectContent)
-			if err := writer.WriteField("protect_content", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("protect_content", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.AllowPaidBroadcast {
 			v := strconv.FormatBool(params.AllowPaidBroadcast)
-			if err := writer.WriteField("allow_paid_broadcast", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("allow_paid_broadcast", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageEffectID != "" {
 			v := params.MessageEffectID
-			if err := writer.WriteField("message_effect_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_effect_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.SuggestedPostParameters != nil {
-			bs, err := json.Marshal(&params.SuggestedPostParameters)
+			var bs []byte
+			bs, err = json.Marshal(&params.SuggestedPostParameters)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("suggested_post_parameters")
+			var p io.Writer
+			p, err = writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			bs, err := json.Marshal(&params.ReplyParameters)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyParameters)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_parameters")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			bs, err := json.Marshal(&params.ReplyMarkup)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyMarkup)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_markup")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "sendSticker", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 
@@ -21397,39 +21646,56 @@ func WithSendVideoReplyMarkup(value *ReplyMarkup) SendVideoOption {
 func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *Message, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
-			if err := writer.WriteField("business_connection_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("business_connection_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		{
 			v := params.ChatID
-			if err := writer.WriteField("chat_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("chat_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageThreadID != 0 {
 			v := strconv.FormatInt(params.MessageThreadID, 10)
-			if err := writer.WriteField("message_thread_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_thread_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.DirectMessagesTopicID != 0 {
 			v := strconv.FormatInt(params.DirectMessagesTopicID, 10)
-			if err := writer.WriteField("direct_messages_topic_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("direct_messages_topic_id", v)
+			if err != nil {
 				return
 			}
 		}
@@ -21448,24 +21714,24 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 
 		if params.Duration != 0 {
 			v := strconv.FormatInt(params.Duration, 10)
-			if err := writer.WriteField("duration", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("duration", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.Width != 0 {
 			v := strconv.FormatInt(params.Width, 10)
-			if err := writer.WriteField("width", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("width", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.Height != 0 {
 			v := strconv.FormatInt(params.Height, 10)
-			if err := writer.WriteField("height", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("height", v)
+			if err != nil {
 				return
 			}
 		}
@@ -21500,172 +21766,171 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 
 		if params.StartTimestamp != 0 {
 			v := strconv.FormatInt(params.StartTimestamp, 10)
-			if err := writer.WriteField("start_timestamp", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("start_timestamp", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.Caption != "" {
 			v := params.Caption
-			if err := writer.WriteField("caption", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("caption", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ParseMode != "" {
 			v := params.ParseMode
-			if err := writer.WriteField("parse_mode", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("parse_mode", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			bs, err := json.Marshal(&params.CaptionEntities)
+			var bs []byte
+			bs, err = json.Marshal(&params.CaptionEntities)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("caption_entities")
+			var p io.Writer
+			p, err = writer.CreateFormField("caption_entities")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ShowCaptionAboveMedia {
 			v := strconv.FormatBool(params.ShowCaptionAboveMedia)
-			if err := writer.WriteField("show_caption_above_media", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("show_caption_above_media", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.HasSpoiler {
 			v := strconv.FormatBool(params.HasSpoiler)
-			if err := writer.WriteField("has_spoiler", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("has_spoiler", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.SupportsStreaming {
 			v := strconv.FormatBool(params.SupportsStreaming)
-			if err := writer.WriteField("supports_streaming", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("supports_streaming", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.DisableNotification {
 			v := strconv.FormatBool(params.DisableNotification)
-			if err := writer.WriteField("disable_notification", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("disable_notification", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ProtectContent {
 			v := strconv.FormatBool(params.ProtectContent)
-			if err := writer.WriteField("protect_content", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("protect_content", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.AllowPaidBroadcast {
 			v := strconv.FormatBool(params.AllowPaidBroadcast)
-			if err := writer.WriteField("allow_paid_broadcast", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("allow_paid_broadcast", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageEffectID != "" {
 			v := params.MessageEffectID
-			if err := writer.WriteField("message_effect_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_effect_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.SuggestedPostParameters != nil {
-			bs, err := json.Marshal(&params.SuggestedPostParameters)
+			var bs []byte
+			bs, err = json.Marshal(&params.SuggestedPostParameters)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("suggested_post_parameters")
+			var p io.Writer
+			p, err = writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			bs, err := json.Marshal(&params.ReplyParameters)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyParameters)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_parameters")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			bs, err := json.Marshal(&params.ReplyMarkup)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyMarkup)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_markup")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "sendVideo", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 
@@ -21978,39 +22243,56 @@ func WithSendVideoNoteReplyMarkup(value *ReplyMarkup) SendVideoNoteOption {
 func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams) (ret *Message, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
-			if err := writer.WriteField("business_connection_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("business_connection_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		{
 			v := params.ChatID
-			if err := writer.WriteField("chat_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("chat_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageThreadID != 0 {
 			v := strconv.FormatInt(params.MessageThreadID, 10)
-			if err := writer.WriteField("message_thread_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_thread_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.DirectMessagesTopicID != 0 {
 			v := strconv.FormatInt(params.DirectMessagesTopicID, 10)
-			if err := writer.WriteField("direct_messages_topic_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("direct_messages_topic_id", v)
+			if err != nil {
 				return
 			}
 		}
@@ -22029,16 +22311,16 @@ func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams)
 
 		if params.Duration != 0 {
 			v := strconv.FormatInt(params.Duration, 10)
-			if err := writer.WriteField("duration", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("duration", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.Length != 0 {
 			v := strconv.FormatInt(params.Length, 10)
-			if err := writer.WriteField("length", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("length", v)
+			if err != nil {
 				return
 			}
 		}
@@ -22059,104 +22341,104 @@ func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams)
 
 		if params.DisableNotification {
 			v := strconv.FormatBool(params.DisableNotification)
-			if err := writer.WriteField("disable_notification", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("disable_notification", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ProtectContent {
 			v := strconv.FormatBool(params.ProtectContent)
-			if err := writer.WriteField("protect_content", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("protect_content", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.AllowPaidBroadcast {
 			v := strconv.FormatBool(params.AllowPaidBroadcast)
-			if err := writer.WriteField("allow_paid_broadcast", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("allow_paid_broadcast", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageEffectID != "" {
 			v := params.MessageEffectID
-			if err := writer.WriteField("message_effect_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_effect_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.SuggestedPostParameters != nil {
-			bs, err := json.Marshal(&params.SuggestedPostParameters)
+			var bs []byte
+			bs, err = json.Marshal(&params.SuggestedPostParameters)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("suggested_post_parameters")
+			var p io.Writer
+			p, err = writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			bs, err := json.Marshal(&params.ReplyParameters)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyParameters)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_parameters")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			bs, err := json.Marshal(&params.ReplyMarkup)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyMarkup)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_markup")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "sendVideoNote", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 
@@ -22474,39 +22756,56 @@ func WithSendVoiceReplyMarkup(value *ReplyMarkup) SendVoiceOption {
 func (c *Client) SendVoice(ctx context.Context, params *SendVoiceParams) (ret *Message, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
-			if err := writer.WriteField("business_connection_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("business_connection_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		{
 			v := params.ChatID
-			if err := writer.WriteField("chat_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("chat_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageThreadID != 0 {
 			v := strconv.FormatInt(params.MessageThreadID, 10)
-			if err := writer.WriteField("message_thread_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_thread_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.DirectMessagesTopicID != 0 {
 			v := strconv.FormatInt(params.DirectMessagesTopicID, 10)
-			if err := writer.WriteField("direct_messages_topic_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("direct_messages_topic_id", v)
+			if err != nil {
 				return
 			}
 		}
@@ -22525,148 +22824,147 @@ func (c *Client) SendVoice(ctx context.Context, params *SendVoiceParams) (ret *M
 
 		if params.Caption != "" {
 			v := params.Caption
-			if err := writer.WriteField("caption", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("caption", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ParseMode != "" {
 			v := params.ParseMode
-			if err := writer.WriteField("parse_mode", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("parse_mode", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			bs, err := json.Marshal(&params.CaptionEntities)
+			var bs []byte
+			bs, err = json.Marshal(&params.CaptionEntities)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("caption_entities")
+			var p io.Writer
+			p, err = writer.CreateFormField("caption_entities")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.Duration != 0 {
 			v := strconv.FormatInt(params.Duration, 10)
-			if err := writer.WriteField("duration", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("duration", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.DisableNotification {
 			v := strconv.FormatBool(params.DisableNotification)
-			if err := writer.WriteField("disable_notification", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("disable_notification", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.ProtectContent {
 			v := strconv.FormatBool(params.ProtectContent)
-			if err := writer.WriteField("protect_content", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("protect_content", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.AllowPaidBroadcast {
 			v := strconv.FormatBool(params.AllowPaidBroadcast)
-			if err := writer.WriteField("allow_paid_broadcast", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("allow_paid_broadcast", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MessageEffectID != "" {
 			v := params.MessageEffectID
-			if err := writer.WriteField("message_effect_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("message_effect_id", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.SuggestedPostParameters != nil {
-			bs, err := json.Marshal(&params.SuggestedPostParameters)
+			var bs []byte
+			bs, err = json.Marshal(&params.SuggestedPostParameters)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("suggested_post_parameters")
+			var p io.Writer
+			p, err = writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			bs, err := json.Marshal(&params.ReplyParameters)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyParameters)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_parameters")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			bs, err := json.Marshal(&params.ReplyMarkup)
+			var bs []byte
+			bs, err = json.Marshal(&params.ReplyMarkup)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("reply_markup")
+			var p io.Writer
+			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "sendVoice", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 
@@ -23008,15 +23306,32 @@ func WithSetBusinessAccountProfilePhotoIsPublic(value bool) SetBusinessAccountPr
 func (c *Client) SetBusinessAccountProfilePhoto(ctx context.Context, params *SetBusinessAccountProfilePhotoParams) (ret bool, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		{
 			v := params.BusinessConnectionID
-			if err := writer.WriteField("business_connection_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("business_connection_id", v)
+			if err != nil {
 				return
 			}
 		}
@@ -23043,41 +23358,43 @@ func (c *Client) SetBusinessAccountProfilePhoto(ctx context.Context, params *Set
 				}
 			}
 
-			bs, err := json.Marshal(&params.Photo)
+			var bs []byte
+			bs, err = json.Marshal(&params.Photo)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("photo")
+			var p io.Writer
+			p, err = writer.CreateFormField("photo")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.IsPublic {
 			v := strconv.FormatBool(params.IsPublic)
-			if err := writer.WriteField("is_public", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("is_public", v)
+			if err != nil {
 				return
 			}
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "setBusinessAccountProfilePhoto", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 
@@ -23653,15 +23970,32 @@ func WithSetChatPhotoPhoto(value InputFile) SetChatPhotoOption {
 func (c *Client) SetChatPhoto(ctx context.Context, params *SetChatPhotoParams) (ret bool, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		{
 			v := params.ChatID
-			if err := writer.WriteField("chat_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("chat_id", v)
+			if err != nil {
 				return
 			}
 		}
@@ -23677,15 +24011,18 @@ func (c *Client) SetChatPhoto(ctx context.Context, params *SetChatPhotoParams) (
 			}
 
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "setChatPhoto", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 
@@ -24679,10 +25016,27 @@ func WithSetMyProfilePhotoPhoto(value InputProfilePhoto) SetMyProfilePhotoOption
 func (c *Client) SetMyProfilePhoto(ctx context.Context, params *SetMyProfilePhotoParams) (ret bool, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		{
 			switch {
@@ -24706,33 +25060,35 @@ func (c *Client) SetMyProfilePhoto(ctx context.Context, params *SetMyProfilePhot
 				}
 			}
 
-			bs, err := json.Marshal(&params.Photo)
+			var bs []byte
+			bs, err = json.Marshal(&params.Photo)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("photo")
+			var p io.Writer
+			p, err = writer.CreateFormField("photo")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "setMyProfilePhoto", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 
@@ -25309,23 +25665,40 @@ func WithSetStickerSetThumbnailFormat(value string) SetStickerSetThumbnailOption
 func (c *Client) SetStickerSetThumbnail(ctx context.Context, params *SetStickerSetThumbnailParams) (ret bool, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		{
 			v := params.Name
-			if err := writer.WriteField("name", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("name", v)
+			if err != nil {
 				return
 			}
 		}
 
 		{
 			v := strconv.FormatInt(params.UserID, 10)
-			if err := writer.WriteField("user_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("user_id", v)
+			if err != nil {
 				return
 			}
 		}
@@ -25346,20 +25719,23 @@ func (c *Client) SetStickerSetThumbnail(ctx context.Context, params *SetStickerS
 
 		{
 			v := params.Format
-			if err := writer.WriteField("format", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("format", v)
+			if err != nil {
 				return
 			}
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "setStickerSetThumbnail", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 
@@ -25705,15 +26081,32 @@ func WithSetWebhookSecretToken(value string) SetWebhookOption {
 func (c *Client) SetWebhook(ctx context.Context, params *SetWebhookParams) (ret bool, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		{
 			v := params.URL
-			if err := writer.WriteField("url", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("url", v)
+			if err != nil {
 				return
 			}
 		}
@@ -25734,64 +26127,66 @@ func (c *Client) SetWebhook(ctx context.Context, params *SetWebhookParams) (ret 
 
 		if params.IpAddress != "" {
 			v := params.IpAddress
-			if err := writer.WriteField("ip_address", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("ip_address", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.MaxConnections != 0 {
 			v := strconv.FormatInt(params.MaxConnections, 10)
-			if err := writer.WriteField("max_connections", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("max_connections", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if len(params.AllowedUpdates) != 0 {
-			bs, err := json.Marshal(&params.AllowedUpdates)
+			var bs []byte
+			bs, err = json.Marshal(&params.AllowedUpdates)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
-			p, err := writer.CreateFormField("allowed_updates")
+			var p io.Writer
+			p, err = writer.CreateFormField("allowed_updates")
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 
 			_, err = p.Write(bs)
 			if err != nil {
-				_ = pw.CloseWithError(err)
 				return
 			}
 		}
 
 		if params.DropPendingUpdates {
 			v := strconv.FormatBool(params.DropPendingUpdates)
-			if err := writer.WriteField("drop_pending_updates", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("drop_pending_updates", v)
+			if err != nil {
 				return
 			}
 		}
 
 		if params.SecretToken != "" {
 			v := params.SecretToken
-			if err := writer.WriteField("secret_token", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("secret_token", v)
+			if err != nil {
 				return
 			}
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "setWebhook", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 
@@ -26954,15 +27349,32 @@ func WithUploadStickerFileStickerFormat(value string) UploadStickerFileOption {
 func (c *Client) UploadStickerFile(ctx context.Context, params *UploadStickerFileParams) (ret *File, err error) {
 	reader, pw := io.Pipe()
 	writer := multipart.NewWriter(pw)
+	contentType := writer.FormDataContentType()
+	writeErr := make(chan error, 1)
 
 	go func() {
-		defer pw.Close()
-		defer writer.Close()
+		var err error
+		defer func() {
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			err = writer.Close()
+			if err != nil {
+				_ = pw.CloseWithError(err)
+				writeErr <- err
+				return
+			}
+
+			writeErr <- pw.Close()
+		}()
 
 		{
 			v := strconv.FormatInt(params.UserID, 10)
-			if err := writer.WriteField("user_id", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("user_id", v)
+			if err != nil {
 				return
 			}
 		}
@@ -26981,20 +27393,23 @@ func (c *Client) UploadStickerFile(ctx context.Context, params *UploadStickerFil
 
 		{
 			v := params.StickerFormat
-			if err := writer.WriteField("sticker_format", v); err != nil {
-				_ = pw.CloseWithError(err)
+			err = writer.WriteField("sticker_format", v)
+			if err != nil {
 				return
 			}
 		}
-	}()
 
-	contentType := writer.FormDataContentType()
+	}()
 
 	var result json.RawMessage
 
 	result, err = c.Raw(ctx, "uploadStickerFile", reader, contentType, nil)
 	if err != nil {
 		_ = reader.CloseWithError(err)
+		<-writeErr
+		return
+	}
+	if err = <-writeErr; err != nil {
 		return
 	}
 

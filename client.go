@@ -10,6 +10,7 @@ import (
 	"net/http/httptrace"
 	"strconv"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -125,7 +126,13 @@ type Client struct {
 	httpTrace             *httptrace.ClientTrace
 	localAddr, remoteAddr atomic.Value
 
-	cancel atomic.Pointer[context.CancelFunc]
+	runMu sync.Mutex
+	run   *runState
+}
+
+type runState struct {
+	stop     chan struct{}
+	stopOnce sync.Once
 }
 
 func (c *Client) setLinkPrefix() {
@@ -294,7 +301,7 @@ func (c *Client) Raw(
 		return c.handleRetryErr(ctx, method, reader, contentType, err, dst)
 	}
 
-	return append(dst, buffer.B...), nil
+	return append(dst, v.Result...), nil
 }
 
 func (c *Client) handleRetryErr(
@@ -391,15 +398,61 @@ func (c *Client) startPolling(ctx context.Context, params *GetUpdatesParams, wor
 				idx = -idx
 			}
 
-			workers[idx] <- gogramCtx
+			select {
+			case workers[idx] <- gogramCtx:
+			case <-ctx.Done():
+				c.releaseContext(gogramCtx)
+				return
+			}
 		}
 	}
 }
 
-// Stop stops the Client.
+func (c *Client) beginRun(ctx context.Context) (context.Context, *runState, error) {
+	state := &runState{
+		stop: make(chan struct{}),
+	}
+
+	c.runMu.Lock()
+	if c.run != nil {
+		c.runMu.Unlock()
+		return nil, nil, ErrAlreadyStarted
+	}
+	c.run = state
+	c.runMu.Unlock()
+
+	innerCtx, cancel := context.WithCancel(ctx)
+	go func() {
+		select {
+		case <-ctx.Done():
+		case <-state.stop:
+		}
+		cancel()
+	}()
+
+	return innerCtx, state, nil
+}
+
+func (c *Client) finishRun(state *runState) {
+	state.stopOnce.Do(func() { close(state.stop) })
+
+	c.runMu.Lock()
+	if c.run == state {
+		c.run = nil
+	}
+	c.runMu.Unlock()
+}
+
+// Stop requests the active polling or webhook run to stop.
+//
+// Stop never waits for handlers to finish, so it is safe to call from a
+// handler. Start or StartWebhook returns after the run has fully drained.
 func (c *Client) Stop() {
-	cancel := c.cancel.Load()
-	if cancel != nil {
-		(*cancel)()
+	c.runMu.Lock()
+	state := c.run
+	c.runMu.Unlock()
+
+	if state != nil {
+		state.stopOnce.Do(func() { close(state.stop) })
 	}
 }

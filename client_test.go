@@ -370,6 +370,87 @@ func TestDownloadFile_PreservesTargetOnReadError(t *testing.T) {
 	}
 }
 
+func TestClient_Stop_DrainsWorkerQueues(t *testing.T) {
+	t.Parallel()
+
+	const updatesCount = 3
+
+	var served atomic.Bool
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		var updates []gogram.Update
+		if served.CompareAndSwap(false, true) {
+			updates = make([]gogram.Update, updatesCount)
+			for i := range updates {
+				updates[i] = gogram.Update{
+					UpdateID: int64(i + 1),
+					Message:  &gogram.Message{Text: "drain"},
+				}
+			}
+		}
+
+		resp := gogram.Response{
+			OK:     true,
+			Result: json.RawMessage(mustMarshal(t, updates)),
+		}
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(mustMarshal(t, &resp))
+	}))
+	defer server.Close()
+
+	started := make(chan struct{})
+	var startedOnce atomic.Bool
+	var processed atomic.Int64
+	var client *gogram.Client
+	var err error
+
+	router := gogram.NewRouter()
+	router.HandleOnMessage(func(_ *gogram.Context, _ *gogram.Message) error {
+		if startedOnce.CompareAndSwap(false, true) {
+			close(started)
+			client.Stop()
+		}
+		time.Sleep(10 * time.Millisecond)
+		processed.Add(1)
+		return nil
+	}, gogram.FilterAny())
+
+	client, err = gogram.NewClient(testToken,
+		gogram.WithHost(strings.TrimPrefix(server.URL, "https://")),
+		gogram.WithHTTPClient(server.Client()),
+		gogram.WithRouter(router),
+		gogram.WithNumWorkers(1),
+	)
+	if err != nil {
+		t.Fatalf("NewClient: %v", err)
+	}
+
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- client.Start(t.Context(), &gogram.GetUpdatesParams{Limit: updatesCount})
+	}()
+
+	select {
+	case <-started:
+	case <-time.After(time.Second):
+		t.Fatal("worker did not start processing")
+	}
+
+	client.Stop()
+
+	select {
+	case err = <-errCh:
+		if err != nil {
+			t.Fatalf("Start returned error: %v", err)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("Start did not return after Stop")
+	}
+
+	if got := processed.Load(); got != updatesCount {
+		t.Fatalf("Start returned before worker drained queue: processed %d/%d", got, updatesCount)
+	}
+}
+
 // mustMarshal is a test helper to simplify JSON marshaling checks.
 func mustMarshal(t *testing.T, v any) []byte {
 	t.Helper()
