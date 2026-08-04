@@ -17,7 +17,7 @@ func TestMethodOptionAliasRollsBack(t *testing.T) {
 	t.Parallel()
 
 	params := gogram.SendMessageParams{Text: "before"}
-	var option gogram.Option[gogram.SendMessageParams] = gogram.WithSendMessageText("after")
+	option := gogram.WithSendMessageText("after")
 
 	rollback := params.Option(option)
 	if params.Text != "after" {
