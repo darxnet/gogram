@@ -13,6 +13,23 @@ import (
 	"github.com/darxnet/gogram"
 )
 
+func TestMethodOptionAliasRollsBack(t *testing.T) {
+	t.Parallel()
+
+	params := gogram.SendMessageParams{Text: "before"}
+	var option gogram.Option[gogram.SendMessageParams] = gogram.WithSendMessageText("after")
+
+	rollback := params.Option(option)
+	if params.Text != "after" {
+		t.Fatalf("Text after apply = %q, want %q", params.Text, "after")
+	}
+
+	params.Option(rollback)
+	if params.Text != "before" {
+		t.Fatalf("Text after rollback = %q, want %q", params.Text, "before")
+	}
+}
+
 // ---------------------------------------------------------------------------
 // RichText.UnmarshalJSON — pure unit tests, no HTTP involved.
 // ---------------------------------------------------------------------------

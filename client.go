@@ -184,7 +184,8 @@ func NewClient(token string, opts ...ClientOption) (*Client, error) {
 		return nil, ErrNoToken
 	}
 
-	botID, err := strconv.ParseInt(strings.SplitN(token, ":", 2)[0], 10, 64)
+	botIDText, _, _ := strings.Cut(token, ":")
+	botID, err := strconv.ParseInt(botIDText, 10, 64)
 	if err != nil {
 		return nil, ErrInvalidToken
 	}

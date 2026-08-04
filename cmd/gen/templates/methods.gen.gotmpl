@@ -24,7 +24,7 @@ import (
     }
 
     // {{ $option }} configures {{ $params }}.
-    type {{ $option }} func(params *{{ $params }}) {{ $option }}
+    type {{ $option }} = Option[{{ $params }}]
 
     // Option applies one or more {{ $option }} values and returns the last rollback option.
     func (r *{{ $params }}) Option(opts ...{{ $option }}) (previous {{ $option }}) {
@@ -39,12 +39,9 @@ import (
         // With{{ $method }}{{ $param }} sets the {{ $param }} field.
         // {{ .Desc }}
         func With{{ $method }}{{ $param }} (value {{ toType .Type .IsRequired }}) {{ $option }} {
-            return func(params *{{ $params }}) {{ $option }} {
-                previous := params.{{ $param }}
-                params.{{ $param }} = value
-
-                return With{{ $method }}{{ $param }}(previous)
-            }
+            return fieldOption(value, func(params *{{ $params }}) *{{ toType .Type .IsRequired }} {
+                return &params.{{ $param }}
+            })
         }
     {{ end }}
 

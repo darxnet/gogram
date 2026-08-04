@@ -25,7 +25,7 @@ type AddStickerToSetParams struct {
 }
 
 // AddStickerToSetOption configures AddStickerToSetParams.
-type AddStickerToSetOption func(params *AddStickerToSetParams) AddStickerToSetOption
+type AddStickerToSetOption = Option[AddStickerToSetParams]
 
 // Option applies one or more AddStickerToSetOption values and returns the last rollback option.
 func (r *AddStickerToSetParams) Option(opts ...AddStickerToSetOption) (previous AddStickerToSetOption) {
@@ -39,24 +39,18 @@ func (r *AddStickerToSetParams) Option(opts ...AddStickerToSetOption) (previous 
 //
 // User identifier of sticker set owner
 func WithAddStickerToSetUserID(value int64) AddStickerToSetOption {
-	return func(params *AddStickerToSetParams) AddStickerToSetOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithAddStickerToSetUserID(previous)
-	}
+	return fieldOption(value, func(params *AddStickerToSetParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithAddStickerToSetName sets the Name field.
 //
 // Sticker set name
 func WithAddStickerToSetName(value string) AddStickerToSetOption {
-	return func(params *AddStickerToSetParams) AddStickerToSetOption {
-		previous := params.Name
-		params.Name = value
-
-		return WithAddStickerToSetName(previous)
-	}
+	return fieldOption(value, func(params *AddStickerToSetParams) *string {
+		return &params.Name
+	})
 }
 
 // WithAddStickerToSetSticker sets the Sticker field.
@@ -64,12 +58,9 @@ func WithAddStickerToSetName(value string) AddStickerToSetOption {
 // A JSON-serialized object with information about the added sticker.
 // If exactly the same sticker had already been added to the set, then the set isn't changed.
 func WithAddStickerToSetSticker(value InputSticker) AddStickerToSetOption {
-	return func(params *AddStickerToSetParams) AddStickerToSetOption {
-		previous := params.Sticker
-		params.Sticker = value
-
-		return WithAddStickerToSetSticker(previous)
-	}
+	return fieldOption(value, func(params *AddStickerToSetParams) *InputSticker {
+		return &params.Sticker
+	})
 }
 
 // AddStickerToSet calls the addStickerToSet Telegram Bot API method.
@@ -201,7 +192,7 @@ type AnswerCallbackQueryParams struct {
 }
 
 // AnswerCallbackQueryOption configures AnswerCallbackQueryParams.
-type AnswerCallbackQueryOption func(params *AnswerCallbackQueryParams) AnswerCallbackQueryOption
+type AnswerCallbackQueryOption = Option[AnswerCallbackQueryParams]
 
 // Option applies one or more AnswerCallbackQueryOption values and returns the last rollback option.
 func (r *AnswerCallbackQueryParams) Option(opts ...AnswerCallbackQueryOption) (previous AnswerCallbackQueryOption) {
@@ -215,12 +206,9 @@ func (r *AnswerCallbackQueryParams) Option(opts ...AnswerCallbackQueryOption) (p
 //
 // Unique identifier for the query to be answered
 func WithAnswerCallbackQueryCallbackQueryID(value string) AnswerCallbackQueryOption {
-	return func(params *AnswerCallbackQueryParams) AnswerCallbackQueryOption {
-		previous := params.CallbackQueryID
-		params.CallbackQueryID = value
-
-		return WithAnswerCallbackQueryCallbackQueryID(previous)
-	}
+	return fieldOption(value, func(params *AnswerCallbackQueryParams) *string {
+		return &params.CallbackQueryID
+	})
 }
 
 // WithAnswerCallbackQueryText sets the Text field.
@@ -228,12 +216,9 @@ func WithAnswerCallbackQueryCallbackQueryID(value string) AnswerCallbackQueryOpt
 // Text of the notification.
 // If not specified, nothing will be shown to the user, 0-200 characters.
 func WithAnswerCallbackQueryText(value string) AnswerCallbackQueryOption {
-	return func(params *AnswerCallbackQueryParams) AnswerCallbackQueryOption {
-		previous := params.Text
-		params.Text = value
-
-		return WithAnswerCallbackQueryText(previous)
-	}
+	return fieldOption(value, func(params *AnswerCallbackQueryParams) *string {
+		return &params.Text
+	})
 }
 
 // WithAnswerCallbackQueryShowAlert sets the ShowAlert field.
@@ -241,12 +226,9 @@ func WithAnswerCallbackQueryText(value string) AnswerCallbackQueryOption {
 // If True, an alert will be shown by the client instead of a notification at the top of the chat screen.
 // Defaults to False.
 func WithAnswerCallbackQueryShowAlert(value bool) AnswerCallbackQueryOption {
-	return func(params *AnswerCallbackQueryParams) AnswerCallbackQueryOption {
-		previous := params.ShowAlert
-		params.ShowAlert = value
-
-		return WithAnswerCallbackQueryShowAlert(previous)
-	}
+	return fieldOption(value, func(params *AnswerCallbackQueryParams) *bool {
+		return &params.ShowAlert
+	})
 }
 
 // WithAnswerCallbackQueryURL sets the URL field.
@@ -260,12 +242,9 @@ func WithAnswerCallbackQueryShowAlert(value bool) AnswerCallbackQueryOption {
 // [@BotFather]: https://t.me/botfather
 // [callback_game]: https://core.telegram.org/bots/api#inlinekeyboardbutton
 func WithAnswerCallbackQueryURL(value string) AnswerCallbackQueryOption {
-	return func(params *AnswerCallbackQueryParams) AnswerCallbackQueryOption {
-		previous := params.URL
-		params.URL = value
-
-		return WithAnswerCallbackQueryURL(previous)
-	}
+	return fieldOption(value, func(params *AnswerCallbackQueryParams) *string {
+		return &params.URL
+	})
 }
 
 // WithAnswerCallbackQueryCacheTime sets the CacheTime field.
@@ -274,12 +253,9 @@ func WithAnswerCallbackQueryURL(value string) AnswerCallbackQueryOption {
 // Telegram apps will support caching starting in version 3.14.
 // Defaults to 0.
 func WithAnswerCallbackQueryCacheTime(value int64) AnswerCallbackQueryOption {
-	return func(params *AnswerCallbackQueryParams) AnswerCallbackQueryOption {
-		previous := params.CacheTime
-		params.CacheTime = value
-
-		return WithAnswerCallbackQueryCacheTime(previous)
-	}
+	return fieldOption(value, func(params *AnswerCallbackQueryParams) *int64 {
+		return &params.CacheTime
+	})
 }
 
 // AnswerCallbackQuery calls the answerCallbackQuery Telegram Bot API method.
@@ -327,7 +303,7 @@ type AnswerChatJoinRequestQueryParams struct {
 }
 
 // AnswerChatJoinRequestQueryOption configures AnswerChatJoinRequestQueryParams.
-type AnswerChatJoinRequestQueryOption func(params *AnswerChatJoinRequestQueryParams) AnswerChatJoinRequestQueryOption
+type AnswerChatJoinRequestQueryOption = Option[AnswerChatJoinRequestQueryParams]
 
 // Option applies one or more AnswerChatJoinRequestQueryOption values and returns the last rollback option.
 func (r *AnswerChatJoinRequestQueryParams) Option(opts ...AnswerChatJoinRequestQueryOption) (previous AnswerChatJoinRequestQueryOption) {
@@ -341,12 +317,9 @@ func (r *AnswerChatJoinRequestQueryParams) Option(opts ...AnswerChatJoinRequestQ
 //
 // Unique identifier of the join request query
 func WithAnswerChatJoinRequestQueryChatJoinRequestQueryID(value string) AnswerChatJoinRequestQueryOption {
-	return func(params *AnswerChatJoinRequestQueryParams) AnswerChatJoinRequestQueryOption {
-		previous := params.ChatJoinRequestQueryID
-		params.ChatJoinRequestQueryID = value
-
-		return WithAnswerChatJoinRequestQueryChatJoinRequestQueryID(previous)
-	}
+	return fieldOption(value, func(params *AnswerChatJoinRequestQueryParams) *string {
+		return &params.ChatJoinRequestQueryID
+	})
 }
 
 // WithAnswerChatJoinRequestQueryResult sets the Result field.
@@ -354,12 +327,9 @@ func WithAnswerChatJoinRequestQueryChatJoinRequestQueryID(value string) AnswerCh
 // Result of the query.
 // Must be either “approve” to allow the user to join the chat, “decline” to disallow the user to join the chat, or “queue” to leave the decision to other administrators.
 func WithAnswerChatJoinRequestQueryResult(value string) AnswerChatJoinRequestQueryOption {
-	return func(params *AnswerChatJoinRequestQueryParams) AnswerChatJoinRequestQueryOption {
-		previous := params.Result
-		params.Result = value
-
-		return WithAnswerChatJoinRequestQueryResult(previous)
-	}
+	return fieldOption(value, func(params *AnswerChatJoinRequestQueryParams) *string {
+		return &params.Result
+	})
 }
 
 // AnswerChatJoinRequestQuery calls the answerChatJoinRequestQuery Telegram Bot API method.
@@ -403,7 +373,7 @@ type AnswerGuestQueryParams struct {
 }
 
 // AnswerGuestQueryOption configures AnswerGuestQueryParams.
-type AnswerGuestQueryOption func(params *AnswerGuestQueryParams) AnswerGuestQueryOption
+type AnswerGuestQueryOption = Option[AnswerGuestQueryParams]
 
 // Option applies one or more AnswerGuestQueryOption values and returns the last rollback option.
 func (r *AnswerGuestQueryParams) Option(opts ...AnswerGuestQueryOption) (previous AnswerGuestQueryOption) {
@@ -417,24 +387,18 @@ func (r *AnswerGuestQueryParams) Option(opts ...AnswerGuestQueryOption) (previou
 //
 // Unique identifier for the query to be answered
 func WithAnswerGuestQueryGuestQueryID(value string) AnswerGuestQueryOption {
-	return func(params *AnswerGuestQueryParams) AnswerGuestQueryOption {
-		previous := params.GuestQueryID
-		params.GuestQueryID = value
-
-		return WithAnswerGuestQueryGuestQueryID(previous)
-	}
+	return fieldOption(value, func(params *AnswerGuestQueryParams) *string {
+		return &params.GuestQueryID
+	})
 }
 
 // WithAnswerGuestQueryResult sets the Result field.
 //
 // A JSON-serialized object describing the message to be sent
 func WithAnswerGuestQueryResult(value InlineQueryResult) AnswerGuestQueryOption {
-	return func(params *AnswerGuestQueryParams) AnswerGuestQueryOption {
-		previous := params.Result
-		params.Result = value
-
-		return WithAnswerGuestQueryResult(previous)
-	}
+	return fieldOption(value, func(params *AnswerGuestQueryParams) *InlineQueryResult {
+		return &params.Result
+	})
 }
 
 // AnswerGuestQuery calls the answerGuestQuery Telegram Bot API method.
@@ -497,7 +461,7 @@ type AnswerInlineQueryParams struct {
 }
 
 // AnswerInlineQueryOption configures AnswerInlineQueryParams.
-type AnswerInlineQueryOption func(params *AnswerInlineQueryParams) AnswerInlineQueryOption
+type AnswerInlineQueryOption = Option[AnswerInlineQueryParams]
 
 // Option applies one or more AnswerInlineQueryOption values and returns the last rollback option.
 func (r *AnswerInlineQueryParams) Option(opts ...AnswerInlineQueryOption) (previous AnswerInlineQueryOption) {
@@ -511,24 +475,18 @@ func (r *AnswerInlineQueryParams) Option(opts ...AnswerInlineQueryOption) (previ
 //
 // Unique identifier for the answered query
 func WithAnswerInlineQueryInlineQueryID(value string) AnswerInlineQueryOption {
-	return func(params *AnswerInlineQueryParams) AnswerInlineQueryOption {
-		previous := params.InlineQueryID
-		params.InlineQueryID = value
-
-		return WithAnswerInlineQueryInlineQueryID(previous)
-	}
+	return fieldOption(value, func(params *AnswerInlineQueryParams) *string {
+		return &params.InlineQueryID
+	})
 }
 
 // WithAnswerInlineQueryResults sets the Results field.
 //
 // A JSON-serialized Array of results for the inline query
 func WithAnswerInlineQueryResults(value []InlineQueryResult) AnswerInlineQueryOption {
-	return func(params *AnswerInlineQueryParams) AnswerInlineQueryOption {
-		previous := params.Results
-		params.Results = value
-
-		return WithAnswerInlineQueryResults(previous)
-	}
+	return fieldOption(value, func(params *AnswerInlineQueryParams) *[]InlineQueryResult {
+		return &params.Results
+	})
 }
 
 // WithAnswerInlineQueryCacheTime sets the CacheTime field.
@@ -536,12 +494,9 @@ func WithAnswerInlineQueryResults(value []InlineQueryResult) AnswerInlineQueryOp
 // The maximum amount of time in seconds that the result of the inline query may be cached on the server.
 // Defaults to 300.
 func WithAnswerInlineQueryCacheTime(value int64) AnswerInlineQueryOption {
-	return func(params *AnswerInlineQueryParams) AnswerInlineQueryOption {
-		previous := params.CacheTime
-		params.CacheTime = value
-
-		return WithAnswerInlineQueryCacheTime(previous)
-	}
+	return fieldOption(value, func(params *AnswerInlineQueryParams) *int64 {
+		return &params.CacheTime
+	})
 }
 
 // WithAnswerInlineQueryIsPersonal sets the IsPersonal field.
@@ -549,12 +504,9 @@ func WithAnswerInlineQueryCacheTime(value int64) AnswerInlineQueryOption {
 // Pass True if results may be cached on the server side only for the user that sent the query.
 // By default, results may be returned to any user who sends the same query.
 func WithAnswerInlineQueryIsPersonal(value bool) AnswerInlineQueryOption {
-	return func(params *AnswerInlineQueryParams) AnswerInlineQueryOption {
-		previous := params.IsPersonal
-		params.IsPersonal = value
-
-		return WithAnswerInlineQueryIsPersonal(previous)
-	}
+	return fieldOption(value, func(params *AnswerInlineQueryParams) *bool {
+		return &params.IsPersonal
+	})
 }
 
 // WithAnswerInlineQueryNextOffset sets the NextOffset field.
@@ -563,24 +515,18 @@ func WithAnswerInlineQueryIsPersonal(value bool) AnswerInlineQueryOption {
 // Pass an empty string if there are no more results or if you don't support pagination.
 // Offset length can't exceed 64 bytes.
 func WithAnswerInlineQueryNextOffset(value string) AnswerInlineQueryOption {
-	return func(params *AnswerInlineQueryParams) AnswerInlineQueryOption {
-		previous := params.NextOffset
-		params.NextOffset = value
-
-		return WithAnswerInlineQueryNextOffset(previous)
-	}
+	return fieldOption(value, func(params *AnswerInlineQueryParams) *string {
+		return &params.NextOffset
+	})
 }
 
 // WithAnswerInlineQueryButton sets the Button field.
 //
 // A JSON-serialized object describing a button to be shown above inline query results
 func WithAnswerInlineQueryButton(value *InlineQueryResultsButton) AnswerInlineQueryOption {
-	return func(params *AnswerInlineQueryParams) AnswerInlineQueryOption {
-		previous := params.Button
-		params.Button = value
-
-		return WithAnswerInlineQueryButton(previous)
-	}
+	return fieldOption(value, func(params *AnswerInlineQueryParams) **InlineQueryResultsButton {
+		return &params.Button
+	})
 }
 
 // AnswerInlineQuery calls the answerInlineQuery Telegram Bot API method.
@@ -633,7 +579,7 @@ type AnswerPreCheckoutQueryParams struct {
 }
 
 // AnswerPreCheckoutQueryOption configures AnswerPreCheckoutQueryParams.
-type AnswerPreCheckoutQueryOption func(params *AnswerPreCheckoutQueryParams) AnswerPreCheckoutQueryOption
+type AnswerPreCheckoutQueryOption = Option[AnswerPreCheckoutQueryParams]
 
 // Option applies one or more AnswerPreCheckoutQueryOption values and returns the last rollback option.
 func (r *AnswerPreCheckoutQueryParams) Option(opts ...AnswerPreCheckoutQueryOption) (previous AnswerPreCheckoutQueryOption) {
@@ -647,12 +593,9 @@ func (r *AnswerPreCheckoutQueryParams) Option(opts ...AnswerPreCheckoutQueryOpti
 //
 // Unique identifier for the query to be answered
 func WithAnswerPreCheckoutQueryPreCheckoutQueryID(value string) AnswerPreCheckoutQueryOption {
-	return func(params *AnswerPreCheckoutQueryParams) AnswerPreCheckoutQueryOption {
-		previous := params.PreCheckoutQueryID
-		params.PreCheckoutQueryID = value
-
-		return WithAnswerPreCheckoutQueryPreCheckoutQueryID(previous)
-	}
+	return fieldOption(value, func(params *AnswerPreCheckoutQueryParams) *string {
+		return &params.PreCheckoutQueryID
+	})
 }
 
 // WithAnswerPreCheckoutQueryOk sets the Ok field.
@@ -660,12 +603,9 @@ func WithAnswerPreCheckoutQueryPreCheckoutQueryID(value string) AnswerPreCheckou
 // Specify True if everything is alright (goods are available, etc.) and the bot is ready to proceed with the order.
 // Use False if there are any problems.
 func WithAnswerPreCheckoutQueryOk(value bool) AnswerPreCheckoutQueryOption {
-	return func(params *AnswerPreCheckoutQueryParams) AnswerPreCheckoutQueryOption {
-		previous := params.Ok
-		params.Ok = value
-
-		return WithAnswerPreCheckoutQueryOk(previous)
-	}
+	return fieldOption(value, func(params *AnswerPreCheckoutQueryParams) *bool {
+		return &params.Ok
+	})
 }
 
 // WithAnswerPreCheckoutQueryErrorMessage sets the ErrorMessage field.
@@ -676,12 +616,9 @@ func WithAnswerPreCheckoutQueryOk(value bool) AnswerPreCheckoutQueryOption {
 // Please choose a different color or garment!").
 // Telegram will display this message to the user.
 func WithAnswerPreCheckoutQueryErrorMessage(value string) AnswerPreCheckoutQueryOption {
-	return func(params *AnswerPreCheckoutQueryParams) AnswerPreCheckoutQueryOption {
-		previous := params.ErrorMessage
-		params.ErrorMessage = value
-
-		return WithAnswerPreCheckoutQueryErrorMessage(previous)
-	}
+	return fieldOption(value, func(params *AnswerPreCheckoutQueryParams) *string {
+		return &params.ErrorMessage
+	})
 }
 
 // AnswerPreCheckoutQuery calls the answerPreCheckoutQuery Telegram Bot API method.
@@ -739,7 +676,7 @@ type AnswerShippingQueryParams struct {
 }
 
 // AnswerShippingQueryOption configures AnswerShippingQueryParams.
-type AnswerShippingQueryOption func(params *AnswerShippingQueryParams) AnswerShippingQueryOption
+type AnswerShippingQueryOption = Option[AnswerShippingQueryParams]
 
 // Option applies one or more AnswerShippingQueryOption values and returns the last rollback option.
 func (r *AnswerShippingQueryParams) Option(opts ...AnswerShippingQueryOption) (previous AnswerShippingQueryOption) {
@@ -753,24 +690,18 @@ func (r *AnswerShippingQueryParams) Option(opts ...AnswerShippingQueryOption) (p
 //
 // Unique identifier for the query to be answered
 func WithAnswerShippingQueryShippingQueryID(value string) AnswerShippingQueryOption {
-	return func(params *AnswerShippingQueryParams) AnswerShippingQueryOption {
-		previous := params.ShippingQueryID
-		params.ShippingQueryID = value
-
-		return WithAnswerShippingQueryShippingQueryID(previous)
-	}
+	return fieldOption(value, func(params *AnswerShippingQueryParams) *string {
+		return &params.ShippingQueryID
+	})
 }
 
 // WithAnswerShippingQueryOk sets the Ok field.
 //
 // Pass True if delivery to the specified address is possible and False if there are any problems (for example, if delivery to the specified address is not possible)
 func WithAnswerShippingQueryOk(value bool) AnswerShippingQueryOption {
-	return func(params *AnswerShippingQueryParams) AnswerShippingQueryOption {
-		previous := params.Ok
-		params.Ok = value
-
-		return WithAnswerShippingQueryOk(previous)
-	}
+	return fieldOption(value, func(params *AnswerShippingQueryParams) *bool {
+		return &params.Ok
+	})
 }
 
 // WithAnswerShippingQueryShippingOptions sets the ShippingOptions field.
@@ -778,12 +709,9 @@ func WithAnswerShippingQueryOk(value bool) AnswerShippingQueryOption {
 // Required if ok is True.
 // A JSON-serialized Array of available shipping options.
 func WithAnswerShippingQueryShippingOptions(value []ShippingOption) AnswerShippingQueryOption {
-	return func(params *AnswerShippingQueryParams) AnswerShippingQueryOption {
-		previous := params.ShippingOptions
-		params.ShippingOptions = value
-
-		return WithAnswerShippingQueryShippingOptions(previous)
-	}
+	return fieldOption(value, func(params *AnswerShippingQueryParams) *[]ShippingOption {
+		return &params.ShippingOptions
+	})
 }
 
 // WithAnswerShippingQueryErrorMessage sets the ErrorMessage field.
@@ -793,12 +721,9 @@ func WithAnswerShippingQueryShippingOptions(value []ShippingOption) AnswerShippi
 // “Sorry, delivery to your desired address is unavailable”).
 // Telegram will display this message to the user.
 func WithAnswerShippingQueryErrorMessage(value string) AnswerShippingQueryOption {
-	return func(params *AnswerShippingQueryParams) AnswerShippingQueryOption {
-		previous := params.ErrorMessage
-		params.ErrorMessage = value
-
-		return WithAnswerShippingQueryErrorMessage(previous)
-	}
+	return fieldOption(value, func(params *AnswerShippingQueryParams) *string {
+		return &params.ErrorMessage
+	})
 }
 
 // AnswerShippingQuery calls the answerShippingQuery Telegram Bot API method.
@@ -845,7 +770,7 @@ type AnswerWebAppQueryParams struct {
 }
 
 // AnswerWebAppQueryOption configures AnswerWebAppQueryParams.
-type AnswerWebAppQueryOption func(params *AnswerWebAppQueryParams) AnswerWebAppQueryOption
+type AnswerWebAppQueryOption = Option[AnswerWebAppQueryParams]
 
 // Option applies one or more AnswerWebAppQueryOption values and returns the last rollback option.
 func (r *AnswerWebAppQueryParams) Option(opts ...AnswerWebAppQueryOption) (previous AnswerWebAppQueryOption) {
@@ -859,24 +784,18 @@ func (r *AnswerWebAppQueryParams) Option(opts ...AnswerWebAppQueryOption) (previ
 //
 // Unique identifier for the query to be answered
 func WithAnswerWebAppQueryWebAppQueryID(value string) AnswerWebAppQueryOption {
-	return func(params *AnswerWebAppQueryParams) AnswerWebAppQueryOption {
-		previous := params.WebAppQueryID
-		params.WebAppQueryID = value
-
-		return WithAnswerWebAppQueryWebAppQueryID(previous)
-	}
+	return fieldOption(value, func(params *AnswerWebAppQueryParams) *string {
+		return &params.WebAppQueryID
+	})
 }
 
 // WithAnswerWebAppQueryResult sets the Result field.
 //
 // A JSON-serialized object describing the message to be sent
 func WithAnswerWebAppQueryResult(value InlineQueryResult) AnswerWebAppQueryOption {
-	return func(params *AnswerWebAppQueryParams) AnswerWebAppQueryOption {
-		previous := params.Result
-		params.Result = value
-
-		return WithAnswerWebAppQueryResult(previous)
-	}
+	return fieldOption(value, func(params *AnswerWebAppQueryParams) *InlineQueryResult {
+		return &params.Result
+	})
 }
 
 // AnswerWebAppQuery calls the answerWebAppQuery Telegram Bot API method.
@@ -924,7 +843,7 @@ type ApproveChatJoinRequestParams struct {
 }
 
 // ApproveChatJoinRequestOption configures ApproveChatJoinRequestParams.
-type ApproveChatJoinRequestOption func(params *ApproveChatJoinRequestParams) ApproveChatJoinRequestOption
+type ApproveChatJoinRequestOption = Option[ApproveChatJoinRequestParams]
 
 // Option applies one or more ApproveChatJoinRequestOption values and returns the last rollback option.
 func (r *ApproveChatJoinRequestParams) Option(opts ...ApproveChatJoinRequestOption) (previous ApproveChatJoinRequestOption) {
@@ -938,24 +857,18 @@ func (r *ApproveChatJoinRequestParams) Option(opts ...ApproveChatJoinRequestOpti
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
 func WithApproveChatJoinRequestChatID(value string) ApproveChatJoinRequestOption {
-	return func(params *ApproveChatJoinRequestParams) ApproveChatJoinRequestOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithApproveChatJoinRequestChatID(previous)
-	}
+	return fieldOption(value, func(params *ApproveChatJoinRequestParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithApproveChatJoinRequestUserID sets the UserID field.
 //
 // Unique identifier of the target user
 func WithApproveChatJoinRequestUserID(value int64) ApproveChatJoinRequestOption {
-	return func(params *ApproveChatJoinRequestParams) ApproveChatJoinRequestOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithApproveChatJoinRequestUserID(previous)
-	}
+	return fieldOption(value, func(params *ApproveChatJoinRequestParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // ApproveChatJoinRequest calls the approveChatJoinRequest Telegram Bot API method.
@@ -1004,7 +917,7 @@ type ApproveSuggestedPostParams struct {
 }
 
 // ApproveSuggestedPostOption configures ApproveSuggestedPostParams.
-type ApproveSuggestedPostOption func(params *ApproveSuggestedPostParams) ApproveSuggestedPostOption
+type ApproveSuggestedPostOption = Option[ApproveSuggestedPostParams]
 
 // Option applies one or more ApproveSuggestedPostOption values and returns the last rollback option.
 func (r *ApproveSuggestedPostParams) Option(opts ...ApproveSuggestedPostOption) (previous ApproveSuggestedPostOption) {
@@ -1018,24 +931,18 @@ func (r *ApproveSuggestedPostParams) Option(opts ...ApproveSuggestedPostOption) 
 //
 // Unique identifier for the target direct messages chat
 func WithApproveSuggestedPostChatID(value int64) ApproveSuggestedPostOption {
-	return func(params *ApproveSuggestedPostParams) ApproveSuggestedPostOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithApproveSuggestedPostChatID(previous)
-	}
+	return fieldOption(value, func(params *ApproveSuggestedPostParams) *int64 {
+		return &params.ChatID
+	})
 }
 
 // WithApproveSuggestedPostMessageID sets the MessageID field.
 //
 // Identifier of a suggested post message to approve
 func WithApproveSuggestedPostMessageID(value int64) ApproveSuggestedPostOption {
-	return func(params *ApproveSuggestedPostParams) ApproveSuggestedPostOption {
-		previous := params.MessageID
-		params.MessageID = value
-
-		return WithApproveSuggestedPostMessageID(previous)
-	}
+	return fieldOption(value, func(params *ApproveSuggestedPostParams) *int64 {
+		return &params.MessageID
+	})
 }
 
 // WithApproveSuggestedPostSendDate sets the SendDate field.
@@ -1043,12 +950,9 @@ func WithApproveSuggestedPostMessageID(value int64) ApproveSuggestedPostOption {
 // Point in time (Unix timestamp) when the post is expected to be published; omit if the date has already been specified when the suggested post was created.
 // If specified, then the date must be not more than 2678400 seconds (30 days) in the future.
 func WithApproveSuggestedPostSendDate(value int64) ApproveSuggestedPostOption {
-	return func(params *ApproveSuggestedPostParams) ApproveSuggestedPostOption {
-		previous := params.SendDate
-		params.SendDate = value
-
-		return WithApproveSuggestedPostSendDate(previous)
-	}
+	return fieldOption(value, func(params *ApproveSuggestedPostParams) *int64 {
+		return &params.SendDate
+	})
 }
 
 // ApproveSuggestedPost calls the approveSuggestedPost Telegram Bot API method.
@@ -1103,7 +1007,7 @@ type BanChatMemberParams struct {
 }
 
 // BanChatMemberOption configures BanChatMemberParams.
-type BanChatMemberOption func(params *BanChatMemberParams) BanChatMemberOption
+type BanChatMemberOption = Option[BanChatMemberParams]
 
 // Option applies one or more BanChatMemberOption values and returns the last rollback option.
 func (r *BanChatMemberParams) Option(opts ...BanChatMemberOption) (previous BanChatMemberOption) {
@@ -1117,24 +1021,18 @@ func (r *BanChatMemberParams) Option(opts ...BanChatMemberOption) (previous BanC
 //
 // Unique identifier for the target group or username of the target supergroup or channel in the format @username
 func WithBanChatMemberChatID(value string) BanChatMemberOption {
-	return func(params *BanChatMemberParams) BanChatMemberOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithBanChatMemberChatID(previous)
-	}
+	return fieldOption(value, func(params *BanChatMemberParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithBanChatMemberUserID sets the UserID field.
 //
 // Unique identifier of the target user
 func WithBanChatMemberUserID(value int64) BanChatMemberOption {
-	return func(params *BanChatMemberParams) BanChatMemberOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithBanChatMemberUserID(previous)
-	}
+	return fieldOption(value, func(params *BanChatMemberParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithBanChatMemberUntilDate sets the UntilDate field.
@@ -1143,12 +1041,9 @@ func WithBanChatMemberUserID(value int64) BanChatMemberOption {
 // If user is banned for more than 366 days or less than 30 seconds from the current time they are considered to be banned forever.
 // Applied for supergroups and channels only.
 func WithBanChatMemberUntilDate(value int64) BanChatMemberOption {
-	return func(params *BanChatMemberParams) BanChatMemberOption {
-		previous := params.UntilDate
-		params.UntilDate = value
-
-		return WithBanChatMemberUntilDate(previous)
-	}
+	return fieldOption(value, func(params *BanChatMemberParams) *int64 {
+		return &params.UntilDate
+	})
 }
 
 // WithBanChatMemberRevokeMessages sets the RevokeMessages field.
@@ -1157,12 +1052,9 @@ func WithBanChatMemberUntilDate(value int64) BanChatMemberOption {
 // If False, the user will be able to see messages in the group that were sent before the user was removed.
 // Always True for supergroups and channels.
 func WithBanChatMemberRevokeMessages(value bool) BanChatMemberOption {
-	return func(params *BanChatMemberParams) BanChatMemberOption {
-		previous := params.RevokeMessages
-		params.RevokeMessages = value
-
-		return WithBanChatMemberRevokeMessages(previous)
-	}
+	return fieldOption(value, func(params *BanChatMemberParams) *bool {
+		return &params.RevokeMessages
+	})
 }
 
 // BanChatMember calls the banChatMember Telegram Bot API method.
@@ -1210,7 +1102,7 @@ type BanChatSenderChatParams struct {
 }
 
 // BanChatSenderChatOption configures BanChatSenderChatParams.
-type BanChatSenderChatOption func(params *BanChatSenderChatParams) BanChatSenderChatOption
+type BanChatSenderChatOption = Option[BanChatSenderChatParams]
 
 // Option applies one or more BanChatSenderChatOption values and returns the last rollback option.
 func (r *BanChatSenderChatParams) Option(opts ...BanChatSenderChatOption) (previous BanChatSenderChatOption) {
@@ -1224,24 +1116,18 @@ func (r *BanChatSenderChatParams) Option(opts ...BanChatSenderChatOption) (previ
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
 func WithBanChatSenderChatChatID(value string) BanChatSenderChatOption {
-	return func(params *BanChatSenderChatParams) BanChatSenderChatOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithBanChatSenderChatChatID(previous)
-	}
+	return fieldOption(value, func(params *BanChatSenderChatParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithBanChatSenderChatSenderChatID sets the SenderChatID field.
 //
 // Unique identifier of the target sender chat
 func WithBanChatSenderChatSenderChatID(value int64) BanChatSenderChatOption {
-	return func(params *BanChatSenderChatParams) BanChatSenderChatOption {
-		previous := params.SenderChatID
-		params.SenderChatID = value
-
-		return WithBanChatSenderChatSenderChatID(previous)
-	}
+	return fieldOption(value, func(params *BanChatSenderChatParams) *int64 {
+		return &params.SenderChatID
+	})
 }
 
 // BanChatSenderChat calls the banChatSenderChat Telegram Bot API method.
@@ -1284,7 +1170,7 @@ type CloseParams struct {
 }
 
 // CloseOption configures CloseParams.
-type CloseOption func(params *CloseParams) CloseOption
+type CloseOption = Option[CloseParams]
 
 // Option applies one or more CloseOption values and returns the last rollback option.
 func (r *CloseParams) Option(opts ...CloseOption) (previous CloseOption) {
@@ -1338,7 +1224,7 @@ type CloseForumTopicParams struct {
 }
 
 // CloseForumTopicOption configures CloseForumTopicParams.
-type CloseForumTopicOption func(params *CloseForumTopicParams) CloseForumTopicOption
+type CloseForumTopicOption = Option[CloseForumTopicParams]
 
 // Option applies one or more CloseForumTopicOption values and returns the last rollback option.
 func (r *CloseForumTopicParams) Option(opts ...CloseForumTopicOption) (previous CloseForumTopicOption) {
@@ -1352,24 +1238,18 @@ func (r *CloseForumTopicParams) Option(opts ...CloseForumTopicOption) (previous 
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithCloseForumTopicChatID(value string) CloseForumTopicOption {
-	return func(params *CloseForumTopicParams) CloseForumTopicOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithCloseForumTopicChatID(previous)
-	}
+	return fieldOption(value, func(params *CloseForumTopicParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithCloseForumTopicMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread of the forum topic
 func WithCloseForumTopicMessageThreadID(value int64) CloseForumTopicOption {
-	return func(params *CloseForumTopicParams) CloseForumTopicOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithCloseForumTopicMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *CloseForumTopicParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // CloseForumTopic calls the closeForumTopic Telegram Bot API method.
@@ -1411,7 +1291,7 @@ type CloseGeneralForumTopicParams struct {
 }
 
 // CloseGeneralForumTopicOption configures CloseGeneralForumTopicParams.
-type CloseGeneralForumTopicOption func(params *CloseGeneralForumTopicParams) CloseGeneralForumTopicOption
+type CloseGeneralForumTopicOption = Option[CloseGeneralForumTopicParams]
 
 // Option applies one or more CloseGeneralForumTopicOption values and returns the last rollback option.
 func (r *CloseGeneralForumTopicParams) Option(opts ...CloseGeneralForumTopicOption) (previous CloseGeneralForumTopicOption) {
@@ -1425,12 +1305,9 @@ func (r *CloseGeneralForumTopicParams) Option(opts ...CloseGeneralForumTopicOpti
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithCloseGeneralForumTopicChatID(value string) CloseGeneralForumTopicOption {
-	return func(params *CloseGeneralForumTopicParams) CloseGeneralForumTopicOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithCloseGeneralForumTopicChatID(previous)
-	}
+	return fieldOption(value, func(params *CloseGeneralForumTopicParams) *string {
+		return &params.ChatID
+	})
 }
 
 // CloseGeneralForumTopic calls the closeGeneralForumTopic Telegram Bot API method.
@@ -1475,7 +1352,7 @@ type ConvertGiftToStarsParams struct {
 }
 
 // ConvertGiftToStarsOption configures ConvertGiftToStarsParams.
-type ConvertGiftToStarsOption func(params *ConvertGiftToStarsParams) ConvertGiftToStarsOption
+type ConvertGiftToStarsOption = Option[ConvertGiftToStarsParams]
 
 // Option applies one or more ConvertGiftToStarsOption values and returns the last rollback option.
 func (r *ConvertGiftToStarsParams) Option(opts ...ConvertGiftToStarsOption) (previous ConvertGiftToStarsOption) {
@@ -1489,24 +1366,18 @@ func (r *ConvertGiftToStarsParams) Option(opts ...ConvertGiftToStarsOption) (pre
 //
 // Unique identifier of the business connection
 func WithConvertGiftToStarsBusinessConnectionID(value string) ConvertGiftToStarsOption {
-	return func(params *ConvertGiftToStarsParams) ConvertGiftToStarsOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithConvertGiftToStarsBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *ConvertGiftToStarsParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithConvertGiftToStarsOwnedGiftID sets the OwnedGiftID field.
 //
 // Unique identifier of the regular gift that should be converted to Telegram Stars
 func WithConvertGiftToStarsOwnedGiftID(value string) ConvertGiftToStarsOption {
-	return func(params *ConvertGiftToStarsParams) ConvertGiftToStarsOption {
-		previous := params.OwnedGiftID
-		params.OwnedGiftID = value
-
-		return WithConvertGiftToStarsOwnedGiftID(previous)
-	}
+	return fieldOption(value, func(params *ConvertGiftToStarsParams) *string {
+		return &params.OwnedGiftID
+	})
 }
 
 // ConvertGiftToStars calls the convertGiftToStars Telegram Bot API method.
@@ -1612,7 +1483,7 @@ type CopyMessageParams struct {
 }
 
 // CopyMessageOption configures CopyMessageParams.
-type CopyMessageOption func(params *CopyMessageParams) CopyMessageOption
+type CopyMessageOption = Option[CopyMessageParams]
 
 // Option applies one or more CopyMessageOption values and returns the last rollback option.
 func (r *CopyMessageParams) Option(opts ...CopyMessageOption) (previous CopyMessageOption) {
@@ -1626,72 +1497,54 @@ func (r *CopyMessageParams) Option(opts ...CopyMessageOption) (previous CopyMess
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithCopyMessageChatID(value string) CopyMessageOption {
-	return func(params *CopyMessageParams) CopyMessageOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithCopyMessageChatID(previous)
-	}
+	return fieldOption(value, func(params *CopyMessageParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithCopyMessageMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithCopyMessageMessageThreadID(value int64) CopyMessageOption {
-	return func(params *CopyMessageParams) CopyMessageOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithCopyMessageMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *CopyMessageParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithCopyMessageDirectMessagesTopicID sets the DirectMessagesTopicID field.
 //
 // Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 func WithCopyMessageDirectMessagesTopicID(value int64) CopyMessageOption {
-	return func(params *CopyMessageParams) CopyMessageOption {
-		previous := params.DirectMessagesTopicID
-		params.DirectMessagesTopicID = value
-
-		return WithCopyMessageDirectMessagesTopicID(previous)
-	}
+	return fieldOption(value, func(params *CopyMessageParams) *int64 {
+		return &params.DirectMessagesTopicID
+	})
 }
 
 // WithCopyMessageFromChatID sets the FromChatID field.
 //
 // Unique identifier for the chat where the original message was sent (or username of the target bot, supergroup or channel in the format @username)
 func WithCopyMessageFromChatID(value string) CopyMessageOption {
-	return func(params *CopyMessageParams) CopyMessageOption {
-		previous := params.FromChatID
-		params.FromChatID = value
-
-		return WithCopyMessageFromChatID(previous)
-	}
+	return fieldOption(value, func(params *CopyMessageParams) *string {
+		return &params.FromChatID
+	})
 }
 
 // WithCopyMessageMessageID sets the MessageID field.
 //
 // Message identifier in the chat specified in from_chat_id
 func WithCopyMessageMessageID(value int64) CopyMessageOption {
-	return func(params *CopyMessageParams) CopyMessageOption {
-		previous := params.MessageID
-		params.MessageID = value
-
-		return WithCopyMessageMessageID(previous)
-	}
+	return fieldOption(value, func(params *CopyMessageParams) *int64 {
+		return &params.MessageID
+	})
 }
 
 // WithCopyMessageVideoStartTimestamp sets the VideoStartTimestamp field.
 //
 // New start timestamp for the copied video in the message
 func WithCopyMessageVideoStartTimestamp(value int64) CopyMessageOption {
-	return func(params *CopyMessageParams) CopyMessageOption {
-		previous := params.VideoStartTimestamp
-		params.VideoStartTimestamp = value
-
-		return WithCopyMessageVideoStartTimestamp(previous)
-	}
+	return fieldOption(value, func(params *CopyMessageParams) *int64 {
+		return &params.VideoStartTimestamp
+	})
 }
 
 // WithCopyMessageCaption sets the Caption field.
@@ -1699,12 +1552,9 @@ func WithCopyMessageVideoStartTimestamp(value int64) CopyMessageOption {
 // New caption for media, 0-1024 characters after entities parsing.
 // If not specified, the original caption is kept.
 func WithCopyMessageCaption(value string) CopyMessageOption {
-	return func(params *CopyMessageParams) CopyMessageOption {
-		previous := params.Caption
-		params.Caption = value
-
-		return WithCopyMessageCaption(previous)
-	}
+	return fieldOption(value, func(params *CopyMessageParams) *string {
+		return &params.Caption
+	})
 }
 
 // WithCopyMessageParseMode sets the ParseMode field.
@@ -1714,24 +1564,18 @@ func WithCopyMessageCaption(value string) CopyMessageOption {
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithCopyMessageParseMode(value string) CopyMessageOption {
-	return func(params *CopyMessageParams) CopyMessageOption {
-		previous := params.ParseMode
-		params.ParseMode = value
-
-		return WithCopyMessageParseMode(previous)
-	}
+	return fieldOption(value, func(params *CopyMessageParams) *string {
+		return &params.ParseMode
+	})
 }
 
 // WithCopyMessageCaptionEntities sets the CaptionEntities field.
 //
 // A JSON-serialized list of special entities that appear in the new caption, which can be specified instead of parse_mode
 func WithCopyMessageCaptionEntities(value []MessageEntity) CopyMessageOption {
-	return func(params *CopyMessageParams) CopyMessageOption {
-		previous := params.CaptionEntities
-		params.CaptionEntities = value
-
-		return WithCopyMessageCaptionEntities(previous)
-	}
+	return fieldOption(value, func(params *CopyMessageParams) *[]MessageEntity {
+		return &params.CaptionEntities
+	})
 }
 
 // WithCopyMessageShowCaptionAboveMedia sets the ShowCaptionAboveMedia field.
@@ -1739,12 +1583,9 @@ func WithCopyMessageCaptionEntities(value []MessageEntity) CopyMessageOption {
 // Pass True if the caption must be shown above the message media.
 // Ignored if a new caption isn't specified.
 func WithCopyMessageShowCaptionAboveMedia(value bool) CopyMessageOption {
-	return func(params *CopyMessageParams) CopyMessageOption {
-		previous := params.ShowCaptionAboveMedia
-		params.ShowCaptionAboveMedia = value
-
-		return WithCopyMessageShowCaptionAboveMedia(previous)
-	}
+	return fieldOption(value, func(params *CopyMessageParams) *bool {
+		return &params.ShowCaptionAboveMedia
+	})
 }
 
 // WithCopyMessageDisableNotification sets the DisableNotification field.
@@ -1754,24 +1595,18 @@ func WithCopyMessageShowCaptionAboveMedia(value bool) CopyMessageOption {
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithCopyMessageDisableNotification(value bool) CopyMessageOption {
-	return func(params *CopyMessageParams) CopyMessageOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithCopyMessageDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *CopyMessageParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithCopyMessageProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the sent message from forwarding and saving
 func WithCopyMessageProtectContent(value bool) CopyMessageOption {
-	return func(params *CopyMessageParams) CopyMessageOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithCopyMessageProtectContent(previous)
-	}
+	return fieldOption(value, func(params *CopyMessageParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithCopyMessageAllowPaidBroadcast sets the AllowPaidBroadcast field.
@@ -1781,24 +1616,18 @@ func WithCopyMessageProtectContent(value bool) CopyMessageOption {
 //
 // [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
 func WithCopyMessageAllowPaidBroadcast(value bool) CopyMessageOption {
-	return func(params *CopyMessageParams) CopyMessageOption {
-		previous := params.AllowPaidBroadcast
-		params.AllowPaidBroadcast = value
-
-		return WithCopyMessageAllowPaidBroadcast(previous)
-	}
+	return fieldOption(value, func(params *CopyMessageParams) *bool {
+		return &params.AllowPaidBroadcast
+	})
 }
 
 // WithCopyMessageMessageEffectID sets the MessageEffectID field.
 //
 // Unique identifier of the message effect to be added to the message; only available when copying to private chats
 func WithCopyMessageMessageEffectID(value string) CopyMessageOption {
-	return func(params *CopyMessageParams) CopyMessageOption {
-		previous := params.MessageEffectID
-		params.MessageEffectID = value
-
-		return WithCopyMessageMessageEffectID(previous)
-	}
+	return fieldOption(value, func(params *CopyMessageParams) *string {
+		return &params.MessageEffectID
+	})
 }
 
 // WithCopyMessageSuggestedPostParameters sets the SuggestedPostParameters field.
@@ -1806,24 +1635,18 @@ func WithCopyMessageMessageEffectID(value string) CopyMessageOption {
 // A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only.
 // If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
 func WithCopyMessageSuggestedPostParameters(value *SuggestedPostParameters) CopyMessageOption {
-	return func(params *CopyMessageParams) CopyMessageOption {
-		previous := params.SuggestedPostParameters
-		params.SuggestedPostParameters = value
-
-		return WithCopyMessageSuggestedPostParameters(previous)
-	}
+	return fieldOption(value, func(params *CopyMessageParams) **SuggestedPostParameters {
+		return &params.SuggestedPostParameters
+	})
 }
 
 // WithCopyMessageReplyParameters sets the ReplyParameters field.
 //
 // Description of the message to reply to
 func WithCopyMessageReplyParameters(value *ReplyParameters) CopyMessageOption {
-	return func(params *CopyMessageParams) CopyMessageOption {
-		previous := params.ReplyParameters
-		params.ReplyParameters = value
-
-		return WithCopyMessageReplyParameters(previous)
-	}
+	return fieldOption(value, func(params *CopyMessageParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
 }
 
 // WithCopyMessageReplyMarkup sets the ReplyMarkup field.
@@ -1834,12 +1657,9 @@ func WithCopyMessageReplyParameters(value *ReplyParameters) CopyMessageOption {
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 // [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
 func WithCopyMessageReplyMarkup(value *ReplyMarkup) CopyMessageOption {
-	return func(params *CopyMessageParams) CopyMessageOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithCopyMessageReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *CopyMessageParams) **ReplyMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // CopyMessage calls the copyMessage Telegram Bot API method.
@@ -1913,7 +1733,7 @@ type CopyMessagesParams struct {
 }
 
 // CopyMessagesOption configures CopyMessagesParams.
-type CopyMessagesOption func(params *CopyMessagesParams) CopyMessagesOption
+type CopyMessagesOption = Option[CopyMessagesParams]
 
 // Option applies one or more CopyMessagesOption values and returns the last rollback option.
 func (r *CopyMessagesParams) Option(opts ...CopyMessagesOption) (previous CopyMessagesOption) {
@@ -1927,48 +1747,36 @@ func (r *CopyMessagesParams) Option(opts ...CopyMessagesOption) (previous CopyMe
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithCopyMessagesChatID(value string) CopyMessagesOption {
-	return func(params *CopyMessagesParams) CopyMessagesOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithCopyMessagesChatID(previous)
-	}
+	return fieldOption(value, func(params *CopyMessagesParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithCopyMessagesMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithCopyMessagesMessageThreadID(value int64) CopyMessagesOption {
-	return func(params *CopyMessagesParams) CopyMessagesOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithCopyMessagesMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *CopyMessagesParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithCopyMessagesDirectMessagesTopicID sets the DirectMessagesTopicID field.
 //
 // Identifier of the direct messages topic to which the messages will be sent; required if the messages are sent to a direct messages chat
 func WithCopyMessagesDirectMessagesTopicID(value int64) CopyMessagesOption {
-	return func(params *CopyMessagesParams) CopyMessagesOption {
-		previous := params.DirectMessagesTopicID
-		params.DirectMessagesTopicID = value
-
-		return WithCopyMessagesDirectMessagesTopicID(previous)
-	}
+	return fieldOption(value, func(params *CopyMessagesParams) *int64 {
+		return &params.DirectMessagesTopicID
+	})
 }
 
 // WithCopyMessagesFromChatID sets the FromChatID field.
 //
 // Unique identifier for the chat where the original messages were sent (or username of the target bot, supergroup or channel in the format @username)
 func WithCopyMessagesFromChatID(value string) CopyMessagesOption {
-	return func(params *CopyMessagesParams) CopyMessagesOption {
-		previous := params.FromChatID
-		params.FromChatID = value
-
-		return WithCopyMessagesFromChatID(previous)
-	}
+	return fieldOption(value, func(params *CopyMessagesParams) *string {
+		return &params.FromChatID
+	})
 }
 
 // WithCopyMessagesMessageIDs sets the MessageIDs field.
@@ -1976,12 +1784,9 @@ func WithCopyMessagesFromChatID(value string) CopyMessagesOption {
 // A JSON-serialized list of 1-100 identifiers of messages in the chat from_chat_id to copy.
 // The identifiers must be specified in a strictly increasing order.
 func WithCopyMessagesMessageIDs(value []int64) CopyMessagesOption {
-	return func(params *CopyMessagesParams) CopyMessagesOption {
-		previous := params.MessageIDs
-		params.MessageIDs = value
-
-		return WithCopyMessagesMessageIDs(previous)
-	}
+	return fieldOption(value, func(params *CopyMessagesParams) *[]int64 {
+		return &params.MessageIDs
+	})
 }
 
 // WithCopyMessagesDisableNotification sets the DisableNotification field.
@@ -1991,36 +1796,27 @@ func WithCopyMessagesMessageIDs(value []int64) CopyMessagesOption {
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithCopyMessagesDisableNotification(value bool) CopyMessagesOption {
-	return func(params *CopyMessagesParams) CopyMessagesOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithCopyMessagesDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *CopyMessagesParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithCopyMessagesProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the sent messages from forwarding and saving
 func WithCopyMessagesProtectContent(value bool) CopyMessagesOption {
-	return func(params *CopyMessagesParams) CopyMessagesOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithCopyMessagesProtectContent(previous)
-	}
+	return fieldOption(value, func(params *CopyMessagesParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithCopyMessagesRemoveCaption sets the RemoveCaption field.
 //
 // Pass True to copy the messages without their captions
 func WithCopyMessagesRemoveCaption(value bool) CopyMessagesOption {
-	return func(params *CopyMessagesParams) CopyMessagesOption {
-		previous := params.RemoveCaption
-		params.RemoveCaption = value
-
-		return WithCopyMessagesRemoveCaption(previous)
-	}
+	return fieldOption(value, func(params *CopyMessagesParams) *bool {
+		return &params.RemoveCaption
+	})
 }
 
 // CopyMessages calls the copyMessages Telegram Bot API method.
@@ -2084,7 +1880,7 @@ type CreateChatInviteLinkParams struct {
 }
 
 // CreateChatInviteLinkOption configures CreateChatInviteLinkParams.
-type CreateChatInviteLinkOption func(params *CreateChatInviteLinkParams) CreateChatInviteLinkOption
+type CreateChatInviteLinkOption = Option[CreateChatInviteLinkParams]
 
 // Option applies one or more CreateChatInviteLinkOption values and returns the last rollback option.
 func (r *CreateChatInviteLinkParams) Option(opts ...CreateChatInviteLinkOption) (previous CreateChatInviteLinkOption) {
@@ -2098,48 +1894,36 @@ func (r *CreateChatInviteLinkParams) Option(opts ...CreateChatInviteLinkOption) 
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
 func WithCreateChatInviteLinkChatID(value string) CreateChatInviteLinkOption {
-	return func(params *CreateChatInviteLinkParams) CreateChatInviteLinkOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithCreateChatInviteLinkChatID(previous)
-	}
+	return fieldOption(value, func(params *CreateChatInviteLinkParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithCreateChatInviteLinkName sets the Name field.
 //
 // Invite link name; 0-32 characters
 func WithCreateChatInviteLinkName(value string) CreateChatInviteLinkOption {
-	return func(params *CreateChatInviteLinkParams) CreateChatInviteLinkOption {
-		previous := params.Name
-		params.Name = value
-
-		return WithCreateChatInviteLinkName(previous)
-	}
+	return fieldOption(value, func(params *CreateChatInviteLinkParams) *string {
+		return &params.Name
+	})
 }
 
 // WithCreateChatInviteLinkExpireDate sets the ExpireDate field.
 //
 // Point in time (Unix timestamp) when the link will expire
 func WithCreateChatInviteLinkExpireDate(value int64) CreateChatInviteLinkOption {
-	return func(params *CreateChatInviteLinkParams) CreateChatInviteLinkOption {
-		previous := params.ExpireDate
-		params.ExpireDate = value
-
-		return WithCreateChatInviteLinkExpireDate(previous)
-	}
+	return fieldOption(value, func(params *CreateChatInviteLinkParams) *int64 {
+		return &params.ExpireDate
+	})
 }
 
 // WithCreateChatInviteLinkMemberLimit sets the MemberLimit field.
 //
 // The maximum number of users that can be members of the chat simultaneously after joining the chat via this invite link; 1-99999
 func WithCreateChatInviteLinkMemberLimit(value int64) CreateChatInviteLinkOption {
-	return func(params *CreateChatInviteLinkParams) CreateChatInviteLinkOption {
-		previous := params.MemberLimit
-		params.MemberLimit = value
-
-		return WithCreateChatInviteLinkMemberLimit(previous)
-	}
+	return fieldOption(value, func(params *CreateChatInviteLinkParams) *int64 {
+		return &params.MemberLimit
+	})
 }
 
 // WithCreateChatInviteLinkCreatesJoinRequest sets the CreatesJoinRequest field.
@@ -2147,12 +1931,9 @@ func WithCreateChatInviteLinkMemberLimit(value int64) CreateChatInviteLinkOption
 // True, if users joining the chat via the link need to be approved by chat administrators.
 // If True, member_limit can't be specified.
 func WithCreateChatInviteLinkCreatesJoinRequest(value bool) CreateChatInviteLinkOption {
-	return func(params *CreateChatInviteLinkParams) CreateChatInviteLinkOption {
-		previous := params.CreatesJoinRequest
-		params.CreatesJoinRequest = value
-
-		return WithCreateChatInviteLinkCreatesJoinRequest(previous)
-	}
+	return fieldOption(value, func(params *CreateChatInviteLinkParams) *bool {
+		return &params.CreatesJoinRequest
+	})
 }
 
 // CreateChatInviteLink calls the createChatInviteLink Telegram Bot API method.
@@ -2209,7 +1990,7 @@ type CreateChatSubscriptionInviteLinkParams struct {
 }
 
 // CreateChatSubscriptionInviteLinkOption configures CreateChatSubscriptionInviteLinkParams.
-type CreateChatSubscriptionInviteLinkOption func(params *CreateChatSubscriptionInviteLinkParams) CreateChatSubscriptionInviteLinkOption
+type CreateChatSubscriptionInviteLinkOption = Option[CreateChatSubscriptionInviteLinkParams]
 
 // Option applies one or more CreateChatSubscriptionInviteLinkOption values and returns the last rollback option.
 func (r *CreateChatSubscriptionInviteLinkParams) Option(opts ...CreateChatSubscriptionInviteLinkOption) (previous CreateChatSubscriptionInviteLinkOption) {
@@ -2223,24 +2004,18 @@ func (r *CreateChatSubscriptionInviteLinkParams) Option(opts ...CreateChatSubscr
 //
 // Unique identifier for the target channel chat or username of the target channel in the format @username
 func WithCreateChatSubscriptionInviteLinkChatID(value string) CreateChatSubscriptionInviteLinkOption {
-	return func(params *CreateChatSubscriptionInviteLinkParams) CreateChatSubscriptionInviteLinkOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithCreateChatSubscriptionInviteLinkChatID(previous)
-	}
+	return fieldOption(value, func(params *CreateChatSubscriptionInviteLinkParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithCreateChatSubscriptionInviteLinkName sets the Name field.
 //
 // Invite link name; 0-32 characters
 func WithCreateChatSubscriptionInviteLinkName(value string) CreateChatSubscriptionInviteLinkOption {
-	return func(params *CreateChatSubscriptionInviteLinkParams) CreateChatSubscriptionInviteLinkOption {
-		previous := params.Name
-		params.Name = value
-
-		return WithCreateChatSubscriptionInviteLinkName(previous)
-	}
+	return fieldOption(value, func(params *CreateChatSubscriptionInviteLinkParams) *string {
+		return &params.Name
+	})
 }
 
 // WithCreateChatSubscriptionInviteLinkSubscriptionPeriod sets the SubscriptionPeriod field.
@@ -2248,24 +2023,18 @@ func WithCreateChatSubscriptionInviteLinkName(value string) CreateChatSubscripti
 // The number of seconds the subscription will be active for before the next payment.
 // Currently, it must always be 2592000 (30 days).
 func WithCreateChatSubscriptionInviteLinkSubscriptionPeriod(value int64) CreateChatSubscriptionInviteLinkOption {
-	return func(params *CreateChatSubscriptionInviteLinkParams) CreateChatSubscriptionInviteLinkOption {
-		previous := params.SubscriptionPeriod
-		params.SubscriptionPeriod = value
-
-		return WithCreateChatSubscriptionInviteLinkSubscriptionPeriod(previous)
-	}
+	return fieldOption(value, func(params *CreateChatSubscriptionInviteLinkParams) *int64 {
+		return &params.SubscriptionPeriod
+	})
 }
 
 // WithCreateChatSubscriptionInviteLinkSubscriptionPrice sets the SubscriptionPrice field.
 //
 // The amount of Telegram Stars a user must pay initially and after each subsequent subscription period to be a member of the chat; 1-10000
 func WithCreateChatSubscriptionInviteLinkSubscriptionPrice(value int64) CreateChatSubscriptionInviteLinkOption {
-	return func(params *CreateChatSubscriptionInviteLinkParams) CreateChatSubscriptionInviteLinkOption {
-		previous := params.SubscriptionPrice
-		params.SubscriptionPrice = value
-
-		return WithCreateChatSubscriptionInviteLinkSubscriptionPrice(previous)
-	}
+	return fieldOption(value, func(params *CreateChatSubscriptionInviteLinkParams) *int64 {
+		return &params.SubscriptionPrice
+	})
 }
 
 // CreateChatSubscriptionInviteLink calls the createChatSubscriptionInviteLink Telegram Bot API method.
@@ -2327,7 +2096,7 @@ type CreateForumTopicParams struct {
 }
 
 // CreateForumTopicOption configures CreateForumTopicParams.
-type CreateForumTopicOption func(params *CreateForumTopicParams) CreateForumTopicOption
+type CreateForumTopicOption = Option[CreateForumTopicParams]
 
 // Option applies one or more CreateForumTopicOption values and returns the last rollback option.
 func (r *CreateForumTopicParams) Option(opts ...CreateForumTopicOption) (previous CreateForumTopicOption) {
@@ -2341,24 +2110,18 @@ func (r *CreateForumTopicParams) Option(opts ...CreateForumTopicOption) (previou
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithCreateForumTopicChatID(value string) CreateForumTopicOption {
-	return func(params *CreateForumTopicParams) CreateForumTopicOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithCreateForumTopicChatID(previous)
-	}
+	return fieldOption(value, func(params *CreateForumTopicParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithCreateForumTopicName sets the Name field.
 //
 // Topic name, 1-128 characters
 func WithCreateForumTopicName(value string) CreateForumTopicOption {
-	return func(params *CreateForumTopicParams) CreateForumTopicOption {
-		previous := params.Name
-		params.Name = value
-
-		return WithCreateForumTopicName(previous)
-	}
+	return fieldOption(value, func(params *CreateForumTopicParams) *string {
+		return &params.Name
+	})
 }
 
 // WithCreateForumTopicIconColor sets the IconColor field.
@@ -2366,12 +2129,9 @@ func WithCreateForumTopicName(value string) CreateForumTopicOption {
 // Color of the topic icon in RGB format.
 // Currently, must be one of 7322096 (0x6FB9F0), 16766590 (0xFFD67E), 13338331 (0xCB86DB), 9367192 (0x8EEE98), 16749490 (0xFF93B2), or 16478047 (0xFB6F5F).
 func WithCreateForumTopicIconColor(value int64) CreateForumTopicOption {
-	return func(params *CreateForumTopicParams) CreateForumTopicOption {
-		previous := params.IconColor
-		params.IconColor = value
-
-		return WithCreateForumTopicIconColor(previous)
-	}
+	return fieldOption(value, func(params *CreateForumTopicParams) *int64 {
+		return &params.IconColor
+	})
 }
 
 // WithCreateForumTopicIconCustomEmojiID sets the IconCustomEmojiID field.
@@ -2381,12 +2141,9 @@ func WithCreateForumTopicIconColor(value int64) CreateForumTopicOption {
 //
 // [getForumTopicIconStickers]: https://core.telegram.org/bots/api#getforumtopiciconstickers
 func WithCreateForumTopicIconCustomEmojiID(value string) CreateForumTopicOption {
-	return func(params *CreateForumTopicParams) CreateForumTopicOption {
-		previous := params.IconCustomEmojiID
-		params.IconCustomEmojiID = value
-
-		return WithCreateForumTopicIconCustomEmojiID(previous)
-	}
+	return fieldOption(value, func(params *CreateForumTopicParams) *string {
+		return &params.IconCustomEmojiID
+	})
 }
 
 // CreateForumTopic calls the createForumTopic Telegram Bot API method.
@@ -2546,7 +2303,7 @@ type CreateInvoiceLinkParams struct {
 }
 
 // CreateInvoiceLinkOption configures CreateInvoiceLinkParams.
-type CreateInvoiceLinkOption func(params *CreateInvoiceLinkParams) CreateInvoiceLinkOption
+type CreateInvoiceLinkOption = Option[CreateInvoiceLinkParams]
 
 // Option applies one or more CreateInvoiceLinkOption values and returns the last rollback option.
 func (r *CreateInvoiceLinkParams) Option(opts ...CreateInvoiceLinkOption) (previous CreateInvoiceLinkOption) {
@@ -2563,36 +2320,27 @@ func (r *CreateInvoiceLinkParams) Option(opts ...CreateInvoiceLinkOption) (previ
 //
 // [Telegram Stars]: https://t.me/BotNews/90
 func WithCreateInvoiceLinkBusinessConnectionID(value string) CreateInvoiceLinkOption {
-	return func(params *CreateInvoiceLinkParams) CreateInvoiceLinkOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithCreateInvoiceLinkBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *CreateInvoiceLinkParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithCreateInvoiceLinkTitle sets the Title field.
 //
 // Product name, 1-32 characters
 func WithCreateInvoiceLinkTitle(value string) CreateInvoiceLinkOption {
-	return func(params *CreateInvoiceLinkParams) CreateInvoiceLinkOption {
-		previous := params.Title
-		params.Title = value
-
-		return WithCreateInvoiceLinkTitle(previous)
-	}
+	return fieldOption(value, func(params *CreateInvoiceLinkParams) *string {
+		return &params.Title
+	})
 }
 
 // WithCreateInvoiceLinkDescription sets the Description field.
 //
 // Product description, 1-255 characters
 func WithCreateInvoiceLinkDescription(value string) CreateInvoiceLinkOption {
-	return func(params *CreateInvoiceLinkParams) CreateInvoiceLinkOption {
-		previous := params.Description
-		params.Description = value
-
-		return WithCreateInvoiceLinkDescription(previous)
-	}
+	return fieldOption(value, func(params *CreateInvoiceLinkParams) *string {
+		return &params.Description
+	})
 }
 
 // WithCreateInvoiceLinkPayload sets the Payload field.
@@ -2600,12 +2348,9 @@ func WithCreateInvoiceLinkDescription(value string) CreateInvoiceLinkOption {
 // Bot-defined invoice payload, 1-128 bytes.
 // This will not be displayed to the user, use it for your internal processes.
 func WithCreateInvoiceLinkPayload(value string) CreateInvoiceLinkOption {
-	return func(params *CreateInvoiceLinkParams) CreateInvoiceLinkOption {
-		previous := params.Payload
-		params.Payload = value
-
-		return WithCreateInvoiceLinkPayload(previous)
-	}
+	return fieldOption(value, func(params *CreateInvoiceLinkParams) *string {
+		return &params.Payload
+	})
 }
 
 // WithCreateInvoiceLinkProviderToken sets the ProviderToken field.
@@ -2616,12 +2361,9 @@ func WithCreateInvoiceLinkPayload(value string) CreateInvoiceLinkOption {
 // [@BotFather]: https://t.me/botfather
 // [Telegram Stars]: https://t.me/BotNews/90
 func WithCreateInvoiceLinkProviderToken(value string) CreateInvoiceLinkOption {
-	return func(params *CreateInvoiceLinkParams) CreateInvoiceLinkOption {
-		previous := params.ProviderToken
-		params.ProviderToken = value
-
-		return WithCreateInvoiceLinkProviderToken(previous)
-	}
+	return fieldOption(value, func(params *CreateInvoiceLinkParams) *string {
+		return &params.ProviderToken
+	})
 }
 
 // WithCreateInvoiceLinkCurrency sets the Currency field.
@@ -2632,12 +2374,9 @@ func WithCreateInvoiceLinkProviderToken(value string) CreateInvoiceLinkOption {
 // [more on currencies]: https://core.telegram.org/bots/payments#supported-currencies
 // [Telegram Stars]: https://t.me/BotNews/90
 func WithCreateInvoiceLinkCurrency(value string) CreateInvoiceLinkOption {
-	return func(params *CreateInvoiceLinkParams) CreateInvoiceLinkOption {
-		previous := params.Currency
-		params.Currency = value
-
-		return WithCreateInvoiceLinkCurrency(previous)
-	}
+	return fieldOption(value, func(params *CreateInvoiceLinkParams) *string {
+		return &params.Currency
+	})
 }
 
 // WithCreateInvoiceLinkPrices sets the Prices field.
@@ -2648,12 +2387,9 @@ func WithCreateInvoiceLinkCurrency(value string) CreateInvoiceLinkOption {
 //
 // [Telegram Stars]: https://t.me/BotNews/90
 func WithCreateInvoiceLinkPrices(value []LabeledPrice) CreateInvoiceLinkOption {
-	return func(params *CreateInvoiceLinkParams) CreateInvoiceLinkOption {
-		previous := params.Prices
-		params.Prices = value
-
-		return WithCreateInvoiceLinkPrices(previous)
-	}
+	return fieldOption(value, func(params *CreateInvoiceLinkParams) *[]LabeledPrice {
+		return &params.Prices
+	})
 }
 
 // WithCreateInvoiceLinkSubscriptionPeriod sets the SubscriptionPeriod field.
@@ -2664,12 +2400,9 @@ func WithCreateInvoiceLinkPrices(value []LabeledPrice) CreateInvoiceLinkOption {
 // Any number of subscriptions can be active for a given bot at the same time, including multiple concurrent subscriptions from the same user.
 // Subscription price must no exceed 10000 Telegram Stars.
 func WithCreateInvoiceLinkSubscriptionPeriod(value int64) CreateInvoiceLinkOption {
-	return func(params *CreateInvoiceLinkParams) CreateInvoiceLinkOption {
-		previous := params.SubscriptionPeriod
-		params.SubscriptionPeriod = value
-
-		return WithCreateInvoiceLinkSubscriptionPeriod(previous)
-	}
+	return fieldOption(value, func(params *CreateInvoiceLinkParams) *int64 {
+		return &params.SubscriptionPeriod
+	})
 }
 
 // WithCreateInvoiceLinkMaxTipAmount sets the MaxTipAmount field.
@@ -2683,12 +2416,9 @@ func WithCreateInvoiceLinkSubscriptionPeriod(value int64) CreateInvoiceLinkOptio
 // [currencies.json]: https://core.telegram.org/bots/payments/currencies.json
 // [Telegram Stars]: https://t.me/BotNews/90
 func WithCreateInvoiceLinkMaxTipAmount(value int64) CreateInvoiceLinkOption {
-	return func(params *CreateInvoiceLinkParams) CreateInvoiceLinkOption {
-		previous := params.MaxTipAmount
-		params.MaxTipAmount = value
-
-		return WithCreateInvoiceLinkMaxTipAmount(previous)
-	}
+	return fieldOption(value, func(params *CreateInvoiceLinkParams) *int64 {
+		return &params.MaxTipAmount
+	})
 }
 
 // WithCreateInvoiceLinkSuggestedTipAmounts sets the SuggestedTipAmounts field.
@@ -2697,12 +2427,9 @@ func WithCreateInvoiceLinkMaxTipAmount(value int64) CreateInvoiceLinkOption {
 // At most 4 suggested tip amounts can be specified.
 // The suggested tip amounts must be positive, passed in a strictly increased order and must not exceed max_tip_amount.
 func WithCreateInvoiceLinkSuggestedTipAmounts(value []int64) CreateInvoiceLinkOption {
-	return func(params *CreateInvoiceLinkParams) CreateInvoiceLinkOption {
-		previous := params.SuggestedTipAmounts
-		params.SuggestedTipAmounts = value
-
-		return WithCreateInvoiceLinkSuggestedTipAmounts(previous)
-	}
+	return fieldOption(value, func(params *CreateInvoiceLinkParams) *[]int64 {
+		return &params.SuggestedTipAmounts
+	})
 }
 
 // WithCreateInvoiceLinkProviderData sets the ProviderData field.
@@ -2710,12 +2437,9 @@ func WithCreateInvoiceLinkSuggestedTipAmounts(value []int64) CreateInvoiceLinkOp
 // JSON-serialized data about the invoice, which will be shared with the payment provider.
 // A detailed description of required fields should be provided by the payment provider.
 func WithCreateInvoiceLinkProviderData(value string) CreateInvoiceLinkOption {
-	return func(params *CreateInvoiceLinkParams) CreateInvoiceLinkOption {
-		previous := params.ProviderData
-		params.ProviderData = value
-
-		return WithCreateInvoiceLinkProviderData(previous)
-	}
+	return fieldOption(value, func(params *CreateInvoiceLinkParams) *string {
+		return &params.ProviderData
+	})
 }
 
 // WithCreateInvoiceLinkPhotoUrl sets the PhotoUrl field.
@@ -2723,48 +2447,36 @@ func WithCreateInvoiceLinkProviderData(value string) CreateInvoiceLinkOption {
 // URL of the product photo for the invoice.
 // Can be a photo of the goods or a marketing image for a service.
 func WithCreateInvoiceLinkPhotoUrl(value string) CreateInvoiceLinkOption {
-	return func(params *CreateInvoiceLinkParams) CreateInvoiceLinkOption {
-		previous := params.PhotoUrl
-		params.PhotoUrl = value
-
-		return WithCreateInvoiceLinkPhotoUrl(previous)
-	}
+	return fieldOption(value, func(params *CreateInvoiceLinkParams) *string {
+		return &params.PhotoUrl
+	})
 }
 
 // WithCreateInvoiceLinkPhotoSize sets the PhotoSize field.
 //
 // Photo size in bytes
 func WithCreateInvoiceLinkPhotoSize(value int64) CreateInvoiceLinkOption {
-	return func(params *CreateInvoiceLinkParams) CreateInvoiceLinkOption {
-		previous := params.PhotoSize
-		params.PhotoSize = value
-
-		return WithCreateInvoiceLinkPhotoSize(previous)
-	}
+	return fieldOption(value, func(params *CreateInvoiceLinkParams) *int64 {
+		return &params.PhotoSize
+	})
 }
 
 // WithCreateInvoiceLinkPhotoWidth sets the PhotoWidth field.
 //
 // Photo width
 func WithCreateInvoiceLinkPhotoWidth(value int64) CreateInvoiceLinkOption {
-	return func(params *CreateInvoiceLinkParams) CreateInvoiceLinkOption {
-		previous := params.PhotoWidth
-		params.PhotoWidth = value
-
-		return WithCreateInvoiceLinkPhotoWidth(previous)
-	}
+	return fieldOption(value, func(params *CreateInvoiceLinkParams) *int64 {
+		return &params.PhotoWidth
+	})
 }
 
 // WithCreateInvoiceLinkPhotoHeight sets the PhotoHeight field.
 //
 // Photo height
 func WithCreateInvoiceLinkPhotoHeight(value int64) CreateInvoiceLinkOption {
-	return func(params *CreateInvoiceLinkParams) CreateInvoiceLinkOption {
-		previous := params.PhotoHeight
-		params.PhotoHeight = value
-
-		return WithCreateInvoiceLinkPhotoHeight(previous)
-	}
+	return fieldOption(value, func(params *CreateInvoiceLinkParams) *int64 {
+		return &params.PhotoHeight
+	})
 }
 
 // WithCreateInvoiceLinkNeedName sets the NeedName field.
@@ -2774,12 +2486,9 @@ func WithCreateInvoiceLinkPhotoHeight(value int64) CreateInvoiceLinkOption {
 //
 // [Telegram Stars]: https://t.me/BotNews/90
 func WithCreateInvoiceLinkNeedName(value bool) CreateInvoiceLinkOption {
-	return func(params *CreateInvoiceLinkParams) CreateInvoiceLinkOption {
-		previous := params.NeedName
-		params.NeedName = value
-
-		return WithCreateInvoiceLinkNeedName(previous)
-	}
+	return fieldOption(value, func(params *CreateInvoiceLinkParams) *bool {
+		return &params.NeedName
+	})
 }
 
 // WithCreateInvoiceLinkNeedPhoneNumber sets the NeedPhoneNumber field.
@@ -2789,12 +2498,9 @@ func WithCreateInvoiceLinkNeedName(value bool) CreateInvoiceLinkOption {
 //
 // [Telegram Stars]: https://t.me/BotNews/90
 func WithCreateInvoiceLinkNeedPhoneNumber(value bool) CreateInvoiceLinkOption {
-	return func(params *CreateInvoiceLinkParams) CreateInvoiceLinkOption {
-		previous := params.NeedPhoneNumber
-		params.NeedPhoneNumber = value
-
-		return WithCreateInvoiceLinkNeedPhoneNumber(previous)
-	}
+	return fieldOption(value, func(params *CreateInvoiceLinkParams) *bool {
+		return &params.NeedPhoneNumber
+	})
 }
 
 // WithCreateInvoiceLinkNeedEmail sets the NeedEmail field.
@@ -2804,12 +2510,9 @@ func WithCreateInvoiceLinkNeedPhoneNumber(value bool) CreateInvoiceLinkOption {
 //
 // [Telegram Stars]: https://t.me/BotNews/90
 func WithCreateInvoiceLinkNeedEmail(value bool) CreateInvoiceLinkOption {
-	return func(params *CreateInvoiceLinkParams) CreateInvoiceLinkOption {
-		previous := params.NeedEmail
-		params.NeedEmail = value
-
-		return WithCreateInvoiceLinkNeedEmail(previous)
-	}
+	return fieldOption(value, func(params *CreateInvoiceLinkParams) *bool {
+		return &params.NeedEmail
+	})
 }
 
 // WithCreateInvoiceLinkNeedShippingAddress sets the NeedShippingAddress field.
@@ -2819,12 +2522,9 @@ func WithCreateInvoiceLinkNeedEmail(value bool) CreateInvoiceLinkOption {
 //
 // [Telegram Stars]: https://t.me/BotNews/90
 func WithCreateInvoiceLinkNeedShippingAddress(value bool) CreateInvoiceLinkOption {
-	return func(params *CreateInvoiceLinkParams) CreateInvoiceLinkOption {
-		previous := params.NeedShippingAddress
-		params.NeedShippingAddress = value
-
-		return WithCreateInvoiceLinkNeedShippingAddress(previous)
-	}
+	return fieldOption(value, func(params *CreateInvoiceLinkParams) *bool {
+		return &params.NeedShippingAddress
+	})
 }
 
 // WithCreateInvoiceLinkSendPhoneNumberToProvider sets the SendPhoneNumberToProvider field.
@@ -2834,12 +2534,9 @@ func WithCreateInvoiceLinkNeedShippingAddress(value bool) CreateInvoiceLinkOptio
 //
 // [Telegram Stars]: https://t.me/BotNews/90
 func WithCreateInvoiceLinkSendPhoneNumberToProvider(value bool) CreateInvoiceLinkOption {
-	return func(params *CreateInvoiceLinkParams) CreateInvoiceLinkOption {
-		previous := params.SendPhoneNumberToProvider
-		params.SendPhoneNumberToProvider = value
-
-		return WithCreateInvoiceLinkSendPhoneNumberToProvider(previous)
-	}
+	return fieldOption(value, func(params *CreateInvoiceLinkParams) *bool {
+		return &params.SendPhoneNumberToProvider
+	})
 }
 
 // WithCreateInvoiceLinkSendEmailToProvider sets the SendEmailToProvider field.
@@ -2849,12 +2546,9 @@ func WithCreateInvoiceLinkSendPhoneNumberToProvider(value bool) CreateInvoiceLin
 //
 // [Telegram Stars]: https://t.me/BotNews/90
 func WithCreateInvoiceLinkSendEmailToProvider(value bool) CreateInvoiceLinkOption {
-	return func(params *CreateInvoiceLinkParams) CreateInvoiceLinkOption {
-		previous := params.SendEmailToProvider
-		params.SendEmailToProvider = value
-
-		return WithCreateInvoiceLinkSendEmailToProvider(previous)
-	}
+	return fieldOption(value, func(params *CreateInvoiceLinkParams) *bool {
+		return &params.SendEmailToProvider
+	})
 }
 
 // WithCreateInvoiceLinkIsFlexible sets the IsFlexible field.
@@ -2864,12 +2558,9 @@ func WithCreateInvoiceLinkSendEmailToProvider(value bool) CreateInvoiceLinkOptio
 //
 // [Telegram Stars]: https://t.me/BotNews/90
 func WithCreateInvoiceLinkIsFlexible(value bool) CreateInvoiceLinkOption {
-	return func(params *CreateInvoiceLinkParams) CreateInvoiceLinkOption {
-		previous := params.IsFlexible
-		params.IsFlexible = value
-
-		return WithCreateInvoiceLinkIsFlexible(previous)
-	}
+	return fieldOption(value, func(params *CreateInvoiceLinkParams) *bool {
+		return &params.IsFlexible
+	})
 }
 
 // CreateInvoiceLink calls the createInvoiceLink Telegram Bot API method.
@@ -2930,7 +2621,7 @@ type CreateNewStickerSetParams struct {
 }
 
 // CreateNewStickerSetOption configures CreateNewStickerSetParams.
-type CreateNewStickerSetOption func(params *CreateNewStickerSetParams) CreateNewStickerSetOption
+type CreateNewStickerSetOption = Option[CreateNewStickerSetParams]
 
 // Option applies one or more CreateNewStickerSetOption values and returns the last rollback option.
 func (r *CreateNewStickerSetParams) Option(opts ...CreateNewStickerSetOption) (previous CreateNewStickerSetOption) {
@@ -2944,12 +2635,9 @@ func (r *CreateNewStickerSetParams) Option(opts ...CreateNewStickerSetOption) (p
 //
 // User identifier of created sticker set owner
 func WithCreateNewStickerSetUserID(value int64) CreateNewStickerSetOption {
-	return func(params *CreateNewStickerSetParams) CreateNewStickerSetOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithCreateNewStickerSetUserID(previous)
-	}
+	return fieldOption(value, func(params *CreateNewStickerSetParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithCreateNewStickerSetName sets the Name field.
@@ -2960,36 +2648,27 @@ func WithCreateNewStickerSetUserID(value int64) CreateNewStickerSetOption {
 // <bot_username> is case insensitive.
 // 1-64 characters.
 func WithCreateNewStickerSetName(value string) CreateNewStickerSetOption {
-	return func(params *CreateNewStickerSetParams) CreateNewStickerSetOption {
-		previous := params.Name
-		params.Name = value
-
-		return WithCreateNewStickerSetName(previous)
-	}
+	return fieldOption(value, func(params *CreateNewStickerSetParams) *string {
+		return &params.Name
+	})
 }
 
 // WithCreateNewStickerSetTitle sets the Title field.
 //
 // Sticker set title, 1-64 characters
 func WithCreateNewStickerSetTitle(value string) CreateNewStickerSetOption {
-	return func(params *CreateNewStickerSetParams) CreateNewStickerSetOption {
-		previous := params.Title
-		params.Title = value
-
-		return WithCreateNewStickerSetTitle(previous)
-	}
+	return fieldOption(value, func(params *CreateNewStickerSetParams) *string {
+		return &params.Title
+	})
 }
 
 // WithCreateNewStickerSetStickers sets the Stickers field.
 //
 // A JSON-serialized list of 1-50 initial stickers to be added to the sticker set
 func WithCreateNewStickerSetStickers(value []InputSticker) CreateNewStickerSetOption {
-	return func(params *CreateNewStickerSetParams) CreateNewStickerSetOption {
-		previous := params.Stickers
-		params.Stickers = value
-
-		return WithCreateNewStickerSetStickers(previous)
-	}
+	return fieldOption(value, func(params *CreateNewStickerSetParams) *[]InputSticker {
+		return &params.Stickers
+	})
 }
 
 // WithCreateNewStickerSetStickerType sets the StickerType field.
@@ -2997,24 +2676,18 @@ func WithCreateNewStickerSetStickers(value []InputSticker) CreateNewStickerSetOp
 // Type of stickers in the set, pass “regular”, “mask”, or “custom_emoji”.
 // By default, a regular sticker set is created.
 func WithCreateNewStickerSetStickerType(value string) CreateNewStickerSetOption {
-	return func(params *CreateNewStickerSetParams) CreateNewStickerSetOption {
-		previous := params.StickerType
-		params.StickerType = value
-
-		return WithCreateNewStickerSetStickerType(previous)
-	}
+	return fieldOption(value, func(params *CreateNewStickerSetParams) *string {
+		return &params.StickerType
+	})
 }
 
 // WithCreateNewStickerSetNeedsRepainting sets the NeedsRepainting field.
 //
 // Pass True if stickers in the sticker set must be repainted to the color of text when used in messages, the accent color if used as emoji status, white on chat photos, or another appropriate color based on context; for custom emoji sticker sets only
 func WithCreateNewStickerSetNeedsRepainting(value bool) CreateNewStickerSetOption {
-	return func(params *CreateNewStickerSetParams) CreateNewStickerSetOption {
-		previous := params.NeedsRepainting
-		params.NeedsRepainting = value
-
-		return WithCreateNewStickerSetNeedsRepainting(previous)
-	}
+	return fieldOption(value, func(params *CreateNewStickerSetParams) *bool {
+		return &params.NeedsRepainting
+	})
 }
 
 // CreateNewStickerSet calls the createNewStickerSet Telegram Bot API method.
@@ -3151,7 +2824,7 @@ type DeclineChatJoinRequestParams struct {
 }
 
 // DeclineChatJoinRequestOption configures DeclineChatJoinRequestParams.
-type DeclineChatJoinRequestOption func(params *DeclineChatJoinRequestParams) DeclineChatJoinRequestOption
+type DeclineChatJoinRequestOption = Option[DeclineChatJoinRequestParams]
 
 // Option applies one or more DeclineChatJoinRequestOption values and returns the last rollback option.
 func (r *DeclineChatJoinRequestParams) Option(opts ...DeclineChatJoinRequestOption) (previous DeclineChatJoinRequestOption) {
@@ -3165,24 +2838,18 @@ func (r *DeclineChatJoinRequestParams) Option(opts ...DeclineChatJoinRequestOpti
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
 func WithDeclineChatJoinRequestChatID(value string) DeclineChatJoinRequestOption {
-	return func(params *DeclineChatJoinRequestParams) DeclineChatJoinRequestOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithDeclineChatJoinRequestChatID(previous)
-	}
+	return fieldOption(value, func(params *DeclineChatJoinRequestParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithDeclineChatJoinRequestUserID sets the UserID field.
 //
 // Unique identifier of the target user
 func WithDeclineChatJoinRequestUserID(value int64) DeclineChatJoinRequestOption {
-	return func(params *DeclineChatJoinRequestParams) DeclineChatJoinRequestOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithDeclineChatJoinRequestUserID(previous)
-	}
+	return fieldOption(value, func(params *DeclineChatJoinRequestParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // DeclineChatJoinRequest calls the declineChatJoinRequest Telegram Bot API method.
@@ -3230,7 +2897,7 @@ type DeclineSuggestedPostParams struct {
 }
 
 // DeclineSuggestedPostOption configures DeclineSuggestedPostParams.
-type DeclineSuggestedPostOption func(params *DeclineSuggestedPostParams) DeclineSuggestedPostOption
+type DeclineSuggestedPostOption = Option[DeclineSuggestedPostParams]
 
 // Option applies one or more DeclineSuggestedPostOption values and returns the last rollback option.
 func (r *DeclineSuggestedPostParams) Option(opts ...DeclineSuggestedPostOption) (previous DeclineSuggestedPostOption) {
@@ -3244,36 +2911,27 @@ func (r *DeclineSuggestedPostParams) Option(opts ...DeclineSuggestedPostOption) 
 //
 // Unique identifier for the target direct messages chat
 func WithDeclineSuggestedPostChatID(value int64) DeclineSuggestedPostOption {
-	return func(params *DeclineSuggestedPostParams) DeclineSuggestedPostOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithDeclineSuggestedPostChatID(previous)
-	}
+	return fieldOption(value, func(params *DeclineSuggestedPostParams) *int64 {
+		return &params.ChatID
+	})
 }
 
 // WithDeclineSuggestedPostMessageID sets the MessageID field.
 //
 // Identifier of a suggested post message to decline
 func WithDeclineSuggestedPostMessageID(value int64) DeclineSuggestedPostOption {
-	return func(params *DeclineSuggestedPostParams) DeclineSuggestedPostOption {
-		previous := params.MessageID
-		params.MessageID = value
-
-		return WithDeclineSuggestedPostMessageID(previous)
-	}
+	return fieldOption(value, func(params *DeclineSuggestedPostParams) *int64 {
+		return &params.MessageID
+	})
 }
 
 // WithDeclineSuggestedPostComment sets the Comment field.
 //
 // Comment for the creator of the suggested post; 0-128 characters
 func WithDeclineSuggestedPostComment(value string) DeclineSuggestedPostOption {
-	return func(params *DeclineSuggestedPostParams) DeclineSuggestedPostOption {
-		previous := params.Comment
-		params.Comment = value
-
-		return WithDeclineSuggestedPostComment(previous)
-	}
+	return fieldOption(value, func(params *DeclineSuggestedPostParams) *string {
+		return &params.Comment
+	})
 }
 
 // DeclineSuggestedPost calls the declineSuggestedPost Telegram Bot API method.
@@ -3321,7 +2979,7 @@ type DeleteAllMessageReactionsParams struct {
 }
 
 // DeleteAllMessageReactionsOption configures DeleteAllMessageReactionsParams.
-type DeleteAllMessageReactionsOption func(params *DeleteAllMessageReactionsParams) DeleteAllMessageReactionsOption
+type DeleteAllMessageReactionsOption = Option[DeleteAllMessageReactionsParams]
 
 // Option applies one or more DeleteAllMessageReactionsOption values and returns the last rollback option.
 func (r *DeleteAllMessageReactionsParams) Option(opts ...DeleteAllMessageReactionsOption) (previous DeleteAllMessageReactionsOption) {
@@ -3335,36 +2993,27 @@ func (r *DeleteAllMessageReactionsParams) Option(opts ...DeleteAllMessageReactio
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithDeleteAllMessageReactionsChatID(value string) DeleteAllMessageReactionsOption {
-	return func(params *DeleteAllMessageReactionsParams) DeleteAllMessageReactionsOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithDeleteAllMessageReactionsChatID(previous)
-	}
+	return fieldOption(value, func(params *DeleteAllMessageReactionsParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithDeleteAllMessageReactionsUserID sets the UserID field.
 //
 // Identifier of the user whose reactions will be removed, if the reactions were added by a user
 func WithDeleteAllMessageReactionsUserID(value int64) DeleteAllMessageReactionsOption {
-	return func(params *DeleteAllMessageReactionsParams) DeleteAllMessageReactionsOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithDeleteAllMessageReactionsUserID(previous)
-	}
+	return fieldOption(value, func(params *DeleteAllMessageReactionsParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithDeleteAllMessageReactionsActorChatID sets the ActorChatID field.
 //
 // Identifier of the chat whose reactions will be removed, if the reactions were added by a chat
 func WithDeleteAllMessageReactionsActorChatID(value int64) DeleteAllMessageReactionsOption {
-	return func(params *DeleteAllMessageReactionsParams) DeleteAllMessageReactionsOption {
-		previous := params.ActorChatID
-		params.ActorChatID = value
-
-		return WithDeleteAllMessageReactionsActorChatID(previous)
-	}
+	return fieldOption(value, func(params *DeleteAllMessageReactionsParams) *int64 {
+		return &params.ActorChatID
+	})
 }
 
 // DeleteAllMessageReactions calls the deleteAllMessageReactions Telegram Bot API method.
@@ -3413,7 +3062,7 @@ type DeleteBusinessMessagesParams struct {
 }
 
 // DeleteBusinessMessagesOption configures DeleteBusinessMessagesParams.
-type DeleteBusinessMessagesOption func(params *DeleteBusinessMessagesParams) DeleteBusinessMessagesOption
+type DeleteBusinessMessagesOption = Option[DeleteBusinessMessagesParams]
 
 // Option applies one or more DeleteBusinessMessagesOption values and returns the last rollback option.
 func (r *DeleteBusinessMessagesParams) Option(opts ...DeleteBusinessMessagesOption) (previous DeleteBusinessMessagesOption) {
@@ -3427,12 +3076,9 @@ func (r *DeleteBusinessMessagesParams) Option(opts ...DeleteBusinessMessagesOpti
 //
 // Unique identifier of the business connection on behalf of which to delete the messages
 func WithDeleteBusinessMessagesBusinessConnectionID(value string) DeleteBusinessMessagesOption {
-	return func(params *DeleteBusinessMessagesParams) DeleteBusinessMessagesOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithDeleteBusinessMessagesBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *DeleteBusinessMessagesParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithDeleteBusinessMessagesMessageIDs sets the MessageIDs field.
@@ -3443,12 +3089,9 @@ func WithDeleteBusinessMessagesBusinessConnectionID(value string) DeleteBusiness
 //
 // [deleteMessage]: https://core.telegram.org/bots/api#deletemessage
 func WithDeleteBusinessMessagesMessageIDs(value []int64) DeleteBusinessMessagesOption {
-	return func(params *DeleteBusinessMessagesParams) DeleteBusinessMessagesOption {
-		previous := params.MessageIDs
-		params.MessageIDs = value
-
-		return WithDeleteBusinessMessagesMessageIDs(previous)
-	}
+	return fieldOption(value, func(params *DeleteBusinessMessagesParams) *[]int64 {
+		return &params.MessageIDs
+	})
 }
 
 // DeleteBusinessMessages calls the deleteBusinessMessages Telegram Bot API method.
@@ -3490,7 +3133,7 @@ type DeleteChatPhotoParams struct {
 }
 
 // DeleteChatPhotoOption configures DeleteChatPhotoParams.
-type DeleteChatPhotoOption func(params *DeleteChatPhotoParams) DeleteChatPhotoOption
+type DeleteChatPhotoOption = Option[DeleteChatPhotoParams]
 
 // Option applies one or more DeleteChatPhotoOption values and returns the last rollback option.
 func (r *DeleteChatPhotoParams) Option(opts ...DeleteChatPhotoOption) (previous DeleteChatPhotoOption) {
@@ -3504,12 +3147,9 @@ func (r *DeleteChatPhotoParams) Option(opts ...DeleteChatPhotoOption) (previous 
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
 func WithDeleteChatPhotoChatID(value string) DeleteChatPhotoOption {
-	return func(params *DeleteChatPhotoParams) DeleteChatPhotoOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithDeleteChatPhotoChatID(previous)
-	}
+	return fieldOption(value, func(params *DeleteChatPhotoParams) *string {
+		return &params.ChatID
+	})
 }
 
 // DeleteChatPhoto calls the deleteChatPhoto Telegram Bot API method.
@@ -3552,7 +3192,7 @@ type DeleteChatStickerSetParams struct {
 }
 
 // DeleteChatStickerSetOption configures DeleteChatStickerSetParams.
-type DeleteChatStickerSetOption func(params *DeleteChatStickerSetParams) DeleteChatStickerSetOption
+type DeleteChatStickerSetOption = Option[DeleteChatStickerSetParams]
 
 // Option applies one or more DeleteChatStickerSetOption values and returns the last rollback option.
 func (r *DeleteChatStickerSetParams) Option(opts ...DeleteChatStickerSetOption) (previous DeleteChatStickerSetOption) {
@@ -3566,12 +3206,9 @@ func (r *DeleteChatStickerSetParams) Option(opts ...DeleteChatStickerSetOption) 
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithDeleteChatStickerSetChatID(value string) DeleteChatStickerSetOption {
-	return func(params *DeleteChatStickerSetParams) DeleteChatStickerSetOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithDeleteChatStickerSetChatID(previous)
-	}
+	return fieldOption(value, func(params *DeleteChatStickerSetParams) *string {
+		return &params.ChatID
+	})
 }
 
 // DeleteChatStickerSet calls the deleteChatStickerSet Telegram Bot API method.
@@ -3622,7 +3259,7 @@ type DeleteEphemeralMessageParams struct {
 }
 
 // DeleteEphemeralMessageOption configures DeleteEphemeralMessageParams.
-type DeleteEphemeralMessageOption func(params *DeleteEphemeralMessageParams) DeleteEphemeralMessageOption
+type DeleteEphemeralMessageOption = Option[DeleteEphemeralMessageParams]
 
 // Option applies one or more DeleteEphemeralMessageOption values and returns the last rollback option.
 func (r *DeleteEphemeralMessageParams) Option(opts ...DeleteEphemeralMessageOption) (previous DeleteEphemeralMessageOption) {
@@ -3636,36 +3273,27 @@ func (r *DeleteEphemeralMessageParams) Option(opts ...DeleteEphemeralMessageOpti
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithDeleteEphemeralMessageChatID(value string) DeleteEphemeralMessageOption {
-	return func(params *DeleteEphemeralMessageParams) DeleteEphemeralMessageOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithDeleteEphemeralMessageChatID(previous)
-	}
+	return fieldOption(value, func(params *DeleteEphemeralMessageParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithDeleteEphemeralMessageReceiverUserID sets the ReceiverUserID field.
 //
 // Identifier of the user who received the message
 func WithDeleteEphemeralMessageReceiverUserID(value int64) DeleteEphemeralMessageOption {
-	return func(params *DeleteEphemeralMessageParams) DeleteEphemeralMessageOption {
-		previous := params.ReceiverUserID
-		params.ReceiverUserID = value
-
-		return WithDeleteEphemeralMessageReceiverUserID(previous)
-	}
+	return fieldOption(value, func(params *DeleteEphemeralMessageParams) *int64 {
+		return &params.ReceiverUserID
+	})
 }
 
 // WithDeleteEphemeralMessageEphemeralMessageID sets the EphemeralMessageID field.
 //
 // Identifier of the ephemeral message to delete
 func WithDeleteEphemeralMessageEphemeralMessageID(value int64) DeleteEphemeralMessageOption {
-	return func(params *DeleteEphemeralMessageParams) DeleteEphemeralMessageOption {
-		previous := params.EphemeralMessageID
-		params.EphemeralMessageID = value
-
-		return WithDeleteEphemeralMessageEphemeralMessageID(previous)
-	}
+	return fieldOption(value, func(params *DeleteEphemeralMessageParams) *int64 {
+		return &params.EphemeralMessageID
+	})
 }
 
 // DeleteEphemeralMessage calls the deleteEphemeralMessage Telegram Bot API method.
@@ -3710,7 +3338,7 @@ type DeleteForumTopicParams struct {
 }
 
 // DeleteForumTopicOption configures DeleteForumTopicParams.
-type DeleteForumTopicOption func(params *DeleteForumTopicParams) DeleteForumTopicOption
+type DeleteForumTopicOption = Option[DeleteForumTopicParams]
 
 // Option applies one or more DeleteForumTopicOption values and returns the last rollback option.
 func (r *DeleteForumTopicParams) Option(opts ...DeleteForumTopicOption) (previous DeleteForumTopicOption) {
@@ -3724,24 +3352,18 @@ func (r *DeleteForumTopicParams) Option(opts ...DeleteForumTopicOption) (previou
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithDeleteForumTopicChatID(value string) DeleteForumTopicOption {
-	return func(params *DeleteForumTopicParams) DeleteForumTopicOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithDeleteForumTopicChatID(previous)
-	}
+	return fieldOption(value, func(params *DeleteForumTopicParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithDeleteForumTopicMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread of the forum topic
 func WithDeleteForumTopicMessageThreadID(value int64) DeleteForumTopicOption {
-	return func(params *DeleteForumTopicParams) DeleteForumTopicOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithDeleteForumTopicMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *DeleteForumTopicParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // DeleteForumTopic calls the deleteForumTopic Telegram Bot API method.
@@ -3786,7 +3408,7 @@ type DeleteMessageParams struct {
 }
 
 // DeleteMessageOption configures DeleteMessageParams.
-type DeleteMessageOption func(params *DeleteMessageParams) DeleteMessageOption
+type DeleteMessageOption = Option[DeleteMessageParams]
 
 // Option applies one or more DeleteMessageOption values and returns the last rollback option.
 func (r *DeleteMessageParams) Option(opts ...DeleteMessageOption) (previous DeleteMessageOption) {
@@ -3800,24 +3422,18 @@ func (r *DeleteMessageParams) Option(opts ...DeleteMessageOption) (previous Dele
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithDeleteMessageChatID(value string) DeleteMessageOption {
-	return func(params *DeleteMessageParams) DeleteMessageOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithDeleteMessageChatID(previous)
-	}
+	return fieldOption(value, func(params *DeleteMessageParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithDeleteMessageMessageID sets the MessageID field.
 //
 // Identifier of the message to delete
 func WithDeleteMessageMessageID(value int64) DeleteMessageOption {
-	return func(params *DeleteMessageParams) DeleteMessageOption {
-		previous := params.MessageID
-		params.MessageID = value
-
-		return WithDeleteMessageMessageID(previous)
-	}
+	return fieldOption(value, func(params *DeleteMessageParams) *int64 {
+		return &params.MessageID
+	})
 }
 
 // DeleteMessage calls the deleteMessage Telegram Bot API method.
@@ -3876,7 +3492,7 @@ type DeleteMessageReactionParams struct {
 }
 
 // DeleteMessageReactionOption configures DeleteMessageReactionParams.
-type DeleteMessageReactionOption func(params *DeleteMessageReactionParams) DeleteMessageReactionOption
+type DeleteMessageReactionOption = Option[DeleteMessageReactionParams]
 
 // Option applies one or more DeleteMessageReactionOption values and returns the last rollback option.
 func (r *DeleteMessageReactionParams) Option(opts ...DeleteMessageReactionOption) (previous DeleteMessageReactionOption) {
@@ -3890,48 +3506,36 @@ func (r *DeleteMessageReactionParams) Option(opts ...DeleteMessageReactionOption
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithDeleteMessageReactionChatID(value string) DeleteMessageReactionOption {
-	return func(params *DeleteMessageReactionParams) DeleteMessageReactionOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithDeleteMessageReactionChatID(previous)
-	}
+	return fieldOption(value, func(params *DeleteMessageReactionParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithDeleteMessageReactionMessageID sets the MessageID field.
 //
 // Identifier of the target message
 func WithDeleteMessageReactionMessageID(value int64) DeleteMessageReactionOption {
-	return func(params *DeleteMessageReactionParams) DeleteMessageReactionOption {
-		previous := params.MessageID
-		params.MessageID = value
-
-		return WithDeleteMessageReactionMessageID(previous)
-	}
+	return fieldOption(value, func(params *DeleteMessageReactionParams) *int64 {
+		return &params.MessageID
+	})
 }
 
 // WithDeleteMessageReactionUserID sets the UserID field.
 //
 // Identifier of the user whose reaction will be removed, if the reaction was added by a user
 func WithDeleteMessageReactionUserID(value int64) DeleteMessageReactionOption {
-	return func(params *DeleteMessageReactionParams) DeleteMessageReactionOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithDeleteMessageReactionUserID(previous)
-	}
+	return fieldOption(value, func(params *DeleteMessageReactionParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithDeleteMessageReactionActorChatID sets the ActorChatID field.
 //
 // Identifier of the chat whose reaction will be removed, if the reaction was added by a chat
 func WithDeleteMessageReactionActorChatID(value int64) DeleteMessageReactionOption {
-	return func(params *DeleteMessageReactionParams) DeleteMessageReactionOption {
-		previous := params.ActorChatID
-		params.ActorChatID = value
-
-		return WithDeleteMessageReactionActorChatID(previous)
-	}
+	return fieldOption(value, func(params *DeleteMessageReactionParams) *int64 {
+		return &params.ActorChatID
+	})
 }
 
 // DeleteMessageReaction calls the deleteMessageReaction Telegram Bot API method.
@@ -3979,7 +3583,7 @@ type DeleteMessagesParams struct {
 }
 
 // DeleteMessagesOption configures DeleteMessagesParams.
-type DeleteMessagesOption func(params *DeleteMessagesParams) DeleteMessagesOption
+type DeleteMessagesOption = Option[DeleteMessagesParams]
 
 // Option applies one or more DeleteMessagesOption values and returns the last rollback option.
 func (r *DeleteMessagesParams) Option(opts ...DeleteMessagesOption) (previous DeleteMessagesOption) {
@@ -3993,12 +3597,9 @@ func (r *DeleteMessagesParams) Option(opts ...DeleteMessagesOption) (previous De
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithDeleteMessagesChatID(value string) DeleteMessagesOption {
-	return func(params *DeleteMessagesParams) DeleteMessagesOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithDeleteMessagesChatID(previous)
-	}
+	return fieldOption(value, func(params *DeleteMessagesParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithDeleteMessagesMessageIDs sets the MessageIDs field.
@@ -4008,12 +3609,9 @@ func WithDeleteMessagesChatID(value string) DeleteMessagesOption {
 //
 // [deleteMessage]: https://core.telegram.org/bots/api#deletemessage
 func WithDeleteMessagesMessageIDs(value []int64) DeleteMessagesOption {
-	return func(params *DeleteMessagesParams) DeleteMessagesOption {
-		previous := params.MessageIDs
-		params.MessageIDs = value
-
-		return WithDeleteMessagesMessageIDs(previous)
-	}
+	return fieldOption(value, func(params *DeleteMessagesParams) *[]int64 {
+		return &params.MessageIDs
+	})
 }
 
 // DeleteMessages calls the deleteMessages Telegram Bot API method.
@@ -4062,7 +3660,7 @@ type DeleteMyCommandsParams struct {
 }
 
 // DeleteMyCommandsOption configures DeleteMyCommandsParams.
-type DeleteMyCommandsOption func(params *DeleteMyCommandsParams) DeleteMyCommandsOption
+type DeleteMyCommandsOption = Option[DeleteMyCommandsParams]
 
 // Option applies one or more DeleteMyCommandsOption values and returns the last rollback option.
 func (r *DeleteMyCommandsParams) Option(opts ...DeleteMyCommandsOption) (previous DeleteMyCommandsOption) {
@@ -4079,12 +3677,9 @@ func (r *DeleteMyCommandsParams) Option(opts ...DeleteMyCommandsOption) (previou
 //
 // [BotCommandScopeDefault]: https://core.telegram.org/bots/api#botcommandscopedefault
 func WithDeleteMyCommandsScope(value *BotCommandScope) DeleteMyCommandsOption {
-	return func(params *DeleteMyCommandsParams) DeleteMyCommandsOption {
-		previous := params.Scope
-		params.Scope = value
-
-		return WithDeleteMyCommandsScope(previous)
-	}
+	return fieldOption(value, func(params *DeleteMyCommandsParams) **BotCommandScope {
+		return &params.Scope
+	})
 }
 
 // WithDeleteMyCommandsLanguageCode sets the LanguageCode field.
@@ -4092,12 +3687,9 @@ func WithDeleteMyCommandsScope(value *BotCommandScope) DeleteMyCommandsOption {
 // A two-letter ISO 639-1 language code.
 // If empty, commands will be applied to all users from the given scope, for whose language there are no dedicated commands.
 func WithDeleteMyCommandsLanguageCode(value string) DeleteMyCommandsOption {
-	return func(params *DeleteMyCommandsParams) DeleteMyCommandsOption {
-		previous := params.LanguageCode
-		params.LanguageCode = value
-
-		return WithDeleteMyCommandsLanguageCode(previous)
-	}
+	return fieldOption(value, func(params *DeleteMyCommandsParams) *string {
+		return &params.LanguageCode
+	})
 }
 
 // DeleteMyCommands calls the deleteMyCommands Telegram Bot API method.
@@ -4141,7 +3733,7 @@ type DeleteStickerFromSetParams struct {
 }
 
 // DeleteStickerFromSetOption configures DeleteStickerFromSetParams.
-type DeleteStickerFromSetOption func(params *DeleteStickerFromSetParams) DeleteStickerFromSetOption
+type DeleteStickerFromSetOption = Option[DeleteStickerFromSetParams]
 
 // Option applies one or more DeleteStickerFromSetOption values and returns the last rollback option.
 func (r *DeleteStickerFromSetParams) Option(opts ...DeleteStickerFromSetOption) (previous DeleteStickerFromSetOption) {
@@ -4155,12 +3747,9 @@ func (r *DeleteStickerFromSetParams) Option(opts ...DeleteStickerFromSetOption) 
 //
 // File identifier of the sticker
 func WithDeleteStickerFromSetSticker(value string) DeleteStickerFromSetOption {
-	return func(params *DeleteStickerFromSetParams) DeleteStickerFromSetOption {
-		previous := params.Sticker
-		params.Sticker = value
-
-		return WithDeleteStickerFromSetSticker(previous)
-	}
+	return fieldOption(value, func(params *DeleteStickerFromSetParams) *string {
+		return &params.Sticker
+	})
 }
 
 // DeleteStickerFromSet calls the deleteStickerFromSet Telegram Bot API method.
@@ -4201,7 +3790,7 @@ type DeleteStickerSetParams struct {
 }
 
 // DeleteStickerSetOption configures DeleteStickerSetParams.
-type DeleteStickerSetOption func(params *DeleteStickerSetParams) DeleteStickerSetOption
+type DeleteStickerSetOption = Option[DeleteStickerSetParams]
 
 // Option applies one or more DeleteStickerSetOption values and returns the last rollback option.
 func (r *DeleteStickerSetParams) Option(opts ...DeleteStickerSetOption) (previous DeleteStickerSetOption) {
@@ -4215,12 +3804,9 @@ func (r *DeleteStickerSetParams) Option(opts ...DeleteStickerSetOption) (previou
 //
 // Sticker set name
 func WithDeleteStickerSetName(value string) DeleteStickerSetOption {
-	return func(params *DeleteStickerSetParams) DeleteStickerSetOption {
-		previous := params.Name
-		params.Name = value
-
-		return WithDeleteStickerSetName(previous)
-	}
+	return fieldOption(value, func(params *DeleteStickerSetParams) *string {
+		return &params.Name
+	})
 }
 
 // DeleteStickerSet calls the deleteStickerSet Telegram Bot API method.
@@ -4264,7 +3850,7 @@ type DeleteStoryParams struct {
 }
 
 // DeleteStoryOption configures DeleteStoryParams.
-type DeleteStoryOption func(params *DeleteStoryParams) DeleteStoryOption
+type DeleteStoryOption = Option[DeleteStoryParams]
 
 // Option applies one or more DeleteStoryOption values and returns the last rollback option.
 func (r *DeleteStoryParams) Option(opts ...DeleteStoryOption) (previous DeleteStoryOption) {
@@ -4278,24 +3864,18 @@ func (r *DeleteStoryParams) Option(opts ...DeleteStoryOption) (previous DeleteSt
 //
 // Unique identifier of the business connection
 func WithDeleteStoryBusinessConnectionID(value string) DeleteStoryOption {
-	return func(params *DeleteStoryParams) DeleteStoryOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithDeleteStoryBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *DeleteStoryParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithDeleteStoryStoryID sets the StoryID field.
 //
 // Unique identifier of the story to delete
 func WithDeleteStoryStoryID(value int64) DeleteStoryOption {
-	return func(params *DeleteStoryParams) DeleteStoryOption {
-		previous := params.StoryID
-		params.StoryID = value
-
-		return WithDeleteStoryStoryID(previous)
-	}
+	return fieldOption(value, func(params *DeleteStoryParams) *int64 {
+		return &params.StoryID
+	})
 }
 
 // DeleteStory calls the deleteStory Telegram Bot API method.
@@ -4337,7 +3917,7 @@ type DeleteWebhookParams struct {
 }
 
 // DeleteWebhookOption configures DeleteWebhookParams.
-type DeleteWebhookOption func(params *DeleteWebhookParams) DeleteWebhookOption
+type DeleteWebhookOption = Option[DeleteWebhookParams]
 
 // Option applies one or more DeleteWebhookOption values and returns the last rollback option.
 func (r *DeleteWebhookParams) Option(opts ...DeleteWebhookOption) (previous DeleteWebhookOption) {
@@ -4351,12 +3931,9 @@ func (r *DeleteWebhookParams) Option(opts ...DeleteWebhookOption) (previous Dele
 //
 // Pass True to drop all pending updates
 func WithDeleteWebhookDropPendingUpdates(value bool) DeleteWebhookOption {
-	return func(params *DeleteWebhookParams) DeleteWebhookOption {
-		previous := params.DropPendingUpdates
-		params.DropPendingUpdates = value
-
-		return WithDeleteWebhookDropPendingUpdates(previous)
-	}
+	return fieldOption(value, func(params *DeleteWebhookParams) *bool {
+		return &params.DropPendingUpdates
+	})
 }
 
 // DeleteWebhook calls the deleteWebhook Telegram Bot API method.
@@ -4415,7 +3992,7 @@ type EditChatInviteLinkParams struct {
 }
 
 // EditChatInviteLinkOption configures EditChatInviteLinkParams.
-type EditChatInviteLinkOption func(params *EditChatInviteLinkParams) EditChatInviteLinkOption
+type EditChatInviteLinkOption = Option[EditChatInviteLinkParams]
 
 // Option applies one or more EditChatInviteLinkOption values and returns the last rollback option.
 func (r *EditChatInviteLinkParams) Option(opts ...EditChatInviteLinkOption) (previous EditChatInviteLinkOption) {
@@ -4429,60 +4006,45 @@ func (r *EditChatInviteLinkParams) Option(opts ...EditChatInviteLinkOption) (pre
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
 func WithEditChatInviteLinkChatID(value string) EditChatInviteLinkOption {
-	return func(params *EditChatInviteLinkParams) EditChatInviteLinkOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithEditChatInviteLinkChatID(previous)
-	}
+	return fieldOption(value, func(params *EditChatInviteLinkParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithEditChatInviteLinkInviteLink sets the InviteLink field.
 //
 // The invite link to edit
 func WithEditChatInviteLinkInviteLink(value string) EditChatInviteLinkOption {
-	return func(params *EditChatInviteLinkParams) EditChatInviteLinkOption {
-		previous := params.InviteLink
-		params.InviteLink = value
-
-		return WithEditChatInviteLinkInviteLink(previous)
-	}
+	return fieldOption(value, func(params *EditChatInviteLinkParams) *string {
+		return &params.InviteLink
+	})
 }
 
 // WithEditChatInviteLinkName sets the Name field.
 //
 // Invite link name; 0-32 characters
 func WithEditChatInviteLinkName(value string) EditChatInviteLinkOption {
-	return func(params *EditChatInviteLinkParams) EditChatInviteLinkOption {
-		previous := params.Name
-		params.Name = value
-
-		return WithEditChatInviteLinkName(previous)
-	}
+	return fieldOption(value, func(params *EditChatInviteLinkParams) *string {
+		return &params.Name
+	})
 }
 
 // WithEditChatInviteLinkExpireDate sets the ExpireDate field.
 //
 // Point in time (Unix timestamp) when the link will expire
 func WithEditChatInviteLinkExpireDate(value int64) EditChatInviteLinkOption {
-	return func(params *EditChatInviteLinkParams) EditChatInviteLinkOption {
-		previous := params.ExpireDate
-		params.ExpireDate = value
-
-		return WithEditChatInviteLinkExpireDate(previous)
-	}
+	return fieldOption(value, func(params *EditChatInviteLinkParams) *int64 {
+		return &params.ExpireDate
+	})
 }
 
 // WithEditChatInviteLinkMemberLimit sets the MemberLimit field.
 //
 // The maximum number of users that can be members of the chat simultaneously after joining the chat via this invite link; 1-99999
 func WithEditChatInviteLinkMemberLimit(value int64) EditChatInviteLinkOption {
-	return func(params *EditChatInviteLinkParams) EditChatInviteLinkOption {
-		previous := params.MemberLimit
-		params.MemberLimit = value
-
-		return WithEditChatInviteLinkMemberLimit(previous)
-	}
+	return fieldOption(value, func(params *EditChatInviteLinkParams) *int64 {
+		return &params.MemberLimit
+	})
 }
 
 // WithEditChatInviteLinkCreatesJoinRequest sets the CreatesJoinRequest field.
@@ -4490,12 +4052,9 @@ func WithEditChatInviteLinkMemberLimit(value int64) EditChatInviteLinkOption {
 // True, if users joining the chat via the link need to be approved by chat administrators.
 // If True, member_limit can't be specified.
 func WithEditChatInviteLinkCreatesJoinRequest(value bool) EditChatInviteLinkOption {
-	return func(params *EditChatInviteLinkParams) EditChatInviteLinkOption {
-		previous := params.CreatesJoinRequest
-		params.CreatesJoinRequest = value
-
-		return WithEditChatInviteLinkCreatesJoinRequest(previous)
-	}
+	return fieldOption(value, func(params *EditChatInviteLinkParams) *bool {
+		return &params.CreatesJoinRequest
+	})
 }
 
 // EditChatInviteLink calls the editChatInviteLink Telegram Bot API method.
@@ -4546,7 +4105,7 @@ type EditChatSubscriptionInviteLinkParams struct {
 }
 
 // EditChatSubscriptionInviteLinkOption configures EditChatSubscriptionInviteLinkParams.
-type EditChatSubscriptionInviteLinkOption func(params *EditChatSubscriptionInviteLinkParams) EditChatSubscriptionInviteLinkOption
+type EditChatSubscriptionInviteLinkOption = Option[EditChatSubscriptionInviteLinkParams]
 
 // Option applies one or more EditChatSubscriptionInviteLinkOption values and returns the last rollback option.
 func (r *EditChatSubscriptionInviteLinkParams) Option(opts ...EditChatSubscriptionInviteLinkOption) (previous EditChatSubscriptionInviteLinkOption) {
@@ -4560,36 +4119,27 @@ func (r *EditChatSubscriptionInviteLinkParams) Option(opts ...EditChatSubscripti
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
 func WithEditChatSubscriptionInviteLinkChatID(value string) EditChatSubscriptionInviteLinkOption {
-	return func(params *EditChatSubscriptionInviteLinkParams) EditChatSubscriptionInviteLinkOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithEditChatSubscriptionInviteLinkChatID(previous)
-	}
+	return fieldOption(value, func(params *EditChatSubscriptionInviteLinkParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithEditChatSubscriptionInviteLinkInviteLink sets the InviteLink field.
 //
 // The invite link to edit
 func WithEditChatSubscriptionInviteLinkInviteLink(value string) EditChatSubscriptionInviteLinkOption {
-	return func(params *EditChatSubscriptionInviteLinkParams) EditChatSubscriptionInviteLinkOption {
-		previous := params.InviteLink
-		params.InviteLink = value
-
-		return WithEditChatSubscriptionInviteLinkInviteLink(previous)
-	}
+	return fieldOption(value, func(params *EditChatSubscriptionInviteLinkParams) *string {
+		return &params.InviteLink
+	})
 }
 
 // WithEditChatSubscriptionInviteLinkName sets the Name field.
 //
 // Invite link name; 0-32 characters
 func WithEditChatSubscriptionInviteLinkName(value string) EditChatSubscriptionInviteLinkOption {
-	return func(params *EditChatSubscriptionInviteLinkParams) EditChatSubscriptionInviteLinkOption {
-		previous := params.Name
-		params.Name = value
-
-		return WithEditChatSubscriptionInviteLinkName(previous)
-	}
+	return fieldOption(value, func(params *EditChatSubscriptionInviteLinkParams) *string {
+		return &params.Name
+	})
 }
 
 // EditChatSubscriptionInviteLink calls the editChatSubscriptionInviteLink Telegram Bot API method.
@@ -4657,7 +4207,7 @@ type EditEphemeralMessageCaptionParams struct {
 }
 
 // EditEphemeralMessageCaptionOption configures EditEphemeralMessageCaptionParams.
-type EditEphemeralMessageCaptionOption func(params *EditEphemeralMessageCaptionParams) EditEphemeralMessageCaptionOption
+type EditEphemeralMessageCaptionOption = Option[EditEphemeralMessageCaptionParams]
 
 // Option applies one or more EditEphemeralMessageCaptionOption values and returns the last rollback option.
 func (r *EditEphemeralMessageCaptionParams) Option(opts ...EditEphemeralMessageCaptionOption) (previous EditEphemeralMessageCaptionOption) {
@@ -4671,48 +4221,36 @@ func (r *EditEphemeralMessageCaptionParams) Option(opts ...EditEphemeralMessageC
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithEditEphemeralMessageCaptionChatID(value string) EditEphemeralMessageCaptionOption {
-	return func(params *EditEphemeralMessageCaptionParams) EditEphemeralMessageCaptionOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithEditEphemeralMessageCaptionChatID(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageCaptionParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithEditEphemeralMessageCaptionReceiverUserID sets the ReceiverUserID field.
 //
 // Identifier of the user who received the message
 func WithEditEphemeralMessageCaptionReceiverUserID(value int64) EditEphemeralMessageCaptionOption {
-	return func(params *EditEphemeralMessageCaptionParams) EditEphemeralMessageCaptionOption {
-		previous := params.ReceiverUserID
-		params.ReceiverUserID = value
-
-		return WithEditEphemeralMessageCaptionReceiverUserID(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageCaptionParams) *int64 {
+		return &params.ReceiverUserID
+	})
 }
 
 // WithEditEphemeralMessageCaptionEphemeralMessageID sets the EphemeralMessageID field.
 //
 // Identifier of the ephemeral message to edit
 func WithEditEphemeralMessageCaptionEphemeralMessageID(value int64) EditEphemeralMessageCaptionOption {
-	return func(params *EditEphemeralMessageCaptionParams) EditEphemeralMessageCaptionOption {
-		previous := params.EphemeralMessageID
-		params.EphemeralMessageID = value
-
-		return WithEditEphemeralMessageCaptionEphemeralMessageID(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageCaptionParams) *int64 {
+		return &params.EphemeralMessageID
+	})
 }
 
 // WithEditEphemeralMessageCaptionCaption sets the Caption field.
 //
 // New caption of the message, 0-1024 characters after entities parsing
 func WithEditEphemeralMessageCaptionCaption(value string) EditEphemeralMessageCaptionOption {
-	return func(params *EditEphemeralMessageCaptionParams) EditEphemeralMessageCaptionOption {
-		previous := params.Caption
-		params.Caption = value
-
-		return WithEditEphemeralMessageCaptionCaption(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageCaptionParams) *string {
+		return &params.Caption
+	})
 }
 
 // WithEditEphemeralMessageCaptionParseMode sets the ParseMode field.
@@ -4722,24 +4260,18 @@ func WithEditEphemeralMessageCaptionCaption(value string) EditEphemeralMessageCa
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithEditEphemeralMessageCaptionParseMode(value string) EditEphemeralMessageCaptionOption {
-	return func(params *EditEphemeralMessageCaptionParams) EditEphemeralMessageCaptionOption {
-		previous := params.ParseMode
-		params.ParseMode = value
-
-		return WithEditEphemeralMessageCaptionParseMode(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageCaptionParams) *string {
+		return &params.ParseMode
+	})
 }
 
 // WithEditEphemeralMessageCaptionCaptionEntities sets the CaptionEntities field.
 //
 // A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
 func WithEditEphemeralMessageCaptionCaptionEntities(value []MessageEntity) EditEphemeralMessageCaptionOption {
-	return func(params *EditEphemeralMessageCaptionParams) EditEphemeralMessageCaptionOption {
-		previous := params.CaptionEntities
-		params.CaptionEntities = value
-
-		return WithEditEphemeralMessageCaptionCaptionEntities(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageCaptionParams) *[]MessageEntity {
+		return &params.CaptionEntities
+	})
 }
 
 // WithEditEphemeralMessageCaptionReplyMarkup sets the ReplyMarkup field.
@@ -4748,12 +4280,9 @@ func WithEditEphemeralMessageCaptionCaptionEntities(value []MessageEntity) EditE
 //
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 func WithEditEphemeralMessageCaptionReplyMarkup(value *InlineKeyboardMarkup) EditEphemeralMessageCaptionOption {
-	return func(params *EditEphemeralMessageCaptionParams) EditEphemeralMessageCaptionOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithEditEphemeralMessageCaptionReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageCaptionParams) **InlineKeyboardMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // EditEphemeralMessageCaption calls the editEphemeralMessageCaption Telegram Bot API method.
@@ -4810,7 +4339,7 @@ type EditEphemeralMessageMediaParams struct {
 }
 
 // EditEphemeralMessageMediaOption configures EditEphemeralMessageMediaParams.
-type EditEphemeralMessageMediaOption func(params *EditEphemeralMessageMediaParams) EditEphemeralMessageMediaOption
+type EditEphemeralMessageMediaOption = Option[EditEphemeralMessageMediaParams]
 
 // Option applies one or more EditEphemeralMessageMediaOption values and returns the last rollback option.
 func (r *EditEphemeralMessageMediaParams) Option(opts ...EditEphemeralMessageMediaOption) (previous EditEphemeralMessageMediaOption) {
@@ -4824,36 +4353,27 @@ func (r *EditEphemeralMessageMediaParams) Option(opts ...EditEphemeralMessageMed
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithEditEphemeralMessageMediaChatID(value string) EditEphemeralMessageMediaOption {
-	return func(params *EditEphemeralMessageMediaParams) EditEphemeralMessageMediaOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithEditEphemeralMessageMediaChatID(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageMediaParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithEditEphemeralMessageMediaReceiverUserID sets the ReceiverUserID field.
 //
 // Identifier of the user who received the message
 func WithEditEphemeralMessageMediaReceiverUserID(value int64) EditEphemeralMessageMediaOption {
-	return func(params *EditEphemeralMessageMediaParams) EditEphemeralMessageMediaOption {
-		previous := params.ReceiverUserID
-		params.ReceiverUserID = value
-
-		return WithEditEphemeralMessageMediaReceiverUserID(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageMediaParams) *int64 {
+		return &params.ReceiverUserID
+	})
 }
 
 // WithEditEphemeralMessageMediaEphemeralMessageID sets the EphemeralMessageID field.
 //
 // Identifier of the ephemeral message to edit
 func WithEditEphemeralMessageMediaEphemeralMessageID(value int64) EditEphemeralMessageMediaOption {
-	return func(params *EditEphemeralMessageMediaParams) EditEphemeralMessageMediaOption {
-		previous := params.EphemeralMessageID
-		params.EphemeralMessageID = value
-
-		return WithEditEphemeralMessageMediaEphemeralMessageID(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageMediaParams) *int64 {
+		return &params.EphemeralMessageID
+	})
 }
 
 // WithEditEphemeralMessageMediaMedia sets the Media field.
@@ -4861,12 +4381,9 @@ func WithEditEphemeralMessageMediaEphemeralMessageID(value int64) EditEphemeralM
 // A JSON-serialized object for the new media content of the message.
 // A new file can't be uploaded; use a previously uploaded file via its file_id or specify a URL.
 func WithEditEphemeralMessageMediaMedia(value InputMedia) EditEphemeralMessageMediaOption {
-	return func(params *EditEphemeralMessageMediaParams) EditEphemeralMessageMediaOption {
-		previous := params.Media
-		params.Media = value
-
-		return WithEditEphemeralMessageMediaMedia(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageMediaParams) *InputMedia {
+		return &params.Media
+	})
 }
 
 // WithEditEphemeralMessageMediaReplyMarkup sets the ReplyMarkup field.
@@ -4875,12 +4392,9 @@ func WithEditEphemeralMessageMediaMedia(value InputMedia) EditEphemeralMessageMe
 //
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 func WithEditEphemeralMessageMediaReplyMarkup(value *InlineKeyboardMarkup) EditEphemeralMessageMediaOption {
-	return func(params *EditEphemeralMessageMediaParams) EditEphemeralMessageMediaOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithEditEphemeralMessageMediaReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageMediaParams) **InlineKeyboardMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // EditEphemeralMessageMedia calls the editEphemeralMessageMedia Telegram Bot API method.
@@ -5132,7 +4646,7 @@ type EditEphemeralMessageReplyMarkupParams struct {
 }
 
 // EditEphemeralMessageReplyMarkupOption configures EditEphemeralMessageReplyMarkupParams.
-type EditEphemeralMessageReplyMarkupOption func(params *EditEphemeralMessageReplyMarkupParams) EditEphemeralMessageReplyMarkupOption
+type EditEphemeralMessageReplyMarkupOption = Option[EditEphemeralMessageReplyMarkupParams]
 
 // Option applies one or more EditEphemeralMessageReplyMarkupOption values and returns the last rollback option.
 func (r *EditEphemeralMessageReplyMarkupParams) Option(opts ...EditEphemeralMessageReplyMarkupOption) (previous EditEphemeralMessageReplyMarkupOption) {
@@ -5146,36 +4660,27 @@ func (r *EditEphemeralMessageReplyMarkupParams) Option(opts ...EditEphemeralMess
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithEditEphemeralMessageReplyMarkupChatID(value string) EditEphemeralMessageReplyMarkupOption {
-	return func(params *EditEphemeralMessageReplyMarkupParams) EditEphemeralMessageReplyMarkupOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithEditEphemeralMessageReplyMarkupChatID(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageReplyMarkupParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithEditEphemeralMessageReplyMarkupReceiverUserID sets the ReceiverUserID field.
 //
 // Identifier of the user who received the message
 func WithEditEphemeralMessageReplyMarkupReceiverUserID(value int64) EditEphemeralMessageReplyMarkupOption {
-	return func(params *EditEphemeralMessageReplyMarkupParams) EditEphemeralMessageReplyMarkupOption {
-		previous := params.ReceiverUserID
-		params.ReceiverUserID = value
-
-		return WithEditEphemeralMessageReplyMarkupReceiverUserID(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageReplyMarkupParams) *int64 {
+		return &params.ReceiverUserID
+	})
 }
 
 // WithEditEphemeralMessageReplyMarkupEphemeralMessageID sets the EphemeralMessageID field.
 //
 // Identifier of the ephemeral message to edit
 func WithEditEphemeralMessageReplyMarkupEphemeralMessageID(value int64) EditEphemeralMessageReplyMarkupOption {
-	return func(params *EditEphemeralMessageReplyMarkupParams) EditEphemeralMessageReplyMarkupOption {
-		previous := params.EphemeralMessageID
-		params.EphemeralMessageID = value
-
-		return WithEditEphemeralMessageReplyMarkupEphemeralMessageID(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageReplyMarkupParams) *int64 {
+		return &params.EphemeralMessageID
+	})
 }
 
 // WithEditEphemeralMessageReplyMarkupReplyMarkup sets the ReplyMarkup field.
@@ -5184,12 +4689,9 @@ func WithEditEphemeralMessageReplyMarkupEphemeralMessageID(value int64) EditEphe
 //
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 func WithEditEphemeralMessageReplyMarkupReplyMarkup(value *InlineKeyboardMarkup) EditEphemeralMessageReplyMarkupOption {
-	return func(params *EditEphemeralMessageReplyMarkupParams) EditEphemeralMessageReplyMarkupOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithEditEphemeralMessageReplyMarkupReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageReplyMarkupParams) **InlineKeyboardMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // EditEphemeralMessageReplyMarkup calls the editEphemeralMessageReplyMarkup Telegram Bot API method.
@@ -5257,7 +4759,7 @@ type EditEphemeralMessageTextParams struct {
 }
 
 // EditEphemeralMessageTextOption configures EditEphemeralMessageTextParams.
-type EditEphemeralMessageTextOption func(params *EditEphemeralMessageTextParams) EditEphemeralMessageTextOption
+type EditEphemeralMessageTextOption = Option[EditEphemeralMessageTextParams]
 
 // Option applies one or more EditEphemeralMessageTextOption values and returns the last rollback option.
 func (r *EditEphemeralMessageTextParams) Option(opts ...EditEphemeralMessageTextOption) (previous EditEphemeralMessageTextOption) {
@@ -5271,48 +4773,36 @@ func (r *EditEphemeralMessageTextParams) Option(opts ...EditEphemeralMessageText
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithEditEphemeralMessageTextChatID(value string) EditEphemeralMessageTextOption {
-	return func(params *EditEphemeralMessageTextParams) EditEphemeralMessageTextOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithEditEphemeralMessageTextChatID(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageTextParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithEditEphemeralMessageTextReceiverUserID sets the ReceiverUserID field.
 //
 // Identifier of the user who received the message
 func WithEditEphemeralMessageTextReceiverUserID(value int64) EditEphemeralMessageTextOption {
-	return func(params *EditEphemeralMessageTextParams) EditEphemeralMessageTextOption {
-		previous := params.ReceiverUserID
-		params.ReceiverUserID = value
-
-		return WithEditEphemeralMessageTextReceiverUserID(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageTextParams) *int64 {
+		return &params.ReceiverUserID
+	})
 }
 
 // WithEditEphemeralMessageTextEphemeralMessageID sets the EphemeralMessageID field.
 //
 // Identifier of the ephemeral message to edit
 func WithEditEphemeralMessageTextEphemeralMessageID(value int64) EditEphemeralMessageTextOption {
-	return func(params *EditEphemeralMessageTextParams) EditEphemeralMessageTextOption {
-		previous := params.EphemeralMessageID
-		params.EphemeralMessageID = value
-
-		return WithEditEphemeralMessageTextEphemeralMessageID(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageTextParams) *int64 {
+		return &params.EphemeralMessageID
+	})
 }
 
 // WithEditEphemeralMessageTextText sets the Text field.
 //
 // New text of the message, 1-4096 characters after entity parsing
 func WithEditEphemeralMessageTextText(value string) EditEphemeralMessageTextOption {
-	return func(params *EditEphemeralMessageTextParams) EditEphemeralMessageTextOption {
-		previous := params.Text
-		params.Text = value
-
-		return WithEditEphemeralMessageTextText(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageTextParams) *string {
+		return &params.Text
+	})
 }
 
 // WithEditEphemeralMessageTextParseMode sets the ParseMode field.
@@ -5322,36 +4812,27 @@ func WithEditEphemeralMessageTextText(value string) EditEphemeralMessageTextOpti
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithEditEphemeralMessageTextParseMode(value string) EditEphemeralMessageTextOption {
-	return func(params *EditEphemeralMessageTextParams) EditEphemeralMessageTextOption {
-		previous := params.ParseMode
-		params.ParseMode = value
-
-		return WithEditEphemeralMessageTextParseMode(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageTextParams) *string {
+		return &params.ParseMode
+	})
 }
 
 // WithEditEphemeralMessageTextEntities sets the Entities field.
 //
 // A JSON-serialized list of special entities that appear in message text, which can be specified instead of parse_mode
 func WithEditEphemeralMessageTextEntities(value []MessageEntity) EditEphemeralMessageTextOption {
-	return func(params *EditEphemeralMessageTextParams) EditEphemeralMessageTextOption {
-		previous := params.Entities
-		params.Entities = value
-
-		return WithEditEphemeralMessageTextEntities(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageTextParams) *[]MessageEntity {
+		return &params.Entities
+	})
 }
 
 // WithEditEphemeralMessageTextLinkPreviewOptions sets the LinkPreviewOptions field.
 //
 // Link preview generation options for the message
 func WithEditEphemeralMessageTextLinkPreviewOptions(value *LinkPreviewOptions) EditEphemeralMessageTextOption {
-	return func(params *EditEphemeralMessageTextParams) EditEphemeralMessageTextOption {
-		previous := params.LinkPreviewOptions
-		params.LinkPreviewOptions = value
-
-		return WithEditEphemeralMessageTextLinkPreviewOptions(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageTextParams) **LinkPreviewOptions {
+		return &params.LinkPreviewOptions
+	})
 }
 
 // WithEditEphemeralMessageTextReplyMarkup sets the ReplyMarkup field.
@@ -5360,12 +4841,9 @@ func WithEditEphemeralMessageTextLinkPreviewOptions(value *LinkPreviewOptions) E
 //
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 func WithEditEphemeralMessageTextReplyMarkup(value *InlineKeyboardMarkup) EditEphemeralMessageTextOption {
-	return func(params *EditEphemeralMessageTextParams) EditEphemeralMessageTextOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithEditEphemeralMessageTextReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *EditEphemeralMessageTextParams) **InlineKeyboardMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // EditEphemeralMessageText calls the editEphemeralMessageText Telegram Bot API method.
@@ -5422,7 +4900,7 @@ type EditForumTopicParams struct {
 }
 
 // EditForumTopicOption configures EditForumTopicParams.
-type EditForumTopicOption func(params *EditForumTopicParams) EditForumTopicOption
+type EditForumTopicOption = Option[EditForumTopicParams]
 
 // Option applies one or more EditForumTopicOption values and returns the last rollback option.
 func (r *EditForumTopicParams) Option(opts ...EditForumTopicOption) (previous EditForumTopicOption) {
@@ -5436,24 +4914,18 @@ func (r *EditForumTopicParams) Option(opts ...EditForumTopicOption) (previous Ed
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithEditForumTopicChatID(value string) EditForumTopicOption {
-	return func(params *EditForumTopicParams) EditForumTopicOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithEditForumTopicChatID(previous)
-	}
+	return fieldOption(value, func(params *EditForumTopicParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithEditForumTopicMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread of the forum topic
 func WithEditForumTopicMessageThreadID(value int64) EditForumTopicOption {
-	return func(params *EditForumTopicParams) EditForumTopicOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithEditForumTopicMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *EditForumTopicParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithEditForumTopicName sets the Name field.
@@ -5461,12 +4933,9 @@ func WithEditForumTopicMessageThreadID(value int64) EditForumTopicOption {
 // New topic name, 0-128 characters.
 // If not specified or empty, the current name of the topic will be kept.
 func WithEditForumTopicName(value string) EditForumTopicOption {
-	return func(params *EditForumTopicParams) EditForumTopicOption {
-		previous := params.Name
-		params.Name = value
-
-		return WithEditForumTopicName(previous)
-	}
+	return fieldOption(value, func(params *EditForumTopicParams) *string {
+		return &params.Name
+	})
 }
 
 // WithEditForumTopicIconCustomEmojiID sets the IconCustomEmojiID field.
@@ -5478,12 +4947,9 @@ func WithEditForumTopicName(value string) EditForumTopicOption {
 //
 // [getForumTopicIconStickers]: https://core.telegram.org/bots/api#getforumtopiciconstickers
 func WithEditForumTopicIconCustomEmojiID(value string) EditForumTopicOption {
-	return func(params *EditForumTopicParams) EditForumTopicOption {
-		previous := params.IconCustomEmojiID
-		params.IconCustomEmojiID = value
-
-		return WithEditForumTopicIconCustomEmojiID(previous)
-	}
+	return fieldOption(value, func(params *EditForumTopicParams) *string {
+		return &params.IconCustomEmojiID
+	})
 }
 
 // EditForumTopic calls the editForumTopic Telegram Bot API method.
@@ -5528,7 +4994,7 @@ type EditGeneralForumTopicParams struct {
 }
 
 // EditGeneralForumTopicOption configures EditGeneralForumTopicParams.
-type EditGeneralForumTopicOption func(params *EditGeneralForumTopicParams) EditGeneralForumTopicOption
+type EditGeneralForumTopicOption = Option[EditGeneralForumTopicParams]
 
 // Option applies one or more EditGeneralForumTopicOption values and returns the last rollback option.
 func (r *EditGeneralForumTopicParams) Option(opts ...EditGeneralForumTopicOption) (previous EditGeneralForumTopicOption) {
@@ -5542,24 +5008,18 @@ func (r *EditGeneralForumTopicParams) Option(opts ...EditGeneralForumTopicOption
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithEditGeneralForumTopicChatID(value string) EditGeneralForumTopicOption {
-	return func(params *EditGeneralForumTopicParams) EditGeneralForumTopicOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithEditGeneralForumTopicChatID(previous)
-	}
+	return fieldOption(value, func(params *EditGeneralForumTopicParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithEditGeneralForumTopicName sets the Name field.
 //
 // New topic name, 1-128 characters
 func WithEditGeneralForumTopicName(value string) EditGeneralForumTopicOption {
-	return func(params *EditGeneralForumTopicParams) EditGeneralForumTopicOption {
-		previous := params.Name
-		params.Name = value
-
-		return WithEditGeneralForumTopicName(previous)
-	}
+	return fieldOption(value, func(params *EditGeneralForumTopicParams) *string {
+		return &params.Name
+	})
 }
 
 // EditGeneralForumTopic calls the editGeneralForumTopic Telegram Bot API method.
@@ -5634,7 +5094,7 @@ type EditMessageCaptionParams struct {
 }
 
 // EditMessageCaptionOption configures EditMessageCaptionParams.
-type EditMessageCaptionOption func(params *EditMessageCaptionParams) EditMessageCaptionOption
+type EditMessageCaptionOption = Option[EditMessageCaptionParams]
 
 // Option applies one or more EditMessageCaptionOption values and returns the last rollback option.
 func (r *EditMessageCaptionParams) Option(opts ...EditMessageCaptionOption) (previous EditMessageCaptionOption) {
@@ -5648,12 +5108,9 @@ func (r *EditMessageCaptionParams) Option(opts ...EditMessageCaptionOption) (pre
 //
 // Unique identifier of the business connection on behalf of which the message to be edited was sent
 func WithEditMessageCaptionBusinessConnectionID(value string) EditMessageCaptionOption {
-	return func(params *EditMessageCaptionParams) EditMessageCaptionOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithEditMessageCaptionBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *EditMessageCaptionParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithEditMessageCaptionChatID sets the ChatID field.
@@ -5661,12 +5118,9 @@ func WithEditMessageCaptionBusinessConnectionID(value string) EditMessageCaption
 // Required if inline_message_id is not specified.
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
 func WithEditMessageCaptionChatID(value string) EditMessageCaptionOption {
-	return func(params *EditMessageCaptionParams) EditMessageCaptionOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithEditMessageCaptionChatID(previous)
-	}
+	return fieldOption(value, func(params *EditMessageCaptionParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithEditMessageCaptionMessageID sets the MessageID field.
@@ -5674,12 +5128,9 @@ func WithEditMessageCaptionChatID(value string) EditMessageCaptionOption {
 // Required if inline_message_id is not specified.
 // Identifier of the message to edit.
 func WithEditMessageCaptionMessageID(value int64) EditMessageCaptionOption {
-	return func(params *EditMessageCaptionParams) EditMessageCaptionOption {
-		previous := params.MessageID
-		params.MessageID = value
-
-		return WithEditMessageCaptionMessageID(previous)
-	}
+	return fieldOption(value, func(params *EditMessageCaptionParams) *int64 {
+		return &params.MessageID
+	})
 }
 
 // WithEditMessageCaptionInlineMessageID sets the InlineMessageID field.
@@ -5687,24 +5138,18 @@ func WithEditMessageCaptionMessageID(value int64) EditMessageCaptionOption {
 // Required if chat_id and message_id are not specified.
 // Identifier of the inline message.
 func WithEditMessageCaptionInlineMessageID(value string) EditMessageCaptionOption {
-	return func(params *EditMessageCaptionParams) EditMessageCaptionOption {
-		previous := params.InlineMessageID
-		params.InlineMessageID = value
-
-		return WithEditMessageCaptionInlineMessageID(previous)
-	}
+	return fieldOption(value, func(params *EditMessageCaptionParams) *string {
+		return &params.InlineMessageID
+	})
 }
 
 // WithEditMessageCaptionCaption sets the Caption field.
 //
 // New caption of the message, 0-1024 characters after entities parsing
 func WithEditMessageCaptionCaption(value string) EditMessageCaptionOption {
-	return func(params *EditMessageCaptionParams) EditMessageCaptionOption {
-		previous := params.Caption
-		params.Caption = value
-
-		return WithEditMessageCaptionCaption(previous)
-	}
+	return fieldOption(value, func(params *EditMessageCaptionParams) *string {
+		return &params.Caption
+	})
 }
 
 // WithEditMessageCaptionParseMode sets the ParseMode field.
@@ -5714,24 +5159,18 @@ func WithEditMessageCaptionCaption(value string) EditMessageCaptionOption {
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithEditMessageCaptionParseMode(value string) EditMessageCaptionOption {
-	return func(params *EditMessageCaptionParams) EditMessageCaptionOption {
-		previous := params.ParseMode
-		params.ParseMode = value
-
-		return WithEditMessageCaptionParseMode(previous)
-	}
+	return fieldOption(value, func(params *EditMessageCaptionParams) *string {
+		return &params.ParseMode
+	})
 }
 
 // WithEditMessageCaptionCaptionEntities sets the CaptionEntities field.
 //
 // A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
 func WithEditMessageCaptionCaptionEntities(value []MessageEntity) EditMessageCaptionOption {
-	return func(params *EditMessageCaptionParams) EditMessageCaptionOption {
-		previous := params.CaptionEntities
-		params.CaptionEntities = value
-
-		return WithEditMessageCaptionCaptionEntities(previous)
-	}
+	return fieldOption(value, func(params *EditMessageCaptionParams) *[]MessageEntity {
+		return &params.CaptionEntities
+	})
 }
 
 // WithEditMessageCaptionShowCaptionAboveMedia sets the ShowCaptionAboveMedia field.
@@ -5739,12 +5178,9 @@ func WithEditMessageCaptionCaptionEntities(value []MessageEntity) EditMessageCap
 // Pass True if the caption must be shown above the message media.
 // Supported only for animation, photo and video messages.
 func WithEditMessageCaptionShowCaptionAboveMedia(value bool) EditMessageCaptionOption {
-	return func(params *EditMessageCaptionParams) EditMessageCaptionOption {
-		previous := params.ShowCaptionAboveMedia
-		params.ShowCaptionAboveMedia = value
-
-		return WithEditMessageCaptionShowCaptionAboveMedia(previous)
-	}
+	return fieldOption(value, func(params *EditMessageCaptionParams) *bool {
+		return &params.ShowCaptionAboveMedia
+	})
 }
 
 // WithEditMessageCaptionReplyMarkup sets the ReplyMarkup field.
@@ -5753,12 +5189,9 @@ func WithEditMessageCaptionShowCaptionAboveMedia(value bool) EditMessageCaptionO
 //
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 func WithEditMessageCaptionReplyMarkup(value *InlineKeyboardMarkup) EditMessageCaptionOption {
-	return func(params *EditMessageCaptionParams) EditMessageCaptionOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithEditMessageCaptionReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *EditMessageCaptionParams) **InlineKeyboardMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // EditMessageCaption calls the editMessageCaption Telegram Bot API method.
@@ -5817,7 +5250,7 @@ type EditMessageChecklistParams struct {
 }
 
 // EditMessageChecklistOption configures EditMessageChecklistParams.
-type EditMessageChecklistOption func(params *EditMessageChecklistParams) EditMessageChecklistOption
+type EditMessageChecklistOption = Option[EditMessageChecklistParams]
 
 // Option applies one or more EditMessageChecklistOption values and returns the last rollback option.
 func (r *EditMessageChecklistParams) Option(opts ...EditMessageChecklistOption) (previous EditMessageChecklistOption) {
@@ -5831,48 +5264,36 @@ func (r *EditMessageChecklistParams) Option(opts ...EditMessageChecklistOption) 
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
 func WithEditMessageChecklistBusinessConnectionID(value string) EditMessageChecklistOption {
-	return func(params *EditMessageChecklistParams) EditMessageChecklistOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithEditMessageChecklistBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *EditMessageChecklistParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithEditMessageChecklistChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot in the format @username
 func WithEditMessageChecklistChatID(value string) EditMessageChecklistOption {
-	return func(params *EditMessageChecklistParams) EditMessageChecklistOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithEditMessageChecklistChatID(previous)
-	}
+	return fieldOption(value, func(params *EditMessageChecklistParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithEditMessageChecklistMessageID sets the MessageID field.
 //
 // Unique identifier for the target message
 func WithEditMessageChecklistMessageID(value int64) EditMessageChecklistOption {
-	return func(params *EditMessageChecklistParams) EditMessageChecklistOption {
-		previous := params.MessageID
-		params.MessageID = value
-
-		return WithEditMessageChecklistMessageID(previous)
-	}
+	return fieldOption(value, func(params *EditMessageChecklistParams) *int64 {
+		return &params.MessageID
+	})
 }
 
 // WithEditMessageChecklistChecklist sets the Checklist field.
 //
 // A JSON-serialized object for the new checklist
 func WithEditMessageChecklistChecklist(value InputChecklist) EditMessageChecklistOption {
-	return func(params *EditMessageChecklistParams) EditMessageChecklistOption {
-		previous := params.Checklist
-		params.Checklist = value
-
-		return WithEditMessageChecklistChecklist(previous)
-	}
+	return fieldOption(value, func(params *EditMessageChecklistParams) *InputChecklist {
+		return &params.Checklist
+	})
 }
 
 // WithEditMessageChecklistReplyMarkup sets the ReplyMarkup field.
@@ -5881,12 +5302,9 @@ func WithEditMessageChecklistChecklist(value InputChecklist) EditMessageChecklis
 //
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 func WithEditMessageChecklistReplyMarkup(value *InlineKeyboardMarkup) EditMessageChecklistOption {
-	return func(params *EditMessageChecklistParams) EditMessageChecklistOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithEditMessageChecklistReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *EditMessageChecklistParams) **InlineKeyboardMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // EditMessageChecklist calls the editMessageChecklist Telegram Bot API method.
@@ -5970,7 +5388,7 @@ type EditMessageLiveLocationParams struct {
 }
 
 // EditMessageLiveLocationOption configures EditMessageLiveLocationParams.
-type EditMessageLiveLocationOption func(params *EditMessageLiveLocationParams) EditMessageLiveLocationOption
+type EditMessageLiveLocationOption = Option[EditMessageLiveLocationParams]
 
 // Option applies one or more EditMessageLiveLocationOption values and returns the last rollback option.
 func (r *EditMessageLiveLocationParams) Option(opts ...EditMessageLiveLocationOption) (previous EditMessageLiveLocationOption) {
@@ -5984,12 +5402,9 @@ func (r *EditMessageLiveLocationParams) Option(opts ...EditMessageLiveLocationOp
 //
 // Unique identifier of the business connection on behalf of which the message to be edited was sent
 func WithEditMessageLiveLocationBusinessConnectionID(value string) EditMessageLiveLocationOption {
-	return func(params *EditMessageLiveLocationParams) EditMessageLiveLocationOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithEditMessageLiveLocationBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *EditMessageLiveLocationParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithEditMessageLiveLocationChatID sets the ChatID field.
@@ -5997,12 +5412,9 @@ func WithEditMessageLiveLocationBusinessConnectionID(value string) EditMessageLi
 // Required if inline_message_id is not specified.
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
 func WithEditMessageLiveLocationChatID(value string) EditMessageLiveLocationOption {
-	return func(params *EditMessageLiveLocationParams) EditMessageLiveLocationOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithEditMessageLiveLocationChatID(previous)
-	}
+	return fieldOption(value, func(params *EditMessageLiveLocationParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithEditMessageLiveLocationMessageID sets the MessageID field.
@@ -6010,12 +5422,9 @@ func WithEditMessageLiveLocationChatID(value string) EditMessageLiveLocationOpti
 // Required if inline_message_id is not specified.
 // Identifier of the message to edit.
 func WithEditMessageLiveLocationMessageID(value int64) EditMessageLiveLocationOption {
-	return func(params *EditMessageLiveLocationParams) EditMessageLiveLocationOption {
-		previous := params.MessageID
-		params.MessageID = value
-
-		return WithEditMessageLiveLocationMessageID(previous)
-	}
+	return fieldOption(value, func(params *EditMessageLiveLocationParams) *int64 {
+		return &params.MessageID
+	})
 }
 
 // WithEditMessageLiveLocationInlineMessageID sets the InlineMessageID field.
@@ -6023,36 +5432,27 @@ func WithEditMessageLiveLocationMessageID(value int64) EditMessageLiveLocationOp
 // Required if chat_id and message_id are not specified.
 // Identifier of the inline message.
 func WithEditMessageLiveLocationInlineMessageID(value string) EditMessageLiveLocationOption {
-	return func(params *EditMessageLiveLocationParams) EditMessageLiveLocationOption {
-		previous := params.InlineMessageID
-		params.InlineMessageID = value
-
-		return WithEditMessageLiveLocationInlineMessageID(previous)
-	}
+	return fieldOption(value, func(params *EditMessageLiveLocationParams) *string {
+		return &params.InlineMessageID
+	})
 }
 
 // WithEditMessageLiveLocationLatitude sets the Latitude field.
 //
 // Latitude of new location
 func WithEditMessageLiveLocationLatitude(value float64) EditMessageLiveLocationOption {
-	return func(params *EditMessageLiveLocationParams) EditMessageLiveLocationOption {
-		previous := params.Latitude
-		params.Latitude = value
-
-		return WithEditMessageLiveLocationLatitude(previous)
-	}
+	return fieldOption(value, func(params *EditMessageLiveLocationParams) *float64 {
+		return &params.Latitude
+	})
 }
 
 // WithEditMessageLiveLocationLongitude sets the Longitude field.
 //
 // Longitude of new location
 func WithEditMessageLiveLocationLongitude(value float64) EditMessageLiveLocationOption {
-	return func(params *EditMessageLiveLocationParams) EditMessageLiveLocationOption {
-		previous := params.Longitude
-		params.Longitude = value
-
-		return WithEditMessageLiveLocationLongitude(previous)
-	}
+	return fieldOption(value, func(params *EditMessageLiveLocationParams) *float64 {
+		return &params.Longitude
+	})
 }
 
 // WithEditMessageLiveLocationLivePeriod sets the LivePeriod field.
@@ -6062,24 +5462,18 @@ func WithEditMessageLiveLocationLongitude(value float64) EditMessageLiveLocation
 // Otherwise, the new value must not exceed the current live_period by more than a day, and the live location expiration date must remain within the next 90 days.
 // If not specified, then live_period remains unchanged.
 func WithEditMessageLiveLocationLivePeriod(value int64) EditMessageLiveLocationOption {
-	return func(params *EditMessageLiveLocationParams) EditMessageLiveLocationOption {
-		previous := params.LivePeriod
-		params.LivePeriod = value
-
-		return WithEditMessageLiveLocationLivePeriod(previous)
-	}
+	return fieldOption(value, func(params *EditMessageLiveLocationParams) *int64 {
+		return &params.LivePeriod
+	})
 }
 
 // WithEditMessageLiveLocationHorizontalAccuracy sets the HorizontalAccuracy field.
 //
 // The radius of uncertainty for the location, measured in meters; 0-1500
 func WithEditMessageLiveLocationHorizontalAccuracy(value float64) EditMessageLiveLocationOption {
-	return func(params *EditMessageLiveLocationParams) EditMessageLiveLocationOption {
-		previous := params.HorizontalAccuracy
-		params.HorizontalAccuracy = value
-
-		return WithEditMessageLiveLocationHorizontalAccuracy(previous)
-	}
+	return fieldOption(value, func(params *EditMessageLiveLocationParams) *float64 {
+		return &params.HorizontalAccuracy
+	})
 }
 
 // WithEditMessageLiveLocationHeading sets the Heading field.
@@ -6087,12 +5481,9 @@ func WithEditMessageLiveLocationHorizontalAccuracy(value float64) EditMessageLiv
 // Direction in which the user is moving, in degrees.
 // Must be between 1 and 360 if specified.
 func WithEditMessageLiveLocationHeading(value int64) EditMessageLiveLocationOption {
-	return func(params *EditMessageLiveLocationParams) EditMessageLiveLocationOption {
-		previous := params.Heading
-		params.Heading = value
-
-		return WithEditMessageLiveLocationHeading(previous)
-	}
+	return fieldOption(value, func(params *EditMessageLiveLocationParams) *int64 {
+		return &params.Heading
+	})
 }
 
 // WithEditMessageLiveLocationProximityAlertRadius sets the ProximityAlertRadius field.
@@ -6100,12 +5491,9 @@ func WithEditMessageLiveLocationHeading(value int64) EditMessageLiveLocationOpti
 // The maximum distance for proximity alerts about approaching another chat member, in meters.
 // Must be between 1 and 100000 if specified.
 func WithEditMessageLiveLocationProximityAlertRadius(value int64) EditMessageLiveLocationOption {
-	return func(params *EditMessageLiveLocationParams) EditMessageLiveLocationOption {
-		previous := params.ProximityAlertRadius
-		params.ProximityAlertRadius = value
-
-		return WithEditMessageLiveLocationProximityAlertRadius(previous)
-	}
+	return fieldOption(value, func(params *EditMessageLiveLocationParams) *int64 {
+		return &params.ProximityAlertRadius
+	})
 }
 
 // WithEditMessageLiveLocationReplyMarkup sets the ReplyMarkup field.
@@ -6114,12 +5502,9 @@ func WithEditMessageLiveLocationProximityAlertRadius(value int64) EditMessageLiv
 //
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 func WithEditMessageLiveLocationReplyMarkup(value *InlineKeyboardMarkup) EditMessageLiveLocationOption {
-	return func(params *EditMessageLiveLocationParams) EditMessageLiveLocationOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithEditMessageLiveLocationReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *EditMessageLiveLocationParams) **InlineKeyboardMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // EditMessageLiveLocation calls the editMessageLiveLocation Telegram Bot API method.
@@ -6185,7 +5570,7 @@ type EditMessageMediaParams struct {
 }
 
 // EditMessageMediaOption configures EditMessageMediaParams.
-type EditMessageMediaOption func(params *EditMessageMediaParams) EditMessageMediaOption
+type EditMessageMediaOption = Option[EditMessageMediaParams]
 
 // Option applies one or more EditMessageMediaOption values and returns the last rollback option.
 func (r *EditMessageMediaParams) Option(opts ...EditMessageMediaOption) (previous EditMessageMediaOption) {
@@ -6199,12 +5584,9 @@ func (r *EditMessageMediaParams) Option(opts ...EditMessageMediaOption) (previou
 //
 // Unique identifier of the business connection on behalf of which the message to be edited was sent
 func WithEditMessageMediaBusinessConnectionID(value string) EditMessageMediaOption {
-	return func(params *EditMessageMediaParams) EditMessageMediaOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithEditMessageMediaBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *EditMessageMediaParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithEditMessageMediaChatID sets the ChatID field.
@@ -6212,12 +5594,9 @@ func WithEditMessageMediaBusinessConnectionID(value string) EditMessageMediaOpti
 // Required if inline_message_id is not specified.
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
 func WithEditMessageMediaChatID(value string) EditMessageMediaOption {
-	return func(params *EditMessageMediaParams) EditMessageMediaOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithEditMessageMediaChatID(previous)
-	}
+	return fieldOption(value, func(params *EditMessageMediaParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithEditMessageMediaMessageID sets the MessageID field.
@@ -6225,12 +5604,9 @@ func WithEditMessageMediaChatID(value string) EditMessageMediaOption {
 // Required if inline_message_id is not specified.
 // Identifier of the message to edit.
 func WithEditMessageMediaMessageID(value int64) EditMessageMediaOption {
-	return func(params *EditMessageMediaParams) EditMessageMediaOption {
-		previous := params.MessageID
-		params.MessageID = value
-
-		return WithEditMessageMediaMessageID(previous)
-	}
+	return fieldOption(value, func(params *EditMessageMediaParams) *int64 {
+		return &params.MessageID
+	})
 }
 
 // WithEditMessageMediaInlineMessageID sets the InlineMessageID field.
@@ -6238,24 +5614,18 @@ func WithEditMessageMediaMessageID(value int64) EditMessageMediaOption {
 // Required if chat_id and message_id are not specified.
 // Identifier of the inline message.
 func WithEditMessageMediaInlineMessageID(value string) EditMessageMediaOption {
-	return func(params *EditMessageMediaParams) EditMessageMediaOption {
-		previous := params.InlineMessageID
-		params.InlineMessageID = value
-
-		return WithEditMessageMediaInlineMessageID(previous)
-	}
+	return fieldOption(value, func(params *EditMessageMediaParams) *string {
+		return &params.InlineMessageID
+	})
 }
 
 // WithEditMessageMediaMedia sets the Media field.
 //
 // A JSON-serialized object for the new media content of the message
 func WithEditMessageMediaMedia(value InputMedia) EditMessageMediaOption {
-	return func(params *EditMessageMediaParams) EditMessageMediaOption {
-		previous := params.Media
-		params.Media = value
-
-		return WithEditMessageMediaMedia(previous)
-	}
+	return fieldOption(value, func(params *EditMessageMediaParams) *InputMedia {
+		return &params.Media
+	})
 }
 
 // WithEditMessageMediaReplyMarkup sets the ReplyMarkup field.
@@ -6264,12 +5634,9 @@ func WithEditMessageMediaMedia(value InputMedia) EditMessageMediaOption {
 //
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 func WithEditMessageMediaReplyMarkup(value *InlineKeyboardMarkup) EditMessageMediaOption {
-	return func(params *EditMessageMediaParams) EditMessageMediaOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithEditMessageMediaReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *EditMessageMediaParams) **InlineKeyboardMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // EditMessageMedia calls the editMessageMedia Telegram Bot API method.
@@ -6540,7 +5907,7 @@ type EditMessageReplyMarkupParams struct {
 }
 
 // EditMessageReplyMarkupOption configures EditMessageReplyMarkupParams.
-type EditMessageReplyMarkupOption func(params *EditMessageReplyMarkupParams) EditMessageReplyMarkupOption
+type EditMessageReplyMarkupOption = Option[EditMessageReplyMarkupParams]
 
 // Option applies one or more EditMessageReplyMarkupOption values and returns the last rollback option.
 func (r *EditMessageReplyMarkupParams) Option(opts ...EditMessageReplyMarkupOption) (previous EditMessageReplyMarkupOption) {
@@ -6554,12 +5921,9 @@ func (r *EditMessageReplyMarkupParams) Option(opts ...EditMessageReplyMarkupOpti
 //
 // Unique identifier of the business connection on behalf of which the message to be edited was sent
 func WithEditMessageReplyMarkupBusinessConnectionID(value string) EditMessageReplyMarkupOption {
-	return func(params *EditMessageReplyMarkupParams) EditMessageReplyMarkupOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithEditMessageReplyMarkupBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *EditMessageReplyMarkupParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithEditMessageReplyMarkupChatID sets the ChatID field.
@@ -6567,12 +5931,9 @@ func WithEditMessageReplyMarkupBusinessConnectionID(value string) EditMessageRep
 // Required if inline_message_id is not specified.
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
 func WithEditMessageReplyMarkupChatID(value string) EditMessageReplyMarkupOption {
-	return func(params *EditMessageReplyMarkupParams) EditMessageReplyMarkupOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithEditMessageReplyMarkupChatID(previous)
-	}
+	return fieldOption(value, func(params *EditMessageReplyMarkupParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithEditMessageReplyMarkupMessageID sets the MessageID field.
@@ -6580,12 +5941,9 @@ func WithEditMessageReplyMarkupChatID(value string) EditMessageReplyMarkupOption
 // Required if inline_message_id is not specified.
 // Identifier of the message to edit.
 func WithEditMessageReplyMarkupMessageID(value int64) EditMessageReplyMarkupOption {
-	return func(params *EditMessageReplyMarkupParams) EditMessageReplyMarkupOption {
-		previous := params.MessageID
-		params.MessageID = value
-
-		return WithEditMessageReplyMarkupMessageID(previous)
-	}
+	return fieldOption(value, func(params *EditMessageReplyMarkupParams) *int64 {
+		return &params.MessageID
+	})
 }
 
 // WithEditMessageReplyMarkupInlineMessageID sets the InlineMessageID field.
@@ -6593,12 +5951,9 @@ func WithEditMessageReplyMarkupMessageID(value int64) EditMessageReplyMarkupOpti
 // Required if chat_id and message_id are not specified.
 // Identifier of the inline message.
 func WithEditMessageReplyMarkupInlineMessageID(value string) EditMessageReplyMarkupOption {
-	return func(params *EditMessageReplyMarkupParams) EditMessageReplyMarkupOption {
-		previous := params.InlineMessageID
-		params.InlineMessageID = value
-
-		return WithEditMessageReplyMarkupInlineMessageID(previous)
-	}
+	return fieldOption(value, func(params *EditMessageReplyMarkupParams) *string {
+		return &params.InlineMessageID
+	})
 }
 
 // WithEditMessageReplyMarkupReplyMarkup sets the ReplyMarkup field.
@@ -6607,12 +5962,9 @@ func WithEditMessageReplyMarkupInlineMessageID(value string) EditMessageReplyMar
 //
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 func WithEditMessageReplyMarkupReplyMarkup(value *InlineKeyboardMarkup) EditMessageReplyMarkupOption {
-	return func(params *EditMessageReplyMarkupParams) EditMessageReplyMarkupOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithEditMessageReplyMarkupReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *EditMessageReplyMarkupParams) **InlineKeyboardMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // EditMessageReplyMarkup calls the editMessageReplyMarkup Telegram Bot API method.
@@ -6693,7 +6045,7 @@ type EditMessageTextParams struct {
 }
 
 // EditMessageTextOption configures EditMessageTextParams.
-type EditMessageTextOption func(params *EditMessageTextParams) EditMessageTextOption
+type EditMessageTextOption = Option[EditMessageTextParams]
 
 // Option applies one or more EditMessageTextOption values and returns the last rollback option.
 func (r *EditMessageTextParams) Option(opts ...EditMessageTextOption) (previous EditMessageTextOption) {
@@ -6707,12 +6059,9 @@ func (r *EditMessageTextParams) Option(opts ...EditMessageTextOption) (previous 
 //
 // Unique identifier of the business connection on behalf of which the message to be edited was sent
 func WithEditMessageTextBusinessConnectionID(value string) EditMessageTextOption {
-	return func(params *EditMessageTextParams) EditMessageTextOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithEditMessageTextBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *EditMessageTextParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithEditMessageTextChatID sets the ChatID field.
@@ -6720,12 +6069,9 @@ func WithEditMessageTextBusinessConnectionID(value string) EditMessageTextOption
 // Required if inline_message_id is not specified.
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
 func WithEditMessageTextChatID(value string) EditMessageTextOption {
-	return func(params *EditMessageTextParams) EditMessageTextOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithEditMessageTextChatID(previous)
-	}
+	return fieldOption(value, func(params *EditMessageTextParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithEditMessageTextMessageID sets the MessageID field.
@@ -6733,12 +6079,9 @@ func WithEditMessageTextChatID(value string) EditMessageTextOption {
 // Required if inline_message_id is not specified.
 // Identifier of the message to edit.
 func WithEditMessageTextMessageID(value int64) EditMessageTextOption {
-	return func(params *EditMessageTextParams) EditMessageTextOption {
-		previous := params.MessageID
-		params.MessageID = value
-
-		return WithEditMessageTextMessageID(previous)
-	}
+	return fieldOption(value, func(params *EditMessageTextParams) *int64 {
+		return &params.MessageID
+	})
 }
 
 // WithEditMessageTextInlineMessageID sets the InlineMessageID field.
@@ -6746,24 +6089,18 @@ func WithEditMessageTextMessageID(value int64) EditMessageTextOption {
 // Required if chat_id and message_id are not specified.
 // Identifier of the inline message.
 func WithEditMessageTextInlineMessageID(value string) EditMessageTextOption {
-	return func(params *EditMessageTextParams) EditMessageTextOption {
-		previous := params.InlineMessageID
-		params.InlineMessageID = value
-
-		return WithEditMessageTextInlineMessageID(previous)
-	}
+	return fieldOption(value, func(params *EditMessageTextParams) *string {
+		return &params.InlineMessageID
+	})
 }
 
 // WithEditMessageTextText sets the Text field.
 //
 // New text of the message, 1-4096 characters after entity parsing; required if rich_message isn't specified
 func WithEditMessageTextText(value string) EditMessageTextOption {
-	return func(params *EditMessageTextParams) EditMessageTextOption {
-		previous := params.Text
-		params.Text = value
-
-		return WithEditMessageTextText(previous)
-	}
+	return fieldOption(value, func(params *EditMessageTextParams) *string {
+		return &params.Text
+	})
 }
 
 // WithEditMessageTextParseMode sets the ParseMode field.
@@ -6773,36 +6110,27 @@ func WithEditMessageTextText(value string) EditMessageTextOption {
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithEditMessageTextParseMode(value string) EditMessageTextOption {
-	return func(params *EditMessageTextParams) EditMessageTextOption {
-		previous := params.ParseMode
-		params.ParseMode = value
-
-		return WithEditMessageTextParseMode(previous)
-	}
+	return fieldOption(value, func(params *EditMessageTextParams) *string {
+		return &params.ParseMode
+	})
 }
 
 // WithEditMessageTextEntities sets the Entities field.
 //
 // A JSON-serialized list of special entities that appear in message text, which can be specified instead of parse_mode
 func WithEditMessageTextEntities(value []MessageEntity) EditMessageTextOption {
-	return func(params *EditMessageTextParams) EditMessageTextOption {
-		previous := params.Entities
-		params.Entities = value
-
-		return WithEditMessageTextEntities(previous)
-	}
+	return fieldOption(value, func(params *EditMessageTextParams) *[]MessageEntity {
+		return &params.Entities
+	})
 }
 
 // WithEditMessageTextLinkPreviewOptions sets the LinkPreviewOptions field.
 //
 // Link preview generation options for the message
 func WithEditMessageTextLinkPreviewOptions(value *LinkPreviewOptions) EditMessageTextOption {
-	return func(params *EditMessageTextParams) EditMessageTextOption {
-		previous := params.LinkPreviewOptions
-		params.LinkPreviewOptions = value
-
-		return WithEditMessageTextLinkPreviewOptions(previous)
-	}
+	return fieldOption(value, func(params *EditMessageTextParams) **LinkPreviewOptions {
+		return &params.LinkPreviewOptions
+	})
 }
 
 // WithEditMessageTextRichMessage sets the RichMessage field.
@@ -6810,12 +6138,9 @@ func WithEditMessageTextLinkPreviewOptions(value *LinkPreviewOptions) EditMessag
 // New rich content of the message; required if text isn't specified.
 // Direct upload of new files isn't supported when an inline message is edited.
 func WithEditMessageTextRichMessage(value *InputRichMessage) EditMessageTextOption {
-	return func(params *EditMessageTextParams) EditMessageTextOption {
-		previous := params.RichMessage
-		params.RichMessage = value
-
-		return WithEditMessageTextRichMessage(previous)
-	}
+	return fieldOption(value, func(params *EditMessageTextParams) **InputRichMessage {
+		return &params.RichMessage
+	})
 }
 
 // WithEditMessageTextReplyMarkup sets the ReplyMarkup field.
@@ -6824,12 +6149,9 @@ func WithEditMessageTextRichMessage(value *InputRichMessage) EditMessageTextOpti
 //
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 func WithEditMessageTextReplyMarkup(value *InlineKeyboardMarkup) EditMessageTextOption {
-	return func(params *EditMessageTextParams) EditMessageTextOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithEditMessageTextReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *EditMessageTextParams) **InlineKeyboardMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // EditMessageText calls the editMessageText Telegram Bot API method.
@@ -6896,7 +6218,7 @@ type EditStoryParams struct {
 }
 
 // EditStoryOption configures EditStoryParams.
-type EditStoryOption func(params *EditStoryParams) EditStoryOption
+type EditStoryOption = Option[EditStoryParams]
 
 // Option applies one or more EditStoryOption values and returns the last rollback option.
 func (r *EditStoryParams) Option(opts ...EditStoryOption) (previous EditStoryOption) {
@@ -6910,48 +6232,36 @@ func (r *EditStoryParams) Option(opts ...EditStoryOption) (previous EditStoryOpt
 //
 // Unique identifier of the business connection
 func WithEditStoryBusinessConnectionID(value string) EditStoryOption {
-	return func(params *EditStoryParams) EditStoryOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithEditStoryBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *EditStoryParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithEditStoryStoryID sets the StoryID field.
 //
 // Unique identifier of the story to edit
 func WithEditStoryStoryID(value int64) EditStoryOption {
-	return func(params *EditStoryParams) EditStoryOption {
-		previous := params.StoryID
-		params.StoryID = value
-
-		return WithEditStoryStoryID(previous)
-	}
+	return fieldOption(value, func(params *EditStoryParams) *int64 {
+		return &params.StoryID
+	})
 }
 
 // WithEditStoryContent sets the Content field.
 //
 // Content of the story
 func WithEditStoryContent(value InputStoryContent) EditStoryOption {
-	return func(params *EditStoryParams) EditStoryOption {
-		previous := params.Content
-		params.Content = value
-
-		return WithEditStoryContent(previous)
-	}
+	return fieldOption(value, func(params *EditStoryParams) *InputStoryContent {
+		return &params.Content
+	})
 }
 
 // WithEditStoryCaption sets the Caption field.
 //
 // Caption of the story, 0-2048 characters after entities parsing
 func WithEditStoryCaption(value string) EditStoryOption {
-	return func(params *EditStoryParams) EditStoryOption {
-		previous := params.Caption
-		params.Caption = value
-
-		return WithEditStoryCaption(previous)
-	}
+	return fieldOption(value, func(params *EditStoryParams) *string {
+		return &params.Caption
+	})
 }
 
 // WithEditStoryParseMode sets the ParseMode field.
@@ -6961,36 +6271,27 @@ func WithEditStoryCaption(value string) EditStoryOption {
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithEditStoryParseMode(value string) EditStoryOption {
-	return func(params *EditStoryParams) EditStoryOption {
-		previous := params.ParseMode
-		params.ParseMode = value
-
-		return WithEditStoryParseMode(previous)
-	}
+	return fieldOption(value, func(params *EditStoryParams) *string {
+		return &params.ParseMode
+	})
 }
 
 // WithEditStoryCaptionEntities sets the CaptionEntities field.
 //
 // A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
 func WithEditStoryCaptionEntities(value []MessageEntity) EditStoryOption {
-	return func(params *EditStoryParams) EditStoryOption {
-		previous := params.CaptionEntities
-		params.CaptionEntities = value
-
-		return WithEditStoryCaptionEntities(previous)
-	}
+	return fieldOption(value, func(params *EditStoryParams) *[]MessageEntity {
+		return &params.CaptionEntities
+	})
 }
 
 // WithEditStoryAreas sets the Areas field.
 //
 // A JSON-serialized list of clickable areas to be shown on the story
 func WithEditStoryAreas(value []StoryArea) EditStoryOption {
-	return func(params *EditStoryParams) EditStoryOption {
-		previous := params.Areas
-		params.Areas = value
-
-		return WithEditStoryAreas(previous)
-	}
+	return fieldOption(value, func(params *EditStoryParams) *[]StoryArea {
+		return &params.Areas
+	})
 }
 
 // EditStory calls the editStory Telegram Bot API method.
@@ -7174,7 +6475,7 @@ type EditUserStarSubscriptionParams struct {
 }
 
 // EditUserStarSubscriptionOption configures EditUserStarSubscriptionParams.
-type EditUserStarSubscriptionOption func(params *EditUserStarSubscriptionParams) EditUserStarSubscriptionOption
+type EditUserStarSubscriptionOption = Option[EditUserStarSubscriptionParams]
 
 // Option applies one or more EditUserStarSubscriptionOption values and returns the last rollback option.
 func (r *EditUserStarSubscriptionParams) Option(opts ...EditUserStarSubscriptionOption) (previous EditUserStarSubscriptionOption) {
@@ -7188,24 +6489,18 @@ func (r *EditUserStarSubscriptionParams) Option(opts ...EditUserStarSubscription
 //
 // Identifier of the user whose subscription will be edited
 func WithEditUserStarSubscriptionUserID(value int64) EditUserStarSubscriptionOption {
-	return func(params *EditUserStarSubscriptionParams) EditUserStarSubscriptionOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithEditUserStarSubscriptionUserID(previous)
-	}
+	return fieldOption(value, func(params *EditUserStarSubscriptionParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithEditUserStarSubscriptionTelegramPaymentChargeID sets the TelegramPaymentChargeID field.
 //
 // Telegram payment identifier for the subscription
 func WithEditUserStarSubscriptionTelegramPaymentChargeID(value string) EditUserStarSubscriptionOption {
-	return func(params *EditUserStarSubscriptionParams) EditUserStarSubscriptionOption {
-		previous := params.TelegramPaymentChargeID
-		params.TelegramPaymentChargeID = value
-
-		return WithEditUserStarSubscriptionTelegramPaymentChargeID(previous)
-	}
+	return fieldOption(value, func(params *EditUserStarSubscriptionParams) *string {
+		return &params.TelegramPaymentChargeID
+	})
 }
 
 // WithEditUserStarSubscriptionIsCanceled sets the IsCanceled field.
@@ -7213,12 +6508,9 @@ func WithEditUserStarSubscriptionTelegramPaymentChargeID(value string) EditUserS
 // Pass True to cancel extension of the user subscription; the subscription must be active up to the end of the current subscription period.
 // Pass False to allow the user to re-enable a subscription that was previously canceled by the bot.
 func WithEditUserStarSubscriptionIsCanceled(value bool) EditUserStarSubscriptionOption {
-	return func(params *EditUserStarSubscriptionParams) EditUserStarSubscriptionOption {
-		previous := params.IsCanceled
-		params.IsCanceled = value
-
-		return WithEditUserStarSubscriptionIsCanceled(previous)
-	}
+	return fieldOption(value, func(params *EditUserStarSubscriptionParams) *bool {
+		return &params.IsCanceled
+	})
 }
 
 // EditUserStarSubscription calls the editUserStarSubscription Telegram Bot API method.
@@ -7259,7 +6551,7 @@ type ExportChatInviteLinkParams struct {
 }
 
 // ExportChatInviteLinkOption configures ExportChatInviteLinkParams.
-type ExportChatInviteLinkOption func(params *ExportChatInviteLinkParams) ExportChatInviteLinkOption
+type ExportChatInviteLinkOption = Option[ExportChatInviteLinkParams]
 
 // Option applies one or more ExportChatInviteLinkOption values and returns the last rollback option.
 func (r *ExportChatInviteLinkParams) Option(opts ...ExportChatInviteLinkOption) (previous ExportChatInviteLinkOption) {
@@ -7273,12 +6565,9 @@ func (r *ExportChatInviteLinkParams) Option(opts ...ExportChatInviteLinkOption) 
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
 func WithExportChatInviteLinkChatID(value string) ExportChatInviteLinkOption {
-	return func(params *ExportChatInviteLinkParams) ExportChatInviteLinkOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithExportChatInviteLinkChatID(previous)
-	}
+	return fieldOption(value, func(params *ExportChatInviteLinkParams) *string {
+		return &params.ChatID
+	})
 }
 
 // ExportChatInviteLink calls the exportChatInviteLink Telegram Bot API method.
@@ -7350,7 +6639,7 @@ type ForwardMessageParams struct {
 }
 
 // ForwardMessageOption configures ForwardMessageParams.
-type ForwardMessageOption func(params *ForwardMessageParams) ForwardMessageOption
+type ForwardMessageOption = Option[ForwardMessageParams]
 
 // Option applies one or more ForwardMessageOption values and returns the last rollback option.
 func (r *ForwardMessageParams) Option(opts ...ForwardMessageOption) (previous ForwardMessageOption) {
@@ -7364,60 +6653,45 @@ func (r *ForwardMessageParams) Option(opts ...ForwardMessageOption) (previous Fo
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithForwardMessageChatID(value string) ForwardMessageOption {
-	return func(params *ForwardMessageParams) ForwardMessageOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithForwardMessageChatID(previous)
-	}
+	return fieldOption(value, func(params *ForwardMessageParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithForwardMessageMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithForwardMessageMessageThreadID(value int64) ForwardMessageOption {
-	return func(params *ForwardMessageParams) ForwardMessageOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithForwardMessageMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *ForwardMessageParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithForwardMessageDirectMessagesTopicID sets the DirectMessagesTopicID field.
 //
 // Identifier of the direct messages topic to which the message will be forwarded; required if the message is forwarded to a direct messages chat
 func WithForwardMessageDirectMessagesTopicID(value int64) ForwardMessageOption {
-	return func(params *ForwardMessageParams) ForwardMessageOption {
-		previous := params.DirectMessagesTopicID
-		params.DirectMessagesTopicID = value
-
-		return WithForwardMessageDirectMessagesTopicID(previous)
-	}
+	return fieldOption(value, func(params *ForwardMessageParams) *int64 {
+		return &params.DirectMessagesTopicID
+	})
 }
 
 // WithForwardMessageFromChatID sets the FromChatID field.
 //
 // Unique identifier for the chat where the original message was sent (or username of the target bot, supergroup or channel in the format @username)
 func WithForwardMessageFromChatID(value string) ForwardMessageOption {
-	return func(params *ForwardMessageParams) ForwardMessageOption {
-		previous := params.FromChatID
-		params.FromChatID = value
-
-		return WithForwardMessageFromChatID(previous)
-	}
+	return fieldOption(value, func(params *ForwardMessageParams) *string {
+		return &params.FromChatID
+	})
 }
 
 // WithForwardMessageVideoStartTimestamp sets the VideoStartTimestamp field.
 //
 // New start timestamp for the forwarded video in the message
 func WithForwardMessageVideoStartTimestamp(value int64) ForwardMessageOption {
-	return func(params *ForwardMessageParams) ForwardMessageOption {
-		previous := params.VideoStartTimestamp
-		params.VideoStartTimestamp = value
-
-		return WithForwardMessageVideoStartTimestamp(previous)
-	}
+	return fieldOption(value, func(params *ForwardMessageParams) *int64 {
+		return &params.VideoStartTimestamp
+	})
 }
 
 // WithForwardMessageDisableNotification sets the DisableNotification field.
@@ -7427,60 +6701,45 @@ func WithForwardMessageVideoStartTimestamp(value int64) ForwardMessageOption {
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithForwardMessageDisableNotification(value bool) ForwardMessageOption {
-	return func(params *ForwardMessageParams) ForwardMessageOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithForwardMessageDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *ForwardMessageParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithForwardMessageProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the forwarded message from forwarding and saving
 func WithForwardMessageProtectContent(value bool) ForwardMessageOption {
-	return func(params *ForwardMessageParams) ForwardMessageOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithForwardMessageProtectContent(previous)
-	}
+	return fieldOption(value, func(params *ForwardMessageParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithForwardMessageMessageEffectID sets the MessageEffectID field.
 //
 // Unique identifier of the message effect to be added to the message; only available when forwarding to private chats
 func WithForwardMessageMessageEffectID(value string) ForwardMessageOption {
-	return func(params *ForwardMessageParams) ForwardMessageOption {
-		previous := params.MessageEffectID
-		params.MessageEffectID = value
-
-		return WithForwardMessageMessageEffectID(previous)
-	}
+	return fieldOption(value, func(params *ForwardMessageParams) *string {
+		return &params.MessageEffectID
+	})
 }
 
 // WithForwardMessageSuggestedPostParameters sets the SuggestedPostParameters field.
 //
 // A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only
 func WithForwardMessageSuggestedPostParameters(value *SuggestedPostParameters) ForwardMessageOption {
-	return func(params *ForwardMessageParams) ForwardMessageOption {
-		previous := params.SuggestedPostParameters
-		params.SuggestedPostParameters = value
-
-		return WithForwardMessageSuggestedPostParameters(previous)
-	}
+	return fieldOption(value, func(params *ForwardMessageParams) **SuggestedPostParameters {
+		return &params.SuggestedPostParameters
+	})
 }
 
 // WithForwardMessageMessageID sets the MessageID field.
 //
 // Message identifier in the chat specified in from_chat_id
 func WithForwardMessageMessageID(value int64) ForwardMessageOption {
-	return func(params *ForwardMessageParams) ForwardMessageOption {
-		previous := params.MessageID
-		params.MessageID = value
-
-		return WithForwardMessageMessageID(previous)
-	}
+	return fieldOption(value, func(params *ForwardMessageParams) *int64 {
+		return &params.MessageID
+	})
 }
 
 // ForwardMessage calls the forwardMessage Telegram Bot API method.
@@ -7547,7 +6806,7 @@ type ForwardMessagesParams struct {
 }
 
 // ForwardMessagesOption configures ForwardMessagesParams.
-type ForwardMessagesOption func(params *ForwardMessagesParams) ForwardMessagesOption
+type ForwardMessagesOption = Option[ForwardMessagesParams]
 
 // Option applies one or more ForwardMessagesOption values and returns the last rollback option.
 func (r *ForwardMessagesParams) Option(opts ...ForwardMessagesOption) (previous ForwardMessagesOption) {
@@ -7561,48 +6820,36 @@ func (r *ForwardMessagesParams) Option(opts ...ForwardMessagesOption) (previous 
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithForwardMessagesChatID(value string) ForwardMessagesOption {
-	return func(params *ForwardMessagesParams) ForwardMessagesOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithForwardMessagesChatID(previous)
-	}
+	return fieldOption(value, func(params *ForwardMessagesParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithForwardMessagesMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithForwardMessagesMessageThreadID(value int64) ForwardMessagesOption {
-	return func(params *ForwardMessagesParams) ForwardMessagesOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithForwardMessagesMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *ForwardMessagesParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithForwardMessagesDirectMessagesTopicID sets the DirectMessagesTopicID field.
 //
 // Identifier of the direct messages topic to which the messages will be forwarded; required if the messages are forwarded to a direct messages chat
 func WithForwardMessagesDirectMessagesTopicID(value int64) ForwardMessagesOption {
-	return func(params *ForwardMessagesParams) ForwardMessagesOption {
-		previous := params.DirectMessagesTopicID
-		params.DirectMessagesTopicID = value
-
-		return WithForwardMessagesDirectMessagesTopicID(previous)
-	}
+	return fieldOption(value, func(params *ForwardMessagesParams) *int64 {
+		return &params.DirectMessagesTopicID
+	})
 }
 
 // WithForwardMessagesFromChatID sets the FromChatID field.
 //
 // Unique identifier for the chat where the original messages were sent (or username of the target bot, supergroup or channel in the format @username)
 func WithForwardMessagesFromChatID(value string) ForwardMessagesOption {
-	return func(params *ForwardMessagesParams) ForwardMessagesOption {
-		previous := params.FromChatID
-		params.FromChatID = value
-
-		return WithForwardMessagesFromChatID(previous)
-	}
+	return fieldOption(value, func(params *ForwardMessagesParams) *string {
+		return &params.FromChatID
+	})
 }
 
 // WithForwardMessagesMessageIDs sets the MessageIDs field.
@@ -7610,12 +6857,9 @@ func WithForwardMessagesFromChatID(value string) ForwardMessagesOption {
 // A JSON-serialized list of 1-100 identifiers of messages in the chat from_chat_id to forward.
 // The identifiers must be specified in a strictly increasing order.
 func WithForwardMessagesMessageIDs(value []int64) ForwardMessagesOption {
-	return func(params *ForwardMessagesParams) ForwardMessagesOption {
-		previous := params.MessageIDs
-		params.MessageIDs = value
-
-		return WithForwardMessagesMessageIDs(previous)
-	}
+	return fieldOption(value, func(params *ForwardMessagesParams) *[]int64 {
+		return &params.MessageIDs
+	})
 }
 
 // WithForwardMessagesDisableNotification sets the DisableNotification field.
@@ -7625,24 +6869,18 @@ func WithForwardMessagesMessageIDs(value []int64) ForwardMessagesOption {
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithForwardMessagesDisableNotification(value bool) ForwardMessagesOption {
-	return func(params *ForwardMessagesParams) ForwardMessagesOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithForwardMessagesDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *ForwardMessagesParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithForwardMessagesProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the forwarded messages from forwarding and saving
 func WithForwardMessagesProtectContent(value bool) ForwardMessagesOption {
-	return func(params *ForwardMessagesParams) ForwardMessagesOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithForwardMessagesProtectContent(previous)
-	}
+	return fieldOption(value, func(params *ForwardMessagesParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // ForwardMessages calls the forwardMessages Telegram Bot API method.
@@ -7687,7 +6925,7 @@ type GetAvailableGiftsParams struct {
 }
 
 // GetAvailableGiftsOption configures GetAvailableGiftsParams.
-type GetAvailableGiftsOption func(params *GetAvailableGiftsParams) GetAvailableGiftsOption
+type GetAvailableGiftsOption = Option[GetAvailableGiftsParams]
 
 // Option applies one or more GetAvailableGiftsOption values and returns the last rollback option.
 func (r *GetAvailableGiftsParams) Option(opts ...GetAvailableGiftsOption) (previous GetAvailableGiftsOption) {
@@ -7771,7 +7009,7 @@ type GetBusinessAccountGiftsParams struct {
 }
 
 // GetBusinessAccountGiftsOption configures GetBusinessAccountGiftsParams.
-type GetBusinessAccountGiftsOption func(params *GetBusinessAccountGiftsParams) GetBusinessAccountGiftsOption
+type GetBusinessAccountGiftsOption = Option[GetBusinessAccountGiftsParams]
 
 // Option applies one or more GetBusinessAccountGiftsOption values and returns the last rollback option.
 func (r *GetBusinessAccountGiftsParams) Option(opts ...GetBusinessAccountGiftsOption) (previous GetBusinessAccountGiftsOption) {
@@ -7785,96 +7023,72 @@ func (r *GetBusinessAccountGiftsParams) Option(opts ...GetBusinessAccountGiftsOp
 //
 // Unique identifier of the business connection
 func WithGetBusinessAccountGiftsBusinessConnectionID(value string) GetBusinessAccountGiftsOption {
-	return func(params *GetBusinessAccountGiftsParams) GetBusinessAccountGiftsOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithGetBusinessAccountGiftsBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *GetBusinessAccountGiftsParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithGetBusinessAccountGiftsExcludeUnsaved sets the ExcludeUnsaved field.
 //
 // Pass True to exclude gifts that aren't saved to the account's profile page
 func WithGetBusinessAccountGiftsExcludeUnsaved(value bool) GetBusinessAccountGiftsOption {
-	return func(params *GetBusinessAccountGiftsParams) GetBusinessAccountGiftsOption {
-		previous := params.ExcludeUnsaved
-		params.ExcludeUnsaved = value
-
-		return WithGetBusinessAccountGiftsExcludeUnsaved(previous)
-	}
+	return fieldOption(value, func(params *GetBusinessAccountGiftsParams) *bool {
+		return &params.ExcludeUnsaved
+	})
 }
 
 // WithGetBusinessAccountGiftsExcludeSaved sets the ExcludeSaved field.
 //
 // Pass True to exclude gifts that are saved to the account's profile page
 func WithGetBusinessAccountGiftsExcludeSaved(value bool) GetBusinessAccountGiftsOption {
-	return func(params *GetBusinessAccountGiftsParams) GetBusinessAccountGiftsOption {
-		previous := params.ExcludeSaved
-		params.ExcludeSaved = value
-
-		return WithGetBusinessAccountGiftsExcludeSaved(previous)
-	}
+	return fieldOption(value, func(params *GetBusinessAccountGiftsParams) *bool {
+		return &params.ExcludeSaved
+	})
 }
 
 // WithGetBusinessAccountGiftsExcludeUnlimited sets the ExcludeUnlimited field.
 //
 // Pass True to exclude gifts that can be purchased an unlimited number of times
 func WithGetBusinessAccountGiftsExcludeUnlimited(value bool) GetBusinessAccountGiftsOption {
-	return func(params *GetBusinessAccountGiftsParams) GetBusinessAccountGiftsOption {
-		previous := params.ExcludeUnlimited
-		params.ExcludeUnlimited = value
-
-		return WithGetBusinessAccountGiftsExcludeUnlimited(previous)
-	}
+	return fieldOption(value, func(params *GetBusinessAccountGiftsParams) *bool {
+		return &params.ExcludeUnlimited
+	})
 }
 
 // WithGetBusinessAccountGiftsExcludeLimitedUpgradable sets the ExcludeLimitedUpgradable field.
 //
 // Pass True to exclude gifts that can be purchased a limited number of times and can be upgraded to unique
 func WithGetBusinessAccountGiftsExcludeLimitedUpgradable(value bool) GetBusinessAccountGiftsOption {
-	return func(params *GetBusinessAccountGiftsParams) GetBusinessAccountGiftsOption {
-		previous := params.ExcludeLimitedUpgradable
-		params.ExcludeLimitedUpgradable = value
-
-		return WithGetBusinessAccountGiftsExcludeLimitedUpgradable(previous)
-	}
+	return fieldOption(value, func(params *GetBusinessAccountGiftsParams) *bool {
+		return &params.ExcludeLimitedUpgradable
+	})
 }
 
 // WithGetBusinessAccountGiftsExcludeLimitedNonUpgradable sets the ExcludeLimitedNonUpgradable field.
 //
 // Pass True to exclude gifts that can be purchased a limited number of times and can't be upgraded to unique
 func WithGetBusinessAccountGiftsExcludeLimitedNonUpgradable(value bool) GetBusinessAccountGiftsOption {
-	return func(params *GetBusinessAccountGiftsParams) GetBusinessAccountGiftsOption {
-		previous := params.ExcludeLimitedNonUpgradable
-		params.ExcludeLimitedNonUpgradable = value
-
-		return WithGetBusinessAccountGiftsExcludeLimitedNonUpgradable(previous)
-	}
+	return fieldOption(value, func(params *GetBusinessAccountGiftsParams) *bool {
+		return &params.ExcludeLimitedNonUpgradable
+	})
 }
 
 // WithGetBusinessAccountGiftsExcludeUnique sets the ExcludeUnique field.
 //
 // Pass True to exclude unique gifts
 func WithGetBusinessAccountGiftsExcludeUnique(value bool) GetBusinessAccountGiftsOption {
-	return func(params *GetBusinessAccountGiftsParams) GetBusinessAccountGiftsOption {
-		previous := params.ExcludeUnique
-		params.ExcludeUnique = value
-
-		return WithGetBusinessAccountGiftsExcludeUnique(previous)
-	}
+	return fieldOption(value, func(params *GetBusinessAccountGiftsParams) *bool {
+		return &params.ExcludeUnique
+	})
 }
 
 // WithGetBusinessAccountGiftsExcludeFromBlockchain sets the ExcludeFromBlockchain field.
 //
 // Pass True to exclude gifts that were assigned from the TON blockchain and can't be resold or transferred in Telegram
 func WithGetBusinessAccountGiftsExcludeFromBlockchain(value bool) GetBusinessAccountGiftsOption {
-	return func(params *GetBusinessAccountGiftsParams) GetBusinessAccountGiftsOption {
-		previous := params.ExcludeFromBlockchain
-		params.ExcludeFromBlockchain = value
-
-		return WithGetBusinessAccountGiftsExcludeFromBlockchain(previous)
-	}
+	return fieldOption(value, func(params *GetBusinessAccountGiftsParams) *bool {
+		return &params.ExcludeFromBlockchain
+	})
 }
 
 // WithGetBusinessAccountGiftsSortByPrice sets the SortByPrice field.
@@ -7882,24 +7096,18 @@ func WithGetBusinessAccountGiftsExcludeFromBlockchain(value bool) GetBusinessAcc
 // Pass True to sort results by gift price instead of send date.
 // Sorting is applied before pagination.
 func WithGetBusinessAccountGiftsSortByPrice(value bool) GetBusinessAccountGiftsOption {
-	return func(params *GetBusinessAccountGiftsParams) GetBusinessAccountGiftsOption {
-		previous := params.SortByPrice
-		params.SortByPrice = value
-
-		return WithGetBusinessAccountGiftsSortByPrice(previous)
-	}
+	return fieldOption(value, func(params *GetBusinessAccountGiftsParams) *bool {
+		return &params.SortByPrice
+	})
 }
 
 // WithGetBusinessAccountGiftsOffset sets the Offset field.
 //
 // Offset of the first entry to return as received from the previous request; use empty string to get the first chunk of results
 func WithGetBusinessAccountGiftsOffset(value string) GetBusinessAccountGiftsOption {
-	return func(params *GetBusinessAccountGiftsParams) GetBusinessAccountGiftsOption {
-		previous := params.Offset
-		params.Offset = value
-
-		return WithGetBusinessAccountGiftsOffset(previous)
-	}
+	return fieldOption(value, func(params *GetBusinessAccountGiftsParams) *string {
+		return &params.Offset
+	})
 }
 
 // WithGetBusinessAccountGiftsLimit sets the Limit field.
@@ -7907,12 +7115,9 @@ func WithGetBusinessAccountGiftsOffset(value string) GetBusinessAccountGiftsOpti
 // The maximum number of gifts to be returned; 1-100.
 // Defaults to 100.
 func WithGetBusinessAccountGiftsLimit(value int64) GetBusinessAccountGiftsOption {
-	return func(params *GetBusinessAccountGiftsParams) GetBusinessAccountGiftsOption {
-		previous := params.Limit
-		params.Limit = value
-
-		return WithGetBusinessAccountGiftsLimit(previous)
-	}
+	return fieldOption(value, func(params *GetBusinessAccountGiftsParams) *int64 {
+		return &params.Limit
+	})
 }
 
 // GetBusinessAccountGifts calls the getBusinessAccountGifts Telegram Bot API method.
@@ -7957,7 +7162,7 @@ type GetBusinessAccountStarBalanceParams struct {
 }
 
 // GetBusinessAccountStarBalanceOption configures GetBusinessAccountStarBalanceParams.
-type GetBusinessAccountStarBalanceOption func(params *GetBusinessAccountStarBalanceParams) GetBusinessAccountStarBalanceOption
+type GetBusinessAccountStarBalanceOption = Option[GetBusinessAccountStarBalanceParams]
 
 // Option applies one or more GetBusinessAccountStarBalanceOption values and returns the last rollback option.
 func (r *GetBusinessAccountStarBalanceParams) Option(opts ...GetBusinessAccountStarBalanceOption) (previous GetBusinessAccountStarBalanceOption) {
@@ -7971,12 +7176,9 @@ func (r *GetBusinessAccountStarBalanceParams) Option(opts ...GetBusinessAccountS
 //
 // Unique identifier of the business connection
 func WithGetBusinessAccountStarBalanceBusinessConnectionID(value string) GetBusinessAccountStarBalanceOption {
-	return func(params *GetBusinessAccountStarBalanceParams) GetBusinessAccountStarBalanceOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithGetBusinessAccountStarBalanceBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *GetBusinessAccountStarBalanceParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // GetBusinessAccountStarBalance calls the getBusinessAccountStarBalance Telegram Bot API method.
@@ -8021,7 +7223,7 @@ type GetBusinessConnectionParams struct {
 }
 
 // GetBusinessConnectionOption configures GetBusinessConnectionParams.
-type GetBusinessConnectionOption func(params *GetBusinessConnectionParams) GetBusinessConnectionOption
+type GetBusinessConnectionOption = Option[GetBusinessConnectionParams]
 
 // Option applies one or more GetBusinessConnectionOption values and returns the last rollback option.
 func (r *GetBusinessConnectionParams) Option(opts ...GetBusinessConnectionOption) (previous GetBusinessConnectionOption) {
@@ -8035,12 +7237,9 @@ func (r *GetBusinessConnectionParams) Option(opts ...GetBusinessConnectionOption
 //
 // Unique identifier of the business connection
 func WithGetBusinessConnectionBusinessConnectionID(value string) GetBusinessConnectionOption {
-	return func(params *GetBusinessConnectionParams) GetBusinessConnectionOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithGetBusinessConnectionBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *GetBusinessConnectionParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // GetBusinessConnection calls the getBusinessConnection Telegram Bot API method.
@@ -8084,7 +7283,7 @@ type GetChatParams struct {
 }
 
 // GetChatOption configures GetChatParams.
-type GetChatOption func(params *GetChatParams) GetChatOption
+type GetChatOption = Option[GetChatParams]
 
 // Option applies one or more GetChatOption values and returns the last rollback option.
 func (r *GetChatParams) Option(opts ...GetChatOption) (previous GetChatOption) {
@@ -8098,12 +7297,9 @@ func (r *GetChatParams) Option(opts ...GetChatOption) (previous GetChatOption) {
 //
 // Unique identifier for the target chat or username of the target supergroup or channel in the format @username
 func WithGetChatChatID(value string) GetChatOption {
-	return func(params *GetChatParams) GetChatOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithGetChatChatID(previous)
-	}
+	return fieldOption(value, func(params *GetChatParams) *string {
+		return &params.ChatID
+	})
 }
 
 // GetChat calls the getChat Telegram Bot API method.
@@ -8151,7 +7347,7 @@ type GetChatAdministratorsParams struct {
 }
 
 // GetChatAdministratorsOption configures GetChatAdministratorsParams.
-type GetChatAdministratorsOption func(params *GetChatAdministratorsParams) GetChatAdministratorsOption
+type GetChatAdministratorsOption = Option[GetChatAdministratorsParams]
 
 // Option applies one or more GetChatAdministratorsOption values and returns the last rollback option.
 func (r *GetChatAdministratorsParams) Option(opts ...GetChatAdministratorsOption) (previous GetChatAdministratorsOption) {
@@ -8165,12 +7361,9 @@ func (r *GetChatAdministratorsParams) Option(opts ...GetChatAdministratorsOption
 //
 // Unique identifier for the target chat or username of the target supergroup or channel in the format @username
 func WithGetChatAdministratorsChatID(value string) GetChatAdministratorsOption {
-	return func(params *GetChatAdministratorsParams) GetChatAdministratorsOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithGetChatAdministratorsChatID(previous)
-	}
+	return fieldOption(value, func(params *GetChatAdministratorsParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithGetChatAdministratorsReturnBots sets the ReturnBots field.
@@ -8178,12 +7371,9 @@ func WithGetChatAdministratorsChatID(value string) GetChatAdministratorsOption {
 // Pass True to additionally receive all bots that are administrators of the chat.
 // By default, bots other than the current bot are omitted.
 func WithGetChatAdministratorsReturnBots(value bool) GetChatAdministratorsOption {
-	return func(params *GetChatAdministratorsParams) GetChatAdministratorsOption {
-		previous := params.ReturnBots
-		params.ReturnBots = value
-
-		return WithGetChatAdministratorsReturnBots(previous)
-	}
+	return fieldOption(value, func(params *GetChatAdministratorsParams) *bool {
+		return &params.ReturnBots
+	})
 }
 
 // GetChatAdministrators calls the getChatAdministrators Telegram Bot API method.
@@ -8261,7 +7451,7 @@ type GetChatGiftsParams struct {
 }
 
 // GetChatGiftsOption configures GetChatGiftsParams.
-type GetChatGiftsOption func(params *GetChatGiftsParams) GetChatGiftsOption
+type GetChatGiftsOption = Option[GetChatGiftsParams]
 
 // Option applies one or more GetChatGiftsOption values and returns the last rollback option.
 func (r *GetChatGiftsParams) Option(opts ...GetChatGiftsOption) (previous GetChatGiftsOption) {
@@ -8275,12 +7465,9 @@ func (r *GetChatGiftsParams) Option(opts ...GetChatGiftsOption) (previous GetCha
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
 func WithGetChatGiftsChatID(value string) GetChatGiftsOption {
-	return func(params *GetChatGiftsParams) GetChatGiftsOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithGetChatGiftsChatID(previous)
-	}
+	return fieldOption(value, func(params *GetChatGiftsParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithGetChatGiftsExcludeUnsaved sets the ExcludeUnsaved field.
@@ -8288,12 +7475,9 @@ func WithGetChatGiftsChatID(value string) GetChatGiftsOption {
 // Pass True to exclude gifts that aren't saved to the chat's profile page.
 // Always True, unless the bot has the can_post_messages administrator right in the channel.
 func WithGetChatGiftsExcludeUnsaved(value bool) GetChatGiftsOption {
-	return func(params *GetChatGiftsParams) GetChatGiftsOption {
-		previous := params.ExcludeUnsaved
-		params.ExcludeUnsaved = value
-
-		return WithGetChatGiftsExcludeUnsaved(previous)
-	}
+	return fieldOption(value, func(params *GetChatGiftsParams) *bool {
+		return &params.ExcludeUnsaved
+	})
 }
 
 // WithGetChatGiftsExcludeSaved sets the ExcludeSaved field.
@@ -8301,72 +7485,54 @@ func WithGetChatGiftsExcludeUnsaved(value bool) GetChatGiftsOption {
 // Pass True to exclude gifts that are saved to the chat's profile page.
 // Always False, unless the bot has the can_post_messages administrator right in the channel.
 func WithGetChatGiftsExcludeSaved(value bool) GetChatGiftsOption {
-	return func(params *GetChatGiftsParams) GetChatGiftsOption {
-		previous := params.ExcludeSaved
-		params.ExcludeSaved = value
-
-		return WithGetChatGiftsExcludeSaved(previous)
-	}
+	return fieldOption(value, func(params *GetChatGiftsParams) *bool {
+		return &params.ExcludeSaved
+	})
 }
 
 // WithGetChatGiftsExcludeUnlimited sets the ExcludeUnlimited field.
 //
 // Pass True to exclude gifts that can be purchased an unlimited number of times
 func WithGetChatGiftsExcludeUnlimited(value bool) GetChatGiftsOption {
-	return func(params *GetChatGiftsParams) GetChatGiftsOption {
-		previous := params.ExcludeUnlimited
-		params.ExcludeUnlimited = value
-
-		return WithGetChatGiftsExcludeUnlimited(previous)
-	}
+	return fieldOption(value, func(params *GetChatGiftsParams) *bool {
+		return &params.ExcludeUnlimited
+	})
 }
 
 // WithGetChatGiftsExcludeLimitedUpgradable sets the ExcludeLimitedUpgradable field.
 //
 // Pass True to exclude gifts that can be purchased a limited number of times and can be upgraded to unique
 func WithGetChatGiftsExcludeLimitedUpgradable(value bool) GetChatGiftsOption {
-	return func(params *GetChatGiftsParams) GetChatGiftsOption {
-		previous := params.ExcludeLimitedUpgradable
-		params.ExcludeLimitedUpgradable = value
-
-		return WithGetChatGiftsExcludeLimitedUpgradable(previous)
-	}
+	return fieldOption(value, func(params *GetChatGiftsParams) *bool {
+		return &params.ExcludeLimitedUpgradable
+	})
 }
 
 // WithGetChatGiftsExcludeLimitedNonUpgradable sets the ExcludeLimitedNonUpgradable field.
 //
 // Pass True to exclude gifts that can be purchased a limited number of times and can't be upgraded to unique
 func WithGetChatGiftsExcludeLimitedNonUpgradable(value bool) GetChatGiftsOption {
-	return func(params *GetChatGiftsParams) GetChatGiftsOption {
-		previous := params.ExcludeLimitedNonUpgradable
-		params.ExcludeLimitedNonUpgradable = value
-
-		return WithGetChatGiftsExcludeLimitedNonUpgradable(previous)
-	}
+	return fieldOption(value, func(params *GetChatGiftsParams) *bool {
+		return &params.ExcludeLimitedNonUpgradable
+	})
 }
 
 // WithGetChatGiftsExcludeFromBlockchain sets the ExcludeFromBlockchain field.
 //
 // Pass True to exclude gifts that were assigned from the TON blockchain and can't be resold or transferred in Telegram
 func WithGetChatGiftsExcludeFromBlockchain(value bool) GetChatGiftsOption {
-	return func(params *GetChatGiftsParams) GetChatGiftsOption {
-		previous := params.ExcludeFromBlockchain
-		params.ExcludeFromBlockchain = value
-
-		return WithGetChatGiftsExcludeFromBlockchain(previous)
-	}
+	return fieldOption(value, func(params *GetChatGiftsParams) *bool {
+		return &params.ExcludeFromBlockchain
+	})
 }
 
 // WithGetChatGiftsExcludeUnique sets the ExcludeUnique field.
 //
 // Pass True to exclude unique gifts
 func WithGetChatGiftsExcludeUnique(value bool) GetChatGiftsOption {
-	return func(params *GetChatGiftsParams) GetChatGiftsOption {
-		previous := params.ExcludeUnique
-		params.ExcludeUnique = value
-
-		return WithGetChatGiftsExcludeUnique(previous)
-	}
+	return fieldOption(value, func(params *GetChatGiftsParams) *bool {
+		return &params.ExcludeUnique
+	})
 }
 
 // WithGetChatGiftsSortByPrice sets the SortByPrice field.
@@ -8374,24 +7540,18 @@ func WithGetChatGiftsExcludeUnique(value bool) GetChatGiftsOption {
 // Pass True to sort results by gift price instead of send date.
 // Sorting is applied before pagination.
 func WithGetChatGiftsSortByPrice(value bool) GetChatGiftsOption {
-	return func(params *GetChatGiftsParams) GetChatGiftsOption {
-		previous := params.SortByPrice
-		params.SortByPrice = value
-
-		return WithGetChatGiftsSortByPrice(previous)
-	}
+	return fieldOption(value, func(params *GetChatGiftsParams) *bool {
+		return &params.SortByPrice
+	})
 }
 
 // WithGetChatGiftsOffset sets the Offset field.
 //
 // Offset of the first entry to return as received from the previous request; use an empty string to get the first chunk of results
 func WithGetChatGiftsOffset(value string) GetChatGiftsOption {
-	return func(params *GetChatGiftsParams) GetChatGiftsOption {
-		previous := params.Offset
-		params.Offset = value
-
-		return WithGetChatGiftsOffset(previous)
-	}
+	return fieldOption(value, func(params *GetChatGiftsParams) *string {
+		return &params.Offset
+	})
 }
 
 // WithGetChatGiftsLimit sets the Limit field.
@@ -8399,12 +7559,9 @@ func WithGetChatGiftsOffset(value string) GetChatGiftsOption {
 // The maximum number of gifts to be returned; 1-100.
 // Defaults to 100.
 func WithGetChatGiftsLimit(value int64) GetChatGiftsOption {
-	return func(params *GetChatGiftsParams) GetChatGiftsOption {
-		previous := params.Limit
-		params.Limit = value
-
-		return WithGetChatGiftsLimit(previous)
-	}
+	return fieldOption(value, func(params *GetChatGiftsParams) *int64 {
+		return &params.Limit
+	})
 }
 
 // GetChatGifts calls the getChatGifts Telegram Bot API method.
@@ -8451,7 +7608,7 @@ type GetChatMemberParams struct {
 }
 
 // GetChatMemberOption configures GetChatMemberParams.
-type GetChatMemberOption func(params *GetChatMemberParams) GetChatMemberOption
+type GetChatMemberOption = Option[GetChatMemberParams]
 
 // Option applies one or more GetChatMemberOption values and returns the last rollback option.
 func (r *GetChatMemberParams) Option(opts ...GetChatMemberOption) (previous GetChatMemberOption) {
@@ -8465,24 +7622,18 @@ func (r *GetChatMemberParams) Option(opts ...GetChatMemberOption) (previous GetC
 //
 // Unique identifier for the target chat or username of the target supergroup or channel in the format @username
 func WithGetChatMemberChatID(value string) GetChatMemberOption {
-	return func(params *GetChatMemberParams) GetChatMemberOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithGetChatMemberChatID(previous)
-	}
+	return fieldOption(value, func(params *GetChatMemberParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithGetChatMemberUserID sets the UserID field.
 //
 // Unique identifier of the target user
 func WithGetChatMemberUserID(value int64) GetChatMemberOption {
-	return func(params *GetChatMemberParams) GetChatMemberOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithGetChatMemberUserID(previous)
-	}
+	return fieldOption(value, func(params *GetChatMemberParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // GetChatMember calls the getChatMember Telegram Bot API method.
@@ -8527,7 +7678,7 @@ type GetChatMemberCountParams struct {
 }
 
 // GetChatMemberCountOption configures GetChatMemberCountParams.
-type GetChatMemberCountOption func(params *GetChatMemberCountParams) GetChatMemberCountOption
+type GetChatMemberCountOption = Option[GetChatMemberCountParams]
 
 // Option applies one or more GetChatMemberCountOption values and returns the last rollback option.
 func (r *GetChatMemberCountParams) Option(opts ...GetChatMemberCountOption) (previous GetChatMemberCountOption) {
@@ -8541,12 +7692,9 @@ func (r *GetChatMemberCountParams) Option(opts ...GetChatMemberCountOption) (pre
 //
 // Unique identifier for the target chat or username of the target supergroup or channel in the format @username
 func WithGetChatMemberCountChatID(value string) GetChatMemberCountOption {
-	return func(params *GetChatMemberCountParams) GetChatMemberCountOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithGetChatMemberCountChatID(previous)
-	}
+	return fieldOption(value, func(params *GetChatMemberCountParams) *string {
+		return &params.ChatID
+	})
 }
 
 // GetChatMemberCount calls the getChatMemberCount Telegram Bot API method.
@@ -8588,7 +7736,7 @@ type GetChatMenuButtonParams struct {
 }
 
 // GetChatMenuButtonOption configures GetChatMenuButtonParams.
-type GetChatMenuButtonOption func(params *GetChatMenuButtonParams) GetChatMenuButtonOption
+type GetChatMenuButtonOption = Option[GetChatMenuButtonParams]
 
 // Option applies one or more GetChatMenuButtonOption values and returns the last rollback option.
 func (r *GetChatMenuButtonParams) Option(opts ...GetChatMenuButtonOption) (previous GetChatMenuButtonOption) {
@@ -8603,12 +7751,9 @@ func (r *GetChatMenuButtonParams) Option(opts ...GetChatMenuButtonOption) (previ
 // Unique identifier for the target private chat.
 // If not specified, the bot's default menu button will be returned.
 func WithGetChatMenuButtonChatID(value int64) GetChatMenuButtonOption {
-	return func(params *GetChatMenuButtonParams) GetChatMenuButtonOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithGetChatMenuButtonChatID(previous)
-	}
+	return fieldOption(value, func(params *GetChatMenuButtonParams) *int64 {
+		return &params.ChatID
+	})
 }
 
 // GetChatMenuButton calls the getChatMenuButton Telegram Bot API method.
@@ -8653,7 +7798,7 @@ type GetCustomEmojiStickersParams struct {
 }
 
 // GetCustomEmojiStickersOption configures GetCustomEmojiStickersParams.
-type GetCustomEmojiStickersOption func(params *GetCustomEmojiStickersParams) GetCustomEmojiStickersOption
+type GetCustomEmojiStickersOption = Option[GetCustomEmojiStickersParams]
 
 // Option applies one or more GetCustomEmojiStickersOption values and returns the last rollback option.
 func (r *GetCustomEmojiStickersParams) Option(opts ...GetCustomEmojiStickersOption) (previous GetCustomEmojiStickersOption) {
@@ -8668,12 +7813,9 @@ func (r *GetCustomEmojiStickersParams) Option(opts ...GetCustomEmojiStickersOpti
 // A JSON-serialized list of custom emoji identifiers.
 // At most 200 custom emoji identifiers can be specified.
 func WithGetCustomEmojiStickersCustomEmojiIDs(value []string) GetCustomEmojiStickersOption {
-	return func(params *GetCustomEmojiStickersParams) GetCustomEmojiStickersOption {
-		previous := params.CustomEmojiIDs
-		params.CustomEmojiIDs = value
-
-		return WithGetCustomEmojiStickersCustomEmojiIDs(previous)
-	}
+	return fieldOption(value, func(params *GetCustomEmojiStickersParams) *[]string {
+		return &params.CustomEmojiIDs
+	})
 }
 
 // GetCustomEmojiStickers calls the getCustomEmojiStickers Telegram Bot API method.
@@ -8717,7 +7859,7 @@ type GetFileParams struct {
 }
 
 // GetFileOption configures GetFileParams.
-type GetFileOption func(params *GetFileParams) GetFileOption
+type GetFileOption = Option[GetFileParams]
 
 // Option applies one or more GetFileOption values and returns the last rollback option.
 func (r *GetFileParams) Option(opts ...GetFileOption) (previous GetFileOption) {
@@ -8731,12 +7873,9 @@ func (r *GetFileParams) Option(opts ...GetFileOption) (previous GetFileOption) {
 //
 // File identifier to get information about
 func WithGetFileFileID(value string) GetFileOption {
-	return func(params *GetFileParams) GetFileOption {
-		previous := params.FileID
-		params.FileID = value
-
-		return WithGetFileFileID(previous)
-	}
+	return fieldOption(value, func(params *GetFileParams) *string {
+		return &params.FileID
+	})
 }
 
 // GetFile calls the getFile Telegram Bot API method.
@@ -8785,7 +7924,7 @@ type GetForumTopicIconStickersParams struct {
 }
 
 // GetForumTopicIconStickersOption configures GetForumTopicIconStickersParams.
-type GetForumTopicIconStickersOption func(params *GetForumTopicIconStickersParams) GetForumTopicIconStickersOption
+type GetForumTopicIconStickersOption = Option[GetForumTopicIconStickersParams]
 
 // Option applies one or more GetForumTopicIconStickersOption values and returns the last rollback option.
 func (r *GetForumTopicIconStickersParams) Option(opts ...GetForumTopicIconStickersOption) (previous GetForumTopicIconStickersOption) {
@@ -8849,7 +7988,7 @@ type GetGameHighScoresParams struct {
 }
 
 // GetGameHighScoresOption configures GetGameHighScoresParams.
-type GetGameHighScoresOption func(params *GetGameHighScoresParams) GetGameHighScoresOption
+type GetGameHighScoresOption = Option[GetGameHighScoresParams]
 
 // Option applies one or more GetGameHighScoresOption values and returns the last rollback option.
 func (r *GetGameHighScoresParams) Option(opts ...GetGameHighScoresOption) (previous GetGameHighScoresOption) {
@@ -8863,12 +8002,9 @@ func (r *GetGameHighScoresParams) Option(opts ...GetGameHighScoresOption) (previ
 //
 // Target user id
 func WithGetGameHighScoresUserID(value int64) GetGameHighScoresOption {
-	return func(params *GetGameHighScoresParams) GetGameHighScoresOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithGetGameHighScoresUserID(previous)
-	}
+	return fieldOption(value, func(params *GetGameHighScoresParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithGetGameHighScoresChatID sets the ChatID field.
@@ -8876,12 +8012,9 @@ func WithGetGameHighScoresUserID(value int64) GetGameHighScoresOption {
 // Required if inline_message_id is not specified.
 // Unique identifier for the target chat.
 func WithGetGameHighScoresChatID(value int64) GetGameHighScoresOption {
-	return func(params *GetGameHighScoresParams) GetGameHighScoresOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithGetGameHighScoresChatID(previous)
-	}
+	return fieldOption(value, func(params *GetGameHighScoresParams) *int64 {
+		return &params.ChatID
+	})
 }
 
 // WithGetGameHighScoresMessageID sets the MessageID field.
@@ -8889,12 +8022,9 @@ func WithGetGameHighScoresChatID(value int64) GetGameHighScoresOption {
 // Required if inline_message_id is not specified.
 // Identifier of the sent message.
 func WithGetGameHighScoresMessageID(value int64) GetGameHighScoresOption {
-	return func(params *GetGameHighScoresParams) GetGameHighScoresOption {
-		previous := params.MessageID
-		params.MessageID = value
-
-		return WithGetGameHighScoresMessageID(previous)
-	}
+	return fieldOption(value, func(params *GetGameHighScoresParams) *int64 {
+		return &params.MessageID
+	})
 }
 
 // WithGetGameHighScoresInlineMessageID sets the InlineMessageID field.
@@ -8902,12 +8032,9 @@ func WithGetGameHighScoresMessageID(value int64) GetGameHighScoresOption {
 // Required if chat_id and message_id are not specified.
 // Identifier of the inline message.
 func WithGetGameHighScoresInlineMessageID(value string) GetGameHighScoresOption {
-	return func(params *GetGameHighScoresParams) GetGameHighScoresOption {
-		previous := params.InlineMessageID
-		params.InlineMessageID = value
-
-		return WithGetGameHighScoresInlineMessageID(previous)
-	}
+	return fieldOption(value, func(params *GetGameHighScoresParams) *string {
+		return &params.InlineMessageID
+	})
 }
 
 // GetGameHighScores calls the getGameHighScores Telegram Bot API method.
@@ -8952,7 +8079,7 @@ type GetManagedBotAccessSettingsParams struct {
 }
 
 // GetManagedBotAccessSettingsOption configures GetManagedBotAccessSettingsParams.
-type GetManagedBotAccessSettingsOption func(params *GetManagedBotAccessSettingsParams) GetManagedBotAccessSettingsOption
+type GetManagedBotAccessSettingsOption = Option[GetManagedBotAccessSettingsParams]
 
 // Option applies one or more GetManagedBotAccessSettingsOption values and returns the last rollback option.
 func (r *GetManagedBotAccessSettingsParams) Option(opts ...GetManagedBotAccessSettingsOption) (previous GetManagedBotAccessSettingsOption) {
@@ -8966,12 +8093,9 @@ func (r *GetManagedBotAccessSettingsParams) Option(opts ...GetManagedBotAccessSe
 //
 // User identifier of the managed bot whose access settings will be returned
 func WithGetManagedBotAccessSettingsUserID(value int64) GetManagedBotAccessSettingsOption {
-	return func(params *GetManagedBotAccessSettingsParams) GetManagedBotAccessSettingsOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithGetManagedBotAccessSettingsUserID(previous)
-	}
+	return fieldOption(value, func(params *GetManagedBotAccessSettingsParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // GetManagedBotAccessSettings calls the getManagedBotAccessSettings Telegram Bot API method.
@@ -9015,7 +8139,7 @@ type GetManagedBotTokenParams struct {
 }
 
 // GetManagedBotTokenOption configures GetManagedBotTokenParams.
-type GetManagedBotTokenOption func(params *GetManagedBotTokenParams) GetManagedBotTokenOption
+type GetManagedBotTokenOption = Option[GetManagedBotTokenParams]
 
 // Option applies one or more GetManagedBotTokenOption values and returns the last rollback option.
 func (r *GetManagedBotTokenParams) Option(opts ...GetManagedBotTokenOption) (previous GetManagedBotTokenOption) {
@@ -9029,12 +8153,9 @@ func (r *GetManagedBotTokenParams) Option(opts ...GetManagedBotTokenOption) (pre
 //
 // User identifier of the managed bot whose token will be returned
 func WithGetManagedBotTokenUserID(value int64) GetManagedBotTokenOption {
-	return func(params *GetManagedBotTokenParams) GetManagedBotTokenOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithGetManagedBotTokenUserID(previous)
-	}
+	return fieldOption(value, func(params *GetManagedBotTokenParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // GetManagedBotToken calls the getManagedBotToken Telegram Bot API method.
@@ -9073,7 +8194,7 @@ type GetMeParams struct {
 }
 
 // GetMeOption configures GetMeParams.
-type GetMeOption func(params *GetMeParams) GetMeOption
+type GetMeOption = Option[GetMeParams]
 
 // Option applies one or more GetMeOption values and returns the last rollback option.
 func (r *GetMeParams) Option(opts ...GetMeOption) (previous GetMeOption) {
@@ -9131,7 +8252,7 @@ type GetMyCommandsParams struct {
 }
 
 // GetMyCommandsOption configures GetMyCommandsParams.
-type GetMyCommandsOption func(params *GetMyCommandsParams) GetMyCommandsOption
+type GetMyCommandsOption = Option[GetMyCommandsParams]
 
 // Option applies one or more GetMyCommandsOption values and returns the last rollback option.
 func (r *GetMyCommandsParams) Option(opts ...GetMyCommandsOption) (previous GetMyCommandsOption) {
@@ -9148,24 +8269,18 @@ func (r *GetMyCommandsParams) Option(opts ...GetMyCommandsOption) (previous GetM
 //
 // [BotCommandScopeDefault]: https://core.telegram.org/bots/api#botcommandscopedefault
 func WithGetMyCommandsScope(value *BotCommandScope) GetMyCommandsOption {
-	return func(params *GetMyCommandsParams) GetMyCommandsOption {
-		previous := params.Scope
-		params.Scope = value
-
-		return WithGetMyCommandsScope(previous)
-	}
+	return fieldOption(value, func(params *GetMyCommandsParams) **BotCommandScope {
+		return &params.Scope
+	})
 }
 
 // WithGetMyCommandsLanguageCode sets the LanguageCode field.
 //
 // A two-letter ISO 639-1 language code or an empty string
 func WithGetMyCommandsLanguageCode(value string) GetMyCommandsOption {
-	return func(params *GetMyCommandsParams) GetMyCommandsOption {
-		previous := params.LanguageCode
-		params.LanguageCode = value
-
-		return WithGetMyCommandsLanguageCode(previous)
-	}
+	return fieldOption(value, func(params *GetMyCommandsParams) *string {
+		return &params.LanguageCode
+	})
 }
 
 // GetMyCommands calls the getMyCommands Telegram Bot API method.
@@ -9211,7 +8326,7 @@ type GetMyDefaultAdministratorRightsParams struct {
 }
 
 // GetMyDefaultAdministratorRightsOption configures GetMyDefaultAdministratorRightsParams.
-type GetMyDefaultAdministratorRightsOption func(params *GetMyDefaultAdministratorRightsParams) GetMyDefaultAdministratorRightsOption
+type GetMyDefaultAdministratorRightsOption = Option[GetMyDefaultAdministratorRightsParams]
 
 // Option applies one or more GetMyDefaultAdministratorRightsOption values and returns the last rollback option.
 func (r *GetMyDefaultAdministratorRightsParams) Option(opts ...GetMyDefaultAdministratorRightsOption) (previous GetMyDefaultAdministratorRightsOption) {
@@ -9226,12 +8341,9 @@ func (r *GetMyDefaultAdministratorRightsParams) Option(opts ...GetMyDefaultAdmin
 // Pass True to get default administrator rights of the bot in channels.
 // Otherwise, default administrator rights of the bot for groups and supergroups will be returned.
 func WithGetMyDefaultAdministratorRightsForChannels(value bool) GetMyDefaultAdministratorRightsOption {
-	return func(params *GetMyDefaultAdministratorRightsParams) GetMyDefaultAdministratorRightsOption {
-		previous := params.ForChannels
-		params.ForChannels = value
-
-		return WithGetMyDefaultAdministratorRightsForChannels(previous)
-	}
+	return fieldOption(value, func(params *GetMyDefaultAdministratorRightsParams) *bool {
+		return &params.ForChannels
+	})
 }
 
 // GetMyDefaultAdministratorRights calls the getMyDefaultAdministratorRights Telegram Bot API method.
@@ -9275,7 +8387,7 @@ type GetMyDescriptionParams struct {
 }
 
 // GetMyDescriptionOption configures GetMyDescriptionParams.
-type GetMyDescriptionOption func(params *GetMyDescriptionParams) GetMyDescriptionOption
+type GetMyDescriptionOption = Option[GetMyDescriptionParams]
 
 // Option applies one or more GetMyDescriptionOption values and returns the last rollback option.
 func (r *GetMyDescriptionParams) Option(opts ...GetMyDescriptionOption) (previous GetMyDescriptionOption) {
@@ -9289,12 +8401,9 @@ func (r *GetMyDescriptionParams) Option(opts ...GetMyDescriptionOption) (previou
 //
 // A two-letter ISO 639-1 language code or an empty string
 func WithGetMyDescriptionLanguageCode(value string) GetMyDescriptionOption {
-	return func(params *GetMyDescriptionParams) GetMyDescriptionOption {
-		previous := params.LanguageCode
-		params.LanguageCode = value
-
-		return WithGetMyDescriptionLanguageCode(previous)
-	}
+	return fieldOption(value, func(params *GetMyDescriptionParams) *string {
+		return &params.LanguageCode
+	})
 }
 
 // GetMyDescription calls the getMyDescription Telegram Bot API method.
@@ -9338,7 +8447,7 @@ type GetMyNameParams struct {
 }
 
 // GetMyNameOption configures GetMyNameParams.
-type GetMyNameOption func(params *GetMyNameParams) GetMyNameOption
+type GetMyNameOption = Option[GetMyNameParams]
 
 // Option applies one or more GetMyNameOption values and returns the last rollback option.
 func (r *GetMyNameParams) Option(opts ...GetMyNameOption) (previous GetMyNameOption) {
@@ -9352,12 +8461,9 @@ func (r *GetMyNameParams) Option(opts ...GetMyNameOption) (previous GetMyNameOpt
 //
 // A two-letter ISO 639-1 language code or an empty string
 func WithGetMyNameLanguageCode(value string) GetMyNameOption {
-	return func(params *GetMyNameParams) GetMyNameOption {
-		previous := params.LanguageCode
-		params.LanguageCode = value
-
-		return WithGetMyNameLanguageCode(previous)
-	}
+	return fieldOption(value, func(params *GetMyNameParams) *string {
+		return &params.LanguageCode
+	})
 }
 
 // GetMyName calls the getMyName Telegram Bot API method.
@@ -9401,7 +8507,7 @@ type GetMyShortDescriptionParams struct {
 }
 
 // GetMyShortDescriptionOption configures GetMyShortDescriptionParams.
-type GetMyShortDescriptionOption func(params *GetMyShortDescriptionParams) GetMyShortDescriptionOption
+type GetMyShortDescriptionOption = Option[GetMyShortDescriptionParams]
 
 // Option applies one or more GetMyShortDescriptionOption values and returns the last rollback option.
 func (r *GetMyShortDescriptionParams) Option(opts ...GetMyShortDescriptionOption) (previous GetMyShortDescriptionOption) {
@@ -9415,12 +8521,9 @@ func (r *GetMyShortDescriptionParams) Option(opts ...GetMyShortDescriptionOption
 //
 // A two-letter ISO 639-1 language code or an empty string
 func WithGetMyShortDescriptionLanguageCode(value string) GetMyShortDescriptionOption {
-	return func(params *GetMyShortDescriptionParams) GetMyShortDescriptionOption {
-		previous := params.LanguageCode
-		params.LanguageCode = value
-
-		return WithGetMyShortDescriptionLanguageCode(previous)
-	}
+	return fieldOption(value, func(params *GetMyShortDescriptionParams) *string {
+		return &params.LanguageCode
+	})
 }
 
 // GetMyShortDescription calls the getMyShortDescription Telegram Bot API method.
@@ -9462,7 +8565,7 @@ type GetMyStarBalanceParams struct {
 }
 
 // GetMyStarBalanceOption configures GetMyStarBalanceParams.
-type GetMyStarBalanceOption func(params *GetMyStarBalanceParams) GetMyStarBalanceOption
+type GetMyStarBalanceOption = Option[GetMyStarBalanceParams]
 
 // Option applies one or more GetMyStarBalanceOption values and returns the last rollback option.
 func (r *GetMyStarBalanceParams) Option(opts ...GetMyStarBalanceOption) (previous GetMyStarBalanceOption) {
@@ -9519,7 +8622,7 @@ type GetStarTransactionsParams struct {
 }
 
 // GetStarTransactionsOption configures GetStarTransactionsParams.
-type GetStarTransactionsOption func(params *GetStarTransactionsParams) GetStarTransactionsOption
+type GetStarTransactionsOption = Option[GetStarTransactionsParams]
 
 // Option applies one or more GetStarTransactionsOption values and returns the last rollback option.
 func (r *GetStarTransactionsParams) Option(opts ...GetStarTransactionsOption) (previous GetStarTransactionsOption) {
@@ -9533,12 +8636,9 @@ func (r *GetStarTransactionsParams) Option(opts ...GetStarTransactionsOption) (p
 //
 // Number of transactions to skip in the response
 func WithGetStarTransactionsOffset(value int64) GetStarTransactionsOption {
-	return func(params *GetStarTransactionsParams) GetStarTransactionsOption {
-		previous := params.Offset
-		params.Offset = value
-
-		return WithGetStarTransactionsOffset(previous)
-	}
+	return fieldOption(value, func(params *GetStarTransactionsParams) *int64 {
+		return &params.Offset
+	})
 }
 
 // WithGetStarTransactionsLimit sets the Limit field.
@@ -9547,12 +8647,9 @@ func WithGetStarTransactionsOffset(value int64) GetStarTransactionsOption {
 // Values between 1-100 are accepted.
 // Defaults to 100.
 func WithGetStarTransactionsLimit(value int64) GetStarTransactionsOption {
-	return func(params *GetStarTransactionsParams) GetStarTransactionsOption {
-		previous := params.Limit
-		params.Limit = value
-
-		return WithGetStarTransactionsLimit(previous)
-	}
+	return fieldOption(value, func(params *GetStarTransactionsParams) *int64 {
+		return &params.Limit
+	})
 }
 
 // GetStarTransactions calls the getStarTransactions Telegram Bot API method.
@@ -9596,7 +8693,7 @@ type GetStickerSetParams struct {
 }
 
 // GetStickerSetOption configures GetStickerSetParams.
-type GetStickerSetOption func(params *GetStickerSetParams) GetStickerSetOption
+type GetStickerSetOption = Option[GetStickerSetParams]
 
 // Option applies one or more GetStickerSetOption values and returns the last rollback option.
 func (r *GetStickerSetParams) Option(opts ...GetStickerSetOption) (previous GetStickerSetOption) {
@@ -9610,12 +8707,9 @@ func (r *GetStickerSetParams) Option(opts ...GetStickerSetOption) (previous GetS
 //
 // Name of the sticker set
 func WithGetStickerSetName(value string) GetStickerSetOption {
-	return func(params *GetStickerSetParams) GetStickerSetOption {
-		previous := params.Name
-		params.Name = value
-
-		return WithGetStickerSetName(previous)
-	}
+	return fieldOption(value, func(params *GetStickerSetParams) *string {
+		return &params.Name
+	})
 }
 
 // GetStickerSet calls the getStickerSet Telegram Bot API method.
@@ -9688,7 +8782,7 @@ type GetUpdatesParams struct {
 }
 
 // GetUpdatesOption configures GetUpdatesParams.
-type GetUpdatesOption func(params *GetUpdatesParams) GetUpdatesOption
+type GetUpdatesOption = Option[GetUpdatesParams]
 
 // Option applies one or more GetUpdatesOption values and returns the last rollback option.
 func (r *GetUpdatesParams) Option(opts ...GetUpdatesOption) (previous GetUpdatesOption) {
@@ -9709,12 +8803,9 @@ func (r *GetUpdatesParams) Option(opts ...GetUpdatesOption) (previous GetUpdates
 //
 // [getUpdates]: https://core.telegram.org/bots/api#getupdates
 func WithGetUpdatesOffset(value int64) GetUpdatesOption {
-	return func(params *GetUpdatesParams) GetUpdatesOption {
-		previous := params.Offset
-		params.Offset = value
-
-		return WithGetUpdatesOffset(previous)
-	}
+	return fieldOption(value, func(params *GetUpdatesParams) *int64 {
+		return &params.Offset
+	})
 }
 
 // WithGetUpdatesLimit sets the Limit field.
@@ -9723,12 +8814,9 @@ func WithGetUpdatesOffset(value int64) GetUpdatesOption {
 // Values between 1-100 are accepted.
 // Defaults to 100.
 func WithGetUpdatesLimit(value int64) GetUpdatesOption {
-	return func(params *GetUpdatesParams) GetUpdatesOption {
-		previous := params.Limit
-		params.Limit = value
-
-		return WithGetUpdatesLimit(previous)
-	}
+	return fieldOption(value, func(params *GetUpdatesParams) *int64 {
+		return &params.Limit
+	})
 }
 
 // WithGetUpdatesTimeout sets the Timeout field.
@@ -9738,12 +8826,9 @@ func WithGetUpdatesLimit(value int64) GetUpdatesOption {
 // usual short polling.
 // Should be positive, short polling should be used for testing purposes only.
 func WithGetUpdatesTimeout(value int64) GetUpdatesOption {
-	return func(params *GetUpdatesParams) GetUpdatesOption {
-		previous := params.Timeout
-		params.Timeout = value
-
-		return WithGetUpdatesTimeout(previous)
-	}
+	return fieldOption(value, func(params *GetUpdatesParams) *int64 {
+		return &params.Timeout
+	})
 }
 
 // WithGetUpdatesAllowedUpdates sets the AllowedUpdates field.
@@ -9758,12 +8843,9 @@ func WithGetUpdatesTimeout(value int64) GetUpdatesOption {
 //
 // [Update]: https://core.telegram.org/bots/api#update
 func WithGetUpdatesAllowedUpdates(value []string) GetUpdatesOption {
-	return func(params *GetUpdatesParams) GetUpdatesOption {
-		previous := params.AllowedUpdates
-		params.AllowedUpdates = value
-
-		return WithGetUpdatesAllowedUpdates(previous)
-	}
+	return fieldOption(value, func(params *GetUpdatesParams) *[]string {
+		return &params.AllowedUpdates
+	})
 }
 
 // GetUpdates calls the getUpdates Telegram Bot API method.
@@ -9811,7 +8893,7 @@ type GetUserChatBoostsParams struct {
 }
 
 // GetUserChatBoostsOption configures GetUserChatBoostsParams.
-type GetUserChatBoostsOption func(params *GetUserChatBoostsParams) GetUserChatBoostsOption
+type GetUserChatBoostsOption = Option[GetUserChatBoostsParams]
 
 // Option applies one or more GetUserChatBoostsOption values and returns the last rollback option.
 func (r *GetUserChatBoostsParams) Option(opts ...GetUserChatBoostsOption) (previous GetUserChatBoostsOption) {
@@ -9825,24 +8907,18 @@ func (r *GetUserChatBoostsParams) Option(opts ...GetUserChatBoostsOption) (previ
 //
 // Unique identifier for the chat or username of the channel in the format @username
 func WithGetUserChatBoostsChatID(value string) GetUserChatBoostsOption {
-	return func(params *GetUserChatBoostsParams) GetUserChatBoostsOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithGetUserChatBoostsChatID(previous)
-	}
+	return fieldOption(value, func(params *GetUserChatBoostsParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithGetUserChatBoostsUserID sets the UserID field.
 //
 // Unique identifier of the target user
 func WithGetUserChatBoostsUserID(value int64) GetUserChatBoostsOption {
-	return func(params *GetUserChatBoostsParams) GetUserChatBoostsOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithGetUserChatBoostsUserID(previous)
-	}
+	return fieldOption(value, func(params *GetUserChatBoostsParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // GetUserChatBoosts calls the getUserChatBoosts Telegram Bot API method.
@@ -9913,7 +8989,7 @@ type GetUserGiftsParams struct {
 }
 
 // GetUserGiftsOption configures GetUserGiftsParams.
-type GetUserGiftsOption func(params *GetUserGiftsParams) GetUserGiftsOption
+type GetUserGiftsOption = Option[GetUserGiftsParams]
 
 // Option applies one or more GetUserGiftsOption values and returns the last rollback option.
 func (r *GetUserGiftsParams) Option(opts ...GetUserGiftsOption) (previous GetUserGiftsOption) {
@@ -9927,72 +9003,54 @@ func (r *GetUserGiftsParams) Option(opts ...GetUserGiftsOption) (previous GetUse
 //
 // Unique identifier of the user
 func WithGetUserGiftsUserID(value int64) GetUserGiftsOption {
-	return func(params *GetUserGiftsParams) GetUserGiftsOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithGetUserGiftsUserID(previous)
-	}
+	return fieldOption(value, func(params *GetUserGiftsParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithGetUserGiftsExcludeUnlimited sets the ExcludeUnlimited field.
 //
 // Pass True to exclude gifts that can be purchased an unlimited number of times
 func WithGetUserGiftsExcludeUnlimited(value bool) GetUserGiftsOption {
-	return func(params *GetUserGiftsParams) GetUserGiftsOption {
-		previous := params.ExcludeUnlimited
-		params.ExcludeUnlimited = value
-
-		return WithGetUserGiftsExcludeUnlimited(previous)
-	}
+	return fieldOption(value, func(params *GetUserGiftsParams) *bool {
+		return &params.ExcludeUnlimited
+	})
 }
 
 // WithGetUserGiftsExcludeLimitedUpgradable sets the ExcludeLimitedUpgradable field.
 //
 // Pass True to exclude gifts that can be purchased a limited number of times and can be upgraded to unique
 func WithGetUserGiftsExcludeLimitedUpgradable(value bool) GetUserGiftsOption {
-	return func(params *GetUserGiftsParams) GetUserGiftsOption {
-		previous := params.ExcludeLimitedUpgradable
-		params.ExcludeLimitedUpgradable = value
-
-		return WithGetUserGiftsExcludeLimitedUpgradable(previous)
-	}
+	return fieldOption(value, func(params *GetUserGiftsParams) *bool {
+		return &params.ExcludeLimitedUpgradable
+	})
 }
 
 // WithGetUserGiftsExcludeLimitedNonUpgradable sets the ExcludeLimitedNonUpgradable field.
 //
 // Pass True to exclude gifts that can be purchased a limited number of times and can't be upgraded to unique
 func WithGetUserGiftsExcludeLimitedNonUpgradable(value bool) GetUserGiftsOption {
-	return func(params *GetUserGiftsParams) GetUserGiftsOption {
-		previous := params.ExcludeLimitedNonUpgradable
-		params.ExcludeLimitedNonUpgradable = value
-
-		return WithGetUserGiftsExcludeLimitedNonUpgradable(previous)
-	}
+	return fieldOption(value, func(params *GetUserGiftsParams) *bool {
+		return &params.ExcludeLimitedNonUpgradable
+	})
 }
 
 // WithGetUserGiftsExcludeFromBlockchain sets the ExcludeFromBlockchain field.
 //
 // Pass True to exclude gifts that were assigned from the TON blockchain and can't be resold or transferred in Telegram
 func WithGetUserGiftsExcludeFromBlockchain(value bool) GetUserGiftsOption {
-	return func(params *GetUserGiftsParams) GetUserGiftsOption {
-		previous := params.ExcludeFromBlockchain
-		params.ExcludeFromBlockchain = value
-
-		return WithGetUserGiftsExcludeFromBlockchain(previous)
-	}
+	return fieldOption(value, func(params *GetUserGiftsParams) *bool {
+		return &params.ExcludeFromBlockchain
+	})
 }
 
 // WithGetUserGiftsExcludeUnique sets the ExcludeUnique field.
 //
 // Pass True to exclude unique gifts
 func WithGetUserGiftsExcludeUnique(value bool) GetUserGiftsOption {
-	return func(params *GetUserGiftsParams) GetUserGiftsOption {
-		previous := params.ExcludeUnique
-		params.ExcludeUnique = value
-
-		return WithGetUserGiftsExcludeUnique(previous)
-	}
+	return fieldOption(value, func(params *GetUserGiftsParams) *bool {
+		return &params.ExcludeUnique
+	})
 }
 
 // WithGetUserGiftsSortByPrice sets the SortByPrice field.
@@ -10000,24 +9058,18 @@ func WithGetUserGiftsExcludeUnique(value bool) GetUserGiftsOption {
 // Pass True to sort results by gift price instead of send date.
 // Sorting is applied before pagination.
 func WithGetUserGiftsSortByPrice(value bool) GetUserGiftsOption {
-	return func(params *GetUserGiftsParams) GetUserGiftsOption {
-		previous := params.SortByPrice
-		params.SortByPrice = value
-
-		return WithGetUserGiftsSortByPrice(previous)
-	}
+	return fieldOption(value, func(params *GetUserGiftsParams) *bool {
+		return &params.SortByPrice
+	})
 }
 
 // WithGetUserGiftsOffset sets the Offset field.
 //
 // Offset of the first entry to return as received from the previous request; use an empty string to get the first chunk of results
 func WithGetUserGiftsOffset(value string) GetUserGiftsOption {
-	return func(params *GetUserGiftsParams) GetUserGiftsOption {
-		previous := params.Offset
-		params.Offset = value
-
-		return WithGetUserGiftsOffset(previous)
-	}
+	return fieldOption(value, func(params *GetUserGiftsParams) *string {
+		return &params.Offset
+	})
 }
 
 // WithGetUserGiftsLimit sets the Limit field.
@@ -10025,12 +9077,9 @@ func WithGetUserGiftsOffset(value string) GetUserGiftsOption {
 // The maximum number of gifts to be returned; 1-100.
 // Defaults to 100.
 func WithGetUserGiftsLimit(value int64) GetUserGiftsOption {
-	return func(params *GetUserGiftsParams) GetUserGiftsOption {
-		previous := params.Limit
-		params.Limit = value
-
-		return WithGetUserGiftsLimit(previous)
-	}
+	return fieldOption(value, func(params *GetUserGiftsParams) *int64 {
+		return &params.Limit
+	})
 }
 
 // GetUserGifts calls the getUserGifts Telegram Bot API method.
@@ -10077,7 +9126,7 @@ type GetUserPersonalChatMessagesParams struct {
 }
 
 // GetUserPersonalChatMessagesOption configures GetUserPersonalChatMessagesParams.
-type GetUserPersonalChatMessagesOption func(params *GetUserPersonalChatMessagesParams) GetUserPersonalChatMessagesOption
+type GetUserPersonalChatMessagesOption = Option[GetUserPersonalChatMessagesParams]
 
 // Option applies one or more GetUserPersonalChatMessagesOption values and returns the last rollback option.
 func (r *GetUserPersonalChatMessagesParams) Option(opts ...GetUserPersonalChatMessagesOption) (previous GetUserPersonalChatMessagesOption) {
@@ -10091,24 +9140,18 @@ func (r *GetUserPersonalChatMessagesParams) Option(opts ...GetUserPersonalChatMe
 //
 // Unique identifier for the target user
 func WithGetUserPersonalChatMessagesUserID(value int64) GetUserPersonalChatMessagesOption {
-	return func(params *GetUserPersonalChatMessagesParams) GetUserPersonalChatMessagesOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithGetUserPersonalChatMessagesUserID(previous)
-	}
+	return fieldOption(value, func(params *GetUserPersonalChatMessagesParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithGetUserPersonalChatMessagesLimit sets the Limit field.
 //
 // The maximum number of messages to return; 1-20
 func WithGetUserPersonalChatMessagesLimit(value int64) GetUserPersonalChatMessagesOption {
-	return func(params *GetUserPersonalChatMessagesParams) GetUserPersonalChatMessagesOption {
-		previous := params.Limit
-		params.Limit = value
-
-		return WithGetUserPersonalChatMessagesLimit(previous)
-	}
+	return fieldOption(value, func(params *GetUserPersonalChatMessagesParams) *int64 {
+		return &params.Limit
+	})
 }
 
 // GetUserPersonalChatMessages calls the getUserPersonalChatMessages Telegram Bot API method.
@@ -10161,7 +9204,7 @@ type GetUserProfileAudiosParams struct {
 }
 
 // GetUserProfileAudiosOption configures GetUserProfileAudiosParams.
-type GetUserProfileAudiosOption func(params *GetUserProfileAudiosParams) GetUserProfileAudiosOption
+type GetUserProfileAudiosOption = Option[GetUserProfileAudiosParams]
 
 // Option applies one or more GetUserProfileAudiosOption values and returns the last rollback option.
 func (r *GetUserProfileAudiosParams) Option(opts ...GetUserProfileAudiosOption) (previous GetUserProfileAudiosOption) {
@@ -10175,12 +9218,9 @@ func (r *GetUserProfileAudiosParams) Option(opts ...GetUserProfileAudiosOption) 
 //
 // Unique identifier of the target user
 func WithGetUserProfileAudiosUserID(value int64) GetUserProfileAudiosOption {
-	return func(params *GetUserProfileAudiosParams) GetUserProfileAudiosOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithGetUserProfileAudiosUserID(previous)
-	}
+	return fieldOption(value, func(params *GetUserProfileAudiosParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithGetUserProfileAudiosOffset sets the Offset field.
@@ -10188,12 +9228,9 @@ func WithGetUserProfileAudiosUserID(value int64) GetUserProfileAudiosOption {
 // Sequential number of the first audio to be returned.
 // By default, all audios are returned.
 func WithGetUserProfileAudiosOffset(value int64) GetUserProfileAudiosOption {
-	return func(params *GetUserProfileAudiosParams) GetUserProfileAudiosOption {
-		previous := params.Offset
-		params.Offset = value
-
-		return WithGetUserProfileAudiosOffset(previous)
-	}
+	return fieldOption(value, func(params *GetUserProfileAudiosParams) *int64 {
+		return &params.Offset
+	})
 }
 
 // WithGetUserProfileAudiosLimit sets the Limit field.
@@ -10202,12 +9239,9 @@ func WithGetUserProfileAudiosOffset(value int64) GetUserProfileAudiosOption {
 // Values between 1-100 are accepted.
 // Defaults to 100.
 func WithGetUserProfileAudiosLimit(value int64) GetUserProfileAudiosOption {
-	return func(params *GetUserProfileAudiosParams) GetUserProfileAudiosOption {
-		previous := params.Limit
-		params.Limit = value
-
-		return WithGetUserProfileAudiosLimit(previous)
-	}
+	return fieldOption(value, func(params *GetUserProfileAudiosParams) *int64 {
+		return &params.Limit
+	})
 }
 
 // GetUserProfileAudios calls the getUserProfileAudios Telegram Bot API method.
@@ -10260,7 +9294,7 @@ type GetUserProfilePhotosParams struct {
 }
 
 // GetUserProfilePhotosOption configures GetUserProfilePhotosParams.
-type GetUserProfilePhotosOption func(params *GetUserProfilePhotosParams) GetUserProfilePhotosOption
+type GetUserProfilePhotosOption = Option[GetUserProfilePhotosParams]
 
 // Option applies one or more GetUserProfilePhotosOption values and returns the last rollback option.
 func (r *GetUserProfilePhotosParams) Option(opts ...GetUserProfilePhotosOption) (previous GetUserProfilePhotosOption) {
@@ -10274,12 +9308,9 @@ func (r *GetUserProfilePhotosParams) Option(opts ...GetUserProfilePhotosOption) 
 //
 // Unique identifier of the target user
 func WithGetUserProfilePhotosUserID(value int64) GetUserProfilePhotosOption {
-	return func(params *GetUserProfilePhotosParams) GetUserProfilePhotosOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithGetUserProfilePhotosUserID(previous)
-	}
+	return fieldOption(value, func(params *GetUserProfilePhotosParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithGetUserProfilePhotosOffset sets the Offset field.
@@ -10287,12 +9318,9 @@ func WithGetUserProfilePhotosUserID(value int64) GetUserProfilePhotosOption {
 // Sequential number of the first photo to be returned.
 // By default, all photos are returned.
 func WithGetUserProfilePhotosOffset(value int64) GetUserProfilePhotosOption {
-	return func(params *GetUserProfilePhotosParams) GetUserProfilePhotosOption {
-		previous := params.Offset
-		params.Offset = value
-
-		return WithGetUserProfilePhotosOffset(previous)
-	}
+	return fieldOption(value, func(params *GetUserProfilePhotosParams) *int64 {
+		return &params.Offset
+	})
 }
 
 // WithGetUserProfilePhotosLimit sets the Limit field.
@@ -10301,12 +9329,9 @@ func WithGetUserProfilePhotosOffset(value int64) GetUserProfilePhotosOption {
 // Values between 1-100 are accepted.
 // Defaults to 100.
 func WithGetUserProfilePhotosLimit(value int64) GetUserProfilePhotosOption {
-	return func(params *GetUserProfilePhotosParams) GetUserProfilePhotosOption {
-		previous := params.Limit
-		params.Limit = value
-
-		return WithGetUserProfilePhotosLimit(previous)
-	}
+	return fieldOption(value, func(params *GetUserProfilePhotosParams) *int64 {
+		return &params.Limit
+	})
 }
 
 // GetUserProfilePhotos calls the getUserProfilePhotos Telegram Bot API method.
@@ -10348,7 +9373,7 @@ type GetWebhookInfoParams struct {
 }
 
 // GetWebhookInfoOption configures GetWebhookInfoParams.
-type GetWebhookInfoOption func(params *GetWebhookInfoParams) GetWebhookInfoOption
+type GetWebhookInfoOption = Option[GetWebhookInfoParams]
 
 // Option applies one or more GetWebhookInfoOption values and returns the last rollback option.
 func (r *GetWebhookInfoParams) Option(opts ...GetWebhookInfoOption) (previous GetWebhookInfoOption) {
@@ -10423,7 +9448,7 @@ type GiftPremiumSubscriptionParams struct {
 }
 
 // GiftPremiumSubscriptionOption configures GiftPremiumSubscriptionParams.
-type GiftPremiumSubscriptionOption func(params *GiftPremiumSubscriptionParams) GiftPremiumSubscriptionOption
+type GiftPremiumSubscriptionOption = Option[GiftPremiumSubscriptionParams]
 
 // Option applies one or more GiftPremiumSubscriptionOption values and returns the last rollback option.
 func (r *GiftPremiumSubscriptionParams) Option(opts ...GiftPremiumSubscriptionOption) (previous GiftPremiumSubscriptionOption) {
@@ -10437,48 +9462,36 @@ func (r *GiftPremiumSubscriptionParams) Option(opts ...GiftPremiumSubscriptionOp
 //
 // Unique identifier of the target user who will receive a Telegram Premium subscription
 func WithGiftPremiumSubscriptionUserID(value int64) GiftPremiumSubscriptionOption {
-	return func(params *GiftPremiumSubscriptionParams) GiftPremiumSubscriptionOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithGiftPremiumSubscriptionUserID(previous)
-	}
+	return fieldOption(value, func(params *GiftPremiumSubscriptionParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithGiftPremiumSubscriptionMonthCount sets the MonthCount field.
 //
 // Number of months the Telegram Premium subscription will be active for the user; must be one of 3, 6, or 12
 func WithGiftPremiumSubscriptionMonthCount(value int64) GiftPremiumSubscriptionOption {
-	return func(params *GiftPremiumSubscriptionParams) GiftPremiumSubscriptionOption {
-		previous := params.MonthCount
-		params.MonthCount = value
-
-		return WithGiftPremiumSubscriptionMonthCount(previous)
-	}
+	return fieldOption(value, func(params *GiftPremiumSubscriptionParams) *int64 {
+		return &params.MonthCount
+	})
 }
 
 // WithGiftPremiumSubscriptionStarCount sets the StarCount field.
 //
 // Number of Telegram Stars to pay for the Telegram Premium subscription; must be 1000 for 3 months, 1500 for 6 months, and 2500 for 12 months
 func WithGiftPremiumSubscriptionStarCount(value int64) GiftPremiumSubscriptionOption {
-	return func(params *GiftPremiumSubscriptionParams) GiftPremiumSubscriptionOption {
-		previous := params.StarCount
-		params.StarCount = value
-
-		return WithGiftPremiumSubscriptionStarCount(previous)
-	}
+	return fieldOption(value, func(params *GiftPremiumSubscriptionParams) *int64 {
+		return &params.StarCount
+	})
 }
 
 // WithGiftPremiumSubscriptionText sets the Text field.
 //
 // Text that will be shown along with the service message about the subscription; 0-128 characters
 func WithGiftPremiumSubscriptionText(value string) GiftPremiumSubscriptionOption {
-	return func(params *GiftPremiumSubscriptionParams) GiftPremiumSubscriptionOption {
-		previous := params.Text
-		params.Text = value
-
-		return WithGiftPremiumSubscriptionText(previous)
-	}
+	return fieldOption(value, func(params *GiftPremiumSubscriptionParams) *string {
+		return &params.Text
+	})
 }
 
 // WithGiftPremiumSubscriptionTextParseMode sets the TextParseMode field.
@@ -10489,12 +9502,9 @@ func WithGiftPremiumSubscriptionText(value string) GiftPremiumSubscriptionOption
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithGiftPremiumSubscriptionTextParseMode(value string) GiftPremiumSubscriptionOption {
-	return func(params *GiftPremiumSubscriptionParams) GiftPremiumSubscriptionOption {
-		previous := params.TextParseMode
-		params.TextParseMode = value
-
-		return WithGiftPremiumSubscriptionTextParseMode(previous)
-	}
+	return fieldOption(value, func(params *GiftPremiumSubscriptionParams) *string {
+		return &params.TextParseMode
+	})
 }
 
 // WithGiftPremiumSubscriptionTextEntities sets the TextEntities field.
@@ -10503,12 +9513,9 @@ func WithGiftPremiumSubscriptionTextParseMode(value string) GiftPremiumSubscript
 // It can be specified instead of text_parse_mode.
 // Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, “custom_emoji”, and “date_time” are ignored.
 func WithGiftPremiumSubscriptionTextEntities(value []MessageEntity) GiftPremiumSubscriptionOption {
-	return func(params *GiftPremiumSubscriptionParams) GiftPremiumSubscriptionOption {
-		previous := params.TextEntities
-		params.TextEntities = value
-
-		return WithGiftPremiumSubscriptionTextEntities(previous)
-	}
+	return fieldOption(value, func(params *GiftPremiumSubscriptionParams) *[]MessageEntity {
+		return &params.TextEntities
+	})
 }
 
 // GiftPremiumSubscription calls the giftPremiumSubscription Telegram Bot API method.
@@ -10549,7 +9556,7 @@ type HideGeneralForumTopicParams struct {
 }
 
 // HideGeneralForumTopicOption configures HideGeneralForumTopicParams.
-type HideGeneralForumTopicOption func(params *HideGeneralForumTopicParams) HideGeneralForumTopicOption
+type HideGeneralForumTopicOption = Option[HideGeneralForumTopicParams]
 
 // Option applies one or more HideGeneralForumTopicOption values and returns the last rollback option.
 func (r *HideGeneralForumTopicParams) Option(opts ...HideGeneralForumTopicOption) (previous HideGeneralForumTopicOption) {
@@ -10563,12 +9570,9 @@ func (r *HideGeneralForumTopicParams) Option(opts ...HideGeneralForumTopicOption
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithHideGeneralForumTopicChatID(value string) HideGeneralForumTopicOption {
-	return func(params *HideGeneralForumTopicParams) HideGeneralForumTopicOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithHideGeneralForumTopicChatID(previous)
-	}
+	return fieldOption(value, func(params *HideGeneralForumTopicParams) *string {
+		return &params.ChatID
+	})
 }
 
 // HideGeneralForumTopic calls the hideGeneralForumTopic Telegram Bot API method.
@@ -10612,7 +9616,7 @@ type LeaveChatParams struct {
 }
 
 // LeaveChatOption configures LeaveChatParams.
-type LeaveChatOption func(params *LeaveChatParams) LeaveChatOption
+type LeaveChatOption = Option[LeaveChatParams]
 
 // Option applies one or more LeaveChatOption values and returns the last rollback option.
 func (r *LeaveChatParams) Option(opts ...LeaveChatOption) (previous LeaveChatOption) {
@@ -10627,12 +9631,9 @@ func (r *LeaveChatParams) Option(opts ...LeaveChatOption) (previous LeaveChatOpt
 // Unique identifier for the target chat or username of the target supergroup or channel in the format @username.
 // Channel direct messages chats aren't supported; leave the corresponding channel instead.
 func WithLeaveChatChatID(value string) LeaveChatOption {
-	return func(params *LeaveChatParams) LeaveChatOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithLeaveChatChatID(previous)
-	}
+	return fieldOption(value, func(params *LeaveChatParams) *string {
+		return &params.ChatID
+	})
 }
 
 // LeaveChat calls the leaveChat Telegram Bot API method.
@@ -10671,7 +9672,7 @@ type LogOutParams struct {
 }
 
 // LogOutOption configures LogOutParams.
-type LogOutOption func(params *LogOutParams) LogOutOption
+type LogOutOption = Option[LogOutParams]
 
 // Option applies one or more LogOutOption values and returns the last rollback option.
 func (r *LogOutParams) Option(opts ...LogOutOption) (previous LogOutOption) {
@@ -10732,7 +9733,7 @@ type PinChatMessageParams struct {
 }
 
 // PinChatMessageOption configures PinChatMessageParams.
-type PinChatMessageOption func(params *PinChatMessageParams) PinChatMessageOption
+type PinChatMessageOption = Option[PinChatMessageParams]
 
 // Option applies one or more PinChatMessageOption values and returns the last rollback option.
 func (r *PinChatMessageParams) Option(opts ...PinChatMessageOption) (previous PinChatMessageOption) {
@@ -10746,36 +9747,27 @@ func (r *PinChatMessageParams) Option(opts ...PinChatMessageOption) (previous Pi
 //
 // Unique identifier of the business connection on behalf of which the message will be pinned
 func WithPinChatMessageBusinessConnectionID(value string) PinChatMessageOption {
-	return func(params *PinChatMessageParams) PinChatMessageOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithPinChatMessageBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *PinChatMessageParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithPinChatMessageChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
 func WithPinChatMessageChatID(value string) PinChatMessageOption {
-	return func(params *PinChatMessageParams) PinChatMessageOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithPinChatMessageChatID(previous)
-	}
+	return fieldOption(value, func(params *PinChatMessageParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithPinChatMessageMessageID sets the MessageID field.
 //
 // Identifier of a message to pin
 func WithPinChatMessageMessageID(value int64) PinChatMessageOption {
-	return func(params *PinChatMessageParams) PinChatMessageOption {
-		previous := params.MessageID
-		params.MessageID = value
-
-		return WithPinChatMessageMessageID(previous)
-	}
+	return fieldOption(value, func(params *PinChatMessageParams) *int64 {
+		return &params.MessageID
+	})
 }
 
 // WithPinChatMessageDisableNotification sets the DisableNotification field.
@@ -10783,12 +9775,9 @@ func WithPinChatMessageMessageID(value int64) PinChatMessageOption {
 // Pass True if it is not necessary to send a notification to all chat members about the new pinned message.
 // Notifications are always disabled in channels and private chats.
 func WithPinChatMessageDisableNotification(value bool) PinChatMessageOption {
-	return func(params *PinChatMessageParams) PinChatMessageOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithPinChatMessageDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *PinChatMessageParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // PinChatMessage calls the pinChatMessage Telegram Bot API method.
@@ -10858,7 +9847,7 @@ type PostStoryParams struct {
 }
 
 // PostStoryOption configures PostStoryParams.
-type PostStoryOption func(params *PostStoryParams) PostStoryOption
+type PostStoryOption = Option[PostStoryParams]
 
 // Option applies one or more PostStoryOption values and returns the last rollback option.
 func (r *PostStoryParams) Option(opts ...PostStoryOption) (previous PostStoryOption) {
@@ -10872,48 +9861,36 @@ func (r *PostStoryParams) Option(opts ...PostStoryOption) (previous PostStoryOpt
 //
 // Unique identifier of the business connection
 func WithPostStoryBusinessConnectionID(value string) PostStoryOption {
-	return func(params *PostStoryParams) PostStoryOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithPostStoryBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *PostStoryParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithPostStoryContent sets the Content field.
 //
 // Content of the story
 func WithPostStoryContent(value InputStoryContent) PostStoryOption {
-	return func(params *PostStoryParams) PostStoryOption {
-		previous := params.Content
-		params.Content = value
-
-		return WithPostStoryContent(previous)
-	}
+	return fieldOption(value, func(params *PostStoryParams) *InputStoryContent {
+		return &params.Content
+	})
 }
 
 // WithPostStoryActivePeriod sets the ActivePeriod field.
 //
 // Period after which the story is moved to the archive, in seconds; must be one of 6 * 3600, 12 * 3600, 86400, or 2 * 86400
 func WithPostStoryActivePeriod(value int64) PostStoryOption {
-	return func(params *PostStoryParams) PostStoryOption {
-		previous := params.ActivePeriod
-		params.ActivePeriod = value
-
-		return WithPostStoryActivePeriod(previous)
-	}
+	return fieldOption(value, func(params *PostStoryParams) *int64 {
+		return &params.ActivePeriod
+	})
 }
 
 // WithPostStoryCaption sets the Caption field.
 //
 // Caption of the story, 0-2048 characters after entities parsing
 func WithPostStoryCaption(value string) PostStoryOption {
-	return func(params *PostStoryParams) PostStoryOption {
-		previous := params.Caption
-		params.Caption = value
-
-		return WithPostStoryCaption(previous)
-	}
+	return fieldOption(value, func(params *PostStoryParams) *string {
+		return &params.Caption
+	})
 }
 
 // WithPostStoryParseMode sets the ParseMode field.
@@ -10923,60 +9900,45 @@ func WithPostStoryCaption(value string) PostStoryOption {
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithPostStoryParseMode(value string) PostStoryOption {
-	return func(params *PostStoryParams) PostStoryOption {
-		previous := params.ParseMode
-		params.ParseMode = value
-
-		return WithPostStoryParseMode(previous)
-	}
+	return fieldOption(value, func(params *PostStoryParams) *string {
+		return &params.ParseMode
+	})
 }
 
 // WithPostStoryCaptionEntities sets the CaptionEntities field.
 //
 // A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
 func WithPostStoryCaptionEntities(value []MessageEntity) PostStoryOption {
-	return func(params *PostStoryParams) PostStoryOption {
-		previous := params.CaptionEntities
-		params.CaptionEntities = value
-
-		return WithPostStoryCaptionEntities(previous)
-	}
+	return fieldOption(value, func(params *PostStoryParams) *[]MessageEntity {
+		return &params.CaptionEntities
+	})
 }
 
 // WithPostStoryAreas sets the Areas field.
 //
 // A JSON-serialized list of clickable areas to be shown on the story
 func WithPostStoryAreas(value []StoryArea) PostStoryOption {
-	return func(params *PostStoryParams) PostStoryOption {
-		previous := params.Areas
-		params.Areas = value
-
-		return WithPostStoryAreas(previous)
-	}
+	return fieldOption(value, func(params *PostStoryParams) *[]StoryArea {
+		return &params.Areas
+	})
 }
 
 // WithPostStoryPostToChatPage sets the PostToChatPage field.
 //
 // Pass True to keep the story accessible after it expires
 func WithPostStoryPostToChatPage(value bool) PostStoryOption {
-	return func(params *PostStoryParams) PostStoryOption {
-		previous := params.PostToChatPage
-		params.PostToChatPage = value
-
-		return WithPostStoryPostToChatPage(previous)
-	}
+	return fieldOption(value, func(params *PostStoryParams) *bool {
+		return &params.PostToChatPage
+	})
 }
 
 // WithPostStoryProtectContent sets the ProtectContent field.
 //
 // Pass True if the content of the story must be protected from forwarding and screenshotting
 func WithPostStoryProtectContent(value bool) PostStoryOption {
-	return func(params *PostStoryParams) PostStoryOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithPostStoryProtectContent(previous)
-	}
+	return fieldOption(value, func(params *PostStoryParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // PostStory calls the postStory Telegram Bot API method.
@@ -11225,7 +10187,7 @@ type PromoteChatMemberParams struct {
 }
 
 // PromoteChatMemberOption configures PromoteChatMemberParams.
-type PromoteChatMemberOption func(params *PromoteChatMemberParams) PromoteChatMemberOption
+type PromoteChatMemberOption = Option[PromoteChatMemberParams]
 
 // Option applies one or more PromoteChatMemberOption values and returns the last rollback option.
 func (r *PromoteChatMemberParams) Option(opts ...PromoteChatMemberOption) (previous PromoteChatMemberOption) {
@@ -11239,36 +10201,27 @@ func (r *PromoteChatMemberParams) Option(opts ...PromoteChatMemberOption) (previ
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
 func WithPromoteChatMemberChatID(value string) PromoteChatMemberOption {
-	return func(params *PromoteChatMemberParams) PromoteChatMemberOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithPromoteChatMemberChatID(previous)
-	}
+	return fieldOption(value, func(params *PromoteChatMemberParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithPromoteChatMemberUserID sets the UserID field.
 //
 // Unique identifier of the target user
 func WithPromoteChatMemberUserID(value int64) PromoteChatMemberOption {
-	return func(params *PromoteChatMemberParams) PromoteChatMemberOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithPromoteChatMemberUserID(previous)
-	}
+	return fieldOption(value, func(params *PromoteChatMemberParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithPromoteChatMemberIsAnonymous sets the IsAnonymous field.
 //
 // Pass True if the administrator's presence in the chat is hidden
 func WithPromoteChatMemberIsAnonymous(value bool) PromoteChatMemberOption {
-	return func(params *PromoteChatMemberParams) PromoteChatMemberOption {
-		previous := params.IsAnonymous
-		params.IsAnonymous = value
-
-		return WithPromoteChatMemberIsAnonymous(previous)
-	}
+	return fieldOption(value, func(params *PromoteChatMemberParams) *bool {
+		return &params.IsAnonymous
+	})
 }
 
 // WithPromoteChatMemberCanManageChat sets the CanManageChat field.
@@ -11276,36 +10229,27 @@ func WithPromoteChatMemberIsAnonymous(value bool) PromoteChatMemberOption {
 // Pass True if the administrator can access the chat event log, get boost list, see hidden supergroup and channel members, report spam messages, ignore slow mode, and send messages to the chat without paying Telegram Stars.
 // Implied by any other administrator privilege.
 func WithPromoteChatMemberCanManageChat(value bool) PromoteChatMemberOption {
-	return func(params *PromoteChatMemberParams) PromoteChatMemberOption {
-		previous := params.CanManageChat
-		params.CanManageChat = value
-
-		return WithPromoteChatMemberCanManageChat(previous)
-	}
+	return fieldOption(value, func(params *PromoteChatMemberParams) *bool {
+		return &params.CanManageChat
+	})
 }
 
 // WithPromoteChatMemberCanDeleteMessages sets the CanDeleteMessages field.
 //
 // Pass True if the administrator can delete messages of other users
 func WithPromoteChatMemberCanDeleteMessages(value bool) PromoteChatMemberOption {
-	return func(params *PromoteChatMemberParams) PromoteChatMemberOption {
-		previous := params.CanDeleteMessages
-		params.CanDeleteMessages = value
-
-		return WithPromoteChatMemberCanDeleteMessages(previous)
-	}
+	return fieldOption(value, func(params *PromoteChatMemberParams) *bool {
+		return &params.CanDeleteMessages
+	})
 }
 
 // WithPromoteChatMemberCanManageVideoChats sets the CanManageVideoChats field.
 //
 // Pass True if the administrator can manage video chats
 func WithPromoteChatMemberCanManageVideoChats(value bool) PromoteChatMemberOption {
-	return func(params *PromoteChatMemberParams) PromoteChatMemberOption {
-		previous := params.CanManageVideoChats
-		params.CanManageVideoChats = value
-
-		return WithPromoteChatMemberCanManageVideoChats(previous)
-	}
+	return fieldOption(value, func(params *PromoteChatMemberParams) *bool {
+		return &params.CanManageVideoChats
+	})
 }
 
 // WithPromoteChatMemberCanRestrictMembers sets the CanRestrictMembers field.
@@ -11313,156 +10257,117 @@ func WithPromoteChatMemberCanManageVideoChats(value bool) PromoteChatMemberOptio
 // Pass True if the administrator can restrict, ban or unban chat members, or access supergroup statistics.
 // For backward compatibility, defaults to True for promotions of channel administrators.
 func WithPromoteChatMemberCanRestrictMembers(value bool) PromoteChatMemberOption {
-	return func(params *PromoteChatMemberParams) PromoteChatMemberOption {
-		previous := params.CanRestrictMembers
-		params.CanRestrictMembers = value
-
-		return WithPromoteChatMemberCanRestrictMembers(previous)
-	}
+	return fieldOption(value, func(params *PromoteChatMemberParams) *bool {
+		return &params.CanRestrictMembers
+	})
 }
 
 // WithPromoteChatMemberCanPromoteMembers sets the CanPromoteMembers field.
 //
 // Pass True if the administrator can add new administrators with a subset of their own privileges or demote administrators that they have promoted, directly or indirectly (promoted by administrators that were appointed by him)
 func WithPromoteChatMemberCanPromoteMembers(value bool) PromoteChatMemberOption {
-	return func(params *PromoteChatMemberParams) PromoteChatMemberOption {
-		previous := params.CanPromoteMembers
-		params.CanPromoteMembers = value
-
-		return WithPromoteChatMemberCanPromoteMembers(previous)
-	}
+	return fieldOption(value, func(params *PromoteChatMemberParams) *bool {
+		return &params.CanPromoteMembers
+	})
 }
 
 // WithPromoteChatMemberCanChangeInfo sets the CanChangeInfo field.
 //
 // Pass True if the administrator can change chat title, photo and other settings
 func WithPromoteChatMemberCanChangeInfo(value bool) PromoteChatMemberOption {
-	return func(params *PromoteChatMemberParams) PromoteChatMemberOption {
-		previous := params.CanChangeInfo
-		params.CanChangeInfo = value
-
-		return WithPromoteChatMemberCanChangeInfo(previous)
-	}
+	return fieldOption(value, func(params *PromoteChatMemberParams) *bool {
+		return &params.CanChangeInfo
+	})
 }
 
 // WithPromoteChatMemberCanInviteUsers sets the CanInviteUsers field.
 //
 // Pass True if the administrator can invite new users to the chat
 func WithPromoteChatMemberCanInviteUsers(value bool) PromoteChatMemberOption {
-	return func(params *PromoteChatMemberParams) PromoteChatMemberOption {
-		previous := params.CanInviteUsers
-		params.CanInviteUsers = value
-
-		return WithPromoteChatMemberCanInviteUsers(previous)
-	}
+	return fieldOption(value, func(params *PromoteChatMemberParams) *bool {
+		return &params.CanInviteUsers
+	})
 }
 
 // WithPromoteChatMemberCanPostStories sets the CanPostStories field.
 //
 // Pass True if the administrator can post stories to the chat
 func WithPromoteChatMemberCanPostStories(value bool) PromoteChatMemberOption {
-	return func(params *PromoteChatMemberParams) PromoteChatMemberOption {
-		previous := params.CanPostStories
-		params.CanPostStories = value
-
-		return WithPromoteChatMemberCanPostStories(previous)
-	}
+	return fieldOption(value, func(params *PromoteChatMemberParams) *bool {
+		return &params.CanPostStories
+	})
 }
 
 // WithPromoteChatMemberCanEditStories sets the CanEditStories field.
 //
 // Pass True if the administrator can edit stories posted by other users, post stories to the chat page, pin chat stories, and access the chat's story archive
 func WithPromoteChatMemberCanEditStories(value bool) PromoteChatMemberOption {
-	return func(params *PromoteChatMemberParams) PromoteChatMemberOption {
-		previous := params.CanEditStories
-		params.CanEditStories = value
-
-		return WithPromoteChatMemberCanEditStories(previous)
-	}
+	return fieldOption(value, func(params *PromoteChatMemberParams) *bool {
+		return &params.CanEditStories
+	})
 }
 
 // WithPromoteChatMemberCanDeleteStories sets the CanDeleteStories field.
 //
 // Pass True if the administrator can delete stories posted by other users
 func WithPromoteChatMemberCanDeleteStories(value bool) PromoteChatMemberOption {
-	return func(params *PromoteChatMemberParams) PromoteChatMemberOption {
-		previous := params.CanDeleteStories
-		params.CanDeleteStories = value
-
-		return WithPromoteChatMemberCanDeleteStories(previous)
-	}
+	return fieldOption(value, func(params *PromoteChatMemberParams) *bool {
+		return &params.CanDeleteStories
+	})
 }
 
 // WithPromoteChatMemberCanPostMessages sets the CanPostMessages field.
 //
 // Pass True if the administrator can post messages in the channel, approve suggested posts, or access channel statistics; for channels only
 func WithPromoteChatMemberCanPostMessages(value bool) PromoteChatMemberOption {
-	return func(params *PromoteChatMemberParams) PromoteChatMemberOption {
-		previous := params.CanPostMessages
-		params.CanPostMessages = value
-
-		return WithPromoteChatMemberCanPostMessages(previous)
-	}
+	return fieldOption(value, func(params *PromoteChatMemberParams) *bool {
+		return &params.CanPostMessages
+	})
 }
 
 // WithPromoteChatMemberCanEditMessages sets the CanEditMessages field.
 //
 // Pass True if the administrator can edit messages of other users and can pin messages; for channels only
 func WithPromoteChatMemberCanEditMessages(value bool) PromoteChatMemberOption {
-	return func(params *PromoteChatMemberParams) PromoteChatMemberOption {
-		previous := params.CanEditMessages
-		params.CanEditMessages = value
-
-		return WithPromoteChatMemberCanEditMessages(previous)
-	}
+	return fieldOption(value, func(params *PromoteChatMemberParams) *bool {
+		return &params.CanEditMessages
+	})
 }
 
 // WithPromoteChatMemberCanPinMessages sets the CanPinMessages field.
 //
 // Pass True if the administrator can pin messages; for supergroups only
 func WithPromoteChatMemberCanPinMessages(value bool) PromoteChatMemberOption {
-	return func(params *PromoteChatMemberParams) PromoteChatMemberOption {
-		previous := params.CanPinMessages
-		params.CanPinMessages = value
-
-		return WithPromoteChatMemberCanPinMessages(previous)
-	}
+	return fieldOption(value, func(params *PromoteChatMemberParams) *bool {
+		return &params.CanPinMessages
+	})
 }
 
 // WithPromoteChatMemberCanManageTopics sets the CanManageTopics field.
 //
 // Pass True if the user is allowed to create, rename, close, and reopen forum topics; for supergroups only
 func WithPromoteChatMemberCanManageTopics(value bool) PromoteChatMemberOption {
-	return func(params *PromoteChatMemberParams) PromoteChatMemberOption {
-		previous := params.CanManageTopics
-		params.CanManageTopics = value
-
-		return WithPromoteChatMemberCanManageTopics(previous)
-	}
+	return fieldOption(value, func(params *PromoteChatMemberParams) *bool {
+		return &params.CanManageTopics
+	})
 }
 
 // WithPromoteChatMemberCanManageDirectMessages sets the CanManageDirectMessages field.
 //
 // Pass True if the administrator can manage direct messages within the channel and decline suggested posts; for channels only
 func WithPromoteChatMemberCanManageDirectMessages(value bool) PromoteChatMemberOption {
-	return func(params *PromoteChatMemberParams) PromoteChatMemberOption {
-		previous := params.CanManageDirectMessages
-		params.CanManageDirectMessages = value
-
-		return WithPromoteChatMemberCanManageDirectMessages(previous)
-	}
+	return fieldOption(value, func(params *PromoteChatMemberParams) *bool {
+		return &params.CanManageDirectMessages
+	})
 }
 
 // WithPromoteChatMemberCanManageTags sets the CanManageTags field.
 //
 // Pass True if the administrator can edit the tags of regular members; for groups and supergroups only
 func WithPromoteChatMemberCanManageTags(value bool) PromoteChatMemberOption {
-	return func(params *PromoteChatMemberParams) PromoteChatMemberOption {
-		previous := params.CanManageTags
-		params.CanManageTags = value
-
-		return WithPromoteChatMemberCanManageTags(previous)
-	}
+	return fieldOption(value, func(params *PromoteChatMemberParams) *bool {
+		return &params.CanManageTags
+	})
 }
 
 // PromoteChatMember calls the promoteChatMember Telegram Bot API method.
@@ -11512,7 +10417,7 @@ type ReadBusinessMessageParams struct {
 }
 
 // ReadBusinessMessageOption configures ReadBusinessMessageParams.
-type ReadBusinessMessageOption func(params *ReadBusinessMessageParams) ReadBusinessMessageOption
+type ReadBusinessMessageOption = Option[ReadBusinessMessageParams]
 
 // Option applies one or more ReadBusinessMessageOption values and returns the last rollback option.
 func (r *ReadBusinessMessageParams) Option(opts ...ReadBusinessMessageOption) (previous ReadBusinessMessageOption) {
@@ -11526,12 +10431,9 @@ func (r *ReadBusinessMessageParams) Option(opts ...ReadBusinessMessageOption) (p
 //
 // Unique identifier of the business connection on behalf of which to read the message
 func WithReadBusinessMessageBusinessConnectionID(value string) ReadBusinessMessageOption {
-	return func(params *ReadBusinessMessageParams) ReadBusinessMessageOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithReadBusinessMessageBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *ReadBusinessMessageParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithReadBusinessMessageChatID sets the ChatID field.
@@ -11539,24 +10441,18 @@ func WithReadBusinessMessageBusinessConnectionID(value string) ReadBusinessMessa
 // Unique identifier of the chat in which the message was received.
 // The chat must have been active in the last 24 hours.
 func WithReadBusinessMessageChatID(value int64) ReadBusinessMessageOption {
-	return func(params *ReadBusinessMessageParams) ReadBusinessMessageOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithReadBusinessMessageChatID(previous)
-	}
+	return fieldOption(value, func(params *ReadBusinessMessageParams) *int64 {
+		return &params.ChatID
+	})
 }
 
 // WithReadBusinessMessageMessageID sets the MessageID field.
 //
 // Unique identifier of the message to mark as read
 func WithReadBusinessMessageMessageID(value int64) ReadBusinessMessageOption {
-	return func(params *ReadBusinessMessageParams) ReadBusinessMessageOption {
-		previous := params.MessageID
-		params.MessageID = value
-
-		return WithReadBusinessMessageMessageID(previous)
-	}
+	return fieldOption(value, func(params *ReadBusinessMessageParams) *int64 {
+		return &params.MessageID
+	})
 }
 
 // ReadBusinessMessage calls the readBusinessMessage Telegram Bot API method.
@@ -11601,7 +10497,7 @@ type RefundStarPaymentParams struct {
 }
 
 // RefundStarPaymentOption configures RefundStarPaymentParams.
-type RefundStarPaymentOption func(params *RefundStarPaymentParams) RefundStarPaymentOption
+type RefundStarPaymentOption = Option[RefundStarPaymentParams]
 
 // Option applies one or more RefundStarPaymentOption values and returns the last rollback option.
 func (r *RefundStarPaymentParams) Option(opts ...RefundStarPaymentOption) (previous RefundStarPaymentOption) {
@@ -11615,24 +10511,18 @@ func (r *RefundStarPaymentParams) Option(opts ...RefundStarPaymentOption) (previ
 //
 // Identifier of the user whose payment will be refunded
 func WithRefundStarPaymentUserID(value int64) RefundStarPaymentOption {
-	return func(params *RefundStarPaymentParams) RefundStarPaymentOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithRefundStarPaymentUserID(previous)
-	}
+	return fieldOption(value, func(params *RefundStarPaymentParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithRefundStarPaymentTelegramPaymentChargeID sets the TelegramPaymentChargeID field.
 //
 // Telegram payment identifier
 func WithRefundStarPaymentTelegramPaymentChargeID(value string) RefundStarPaymentOption {
-	return func(params *RefundStarPaymentParams) RefundStarPaymentOption {
-		previous := params.TelegramPaymentChargeID
-		params.TelegramPaymentChargeID = value
-
-		return WithRefundStarPaymentTelegramPaymentChargeID(previous)
-	}
+	return fieldOption(value, func(params *RefundStarPaymentParams) *string {
+		return &params.TelegramPaymentChargeID
+	})
 }
 
 // RefundStarPayment calls the refundStarPayment Telegram Bot API method.
@@ -11679,7 +10569,7 @@ type RemoveBusinessAccountProfilePhotoParams struct {
 }
 
 // RemoveBusinessAccountProfilePhotoOption configures RemoveBusinessAccountProfilePhotoParams.
-type RemoveBusinessAccountProfilePhotoOption func(params *RemoveBusinessAccountProfilePhotoParams) RemoveBusinessAccountProfilePhotoOption
+type RemoveBusinessAccountProfilePhotoOption = Option[RemoveBusinessAccountProfilePhotoParams]
 
 // Option applies one or more RemoveBusinessAccountProfilePhotoOption values and returns the last rollback option.
 func (r *RemoveBusinessAccountProfilePhotoParams) Option(opts ...RemoveBusinessAccountProfilePhotoOption) (previous RemoveBusinessAccountProfilePhotoOption) {
@@ -11693,12 +10583,9 @@ func (r *RemoveBusinessAccountProfilePhotoParams) Option(opts ...RemoveBusinessA
 //
 // Unique identifier of the business connection
 func WithRemoveBusinessAccountProfilePhotoBusinessConnectionID(value string) RemoveBusinessAccountProfilePhotoOption {
-	return func(params *RemoveBusinessAccountProfilePhotoParams) RemoveBusinessAccountProfilePhotoOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithRemoveBusinessAccountProfilePhotoBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *RemoveBusinessAccountProfilePhotoParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithRemoveBusinessAccountProfilePhotoIsPublic sets the IsPublic field.
@@ -11706,12 +10593,9 @@ func WithRemoveBusinessAccountProfilePhotoBusinessConnectionID(value string) Rem
 // Pass True to remove the public photo, which is visible even if the main photo is hidden by the business account's privacy settings.
 // After the main photo is removed, the previous profile photo (if present) becomes the main photo.
 func WithRemoveBusinessAccountProfilePhotoIsPublic(value bool) RemoveBusinessAccountProfilePhotoOption {
-	return func(params *RemoveBusinessAccountProfilePhotoParams) RemoveBusinessAccountProfilePhotoOption {
-		previous := params.IsPublic
-		params.IsPublic = value
-
-		return WithRemoveBusinessAccountProfilePhotoIsPublic(previous)
-	}
+	return fieldOption(value, func(params *RemoveBusinessAccountProfilePhotoParams) *bool {
+		return &params.IsPublic
+	})
 }
 
 // RemoveBusinessAccountProfilePhoto calls the removeBusinessAccountProfilePhoto Telegram Bot API method.
@@ -11753,7 +10637,7 @@ type RemoveChatVerificationParams struct {
 }
 
 // RemoveChatVerificationOption configures RemoveChatVerificationParams.
-type RemoveChatVerificationOption func(params *RemoveChatVerificationParams) RemoveChatVerificationOption
+type RemoveChatVerificationOption = Option[RemoveChatVerificationParams]
 
 // Option applies one or more RemoveChatVerificationOption values and returns the last rollback option.
 func (r *RemoveChatVerificationParams) Option(opts ...RemoveChatVerificationOption) (previous RemoveChatVerificationOption) {
@@ -11767,12 +10651,9 @@ func (r *RemoveChatVerificationParams) Option(opts ...RemoveChatVerificationOpti
 //
 // Unique identifier for the target chat or username of the target bot or channel in the format @username
 func WithRemoveChatVerificationChatID(value string) RemoveChatVerificationOption {
-	return func(params *RemoveChatVerificationParams) RemoveChatVerificationOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithRemoveChatVerificationChatID(previous)
-	}
+	return fieldOption(value, func(params *RemoveChatVerificationParams) *string {
+		return &params.ChatID
+	})
 }
 
 // RemoveChatVerification calls the removeChatVerification Telegram Bot API method.
@@ -11813,7 +10694,7 @@ type RemoveMyProfilePhotoParams struct {
 }
 
 // RemoveMyProfilePhotoOption configures RemoveMyProfilePhotoParams.
-type RemoveMyProfilePhotoOption func(params *RemoveMyProfilePhotoParams) RemoveMyProfilePhotoOption
+type RemoveMyProfilePhotoOption = Option[RemoveMyProfilePhotoParams]
 
 // Option applies one or more RemoveMyProfilePhotoOption values and returns the last rollback option.
 func (r *RemoveMyProfilePhotoParams) Option(opts ...RemoveMyProfilePhotoOption) (previous RemoveMyProfilePhotoOption) {
@@ -11862,7 +10743,7 @@ type RemoveUserVerificationParams struct {
 }
 
 // RemoveUserVerificationOption configures RemoveUserVerificationParams.
-type RemoveUserVerificationOption func(params *RemoveUserVerificationParams) RemoveUserVerificationOption
+type RemoveUserVerificationOption = Option[RemoveUserVerificationParams]
 
 // Option applies one or more RemoveUserVerificationOption values and returns the last rollback option.
 func (r *RemoveUserVerificationParams) Option(opts ...RemoveUserVerificationOption) (previous RemoveUserVerificationOption) {
@@ -11876,12 +10757,9 @@ func (r *RemoveUserVerificationParams) Option(opts ...RemoveUserVerificationOpti
 //
 // Unique identifier of the target user
 func WithRemoveUserVerificationUserID(value int64) RemoveUserVerificationOption {
-	return func(params *RemoveUserVerificationParams) RemoveUserVerificationOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithRemoveUserVerificationUserID(previous)
-	}
+	return fieldOption(value, func(params *RemoveUserVerificationParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // RemoveUserVerification calls the removeUserVerification Telegram Bot API method.
@@ -11927,7 +10805,7 @@ type ReopenForumTopicParams struct {
 }
 
 // ReopenForumTopicOption configures ReopenForumTopicParams.
-type ReopenForumTopicOption func(params *ReopenForumTopicParams) ReopenForumTopicOption
+type ReopenForumTopicOption = Option[ReopenForumTopicParams]
 
 // Option applies one or more ReopenForumTopicOption values and returns the last rollback option.
 func (r *ReopenForumTopicParams) Option(opts ...ReopenForumTopicOption) (previous ReopenForumTopicOption) {
@@ -11941,24 +10819,18 @@ func (r *ReopenForumTopicParams) Option(opts ...ReopenForumTopicOption) (previou
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithReopenForumTopicChatID(value string) ReopenForumTopicOption {
-	return func(params *ReopenForumTopicParams) ReopenForumTopicOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithReopenForumTopicChatID(previous)
-	}
+	return fieldOption(value, func(params *ReopenForumTopicParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithReopenForumTopicMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread of the forum topic
 func WithReopenForumTopicMessageThreadID(value int64) ReopenForumTopicOption {
-	return func(params *ReopenForumTopicParams) ReopenForumTopicOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithReopenForumTopicMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *ReopenForumTopicParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // ReopenForumTopic calls the reopenForumTopic Telegram Bot API method.
@@ -12000,7 +10872,7 @@ type ReopenGeneralForumTopicParams struct {
 }
 
 // ReopenGeneralForumTopicOption configures ReopenGeneralForumTopicParams.
-type ReopenGeneralForumTopicOption func(params *ReopenGeneralForumTopicParams) ReopenGeneralForumTopicOption
+type ReopenGeneralForumTopicOption = Option[ReopenGeneralForumTopicParams]
 
 // Option applies one or more ReopenGeneralForumTopicOption values and returns the last rollback option.
 func (r *ReopenGeneralForumTopicParams) Option(opts ...ReopenGeneralForumTopicOption) (previous ReopenGeneralForumTopicOption) {
@@ -12014,12 +10886,9 @@ func (r *ReopenGeneralForumTopicParams) Option(opts ...ReopenGeneralForumTopicOp
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithReopenGeneralForumTopicChatID(value string) ReopenGeneralForumTopicOption {
-	return func(params *ReopenGeneralForumTopicParams) ReopenGeneralForumTopicOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithReopenGeneralForumTopicChatID(previous)
-	}
+	return fieldOption(value, func(params *ReopenGeneralForumTopicParams) *string {
+		return &params.ChatID
+	})
 }
 
 // ReopenGeneralForumTopic calls the reopenGeneralForumTopic Telegram Bot API method.
@@ -12062,7 +10931,7 @@ type ReplaceManagedBotTokenParams struct {
 }
 
 // ReplaceManagedBotTokenOption configures ReplaceManagedBotTokenParams.
-type ReplaceManagedBotTokenOption func(params *ReplaceManagedBotTokenParams) ReplaceManagedBotTokenOption
+type ReplaceManagedBotTokenOption = Option[ReplaceManagedBotTokenParams]
 
 // Option applies one or more ReplaceManagedBotTokenOption values and returns the last rollback option.
 func (r *ReplaceManagedBotTokenParams) Option(opts ...ReplaceManagedBotTokenOption) (previous ReplaceManagedBotTokenOption) {
@@ -12076,12 +10945,9 @@ func (r *ReplaceManagedBotTokenParams) Option(opts ...ReplaceManagedBotTokenOpti
 //
 // User identifier of the managed bot whose token will be replaced
 func WithReplaceManagedBotTokenUserID(value int64) ReplaceManagedBotTokenOption {
-	return func(params *ReplaceManagedBotTokenParams) ReplaceManagedBotTokenOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithReplaceManagedBotTokenUserID(previous)
-	}
+	return fieldOption(value, func(params *ReplaceManagedBotTokenParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // ReplaceManagedBotToken calls the replaceManagedBotToken Telegram Bot API method.
@@ -12132,7 +10998,7 @@ type ReplaceStickerInSetParams struct {
 }
 
 // ReplaceStickerInSetOption configures ReplaceStickerInSetParams.
-type ReplaceStickerInSetOption func(params *ReplaceStickerInSetParams) ReplaceStickerInSetOption
+type ReplaceStickerInSetOption = Option[ReplaceStickerInSetParams]
 
 // Option applies one or more ReplaceStickerInSetOption values and returns the last rollback option.
 func (r *ReplaceStickerInSetParams) Option(opts ...ReplaceStickerInSetOption) (previous ReplaceStickerInSetOption) {
@@ -12146,36 +11012,27 @@ func (r *ReplaceStickerInSetParams) Option(opts ...ReplaceStickerInSetOption) (p
 //
 // User identifier of the sticker set owner
 func WithReplaceStickerInSetUserID(value int64) ReplaceStickerInSetOption {
-	return func(params *ReplaceStickerInSetParams) ReplaceStickerInSetOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithReplaceStickerInSetUserID(previous)
-	}
+	return fieldOption(value, func(params *ReplaceStickerInSetParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithReplaceStickerInSetName sets the Name field.
 //
 // Sticker set name
 func WithReplaceStickerInSetName(value string) ReplaceStickerInSetOption {
-	return func(params *ReplaceStickerInSetParams) ReplaceStickerInSetOption {
-		previous := params.Name
-		params.Name = value
-
-		return WithReplaceStickerInSetName(previous)
-	}
+	return fieldOption(value, func(params *ReplaceStickerInSetParams) *string {
+		return &params.Name
+	})
 }
 
 // WithReplaceStickerInSetOldSticker sets the OldSticker field.
 //
 // File identifier of the replaced sticker
 func WithReplaceStickerInSetOldSticker(value string) ReplaceStickerInSetOption {
-	return func(params *ReplaceStickerInSetParams) ReplaceStickerInSetOption {
-		previous := params.OldSticker
-		params.OldSticker = value
-
-		return WithReplaceStickerInSetOldSticker(previous)
-	}
+	return fieldOption(value, func(params *ReplaceStickerInSetParams) *string {
+		return &params.OldSticker
+	})
 }
 
 // WithReplaceStickerInSetSticker sets the Sticker field.
@@ -12183,12 +11040,9 @@ func WithReplaceStickerInSetOldSticker(value string) ReplaceStickerInSetOption {
 // A JSON-serialized object with information about the added sticker.
 // If exactly the same sticker had already been added to the set, then the set remains unchanged.
 func WithReplaceStickerInSetSticker(value InputSticker) ReplaceStickerInSetOption {
-	return func(params *ReplaceStickerInSetParams) ReplaceStickerInSetOption {
-		previous := params.Sticker
-		params.Sticker = value
-
-		return WithReplaceStickerInSetSticker(previous)
-	}
+	return fieldOption(value, func(params *ReplaceStickerInSetParams) *InputSticker {
+		return &params.Sticker
+	})
 }
 
 // ReplaceStickerInSet calls the replaceStickerInSet Telegram Bot API method.
@@ -12323,7 +11177,7 @@ type RepostStoryParams struct {
 }
 
 // RepostStoryOption configures RepostStoryParams.
-type RepostStoryOption func(params *RepostStoryParams) RepostStoryOption
+type RepostStoryOption = Option[RepostStoryParams]
 
 // Option applies one or more RepostStoryOption values and returns the last rollback option.
 func (r *RepostStoryParams) Option(opts ...RepostStoryOption) (previous RepostStoryOption) {
@@ -12337,72 +11191,54 @@ func (r *RepostStoryParams) Option(opts ...RepostStoryOption) (previous RepostSt
 //
 // Unique identifier of the business connection
 func WithRepostStoryBusinessConnectionID(value string) RepostStoryOption {
-	return func(params *RepostStoryParams) RepostStoryOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithRepostStoryBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *RepostStoryParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithRepostStoryFromChatID sets the FromChatID field.
 //
 // Unique identifier of the chat which posted the story that should be reposted
 func WithRepostStoryFromChatID(value int64) RepostStoryOption {
-	return func(params *RepostStoryParams) RepostStoryOption {
-		previous := params.FromChatID
-		params.FromChatID = value
-
-		return WithRepostStoryFromChatID(previous)
-	}
+	return fieldOption(value, func(params *RepostStoryParams) *int64 {
+		return &params.FromChatID
+	})
 }
 
 // WithRepostStoryFromStoryID sets the FromStoryID field.
 //
 // Unique identifier of the story that should be reposted
 func WithRepostStoryFromStoryID(value int64) RepostStoryOption {
-	return func(params *RepostStoryParams) RepostStoryOption {
-		previous := params.FromStoryID
-		params.FromStoryID = value
-
-		return WithRepostStoryFromStoryID(previous)
-	}
+	return fieldOption(value, func(params *RepostStoryParams) *int64 {
+		return &params.FromStoryID
+	})
 }
 
 // WithRepostStoryActivePeriod sets the ActivePeriod field.
 //
 // Period after which the story is moved to the archive, in seconds; must be one of 6 * 3600, 12 * 3600, 86400, or 2 * 86400
 func WithRepostStoryActivePeriod(value int64) RepostStoryOption {
-	return func(params *RepostStoryParams) RepostStoryOption {
-		previous := params.ActivePeriod
-		params.ActivePeriod = value
-
-		return WithRepostStoryActivePeriod(previous)
-	}
+	return fieldOption(value, func(params *RepostStoryParams) *int64 {
+		return &params.ActivePeriod
+	})
 }
 
 // WithRepostStoryPostToChatPage sets the PostToChatPage field.
 //
 // Pass True to keep the story accessible after it expires
 func WithRepostStoryPostToChatPage(value bool) RepostStoryOption {
-	return func(params *RepostStoryParams) RepostStoryOption {
-		previous := params.PostToChatPage
-		params.PostToChatPage = value
-
-		return WithRepostStoryPostToChatPage(previous)
-	}
+	return fieldOption(value, func(params *RepostStoryParams) *bool {
+		return &params.PostToChatPage
+	})
 }
 
 // WithRepostStoryProtectContent sets the ProtectContent field.
 //
 // Pass True if the content of the story must be protected from forwarding and screenshotting
 func WithRepostStoryProtectContent(value bool) RepostStoryOption {
-	return func(params *RepostStoryParams) RepostStoryOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithRepostStoryProtectContent(previous)
-	}
+	return fieldOption(value, func(params *RepostStoryParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // RepostStory calls the repostStory Telegram Bot API method.
@@ -12462,7 +11298,7 @@ type RestrictChatMemberParams struct {
 }
 
 // RestrictChatMemberOption configures RestrictChatMemberParams.
-type RestrictChatMemberOption func(params *RestrictChatMemberParams) RestrictChatMemberOption
+type RestrictChatMemberOption = Option[RestrictChatMemberParams]
 
 // Option applies one or more RestrictChatMemberOption values and returns the last rollback option.
 func (r *RestrictChatMemberParams) Option(opts ...RestrictChatMemberOption) (previous RestrictChatMemberOption) {
@@ -12476,36 +11312,27 @@ func (r *RestrictChatMemberParams) Option(opts ...RestrictChatMemberOption) (pre
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithRestrictChatMemberChatID(value string) RestrictChatMemberOption {
-	return func(params *RestrictChatMemberParams) RestrictChatMemberOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithRestrictChatMemberChatID(previous)
-	}
+	return fieldOption(value, func(params *RestrictChatMemberParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithRestrictChatMemberUserID sets the UserID field.
 //
 // Unique identifier of the target user
 func WithRestrictChatMemberUserID(value int64) RestrictChatMemberOption {
-	return func(params *RestrictChatMemberParams) RestrictChatMemberOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithRestrictChatMemberUserID(previous)
-	}
+	return fieldOption(value, func(params *RestrictChatMemberParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithRestrictChatMemberPermissions sets the Permissions field.
 //
 // A JSON-serialized object for new user permissions
 func WithRestrictChatMemberPermissions(value ChatPermissions) RestrictChatMemberOption {
-	return func(params *RestrictChatMemberParams) RestrictChatMemberOption {
-		previous := params.Permissions
-		params.Permissions = value
-
-		return WithRestrictChatMemberPermissions(previous)
-	}
+	return fieldOption(value, func(params *RestrictChatMemberParams) *ChatPermissions {
+		return &params.Permissions
+	})
 }
 
 // WithRestrictChatMemberUseIndependentChatPermissions sets the UseIndependentChatPermissions field.
@@ -12513,12 +11340,9 @@ func WithRestrictChatMemberPermissions(value ChatPermissions) RestrictChatMember
 // Pass True if chat permissions are set independently.
 // Otherwise, the can_send_other_messages and can_add_web_page_previews permissions will imply the can_send_messages, can_send_audios, can_send_documents, can_send_photos, can_send_videos, can_send_video_notes, and can_send_voice_notes permissions; the can_send_polls permission will imply the can_send_messages permission.
 func WithRestrictChatMemberUseIndependentChatPermissions(value bool) RestrictChatMemberOption {
-	return func(params *RestrictChatMemberParams) RestrictChatMemberOption {
-		previous := params.UseIndependentChatPermissions
-		params.UseIndependentChatPermissions = value
-
-		return WithRestrictChatMemberUseIndependentChatPermissions(previous)
-	}
+	return fieldOption(value, func(params *RestrictChatMemberParams) *bool {
+		return &params.UseIndependentChatPermissions
+	})
 }
 
 // WithRestrictChatMemberUntilDate sets the UntilDate field.
@@ -12526,12 +11350,9 @@ func WithRestrictChatMemberUseIndependentChatPermissions(value bool) RestrictCha
 // Date when restrictions will be lifted for the user; Unix time.
 // If user is restricted for more than 366 days or less than 30 seconds from the current time, they are considered to be restricted forever.
 func WithRestrictChatMemberUntilDate(value int64) RestrictChatMemberOption {
-	return func(params *RestrictChatMemberParams) RestrictChatMemberOption {
-		previous := params.UntilDate
-		params.UntilDate = value
-
-		return WithRestrictChatMemberUntilDate(previous)
-	}
+	return fieldOption(value, func(params *RestrictChatMemberParams) *int64 {
+		return &params.UntilDate
+	})
 }
 
 // RestrictChatMember calls the restrictChatMember Telegram Bot API method.
@@ -12577,7 +11398,7 @@ type RevokeChatInviteLinkParams struct {
 }
 
 // RevokeChatInviteLinkOption configures RevokeChatInviteLinkParams.
-type RevokeChatInviteLinkOption func(params *RevokeChatInviteLinkParams) RevokeChatInviteLinkOption
+type RevokeChatInviteLinkOption = Option[RevokeChatInviteLinkParams]
 
 // Option applies one or more RevokeChatInviteLinkOption values and returns the last rollback option.
 func (r *RevokeChatInviteLinkParams) Option(opts ...RevokeChatInviteLinkOption) (previous RevokeChatInviteLinkOption) {
@@ -12591,24 +11412,18 @@ func (r *RevokeChatInviteLinkParams) Option(opts ...RevokeChatInviteLinkOption) 
 //
 // Unique identifier of the target chat or username of the target channel in the format @username
 func WithRevokeChatInviteLinkChatID(value string) RevokeChatInviteLinkOption {
-	return func(params *RevokeChatInviteLinkParams) RevokeChatInviteLinkOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithRevokeChatInviteLinkChatID(previous)
-	}
+	return fieldOption(value, func(params *RevokeChatInviteLinkParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithRevokeChatInviteLinkInviteLink sets the InviteLink field.
 //
 // The invite link to revoke
 func WithRevokeChatInviteLinkInviteLink(value string) RevokeChatInviteLinkOption {
-	return func(params *RevokeChatInviteLinkParams) RevokeChatInviteLinkOption {
-		previous := params.InviteLink
-		params.InviteLink = value
-
-		return WithRevokeChatInviteLinkInviteLink(previous)
-	}
+	return fieldOption(value, func(params *RevokeChatInviteLinkParams) *string {
+		return &params.InviteLink
+	})
 }
 
 // RevokeChatInviteLink calls the revokeChatInviteLink Telegram Bot API method.
@@ -12669,7 +11484,7 @@ type SavePreparedInlineMessageParams struct {
 }
 
 // SavePreparedInlineMessageOption configures SavePreparedInlineMessageParams.
-type SavePreparedInlineMessageOption func(params *SavePreparedInlineMessageParams) SavePreparedInlineMessageOption
+type SavePreparedInlineMessageOption = Option[SavePreparedInlineMessageParams]
 
 // Option applies one or more SavePreparedInlineMessageOption values and returns the last rollback option.
 func (r *SavePreparedInlineMessageParams) Option(opts ...SavePreparedInlineMessageOption) (previous SavePreparedInlineMessageOption) {
@@ -12683,72 +11498,54 @@ func (r *SavePreparedInlineMessageParams) Option(opts ...SavePreparedInlineMessa
 //
 // Unique identifier of the target user that can use the prepared message
 func WithSavePreparedInlineMessageUserID(value int64) SavePreparedInlineMessageOption {
-	return func(params *SavePreparedInlineMessageParams) SavePreparedInlineMessageOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithSavePreparedInlineMessageUserID(previous)
-	}
+	return fieldOption(value, func(params *SavePreparedInlineMessageParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithSavePreparedInlineMessageResult sets the Result field.
 //
 // A JSON-serialized object describing the message to be sent
 func WithSavePreparedInlineMessageResult(value InlineQueryResult) SavePreparedInlineMessageOption {
-	return func(params *SavePreparedInlineMessageParams) SavePreparedInlineMessageOption {
-		previous := params.Result
-		params.Result = value
-
-		return WithSavePreparedInlineMessageResult(previous)
-	}
+	return fieldOption(value, func(params *SavePreparedInlineMessageParams) *InlineQueryResult {
+		return &params.Result
+	})
 }
 
 // WithSavePreparedInlineMessageAllowUserChats sets the AllowUserChats field.
 //
 // Pass True if the message can be sent to private chats with users
 func WithSavePreparedInlineMessageAllowUserChats(value bool) SavePreparedInlineMessageOption {
-	return func(params *SavePreparedInlineMessageParams) SavePreparedInlineMessageOption {
-		previous := params.AllowUserChats
-		params.AllowUserChats = value
-
-		return WithSavePreparedInlineMessageAllowUserChats(previous)
-	}
+	return fieldOption(value, func(params *SavePreparedInlineMessageParams) *bool {
+		return &params.AllowUserChats
+	})
 }
 
 // WithSavePreparedInlineMessageAllowBotChats sets the AllowBotChats field.
 //
 // Pass True if the message can be sent to private chats with bots
 func WithSavePreparedInlineMessageAllowBotChats(value bool) SavePreparedInlineMessageOption {
-	return func(params *SavePreparedInlineMessageParams) SavePreparedInlineMessageOption {
-		previous := params.AllowBotChats
-		params.AllowBotChats = value
-
-		return WithSavePreparedInlineMessageAllowBotChats(previous)
-	}
+	return fieldOption(value, func(params *SavePreparedInlineMessageParams) *bool {
+		return &params.AllowBotChats
+	})
 }
 
 // WithSavePreparedInlineMessageAllowGroupChats sets the AllowGroupChats field.
 //
 // Pass True if the message can be sent to group and supergroup chats
 func WithSavePreparedInlineMessageAllowGroupChats(value bool) SavePreparedInlineMessageOption {
-	return func(params *SavePreparedInlineMessageParams) SavePreparedInlineMessageOption {
-		previous := params.AllowGroupChats
-		params.AllowGroupChats = value
-
-		return WithSavePreparedInlineMessageAllowGroupChats(previous)
-	}
+	return fieldOption(value, func(params *SavePreparedInlineMessageParams) *bool {
+		return &params.AllowGroupChats
+	})
 }
 
 // WithSavePreparedInlineMessageAllowChannelChats sets the AllowChannelChats field.
 //
 // Pass True if the message can be sent to channel chats
 func WithSavePreparedInlineMessageAllowChannelChats(value bool) SavePreparedInlineMessageOption {
-	return func(params *SavePreparedInlineMessageParams) SavePreparedInlineMessageOption {
-		previous := params.AllowChannelChats
-		params.AllowChannelChats = value
-
-		return WithSavePreparedInlineMessageAllowChannelChats(previous)
-	}
+	return fieldOption(value, func(params *SavePreparedInlineMessageParams) *bool {
+		return &params.AllowChannelChats
+	})
 }
 
 // SavePreparedInlineMessage calls the savePreparedInlineMessage Telegram Bot API method.
@@ -12796,7 +11593,7 @@ type SavePreparedKeyboardButtonParams struct {
 }
 
 // SavePreparedKeyboardButtonOption configures SavePreparedKeyboardButtonParams.
-type SavePreparedKeyboardButtonOption func(params *SavePreparedKeyboardButtonParams) SavePreparedKeyboardButtonOption
+type SavePreparedKeyboardButtonOption = Option[SavePreparedKeyboardButtonParams]
 
 // Option applies one or more SavePreparedKeyboardButtonOption values and returns the last rollback option.
 func (r *SavePreparedKeyboardButtonParams) Option(opts ...SavePreparedKeyboardButtonOption) (previous SavePreparedKeyboardButtonOption) {
@@ -12810,12 +11607,9 @@ func (r *SavePreparedKeyboardButtonParams) Option(opts ...SavePreparedKeyboardBu
 //
 // Unique identifier of the target user that can use the button
 func WithSavePreparedKeyboardButtonUserID(value int64) SavePreparedKeyboardButtonOption {
-	return func(params *SavePreparedKeyboardButtonParams) SavePreparedKeyboardButtonOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithSavePreparedKeyboardButtonUserID(previous)
-	}
+	return fieldOption(value, func(params *SavePreparedKeyboardButtonParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithSavePreparedKeyboardButtonButton sets the Button field.
@@ -12823,12 +11617,9 @@ func WithSavePreparedKeyboardButtonUserID(value int64) SavePreparedKeyboardButto
 // A JSON-serialized object describing the button to be saved.
 // The button must be of the type request_users, request_chat, or request_managed_bot.
 func WithSavePreparedKeyboardButtonButton(value KeyboardButton) SavePreparedKeyboardButtonOption {
-	return func(params *SavePreparedKeyboardButtonParams) SavePreparedKeyboardButtonOption {
-		previous := params.Button
-		params.Button = value
-
-		return WithSavePreparedKeyboardButtonButton(previous)
-	}
+	return fieldOption(value, func(params *SavePreparedKeyboardButtonParams) *KeyboardButton {
+		return &params.Button
+	})
 }
 
 // SavePreparedKeyboardButton calls the savePreparedKeyboardButton Telegram Bot API method.
@@ -12967,7 +11758,7 @@ type SendAnimationParams struct {
 }
 
 // SendAnimationOption configures SendAnimationParams.
-type SendAnimationOption func(params *SendAnimationParams) SendAnimationOption
+type SendAnimationOption = Option[SendAnimationParams]
 
 // Option applies one or more SendAnimationOption values and returns the last rollback option.
 func (r *SendAnimationParams) Option(opts ...SendAnimationOption) (previous SendAnimationOption) {
@@ -12981,48 +11772,36 @@ func (r *SendAnimationParams) Option(opts ...SendAnimationOption) (previous Send
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
 func WithSendAnimationBusinessConnectionID(value string) SendAnimationOption {
-	return func(params *SendAnimationParams) SendAnimationOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSendAnimationBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SendAnimationParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSendAnimationChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithSendAnimationChatID(value string) SendAnimationOption {
-	return func(params *SendAnimationParams) SendAnimationOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendAnimationChatID(previous)
-	}
+	return fieldOption(value, func(params *SendAnimationParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSendAnimationMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithSendAnimationMessageThreadID(value int64) SendAnimationOption {
-	return func(params *SendAnimationParams) SendAnimationOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithSendAnimationMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *SendAnimationParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithSendAnimationDirectMessagesTopicID sets the DirectMessagesTopicID field.
 //
 // Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 func WithSendAnimationDirectMessagesTopicID(value int64) SendAnimationOption {
-	return func(params *SendAnimationParams) SendAnimationOption {
-		previous := params.DirectMessagesTopicID
-		params.DirectMessagesTopicID = value
-
-		return WithSendAnimationDirectMessagesTopicID(previous)
-	}
+	return fieldOption(value, func(params *SendAnimationParams) *int64 {
+		return &params.DirectMessagesTopicID
+	})
 }
 
 // WithSendAnimationReceiverUserID sets the ReceiverUserID field.
@@ -13033,24 +11812,18 @@ func WithSendAnimationDirectMessagesTopicID(value int64) SendAnimationOption {
 //
 // [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
 func WithSendAnimationReceiverUserID(value int64) SendAnimationOption {
-	return func(params *SendAnimationParams) SendAnimationOption {
-		previous := params.ReceiverUserID
-		params.ReceiverUserID = value
-
-		return WithSendAnimationReceiverUserID(previous)
-	}
+	return fieldOption(value, func(params *SendAnimationParams) *int64 {
+		return &params.ReceiverUserID
+	})
 }
 
 // WithSendAnimationCallbackQueryID sets the CallbackQueryID field.
 //
 // For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
 func WithSendAnimationCallbackQueryID(value string) SendAnimationOption {
-	return func(params *SendAnimationParams) SendAnimationOption {
-		previous := params.CallbackQueryID
-		params.CallbackQueryID = value
-
-		return WithSendAnimationCallbackQueryID(previous)
-	}
+	return fieldOption(value, func(params *SendAnimationParams) *string {
+		return &params.CallbackQueryID
+	})
 }
 
 // WithSendAnimationAnimation sets the Animation field.
@@ -13061,48 +11834,36 @@ func WithSendAnimationCallbackQueryID(value string) SendAnimationOption {
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
 func WithSendAnimationAnimation(value InputFile) SendAnimationOption {
-	return func(params *SendAnimationParams) SendAnimationOption {
-		previous := params.Animation
-		params.Animation = value
-
-		return WithSendAnimationAnimation(previous)
-	}
+	return fieldOption(value, func(params *SendAnimationParams) *InputFile {
+		return &params.Animation
+	})
 }
 
 // WithSendAnimationDuration sets the Duration field.
 //
 // Duration of sent animation in seconds
 func WithSendAnimationDuration(value int64) SendAnimationOption {
-	return func(params *SendAnimationParams) SendAnimationOption {
-		previous := params.Duration
-		params.Duration = value
-
-		return WithSendAnimationDuration(previous)
-	}
+	return fieldOption(value, func(params *SendAnimationParams) *int64 {
+		return &params.Duration
+	})
 }
 
 // WithSendAnimationWidth sets the Width field.
 //
 // Animation width
 func WithSendAnimationWidth(value int64) SendAnimationOption {
-	return func(params *SendAnimationParams) SendAnimationOption {
-		previous := params.Width
-		params.Width = value
-
-		return WithSendAnimationWidth(previous)
-	}
+	return fieldOption(value, func(params *SendAnimationParams) *int64 {
+		return &params.Width
+	})
 }
 
 // WithSendAnimationHeight sets the Height field.
 //
 // Animation height
 func WithSendAnimationHeight(value int64) SendAnimationOption {
-	return func(params *SendAnimationParams) SendAnimationOption {
-		previous := params.Height
-		params.Height = value
-
-		return WithSendAnimationHeight(previous)
-	}
+	return fieldOption(value, func(params *SendAnimationParams) *int64 {
+		return &params.Height
+	})
 }
 
 // WithSendAnimationThumbnail sets the Thumbnail field.
@@ -13116,24 +11877,18 @@ func WithSendAnimationHeight(value int64) SendAnimationOption {
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
 func WithSendAnimationThumbnail(value *InputFile) SendAnimationOption {
-	return func(params *SendAnimationParams) SendAnimationOption {
-		previous := params.Thumbnail
-		params.Thumbnail = value
-
-		return WithSendAnimationThumbnail(previous)
-	}
+	return fieldOption(value, func(params *SendAnimationParams) **InputFile {
+		return &params.Thumbnail
+	})
 }
 
 // WithSendAnimationCaption sets the Caption field.
 //
 // Animation caption (may also be used when resending animation by file_id), 0-1024 characters after entities parsing
 func WithSendAnimationCaption(value string) SendAnimationOption {
-	return func(params *SendAnimationParams) SendAnimationOption {
-		previous := params.Caption
-		params.Caption = value
-
-		return WithSendAnimationCaption(previous)
-	}
+	return fieldOption(value, func(params *SendAnimationParams) *string {
+		return &params.Caption
+	})
 }
 
 // WithSendAnimationParseMode sets the ParseMode field.
@@ -13143,48 +11898,36 @@ func WithSendAnimationCaption(value string) SendAnimationOption {
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithSendAnimationParseMode(value string) SendAnimationOption {
-	return func(params *SendAnimationParams) SendAnimationOption {
-		previous := params.ParseMode
-		params.ParseMode = value
-
-		return WithSendAnimationParseMode(previous)
-	}
+	return fieldOption(value, func(params *SendAnimationParams) *string {
+		return &params.ParseMode
+	})
 }
 
 // WithSendAnimationCaptionEntities sets the CaptionEntities field.
 //
 // A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
 func WithSendAnimationCaptionEntities(value []MessageEntity) SendAnimationOption {
-	return func(params *SendAnimationParams) SendAnimationOption {
-		previous := params.CaptionEntities
-		params.CaptionEntities = value
-
-		return WithSendAnimationCaptionEntities(previous)
-	}
+	return fieldOption(value, func(params *SendAnimationParams) *[]MessageEntity {
+		return &params.CaptionEntities
+	})
 }
 
 // WithSendAnimationShowCaptionAboveMedia sets the ShowCaptionAboveMedia field.
 //
 // Pass True if the caption must be shown above the message media
 func WithSendAnimationShowCaptionAboveMedia(value bool) SendAnimationOption {
-	return func(params *SendAnimationParams) SendAnimationOption {
-		previous := params.ShowCaptionAboveMedia
-		params.ShowCaptionAboveMedia = value
-
-		return WithSendAnimationShowCaptionAboveMedia(previous)
-	}
+	return fieldOption(value, func(params *SendAnimationParams) *bool {
+		return &params.ShowCaptionAboveMedia
+	})
 }
 
 // WithSendAnimationHasSpoiler sets the HasSpoiler field.
 //
 // Pass True if the animation needs to be covered with a spoiler animation
 func WithSendAnimationHasSpoiler(value bool) SendAnimationOption {
-	return func(params *SendAnimationParams) SendAnimationOption {
-		previous := params.HasSpoiler
-		params.HasSpoiler = value
-
-		return WithSendAnimationHasSpoiler(previous)
-	}
+	return fieldOption(value, func(params *SendAnimationParams) *bool {
+		return &params.HasSpoiler
+	})
 }
 
 // WithSendAnimationDisableNotification sets the DisableNotification field.
@@ -13194,24 +11937,18 @@ func WithSendAnimationHasSpoiler(value bool) SendAnimationOption {
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithSendAnimationDisableNotification(value bool) SendAnimationOption {
-	return func(params *SendAnimationParams) SendAnimationOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithSendAnimationDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *SendAnimationParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithSendAnimationProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the sent message from forwarding and saving
 func WithSendAnimationProtectContent(value bool) SendAnimationOption {
-	return func(params *SendAnimationParams) SendAnimationOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithSendAnimationProtectContent(previous)
-	}
+	return fieldOption(value, func(params *SendAnimationParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithSendAnimationAllowPaidBroadcast sets the AllowPaidBroadcast field.
@@ -13221,24 +11958,18 @@ func WithSendAnimationProtectContent(value bool) SendAnimationOption {
 //
 // [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
 func WithSendAnimationAllowPaidBroadcast(value bool) SendAnimationOption {
-	return func(params *SendAnimationParams) SendAnimationOption {
-		previous := params.AllowPaidBroadcast
-		params.AllowPaidBroadcast = value
-
-		return WithSendAnimationAllowPaidBroadcast(previous)
-	}
+	return fieldOption(value, func(params *SendAnimationParams) *bool {
+		return &params.AllowPaidBroadcast
+	})
 }
 
 // WithSendAnimationMessageEffectID sets the MessageEffectID field.
 //
 // Unique identifier of the message effect to be added to the message; for private chats only
 func WithSendAnimationMessageEffectID(value string) SendAnimationOption {
-	return func(params *SendAnimationParams) SendAnimationOption {
-		previous := params.MessageEffectID
-		params.MessageEffectID = value
-
-		return WithSendAnimationMessageEffectID(previous)
-	}
+	return fieldOption(value, func(params *SendAnimationParams) *string {
+		return &params.MessageEffectID
+	})
 }
 
 // WithSendAnimationSuggestedPostParameters sets the SuggestedPostParameters field.
@@ -13246,24 +11977,18 @@ func WithSendAnimationMessageEffectID(value string) SendAnimationOption {
 // A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only.
 // If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
 func WithSendAnimationSuggestedPostParameters(value *SuggestedPostParameters) SendAnimationOption {
-	return func(params *SendAnimationParams) SendAnimationOption {
-		previous := params.SuggestedPostParameters
-		params.SuggestedPostParameters = value
-
-		return WithSendAnimationSuggestedPostParameters(previous)
-	}
+	return fieldOption(value, func(params *SendAnimationParams) **SuggestedPostParameters {
+		return &params.SuggestedPostParameters
+	})
 }
 
 // WithSendAnimationReplyParameters sets the ReplyParameters field.
 //
 // Description of the message to reply to
 func WithSendAnimationReplyParameters(value *ReplyParameters) SendAnimationOption {
-	return func(params *SendAnimationParams) SendAnimationOption {
-		previous := params.ReplyParameters
-		params.ReplyParameters = value
-
-		return WithSendAnimationReplyParameters(previous)
-	}
+	return fieldOption(value, func(params *SendAnimationParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
 }
 
 // WithSendAnimationReplyMarkup sets the ReplyMarkup field.
@@ -13274,12 +11999,9 @@ func WithSendAnimationReplyParameters(value *ReplyParameters) SendAnimationOptio
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 // [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
 func WithSendAnimationReplyMarkup(value *ReplyMarkup) SendAnimationOption {
-	return func(params *SendAnimationParams) SendAnimationOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithSendAnimationReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *SendAnimationParams) **ReplyMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // SendAnimation calls the sendAnimation Telegram Bot API method.
@@ -13673,7 +12395,7 @@ type SendAudioParams struct {
 }
 
 // SendAudioOption configures SendAudioParams.
-type SendAudioOption func(params *SendAudioParams) SendAudioOption
+type SendAudioOption = Option[SendAudioParams]
 
 // Option applies one or more SendAudioOption values and returns the last rollback option.
 func (r *SendAudioParams) Option(opts ...SendAudioOption) (previous SendAudioOption) {
@@ -13687,48 +12409,36 @@ func (r *SendAudioParams) Option(opts ...SendAudioOption) (previous SendAudioOpt
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
 func WithSendAudioBusinessConnectionID(value string) SendAudioOption {
-	return func(params *SendAudioParams) SendAudioOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSendAudioBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SendAudioParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSendAudioChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithSendAudioChatID(value string) SendAudioOption {
-	return func(params *SendAudioParams) SendAudioOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendAudioChatID(previous)
-	}
+	return fieldOption(value, func(params *SendAudioParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSendAudioMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithSendAudioMessageThreadID(value int64) SendAudioOption {
-	return func(params *SendAudioParams) SendAudioOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithSendAudioMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *SendAudioParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithSendAudioDirectMessagesTopicID sets the DirectMessagesTopicID field.
 //
 // Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 func WithSendAudioDirectMessagesTopicID(value int64) SendAudioOption {
-	return func(params *SendAudioParams) SendAudioOption {
-		previous := params.DirectMessagesTopicID
-		params.DirectMessagesTopicID = value
-
-		return WithSendAudioDirectMessagesTopicID(previous)
-	}
+	return fieldOption(value, func(params *SendAudioParams) *int64 {
+		return &params.DirectMessagesTopicID
+	})
 }
 
 // WithSendAudioReceiverUserID sets the ReceiverUserID field.
@@ -13739,24 +12449,18 @@ func WithSendAudioDirectMessagesTopicID(value int64) SendAudioOption {
 //
 // [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
 func WithSendAudioReceiverUserID(value int64) SendAudioOption {
-	return func(params *SendAudioParams) SendAudioOption {
-		previous := params.ReceiverUserID
-		params.ReceiverUserID = value
-
-		return WithSendAudioReceiverUserID(previous)
-	}
+	return fieldOption(value, func(params *SendAudioParams) *int64 {
+		return &params.ReceiverUserID
+	})
 }
 
 // WithSendAudioCallbackQueryID sets the CallbackQueryID field.
 //
 // For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
 func WithSendAudioCallbackQueryID(value string) SendAudioOption {
-	return func(params *SendAudioParams) SendAudioOption {
-		previous := params.CallbackQueryID
-		params.CallbackQueryID = value
-
-		return WithSendAudioCallbackQueryID(previous)
-	}
+	return fieldOption(value, func(params *SendAudioParams) *string {
+		return &params.CallbackQueryID
+	})
 }
 
 // WithSendAudioAudio sets the Audio field.
@@ -13767,24 +12471,18 @@ func WithSendAudioCallbackQueryID(value string) SendAudioOption {
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
 func WithSendAudioAudio(value InputFile) SendAudioOption {
-	return func(params *SendAudioParams) SendAudioOption {
-		previous := params.Audio
-		params.Audio = value
-
-		return WithSendAudioAudio(previous)
-	}
+	return fieldOption(value, func(params *SendAudioParams) *InputFile {
+		return &params.Audio
+	})
 }
 
 // WithSendAudioCaption sets the Caption field.
 //
 // Audio caption, 0-1024 characters after entities parsing
 func WithSendAudioCaption(value string) SendAudioOption {
-	return func(params *SendAudioParams) SendAudioOption {
-		previous := params.Caption
-		params.Caption = value
-
-		return WithSendAudioCaption(previous)
-	}
+	return fieldOption(value, func(params *SendAudioParams) *string {
+		return &params.Caption
+	})
 }
 
 // WithSendAudioParseMode sets the ParseMode field.
@@ -13794,60 +12492,45 @@ func WithSendAudioCaption(value string) SendAudioOption {
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithSendAudioParseMode(value string) SendAudioOption {
-	return func(params *SendAudioParams) SendAudioOption {
-		previous := params.ParseMode
-		params.ParseMode = value
-
-		return WithSendAudioParseMode(previous)
-	}
+	return fieldOption(value, func(params *SendAudioParams) *string {
+		return &params.ParseMode
+	})
 }
 
 // WithSendAudioCaptionEntities sets the CaptionEntities field.
 //
 // A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
 func WithSendAudioCaptionEntities(value []MessageEntity) SendAudioOption {
-	return func(params *SendAudioParams) SendAudioOption {
-		previous := params.CaptionEntities
-		params.CaptionEntities = value
-
-		return WithSendAudioCaptionEntities(previous)
-	}
+	return fieldOption(value, func(params *SendAudioParams) *[]MessageEntity {
+		return &params.CaptionEntities
+	})
 }
 
 // WithSendAudioDuration sets the Duration field.
 //
 // Duration of the audio in seconds
 func WithSendAudioDuration(value int64) SendAudioOption {
-	return func(params *SendAudioParams) SendAudioOption {
-		previous := params.Duration
-		params.Duration = value
-
-		return WithSendAudioDuration(previous)
-	}
+	return fieldOption(value, func(params *SendAudioParams) *int64 {
+		return &params.Duration
+	})
 }
 
 // WithSendAudioPerformer sets the Performer field.
 //
 // Performer
 func WithSendAudioPerformer(value string) SendAudioOption {
-	return func(params *SendAudioParams) SendAudioOption {
-		previous := params.Performer
-		params.Performer = value
-
-		return WithSendAudioPerformer(previous)
-	}
+	return fieldOption(value, func(params *SendAudioParams) *string {
+		return &params.Performer
+	})
 }
 
 // WithSendAudioTitle sets the Title field.
 //
 // Track name
 func WithSendAudioTitle(value string) SendAudioOption {
-	return func(params *SendAudioParams) SendAudioOption {
-		previous := params.Title
-		params.Title = value
-
-		return WithSendAudioTitle(previous)
-	}
+	return fieldOption(value, func(params *SendAudioParams) *string {
+		return &params.Title
+	})
 }
 
 // WithSendAudioThumbnail sets the Thumbnail field.
@@ -13861,12 +12544,9 @@ func WithSendAudioTitle(value string) SendAudioOption {
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
 func WithSendAudioThumbnail(value *InputFile) SendAudioOption {
-	return func(params *SendAudioParams) SendAudioOption {
-		previous := params.Thumbnail
-		params.Thumbnail = value
-
-		return WithSendAudioThumbnail(previous)
-	}
+	return fieldOption(value, func(params *SendAudioParams) **InputFile {
+		return &params.Thumbnail
+	})
 }
 
 // WithSendAudioDisableNotification sets the DisableNotification field.
@@ -13876,24 +12556,18 @@ func WithSendAudioThumbnail(value *InputFile) SendAudioOption {
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithSendAudioDisableNotification(value bool) SendAudioOption {
-	return func(params *SendAudioParams) SendAudioOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithSendAudioDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *SendAudioParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithSendAudioProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the sent message from forwarding and saving
 func WithSendAudioProtectContent(value bool) SendAudioOption {
-	return func(params *SendAudioParams) SendAudioOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithSendAudioProtectContent(previous)
-	}
+	return fieldOption(value, func(params *SendAudioParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithSendAudioAllowPaidBroadcast sets the AllowPaidBroadcast field.
@@ -13903,24 +12577,18 @@ func WithSendAudioProtectContent(value bool) SendAudioOption {
 //
 // [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
 func WithSendAudioAllowPaidBroadcast(value bool) SendAudioOption {
-	return func(params *SendAudioParams) SendAudioOption {
-		previous := params.AllowPaidBroadcast
-		params.AllowPaidBroadcast = value
-
-		return WithSendAudioAllowPaidBroadcast(previous)
-	}
+	return fieldOption(value, func(params *SendAudioParams) *bool {
+		return &params.AllowPaidBroadcast
+	})
 }
 
 // WithSendAudioMessageEffectID sets the MessageEffectID field.
 //
 // Unique identifier of the message effect to be added to the message; for private chats only
 func WithSendAudioMessageEffectID(value string) SendAudioOption {
-	return func(params *SendAudioParams) SendAudioOption {
-		previous := params.MessageEffectID
-		params.MessageEffectID = value
-
-		return WithSendAudioMessageEffectID(previous)
-	}
+	return fieldOption(value, func(params *SendAudioParams) *string {
+		return &params.MessageEffectID
+	})
 }
 
 // WithSendAudioSuggestedPostParameters sets the SuggestedPostParameters field.
@@ -13928,24 +12596,18 @@ func WithSendAudioMessageEffectID(value string) SendAudioOption {
 // A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only.
 // If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
 func WithSendAudioSuggestedPostParameters(value *SuggestedPostParameters) SendAudioOption {
-	return func(params *SendAudioParams) SendAudioOption {
-		previous := params.SuggestedPostParameters
-		params.SuggestedPostParameters = value
-
-		return WithSendAudioSuggestedPostParameters(previous)
-	}
+	return fieldOption(value, func(params *SendAudioParams) **SuggestedPostParameters {
+		return &params.SuggestedPostParameters
+	})
 }
 
 // WithSendAudioReplyParameters sets the ReplyParameters field.
 //
 // Description of the message to reply to
 func WithSendAudioReplyParameters(value *ReplyParameters) SendAudioOption {
-	return func(params *SendAudioParams) SendAudioOption {
-		previous := params.ReplyParameters
-		params.ReplyParameters = value
-
-		return WithSendAudioReplyParameters(previous)
-	}
+	return fieldOption(value, func(params *SendAudioParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
 }
 
 // WithSendAudioReplyMarkup sets the ReplyMarkup field.
@@ -13956,12 +12618,9 @@ func WithSendAudioReplyParameters(value *ReplyParameters) SendAudioOption {
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 // [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
 func WithSendAudioReplyMarkup(value *ReplyMarkup) SendAudioOption {
-	return func(params *SendAudioParams) SendAudioOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithSendAudioReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *SendAudioParams) **ReplyMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // SendAudio calls the sendAudio Telegram Bot API method.
@@ -14273,7 +12932,7 @@ type SendChatActionParams struct {
 }
 
 // SendChatActionOption configures SendChatActionParams.
-type SendChatActionOption func(params *SendChatActionParams) SendChatActionOption
+type SendChatActionOption = Option[SendChatActionParams]
 
 // Option applies one or more SendChatActionOption values and returns the last rollback option.
 func (r *SendChatActionParams) Option(opts ...SendChatActionOption) (previous SendChatActionOption) {
@@ -14287,12 +12946,9 @@ func (r *SendChatActionParams) Option(opts ...SendChatActionOption) (previous Se
 //
 // Unique identifier of the business connection on behalf of which the action will be sent
 func WithSendChatActionBusinessConnectionID(value string) SendChatActionOption {
-	return func(params *SendChatActionParams) SendChatActionOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSendChatActionBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SendChatActionParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSendChatActionChatID sets the ChatID field.
@@ -14300,24 +12956,18 @@ func WithSendChatActionBusinessConnectionID(value string) SendChatActionOption {
 // Unique identifier for the target chat or username of the target bot or supergroup in the format @username.
 // Channel chats and channel direct messages chats aren't supported.
 func WithSendChatActionChatID(value string) SendChatActionOption {
-	return func(params *SendChatActionParams) SendChatActionOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendChatActionChatID(previous)
-	}
+	return fieldOption(value, func(params *SendChatActionParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSendChatActionMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread or topic of a forum; for supergroups and private chats of bots with forum topic mode enabled only
 func WithSendChatActionMessageThreadID(value int64) SendChatActionOption {
-	return func(params *SendChatActionParams) SendChatActionOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithSendChatActionMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *SendChatActionParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithSendChatActionAction sets the Action field.
@@ -14334,12 +12984,9 @@ func WithSendChatActionMessageThreadID(value int64) SendChatActionOption {
 // [location data]: https://core.telegram.org/bots/api#sendlocation
 // [video notes]: https://core.telegram.org/bots/api#sendvideonote
 func WithSendChatActionAction(value string) SendChatActionOption {
-	return func(params *SendChatActionParams) SendChatActionOption {
-		previous := params.Action
-		params.Action = value
-
-		return WithSendChatActionAction(previous)
-	}
+	return fieldOption(value, func(params *SendChatActionParams) *string {
+		return &params.Action
+	})
 }
 
 // SendChatAction calls the sendChatAction Telegram Bot API method.
@@ -14387,7 +13034,7 @@ type SendChatJoinRequestWebAppParams struct {
 }
 
 // SendChatJoinRequestWebAppOption configures SendChatJoinRequestWebAppParams.
-type SendChatJoinRequestWebAppOption func(params *SendChatJoinRequestWebAppParams) SendChatJoinRequestWebAppOption
+type SendChatJoinRequestWebAppOption = Option[SendChatJoinRequestWebAppParams]
 
 // Option applies one or more SendChatJoinRequestWebAppOption values and returns the last rollback option.
 func (r *SendChatJoinRequestWebAppParams) Option(opts ...SendChatJoinRequestWebAppOption) (previous SendChatJoinRequestWebAppOption) {
@@ -14401,12 +13048,9 @@ func (r *SendChatJoinRequestWebAppParams) Option(opts ...SendChatJoinRequestWebA
 //
 // Unique identifier of the join request query
 func WithSendChatJoinRequestWebAppChatJoinRequestQueryID(value string) SendChatJoinRequestWebAppOption {
-	return func(params *SendChatJoinRequestWebAppParams) SendChatJoinRequestWebAppOption {
-		previous := params.ChatJoinRequestQueryID
-		params.ChatJoinRequestQueryID = value
-
-		return WithSendChatJoinRequestWebAppChatJoinRequestQueryID(previous)
-	}
+	return fieldOption(value, func(params *SendChatJoinRequestWebAppParams) *string {
+		return &params.ChatJoinRequestQueryID
+	})
 }
 
 // WithSendChatJoinRequestWebAppWebAppUrl sets the WebAppUrl field.
@@ -14415,12 +13059,9 @@ func WithSendChatJoinRequestWebAppChatJoinRequestQueryID(value string) SendChatJ
 //
 // [Initializing Web Apps]: https://core.telegram.org/bots/webapps#initializing-mini-apps
 func WithSendChatJoinRequestWebAppWebAppUrl(value string) SendChatJoinRequestWebAppOption {
-	return func(params *SendChatJoinRequestWebAppParams) SendChatJoinRequestWebAppOption {
-		previous := params.WebAppUrl
-		params.WebAppUrl = value
-
-		return WithSendChatJoinRequestWebAppWebAppUrl(previous)
-	}
+	return fieldOption(value, func(params *SendChatJoinRequestWebAppParams) *string {
+		return &params.WebAppUrl
+	})
 }
 
 // SendChatJoinRequestWebApp calls the sendChatJoinRequestWebApp Telegram Bot API method.
@@ -14488,7 +13129,7 @@ type SendChecklistParams struct {
 }
 
 // SendChecklistOption configures SendChecklistParams.
-type SendChecklistOption func(params *SendChecklistParams) SendChecklistOption
+type SendChecklistOption = Option[SendChecklistParams]
 
 // Option applies one or more SendChecklistOption values and returns the last rollback option.
 func (r *SendChecklistParams) Option(opts ...SendChecklistOption) (previous SendChecklistOption) {
@@ -14502,36 +13143,27 @@ func (r *SendChecklistParams) Option(opts ...SendChecklistOption) (previous Send
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
 func WithSendChecklistBusinessConnectionID(value string) SendChecklistOption {
-	return func(params *SendChecklistParams) SendChecklistOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSendChecklistBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SendChecklistParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSendChecklistChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot in the format @username
 func WithSendChecklistChatID(value string) SendChecklistOption {
-	return func(params *SendChecklistParams) SendChecklistOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendChecklistChatID(previous)
-	}
+	return fieldOption(value, func(params *SendChecklistParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSendChecklistChecklist sets the Checklist field.
 //
 // A JSON-serialized object for the checklist to send
 func WithSendChecklistChecklist(value InputChecklist) SendChecklistOption {
-	return func(params *SendChecklistParams) SendChecklistOption {
-		previous := params.Checklist
-		params.Checklist = value
-
-		return WithSendChecklistChecklist(previous)
-	}
+	return fieldOption(value, func(params *SendChecklistParams) *InputChecklist {
+		return &params.Checklist
+	})
 }
 
 // WithSendChecklistDisableNotification sets the DisableNotification field.
@@ -14539,48 +13171,36 @@ func WithSendChecklistChecklist(value InputChecklist) SendChecklistOption {
 // Sends the message silently.
 // Users will receive a notification with no sound.
 func WithSendChecklistDisableNotification(value bool) SendChecklistOption {
-	return func(params *SendChecklistParams) SendChecklistOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithSendChecklistDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *SendChecklistParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithSendChecklistProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the sent message from forwarding and saving
 func WithSendChecklistProtectContent(value bool) SendChecklistOption {
-	return func(params *SendChecklistParams) SendChecklistOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithSendChecklistProtectContent(previous)
-	}
+	return fieldOption(value, func(params *SendChecklistParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithSendChecklistMessageEffectID sets the MessageEffectID field.
 //
 // Unique identifier of the message effect to be added to the message
 func WithSendChecklistMessageEffectID(value string) SendChecklistOption {
-	return func(params *SendChecklistParams) SendChecklistOption {
-		previous := params.MessageEffectID
-		params.MessageEffectID = value
-
-		return WithSendChecklistMessageEffectID(previous)
-	}
+	return fieldOption(value, func(params *SendChecklistParams) *string {
+		return &params.MessageEffectID
+	})
 }
 
 // WithSendChecklistReplyParameters sets the ReplyParameters field.
 //
 // A JSON-serialized object for description of the message to reply to
 func WithSendChecklistReplyParameters(value *ReplyParameters) SendChecklistOption {
-	return func(params *SendChecklistParams) SendChecklistOption {
-		previous := params.ReplyParameters
-		params.ReplyParameters = value
-
-		return WithSendChecklistReplyParameters(previous)
-	}
+	return fieldOption(value, func(params *SendChecklistParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
 }
 
 // WithSendChecklistReplyMarkup sets the ReplyMarkup field.
@@ -14589,12 +13209,9 @@ func WithSendChecklistReplyParameters(value *ReplyParameters) SendChecklistOptio
 //
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 func WithSendChecklistReplyMarkup(value *InlineKeyboardMarkup) SendChecklistOption {
-	return func(params *SendChecklistParams) SendChecklistOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithSendChecklistReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *SendChecklistParams) **InlineKeyboardMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // SendChecklist calls the sendChecklist Telegram Bot API method.
@@ -14703,7 +13320,7 @@ type SendContactParams struct {
 }
 
 // SendContactOption configures SendContactParams.
-type SendContactOption func(params *SendContactParams) SendContactOption
+type SendContactOption = Option[SendContactParams]
 
 // Option applies one or more SendContactOption values and returns the last rollback option.
 func (r *SendContactParams) Option(opts ...SendContactOption) (previous SendContactOption) {
@@ -14717,48 +13334,36 @@ func (r *SendContactParams) Option(opts ...SendContactOption) (previous SendCont
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
 func WithSendContactBusinessConnectionID(value string) SendContactOption {
-	return func(params *SendContactParams) SendContactOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSendContactBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SendContactParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSendContactChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithSendContactChatID(value string) SendContactOption {
-	return func(params *SendContactParams) SendContactOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendContactChatID(previous)
-	}
+	return fieldOption(value, func(params *SendContactParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSendContactMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithSendContactMessageThreadID(value int64) SendContactOption {
-	return func(params *SendContactParams) SendContactOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithSendContactMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *SendContactParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithSendContactDirectMessagesTopicID sets the DirectMessagesTopicID field.
 //
 // Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 func WithSendContactDirectMessagesTopicID(value int64) SendContactOption {
-	return func(params *SendContactParams) SendContactOption {
-		previous := params.DirectMessagesTopicID
-		params.DirectMessagesTopicID = value
-
-		return WithSendContactDirectMessagesTopicID(previous)
-	}
+	return fieldOption(value, func(params *SendContactParams) *int64 {
+		return &params.DirectMessagesTopicID
+	})
 }
 
 // WithSendContactReceiverUserID sets the ReceiverUserID field.
@@ -14769,60 +13374,45 @@ func WithSendContactDirectMessagesTopicID(value int64) SendContactOption {
 //
 // [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
 func WithSendContactReceiverUserID(value int64) SendContactOption {
-	return func(params *SendContactParams) SendContactOption {
-		previous := params.ReceiverUserID
-		params.ReceiverUserID = value
-
-		return WithSendContactReceiverUserID(previous)
-	}
+	return fieldOption(value, func(params *SendContactParams) *int64 {
+		return &params.ReceiverUserID
+	})
 }
 
 // WithSendContactCallbackQueryID sets the CallbackQueryID field.
 //
 // For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
 func WithSendContactCallbackQueryID(value string) SendContactOption {
-	return func(params *SendContactParams) SendContactOption {
-		previous := params.CallbackQueryID
-		params.CallbackQueryID = value
-
-		return WithSendContactCallbackQueryID(previous)
-	}
+	return fieldOption(value, func(params *SendContactParams) *string {
+		return &params.CallbackQueryID
+	})
 }
 
 // WithSendContactPhoneNumber sets the PhoneNumber field.
 //
 // Contact's phone number
 func WithSendContactPhoneNumber(value string) SendContactOption {
-	return func(params *SendContactParams) SendContactOption {
-		previous := params.PhoneNumber
-		params.PhoneNumber = value
-
-		return WithSendContactPhoneNumber(previous)
-	}
+	return fieldOption(value, func(params *SendContactParams) *string {
+		return &params.PhoneNumber
+	})
 }
 
 // WithSendContactFirstName sets the FirstName field.
 //
 // Contact's first name
 func WithSendContactFirstName(value string) SendContactOption {
-	return func(params *SendContactParams) SendContactOption {
-		previous := params.FirstName
-		params.FirstName = value
-
-		return WithSendContactFirstName(previous)
-	}
+	return fieldOption(value, func(params *SendContactParams) *string {
+		return &params.FirstName
+	})
 }
 
 // WithSendContactLastName sets the LastName field.
 //
 // Contact's last name
 func WithSendContactLastName(value string) SendContactOption {
-	return func(params *SendContactParams) SendContactOption {
-		previous := params.LastName
-		params.LastName = value
-
-		return WithSendContactLastName(previous)
-	}
+	return fieldOption(value, func(params *SendContactParams) *string {
+		return &params.LastName
+	})
 }
 
 // WithSendContactVcard sets the Vcard field.
@@ -14831,12 +13421,9 @@ func WithSendContactLastName(value string) SendContactOption {
 //
 // [vCard]: https://en.wikipedia.org/wiki/VCard
 func WithSendContactVcard(value string) SendContactOption {
-	return func(params *SendContactParams) SendContactOption {
-		previous := params.Vcard
-		params.Vcard = value
-
-		return WithSendContactVcard(previous)
-	}
+	return fieldOption(value, func(params *SendContactParams) *string {
+		return &params.Vcard
+	})
 }
 
 // WithSendContactDisableNotification sets the DisableNotification field.
@@ -14846,24 +13433,18 @@ func WithSendContactVcard(value string) SendContactOption {
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithSendContactDisableNotification(value bool) SendContactOption {
-	return func(params *SendContactParams) SendContactOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithSendContactDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *SendContactParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithSendContactProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the sent message from forwarding and saving
 func WithSendContactProtectContent(value bool) SendContactOption {
-	return func(params *SendContactParams) SendContactOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithSendContactProtectContent(previous)
-	}
+	return fieldOption(value, func(params *SendContactParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithSendContactAllowPaidBroadcast sets the AllowPaidBroadcast field.
@@ -14873,24 +13454,18 @@ func WithSendContactProtectContent(value bool) SendContactOption {
 //
 // [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
 func WithSendContactAllowPaidBroadcast(value bool) SendContactOption {
-	return func(params *SendContactParams) SendContactOption {
-		previous := params.AllowPaidBroadcast
-		params.AllowPaidBroadcast = value
-
-		return WithSendContactAllowPaidBroadcast(previous)
-	}
+	return fieldOption(value, func(params *SendContactParams) *bool {
+		return &params.AllowPaidBroadcast
+	})
 }
 
 // WithSendContactMessageEffectID sets the MessageEffectID field.
 //
 // Unique identifier of the message effect to be added to the message; for private chats only
 func WithSendContactMessageEffectID(value string) SendContactOption {
-	return func(params *SendContactParams) SendContactOption {
-		previous := params.MessageEffectID
-		params.MessageEffectID = value
-
-		return WithSendContactMessageEffectID(previous)
-	}
+	return fieldOption(value, func(params *SendContactParams) *string {
+		return &params.MessageEffectID
+	})
 }
 
 // WithSendContactSuggestedPostParameters sets the SuggestedPostParameters field.
@@ -14898,24 +13473,18 @@ func WithSendContactMessageEffectID(value string) SendContactOption {
 // A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only.
 // If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
 func WithSendContactSuggestedPostParameters(value *SuggestedPostParameters) SendContactOption {
-	return func(params *SendContactParams) SendContactOption {
-		previous := params.SuggestedPostParameters
-		params.SuggestedPostParameters = value
-
-		return WithSendContactSuggestedPostParameters(previous)
-	}
+	return fieldOption(value, func(params *SendContactParams) **SuggestedPostParameters {
+		return &params.SuggestedPostParameters
+	})
 }
 
 // WithSendContactReplyParameters sets the ReplyParameters field.
 //
 // Description of the message to reply to
 func WithSendContactReplyParameters(value *ReplyParameters) SendContactOption {
-	return func(params *SendContactParams) SendContactOption {
-		previous := params.ReplyParameters
-		params.ReplyParameters = value
-
-		return WithSendContactReplyParameters(previous)
-	}
+	return fieldOption(value, func(params *SendContactParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
 }
 
 // WithSendContactReplyMarkup sets the ReplyMarkup field.
@@ -14926,12 +13495,9 @@ func WithSendContactReplyParameters(value *ReplyParameters) SendContactOption {
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 // [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
 func WithSendContactReplyMarkup(value *ReplyMarkup) SendContactOption {
-	return func(params *SendContactParams) SendContactOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithSendContactReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *SendContactParams) **ReplyMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // SendContact calls the sendContact Telegram Bot API method.
@@ -15022,7 +13588,7 @@ type SendDiceParams struct {
 }
 
 // SendDiceOption configures SendDiceParams.
-type SendDiceOption func(params *SendDiceParams) SendDiceOption
+type SendDiceOption = Option[SendDiceParams]
 
 // Option applies one or more SendDiceOption values and returns the last rollback option.
 func (r *SendDiceParams) Option(opts ...SendDiceOption) (previous SendDiceOption) {
@@ -15036,48 +13602,36 @@ func (r *SendDiceParams) Option(opts ...SendDiceOption) (previous SendDiceOption
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
 func WithSendDiceBusinessConnectionID(value string) SendDiceOption {
-	return func(params *SendDiceParams) SendDiceOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSendDiceBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SendDiceParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSendDiceChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithSendDiceChatID(value string) SendDiceOption {
-	return func(params *SendDiceParams) SendDiceOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendDiceChatID(previous)
-	}
+	return fieldOption(value, func(params *SendDiceParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSendDiceMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithSendDiceMessageThreadID(value int64) SendDiceOption {
-	return func(params *SendDiceParams) SendDiceOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithSendDiceMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *SendDiceParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithSendDiceDirectMessagesTopicID sets the DirectMessagesTopicID field.
 //
 // Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 func WithSendDiceDirectMessagesTopicID(value int64) SendDiceOption {
-	return func(params *SendDiceParams) SendDiceOption {
-		previous := params.DirectMessagesTopicID
-		params.DirectMessagesTopicID = value
-
-		return WithSendDiceDirectMessagesTopicID(previous)
-	}
+	return fieldOption(value, func(params *SendDiceParams) *int64 {
+		return &params.DirectMessagesTopicID
+	})
 }
 
 // WithSendDiceEmoji sets the Emoji field.
@@ -15087,12 +13641,9 @@ func WithSendDiceDirectMessagesTopicID(value int64) SendDiceOption {
 // Dice can have values 1-6 for “”, “” and “”, values 1-5 for “” and “”, and values 1-64 for “”.
 // Defaults to “”.
 func WithSendDiceEmoji(value string) SendDiceOption {
-	return func(params *SendDiceParams) SendDiceOption {
-		previous := params.Emoji
-		params.Emoji = value
-
-		return WithSendDiceEmoji(previous)
-	}
+	return fieldOption(value, func(params *SendDiceParams) *string {
+		return &params.Emoji
+	})
 }
 
 // WithSendDiceDisableNotification sets the DisableNotification field.
@@ -15102,24 +13653,18 @@ func WithSendDiceEmoji(value string) SendDiceOption {
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithSendDiceDisableNotification(value bool) SendDiceOption {
-	return func(params *SendDiceParams) SendDiceOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithSendDiceDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *SendDiceParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithSendDiceProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the sent message from forwarding
 func WithSendDiceProtectContent(value bool) SendDiceOption {
-	return func(params *SendDiceParams) SendDiceOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithSendDiceProtectContent(previous)
-	}
+	return fieldOption(value, func(params *SendDiceParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithSendDiceAllowPaidBroadcast sets the AllowPaidBroadcast field.
@@ -15129,24 +13674,18 @@ func WithSendDiceProtectContent(value bool) SendDiceOption {
 //
 // [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
 func WithSendDiceAllowPaidBroadcast(value bool) SendDiceOption {
-	return func(params *SendDiceParams) SendDiceOption {
-		previous := params.AllowPaidBroadcast
-		params.AllowPaidBroadcast = value
-
-		return WithSendDiceAllowPaidBroadcast(previous)
-	}
+	return fieldOption(value, func(params *SendDiceParams) *bool {
+		return &params.AllowPaidBroadcast
+	})
 }
 
 // WithSendDiceMessageEffectID sets the MessageEffectID field.
 //
 // Unique identifier of the message effect to be added to the message; for private chats only
 func WithSendDiceMessageEffectID(value string) SendDiceOption {
-	return func(params *SendDiceParams) SendDiceOption {
-		previous := params.MessageEffectID
-		params.MessageEffectID = value
-
-		return WithSendDiceMessageEffectID(previous)
-	}
+	return fieldOption(value, func(params *SendDiceParams) *string {
+		return &params.MessageEffectID
+	})
 }
 
 // WithSendDiceSuggestedPostParameters sets the SuggestedPostParameters field.
@@ -15154,24 +13693,18 @@ func WithSendDiceMessageEffectID(value string) SendDiceOption {
 // A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only.
 // If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
 func WithSendDiceSuggestedPostParameters(value *SuggestedPostParameters) SendDiceOption {
-	return func(params *SendDiceParams) SendDiceOption {
-		previous := params.SuggestedPostParameters
-		params.SuggestedPostParameters = value
-
-		return WithSendDiceSuggestedPostParameters(previous)
-	}
+	return fieldOption(value, func(params *SendDiceParams) **SuggestedPostParameters {
+		return &params.SuggestedPostParameters
+	})
 }
 
 // WithSendDiceReplyParameters sets the ReplyParameters field.
 //
 // Description of the message to reply to
 func WithSendDiceReplyParameters(value *ReplyParameters) SendDiceOption {
-	return func(params *SendDiceParams) SendDiceOption {
-		previous := params.ReplyParameters
-		params.ReplyParameters = value
-
-		return WithSendDiceReplyParameters(previous)
-	}
+	return fieldOption(value, func(params *SendDiceParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
 }
 
 // WithSendDiceReplyMarkup sets the ReplyMarkup field.
@@ -15182,12 +13715,9 @@ func WithSendDiceReplyParameters(value *ReplyParameters) SendDiceOption {
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 // [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
 func WithSendDiceReplyMarkup(value *ReplyMarkup) SendDiceOption {
-	return func(params *SendDiceParams) SendDiceOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithSendDiceReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *SendDiceParams) **ReplyMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // SendDice calls the sendDice Telegram Bot API method.
@@ -15314,7 +13844,7 @@ type SendDocumentParams struct {
 }
 
 // SendDocumentOption configures SendDocumentParams.
-type SendDocumentOption func(params *SendDocumentParams) SendDocumentOption
+type SendDocumentOption = Option[SendDocumentParams]
 
 // Option applies one or more SendDocumentOption values and returns the last rollback option.
 func (r *SendDocumentParams) Option(opts ...SendDocumentOption) (previous SendDocumentOption) {
@@ -15328,48 +13858,36 @@ func (r *SendDocumentParams) Option(opts ...SendDocumentOption) (previous SendDo
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
 func WithSendDocumentBusinessConnectionID(value string) SendDocumentOption {
-	return func(params *SendDocumentParams) SendDocumentOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSendDocumentBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SendDocumentParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSendDocumentChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithSendDocumentChatID(value string) SendDocumentOption {
-	return func(params *SendDocumentParams) SendDocumentOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendDocumentChatID(previous)
-	}
+	return fieldOption(value, func(params *SendDocumentParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSendDocumentMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithSendDocumentMessageThreadID(value int64) SendDocumentOption {
-	return func(params *SendDocumentParams) SendDocumentOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithSendDocumentMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *SendDocumentParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithSendDocumentDirectMessagesTopicID sets the DirectMessagesTopicID field.
 //
 // Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 func WithSendDocumentDirectMessagesTopicID(value int64) SendDocumentOption {
-	return func(params *SendDocumentParams) SendDocumentOption {
-		previous := params.DirectMessagesTopicID
-		params.DirectMessagesTopicID = value
-
-		return WithSendDocumentDirectMessagesTopicID(previous)
-	}
+	return fieldOption(value, func(params *SendDocumentParams) *int64 {
+		return &params.DirectMessagesTopicID
+	})
 }
 
 // WithSendDocumentReceiverUserID sets the ReceiverUserID field.
@@ -15380,24 +13898,18 @@ func WithSendDocumentDirectMessagesTopicID(value int64) SendDocumentOption {
 //
 // [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
 func WithSendDocumentReceiverUserID(value int64) SendDocumentOption {
-	return func(params *SendDocumentParams) SendDocumentOption {
-		previous := params.ReceiverUserID
-		params.ReceiverUserID = value
-
-		return WithSendDocumentReceiverUserID(previous)
-	}
+	return fieldOption(value, func(params *SendDocumentParams) *int64 {
+		return &params.ReceiverUserID
+	})
 }
 
 // WithSendDocumentCallbackQueryID sets the CallbackQueryID field.
 //
 // For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
 func WithSendDocumentCallbackQueryID(value string) SendDocumentOption {
-	return func(params *SendDocumentParams) SendDocumentOption {
-		previous := params.CallbackQueryID
-		params.CallbackQueryID = value
-
-		return WithSendDocumentCallbackQueryID(previous)
-	}
+	return fieldOption(value, func(params *SendDocumentParams) *string {
+		return &params.CallbackQueryID
+	})
 }
 
 // WithSendDocumentDocument sets the Document field.
@@ -15408,12 +13920,9 @@ func WithSendDocumentCallbackQueryID(value string) SendDocumentOption {
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
 func WithSendDocumentDocument(value InputFile) SendDocumentOption {
-	return func(params *SendDocumentParams) SendDocumentOption {
-		previous := params.Document
-		params.Document = value
-
-		return WithSendDocumentDocument(previous)
-	}
+	return fieldOption(value, func(params *SendDocumentParams) *InputFile {
+		return &params.Document
+	})
 }
 
 // WithSendDocumentThumbnail sets the Thumbnail field.
@@ -15427,24 +13936,18 @@ func WithSendDocumentDocument(value InputFile) SendDocumentOption {
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
 func WithSendDocumentThumbnail(value *InputFile) SendDocumentOption {
-	return func(params *SendDocumentParams) SendDocumentOption {
-		previous := params.Thumbnail
-		params.Thumbnail = value
-
-		return WithSendDocumentThumbnail(previous)
-	}
+	return fieldOption(value, func(params *SendDocumentParams) **InputFile {
+		return &params.Thumbnail
+	})
 }
 
 // WithSendDocumentCaption sets the Caption field.
 //
 // Document caption (may also be used when resending documents by file_id), 0-1024 characters after entities parsing
 func WithSendDocumentCaption(value string) SendDocumentOption {
-	return func(params *SendDocumentParams) SendDocumentOption {
-		previous := params.Caption
-		params.Caption = value
-
-		return WithSendDocumentCaption(previous)
-	}
+	return fieldOption(value, func(params *SendDocumentParams) *string {
+		return &params.Caption
+	})
 }
 
 // WithSendDocumentParseMode sets the ParseMode field.
@@ -15454,36 +13957,27 @@ func WithSendDocumentCaption(value string) SendDocumentOption {
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithSendDocumentParseMode(value string) SendDocumentOption {
-	return func(params *SendDocumentParams) SendDocumentOption {
-		previous := params.ParseMode
-		params.ParseMode = value
-
-		return WithSendDocumentParseMode(previous)
-	}
+	return fieldOption(value, func(params *SendDocumentParams) *string {
+		return &params.ParseMode
+	})
 }
 
 // WithSendDocumentCaptionEntities sets the CaptionEntities field.
 //
 // A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
 func WithSendDocumentCaptionEntities(value []MessageEntity) SendDocumentOption {
-	return func(params *SendDocumentParams) SendDocumentOption {
-		previous := params.CaptionEntities
-		params.CaptionEntities = value
-
-		return WithSendDocumentCaptionEntities(previous)
-	}
+	return fieldOption(value, func(params *SendDocumentParams) *[]MessageEntity {
+		return &params.CaptionEntities
+	})
 }
 
 // WithSendDocumentDisableContentTypeDetection sets the DisableContentTypeDetection field.
 //
 // Disables automatic server-side content type detection for files uploaded using multipart/form-data
 func WithSendDocumentDisableContentTypeDetection(value bool) SendDocumentOption {
-	return func(params *SendDocumentParams) SendDocumentOption {
-		previous := params.DisableContentTypeDetection
-		params.DisableContentTypeDetection = value
-
-		return WithSendDocumentDisableContentTypeDetection(previous)
-	}
+	return fieldOption(value, func(params *SendDocumentParams) *bool {
+		return &params.DisableContentTypeDetection
+	})
 }
 
 // WithSendDocumentDisableNotification sets the DisableNotification field.
@@ -15493,24 +13987,18 @@ func WithSendDocumentDisableContentTypeDetection(value bool) SendDocumentOption 
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithSendDocumentDisableNotification(value bool) SendDocumentOption {
-	return func(params *SendDocumentParams) SendDocumentOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithSendDocumentDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *SendDocumentParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithSendDocumentProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the sent message from forwarding and saving
 func WithSendDocumentProtectContent(value bool) SendDocumentOption {
-	return func(params *SendDocumentParams) SendDocumentOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithSendDocumentProtectContent(previous)
-	}
+	return fieldOption(value, func(params *SendDocumentParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithSendDocumentAllowPaidBroadcast sets the AllowPaidBroadcast field.
@@ -15520,24 +14008,18 @@ func WithSendDocumentProtectContent(value bool) SendDocumentOption {
 //
 // [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
 func WithSendDocumentAllowPaidBroadcast(value bool) SendDocumentOption {
-	return func(params *SendDocumentParams) SendDocumentOption {
-		previous := params.AllowPaidBroadcast
-		params.AllowPaidBroadcast = value
-
-		return WithSendDocumentAllowPaidBroadcast(previous)
-	}
+	return fieldOption(value, func(params *SendDocumentParams) *bool {
+		return &params.AllowPaidBroadcast
+	})
 }
 
 // WithSendDocumentMessageEffectID sets the MessageEffectID field.
 //
 // Unique identifier of the message effect to be added to the message; for private chats only
 func WithSendDocumentMessageEffectID(value string) SendDocumentOption {
-	return func(params *SendDocumentParams) SendDocumentOption {
-		previous := params.MessageEffectID
-		params.MessageEffectID = value
-
-		return WithSendDocumentMessageEffectID(previous)
-	}
+	return fieldOption(value, func(params *SendDocumentParams) *string {
+		return &params.MessageEffectID
+	})
 }
 
 // WithSendDocumentSuggestedPostParameters sets the SuggestedPostParameters field.
@@ -15545,24 +14027,18 @@ func WithSendDocumentMessageEffectID(value string) SendDocumentOption {
 // A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only.
 // If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
 func WithSendDocumentSuggestedPostParameters(value *SuggestedPostParameters) SendDocumentOption {
-	return func(params *SendDocumentParams) SendDocumentOption {
-		previous := params.SuggestedPostParameters
-		params.SuggestedPostParameters = value
-
-		return WithSendDocumentSuggestedPostParameters(previous)
-	}
+	return fieldOption(value, func(params *SendDocumentParams) **SuggestedPostParameters {
+		return &params.SuggestedPostParameters
+	})
 }
 
 // WithSendDocumentReplyParameters sets the ReplyParameters field.
 //
 // Description of the message to reply to
 func WithSendDocumentReplyParameters(value *ReplyParameters) SendDocumentOption {
-	return func(params *SendDocumentParams) SendDocumentOption {
-		previous := params.ReplyParameters
-		params.ReplyParameters = value
-
-		return WithSendDocumentReplyParameters(previous)
-	}
+	return fieldOption(value, func(params *SendDocumentParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
 }
 
 // WithSendDocumentReplyMarkup sets the ReplyMarkup field.
@@ -15573,12 +14049,9 @@ func WithSendDocumentReplyParameters(value *ReplyParameters) SendDocumentOption 
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 // [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
 func WithSendDocumentReplyMarkup(value *ReplyMarkup) SendDocumentOption {
-	return func(params *SendDocumentParams) SendDocumentOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithSendDocumentReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *SendDocumentParams) **ReplyMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // SendDocument calls the sendDocument Telegram Bot API method.
@@ -15892,7 +14365,7 @@ type SendGameParams struct {
 }
 
 // SendGameOption configures SendGameParams.
-type SendGameOption func(params *SendGameParams) SendGameOption
+type SendGameOption = Option[SendGameParams]
 
 // Option applies one or more SendGameOption values and returns the last rollback option.
 func (r *SendGameParams) Option(opts ...SendGameOption) (previous SendGameOption) {
@@ -15906,12 +14379,9 @@ func (r *SendGameParams) Option(opts ...SendGameOption) (previous SendGameOption
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
 func WithSendGameBusinessConnectionID(value string) SendGameOption {
-	return func(params *SendGameParams) SendGameOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSendGameBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SendGameParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSendGameChatID sets the ChatID field.
@@ -15919,24 +14389,18 @@ func WithSendGameBusinessConnectionID(value string) SendGameOption {
 // Unique identifier for the target chat or username of the target bot in the format @username.
 // Games can't be sent to channel direct messages chats and channel chats.
 func WithSendGameChatID(value string) SendGameOption {
-	return func(params *SendGameParams) SendGameOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendGameChatID(previous)
-	}
+	return fieldOption(value, func(params *SendGameParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSendGameMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithSendGameMessageThreadID(value int64) SendGameOption {
-	return func(params *SendGameParams) SendGameOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithSendGameMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *SendGameParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithSendGameGameShortName sets the GameShortName field.
@@ -15946,12 +14410,9 @@ func WithSendGameMessageThreadID(value int64) SendGameOption {
 //
 // [@BotFather]: https://t.me/botfather
 func WithSendGameGameShortName(value string) SendGameOption {
-	return func(params *SendGameParams) SendGameOption {
-		previous := params.GameShortName
-		params.GameShortName = value
-
-		return WithSendGameGameShortName(previous)
-	}
+	return fieldOption(value, func(params *SendGameParams) *string {
+		return &params.GameShortName
+	})
 }
 
 // WithSendGameDisableNotification sets the DisableNotification field.
@@ -15961,24 +14422,18 @@ func WithSendGameGameShortName(value string) SendGameOption {
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithSendGameDisableNotification(value bool) SendGameOption {
-	return func(params *SendGameParams) SendGameOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithSendGameDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *SendGameParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithSendGameProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the sent message from forwarding and saving
 func WithSendGameProtectContent(value bool) SendGameOption {
-	return func(params *SendGameParams) SendGameOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithSendGameProtectContent(previous)
-	}
+	return fieldOption(value, func(params *SendGameParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithSendGameAllowPaidBroadcast sets the AllowPaidBroadcast field.
@@ -15988,36 +14443,27 @@ func WithSendGameProtectContent(value bool) SendGameOption {
 //
 // [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
 func WithSendGameAllowPaidBroadcast(value bool) SendGameOption {
-	return func(params *SendGameParams) SendGameOption {
-		previous := params.AllowPaidBroadcast
-		params.AllowPaidBroadcast = value
-
-		return WithSendGameAllowPaidBroadcast(previous)
-	}
+	return fieldOption(value, func(params *SendGameParams) *bool {
+		return &params.AllowPaidBroadcast
+	})
 }
 
 // WithSendGameMessageEffectID sets the MessageEffectID field.
 //
 // Unique identifier of the message effect to be added to the message; for private chats only
 func WithSendGameMessageEffectID(value string) SendGameOption {
-	return func(params *SendGameParams) SendGameOption {
-		previous := params.MessageEffectID
-		params.MessageEffectID = value
-
-		return WithSendGameMessageEffectID(previous)
-	}
+	return fieldOption(value, func(params *SendGameParams) *string {
+		return &params.MessageEffectID
+	})
 }
 
 // WithSendGameReplyParameters sets the ReplyParameters field.
 //
 // Description of the message to reply to
 func WithSendGameReplyParameters(value *ReplyParameters) SendGameOption {
-	return func(params *SendGameParams) SendGameOption {
-		previous := params.ReplyParameters
-		params.ReplyParameters = value
-
-		return WithSendGameReplyParameters(previous)
-	}
+	return fieldOption(value, func(params *SendGameParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
 }
 
 // WithSendGameReplyMarkup sets the ReplyMarkup field.
@@ -16028,12 +14474,9 @@ func WithSendGameReplyParameters(value *ReplyParameters) SendGameOption {
 //
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 func WithSendGameReplyMarkup(value *InlineKeyboardMarkup) SendGameOption {
-	return func(params *SendGameParams) SendGameOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithSendGameReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *SendGameParams) **InlineKeyboardMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // SendGame calls the sendGame Telegram Bot API method.
@@ -16103,7 +14546,7 @@ type SendGiftParams struct {
 }
 
 // SendGiftOption configures SendGiftParams.
-type SendGiftOption func(params *SendGiftParams) SendGiftOption
+type SendGiftOption = Option[SendGiftParams]
 
 // Option applies one or more SendGiftOption values and returns the last rollback option.
 func (r *SendGiftParams) Option(opts ...SendGiftOption) (previous SendGiftOption) {
@@ -16118,12 +14561,9 @@ func (r *SendGiftParams) Option(opts ...SendGiftOption) (previous SendGiftOption
 // Required if chat_id is not specified.
 // Unique identifier of the target user who will receive the gift.
 func WithSendGiftUserID(value int64) SendGiftOption {
-	return func(params *SendGiftParams) SendGiftOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithSendGiftUserID(previous)
-	}
+	return fieldOption(value, func(params *SendGiftParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithSendGiftChatID sets the ChatID field.
@@ -16131,48 +14571,36 @@ func WithSendGiftUserID(value int64) SendGiftOption {
 // Required if user_id is not specified.
 // Unique identifier for the chat or username of the channel (in the format @username) that will receive the gift.
 func WithSendGiftChatID(value string) SendGiftOption {
-	return func(params *SendGiftParams) SendGiftOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendGiftChatID(previous)
-	}
+	return fieldOption(value, func(params *SendGiftParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSendGiftGiftID sets the GiftID field.
 //
 // Identifier of the gift; limited gifts can't be sent to channel chats
 func WithSendGiftGiftID(value string) SendGiftOption {
-	return func(params *SendGiftParams) SendGiftOption {
-		previous := params.GiftID
-		params.GiftID = value
-
-		return WithSendGiftGiftID(previous)
-	}
+	return fieldOption(value, func(params *SendGiftParams) *string {
+		return &params.GiftID
+	})
 }
 
 // WithSendGiftPayForUpgrade sets the PayForUpgrade field.
 //
 // Pass True to pay for the gift upgrade from the bot's balance, thereby making the upgrade free for the receiver
 func WithSendGiftPayForUpgrade(value bool) SendGiftOption {
-	return func(params *SendGiftParams) SendGiftOption {
-		previous := params.PayForUpgrade
-		params.PayForUpgrade = value
-
-		return WithSendGiftPayForUpgrade(previous)
-	}
+	return fieldOption(value, func(params *SendGiftParams) *bool {
+		return &params.PayForUpgrade
+	})
 }
 
 // WithSendGiftText sets the Text field.
 //
 // Text that will be shown along with the gift; 0-128 characters
 func WithSendGiftText(value string) SendGiftOption {
-	return func(params *SendGiftParams) SendGiftOption {
-		previous := params.Text
-		params.Text = value
-
-		return WithSendGiftText(previous)
-	}
+	return fieldOption(value, func(params *SendGiftParams) *string {
+		return &params.Text
+	})
 }
 
 // WithSendGiftTextParseMode sets the TextParseMode field.
@@ -16183,12 +14611,9 @@ func WithSendGiftText(value string) SendGiftOption {
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithSendGiftTextParseMode(value string) SendGiftOption {
-	return func(params *SendGiftParams) SendGiftOption {
-		previous := params.TextParseMode
-		params.TextParseMode = value
-
-		return WithSendGiftTextParseMode(previous)
-	}
+	return fieldOption(value, func(params *SendGiftParams) *string {
+		return &params.TextParseMode
+	})
 }
 
 // WithSendGiftTextEntities sets the TextEntities field.
@@ -16197,12 +14622,9 @@ func WithSendGiftTextParseMode(value string) SendGiftOption {
 // It can be specified instead of text_parse_mode.
 // Entities other than “bold”, “italic”, “underline”, “strikethrough”, “spoiler”, “custom_emoji”, and “date_time” are ignored.
 func WithSendGiftTextEntities(value []MessageEntity) SendGiftOption {
-	return func(params *SendGiftParams) SendGiftOption {
-		previous := params.TextEntities
-		params.TextEntities = value
-
-		return WithSendGiftTextEntities(previous)
-	}
+	return fieldOption(value, func(params *SendGiftParams) *[]MessageEntity {
+		return &params.TextEntities
+	})
 }
 
 // SendGift calls the sendGift Telegram Bot API method.
@@ -16393,7 +14815,7 @@ type SendInvoiceParams struct {
 }
 
 // SendInvoiceOption configures SendInvoiceParams.
-type SendInvoiceOption func(params *SendInvoiceParams) SendInvoiceOption
+type SendInvoiceOption = Option[SendInvoiceParams]
 
 // Option applies one or more SendInvoiceOption values and returns the last rollback option.
 func (r *SendInvoiceParams) Option(opts ...SendInvoiceOption) (previous SendInvoiceOption) {
@@ -16407,60 +14829,45 @@ func (r *SendInvoiceParams) Option(opts ...SendInvoiceOption) (previous SendInvo
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithSendInvoiceChatID(value string) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendInvoiceChatID(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSendInvoiceMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithSendInvoiceMessageThreadID(value int64) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithSendInvoiceMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithSendInvoiceDirectMessagesTopicID sets the DirectMessagesTopicID field.
 //
 // Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 func WithSendInvoiceDirectMessagesTopicID(value int64) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.DirectMessagesTopicID
-		params.DirectMessagesTopicID = value
-
-		return WithSendInvoiceDirectMessagesTopicID(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *int64 {
+		return &params.DirectMessagesTopicID
+	})
 }
 
 // WithSendInvoiceTitle sets the Title field.
 //
 // Product name, 1-32 characters
 func WithSendInvoiceTitle(value string) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.Title
-		params.Title = value
-
-		return WithSendInvoiceTitle(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *string {
+		return &params.Title
+	})
 }
 
 // WithSendInvoiceDescription sets the Description field.
 //
 // Product description, 1-255 characters
 func WithSendInvoiceDescription(value string) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.Description
-		params.Description = value
-
-		return WithSendInvoiceDescription(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *string {
+		return &params.Description
+	})
 }
 
 // WithSendInvoicePayload sets the Payload field.
@@ -16468,12 +14875,9 @@ func WithSendInvoiceDescription(value string) SendInvoiceOption {
 // Bot-defined invoice payload, 1-128 bytes.
 // This will not be displayed to the user, use it for your internal processes.
 func WithSendInvoicePayload(value string) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.Payload
-		params.Payload = value
-
-		return WithSendInvoicePayload(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *string {
+		return &params.Payload
+	})
 }
 
 // WithSendInvoiceProviderToken sets the ProviderToken field.
@@ -16484,12 +14888,9 @@ func WithSendInvoicePayload(value string) SendInvoiceOption {
 // [@BotFather]: https://t.me/botfather
 // [Telegram Stars]: https://t.me/BotNews/90
 func WithSendInvoiceProviderToken(value string) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.ProviderToken
-		params.ProviderToken = value
-
-		return WithSendInvoiceProviderToken(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *string {
+		return &params.ProviderToken
+	})
 }
 
 // WithSendInvoiceCurrency sets the Currency field.
@@ -16500,12 +14901,9 @@ func WithSendInvoiceProviderToken(value string) SendInvoiceOption {
 // [more on currencies]: https://core.telegram.org/bots/payments#supported-currencies
 // [Telegram Stars]: https://t.me/BotNews/90
 func WithSendInvoiceCurrency(value string) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.Currency
-		params.Currency = value
-
-		return WithSendInvoiceCurrency(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *string {
+		return &params.Currency
+	})
 }
 
 // WithSendInvoicePrices sets the Prices field.
@@ -16516,12 +14914,9 @@ func WithSendInvoiceCurrency(value string) SendInvoiceOption {
 //
 // [Telegram Stars]: https://t.me/BotNews/90
 func WithSendInvoicePrices(value []LabeledPrice) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.Prices
-		params.Prices = value
-
-		return WithSendInvoicePrices(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *[]LabeledPrice {
+		return &params.Prices
+	})
 }
 
 // WithSendInvoiceMaxTipAmount sets the MaxTipAmount field.
@@ -16535,12 +14930,9 @@ func WithSendInvoicePrices(value []LabeledPrice) SendInvoiceOption {
 // [currencies.json]: https://core.telegram.org/bots/payments/currencies.json
 // [Telegram Stars]: https://t.me/BotNews/90
 func WithSendInvoiceMaxTipAmount(value int64) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.MaxTipAmount
-		params.MaxTipAmount = value
-
-		return WithSendInvoiceMaxTipAmount(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *int64 {
+		return &params.MaxTipAmount
+	})
 }
 
 // WithSendInvoiceSuggestedTipAmounts sets the SuggestedTipAmounts field.
@@ -16549,12 +14941,9 @@ func WithSendInvoiceMaxTipAmount(value int64) SendInvoiceOption {
 // At most 4 suggested tip amounts can be specified.
 // The suggested tip amounts must be positive, passed in a strictly increased order and must not exceed max_tip_amount.
 func WithSendInvoiceSuggestedTipAmounts(value []int64) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.SuggestedTipAmounts
-		params.SuggestedTipAmounts = value
-
-		return WithSendInvoiceSuggestedTipAmounts(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *[]int64 {
+		return &params.SuggestedTipAmounts
+	})
 }
 
 // WithSendInvoiceStartParameter sets the StartParameter field.
@@ -16563,12 +14952,9 @@ func WithSendInvoiceSuggestedTipAmounts(value []int64) SendInvoiceOption {
 // If left empty, forwarded copies of the sent message will have a Pay button, allowing multiple users to pay directly from the forwarded message, using the same invoice.
 // If non-empty, forwarded copies of the sent message will have a URL button with a deep link to the bot (instead of a Pay button), with the value used as the start parameter.
 func WithSendInvoiceStartParameter(value string) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.StartParameter
-		params.StartParameter = value
-
-		return WithSendInvoiceStartParameter(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *string {
+		return &params.StartParameter
+	})
 }
 
 // WithSendInvoiceProviderData sets the ProviderData field.
@@ -16576,12 +14962,9 @@ func WithSendInvoiceStartParameter(value string) SendInvoiceOption {
 // JSON-serialized data about the invoice, which will be shared with the payment provider.
 // A detailed description of required fields should be provided by the payment provider.
 func WithSendInvoiceProviderData(value string) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.ProviderData
-		params.ProviderData = value
-
-		return WithSendInvoiceProviderData(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *string {
+		return &params.ProviderData
+	})
 }
 
 // WithSendInvoicePhotoUrl sets the PhotoUrl field.
@@ -16590,48 +14973,36 @@ func WithSendInvoiceProviderData(value string) SendInvoiceOption {
 // Can be a photo of the goods or a marketing image for a service.
 // People like it better when they see what they are paying for.
 func WithSendInvoicePhotoUrl(value string) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.PhotoUrl
-		params.PhotoUrl = value
-
-		return WithSendInvoicePhotoUrl(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *string {
+		return &params.PhotoUrl
+	})
 }
 
 // WithSendInvoicePhotoSize sets the PhotoSize field.
 //
 // Photo size in bytes
 func WithSendInvoicePhotoSize(value int64) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.PhotoSize
-		params.PhotoSize = value
-
-		return WithSendInvoicePhotoSize(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *int64 {
+		return &params.PhotoSize
+	})
 }
 
 // WithSendInvoicePhotoWidth sets the PhotoWidth field.
 //
 // Photo width
 func WithSendInvoicePhotoWidth(value int64) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.PhotoWidth
-		params.PhotoWidth = value
-
-		return WithSendInvoicePhotoWidth(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *int64 {
+		return &params.PhotoWidth
+	})
 }
 
 // WithSendInvoicePhotoHeight sets the PhotoHeight field.
 //
 // Photo height
 func WithSendInvoicePhotoHeight(value int64) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.PhotoHeight
-		params.PhotoHeight = value
-
-		return WithSendInvoicePhotoHeight(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *int64 {
+		return &params.PhotoHeight
+	})
 }
 
 // WithSendInvoiceNeedName sets the NeedName field.
@@ -16641,12 +15012,9 @@ func WithSendInvoicePhotoHeight(value int64) SendInvoiceOption {
 //
 // [Telegram Stars]: https://t.me/BotNews/90
 func WithSendInvoiceNeedName(value bool) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.NeedName
-		params.NeedName = value
-
-		return WithSendInvoiceNeedName(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *bool {
+		return &params.NeedName
+	})
 }
 
 // WithSendInvoiceNeedPhoneNumber sets the NeedPhoneNumber field.
@@ -16656,12 +15024,9 @@ func WithSendInvoiceNeedName(value bool) SendInvoiceOption {
 //
 // [Telegram Stars]: https://t.me/BotNews/90
 func WithSendInvoiceNeedPhoneNumber(value bool) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.NeedPhoneNumber
-		params.NeedPhoneNumber = value
-
-		return WithSendInvoiceNeedPhoneNumber(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *bool {
+		return &params.NeedPhoneNumber
+	})
 }
 
 // WithSendInvoiceNeedEmail sets the NeedEmail field.
@@ -16671,12 +15036,9 @@ func WithSendInvoiceNeedPhoneNumber(value bool) SendInvoiceOption {
 //
 // [Telegram Stars]: https://t.me/BotNews/90
 func WithSendInvoiceNeedEmail(value bool) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.NeedEmail
-		params.NeedEmail = value
-
-		return WithSendInvoiceNeedEmail(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *bool {
+		return &params.NeedEmail
+	})
 }
 
 // WithSendInvoiceNeedShippingAddress sets the NeedShippingAddress field.
@@ -16686,12 +15048,9 @@ func WithSendInvoiceNeedEmail(value bool) SendInvoiceOption {
 //
 // [Telegram Stars]: https://t.me/BotNews/90
 func WithSendInvoiceNeedShippingAddress(value bool) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.NeedShippingAddress
-		params.NeedShippingAddress = value
-
-		return WithSendInvoiceNeedShippingAddress(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *bool {
+		return &params.NeedShippingAddress
+	})
 }
 
 // WithSendInvoiceSendPhoneNumberToProvider sets the SendPhoneNumberToProvider field.
@@ -16701,12 +15060,9 @@ func WithSendInvoiceNeedShippingAddress(value bool) SendInvoiceOption {
 //
 // [Telegram Stars]: https://t.me/BotNews/90
 func WithSendInvoiceSendPhoneNumberToProvider(value bool) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.SendPhoneNumberToProvider
-		params.SendPhoneNumberToProvider = value
-
-		return WithSendInvoiceSendPhoneNumberToProvider(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *bool {
+		return &params.SendPhoneNumberToProvider
+	})
 }
 
 // WithSendInvoiceSendEmailToProvider sets the SendEmailToProvider field.
@@ -16716,12 +15072,9 @@ func WithSendInvoiceSendPhoneNumberToProvider(value bool) SendInvoiceOption {
 //
 // [Telegram Stars]: https://t.me/BotNews/90
 func WithSendInvoiceSendEmailToProvider(value bool) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.SendEmailToProvider
-		params.SendEmailToProvider = value
-
-		return WithSendInvoiceSendEmailToProvider(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *bool {
+		return &params.SendEmailToProvider
+	})
 }
 
 // WithSendInvoiceIsFlexible sets the IsFlexible field.
@@ -16731,12 +15084,9 @@ func WithSendInvoiceSendEmailToProvider(value bool) SendInvoiceOption {
 //
 // [Telegram Stars]: https://t.me/BotNews/90
 func WithSendInvoiceIsFlexible(value bool) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.IsFlexible
-		params.IsFlexible = value
-
-		return WithSendInvoiceIsFlexible(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *bool {
+		return &params.IsFlexible
+	})
 }
 
 // WithSendInvoiceDisableNotification sets the DisableNotification field.
@@ -16746,24 +15096,18 @@ func WithSendInvoiceIsFlexible(value bool) SendInvoiceOption {
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithSendInvoiceDisableNotification(value bool) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithSendInvoiceDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithSendInvoiceProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the sent message from forwarding and saving
 func WithSendInvoiceProtectContent(value bool) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithSendInvoiceProtectContent(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithSendInvoiceAllowPaidBroadcast sets the AllowPaidBroadcast field.
@@ -16773,24 +15117,18 @@ func WithSendInvoiceProtectContent(value bool) SendInvoiceOption {
 //
 // [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
 func WithSendInvoiceAllowPaidBroadcast(value bool) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.AllowPaidBroadcast
-		params.AllowPaidBroadcast = value
-
-		return WithSendInvoiceAllowPaidBroadcast(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *bool {
+		return &params.AllowPaidBroadcast
+	})
 }
 
 // WithSendInvoiceMessageEffectID sets the MessageEffectID field.
 //
 // Unique identifier of the message effect to be added to the message; for private chats only
 func WithSendInvoiceMessageEffectID(value string) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.MessageEffectID
-		params.MessageEffectID = value
-
-		return WithSendInvoiceMessageEffectID(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) *string {
+		return &params.MessageEffectID
+	})
 }
 
 // WithSendInvoiceSuggestedPostParameters sets the SuggestedPostParameters field.
@@ -16798,24 +15136,18 @@ func WithSendInvoiceMessageEffectID(value string) SendInvoiceOption {
 // A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only.
 // If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
 func WithSendInvoiceSuggestedPostParameters(value *SuggestedPostParameters) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.SuggestedPostParameters
-		params.SuggestedPostParameters = value
-
-		return WithSendInvoiceSuggestedPostParameters(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) **SuggestedPostParameters {
+		return &params.SuggestedPostParameters
+	})
 }
 
 // WithSendInvoiceReplyParameters sets the ReplyParameters field.
 //
 // Description of the message to reply to
 func WithSendInvoiceReplyParameters(value *ReplyParameters) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.ReplyParameters
-		params.ReplyParameters = value
-
-		return WithSendInvoiceReplyParameters(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
 }
 
 // WithSendInvoiceReplyMarkup sets the ReplyMarkup field.
@@ -16826,12 +15158,9 @@ func WithSendInvoiceReplyParameters(value *ReplyParameters) SendInvoiceOption {
 //
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 func WithSendInvoiceReplyMarkup(value *InlineKeyboardMarkup) SendInvoiceOption {
-	return func(params *SendInvoiceParams) SendInvoiceOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithSendInvoiceReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *SendInvoiceParams) **InlineKeyboardMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // SendInvoice calls the sendInvoice Telegram Bot API method.
@@ -16961,7 +15290,7 @@ type SendLivePhotoParams struct {
 }
 
 // SendLivePhotoOption configures SendLivePhotoParams.
-type SendLivePhotoOption func(params *SendLivePhotoParams) SendLivePhotoOption
+type SendLivePhotoOption = Option[SendLivePhotoParams]
 
 // Option applies one or more SendLivePhotoOption values and returns the last rollback option.
 func (r *SendLivePhotoParams) Option(opts ...SendLivePhotoOption) (previous SendLivePhotoOption) {
@@ -16975,48 +15304,36 @@ func (r *SendLivePhotoParams) Option(opts ...SendLivePhotoOption) (previous Send
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
 func WithSendLivePhotoBusinessConnectionID(value string) SendLivePhotoOption {
-	return func(params *SendLivePhotoParams) SendLivePhotoOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSendLivePhotoBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SendLivePhotoParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSendLivePhotoChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel (in the format @channelusername)
 func WithSendLivePhotoChatID(value string) SendLivePhotoOption {
-	return func(params *SendLivePhotoParams) SendLivePhotoOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendLivePhotoChatID(previous)
-	}
+	return fieldOption(value, func(params *SendLivePhotoParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSendLivePhotoMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithSendLivePhotoMessageThreadID(value int64) SendLivePhotoOption {
-	return func(params *SendLivePhotoParams) SendLivePhotoOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithSendLivePhotoMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *SendLivePhotoParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithSendLivePhotoDirectMessagesTopicID sets the DirectMessagesTopicID field.
 //
 // Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 func WithSendLivePhotoDirectMessagesTopicID(value int64) SendLivePhotoOption {
-	return func(params *SendLivePhotoParams) SendLivePhotoOption {
-		previous := params.DirectMessagesTopicID
-		params.DirectMessagesTopicID = value
-
-		return WithSendLivePhotoDirectMessagesTopicID(previous)
-	}
+	return fieldOption(value, func(params *SendLivePhotoParams) *int64 {
+		return &params.DirectMessagesTopicID
+	})
 }
 
 // WithSendLivePhotoReceiverUserID sets the ReceiverUserID field.
@@ -17027,24 +15344,18 @@ func WithSendLivePhotoDirectMessagesTopicID(value int64) SendLivePhotoOption {
 //
 // [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
 func WithSendLivePhotoReceiverUserID(value int64) SendLivePhotoOption {
-	return func(params *SendLivePhotoParams) SendLivePhotoOption {
-		previous := params.ReceiverUserID
-		params.ReceiverUserID = value
-
-		return WithSendLivePhotoReceiverUserID(previous)
-	}
+	return fieldOption(value, func(params *SendLivePhotoParams) *int64 {
+		return &params.ReceiverUserID
+	})
 }
 
 // WithSendLivePhotoCallbackQueryID sets the CallbackQueryID field.
 //
 // For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
 func WithSendLivePhotoCallbackQueryID(value string) SendLivePhotoOption {
-	return func(params *SendLivePhotoParams) SendLivePhotoOption {
-		previous := params.CallbackQueryID
-		params.CallbackQueryID = value
-
-		return WithSendLivePhotoCallbackQueryID(previous)
-	}
+	return fieldOption(value, func(params *SendLivePhotoParams) *string {
+		return &params.CallbackQueryID
+	})
 }
 
 // WithSendLivePhotoLivePhoto sets the LivePhoto field.
@@ -17057,12 +15368,9 @@ func WithSendLivePhotoCallbackQueryID(value string) SendLivePhotoOption {
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
 func WithSendLivePhotoLivePhoto(value InputFile) SendLivePhotoOption {
-	return func(params *SendLivePhotoParams) SendLivePhotoOption {
-		previous := params.LivePhoto
-		params.LivePhoto = value
-
-		return WithSendLivePhotoLivePhoto(previous)
-	}
+	return fieldOption(value, func(params *SendLivePhotoParams) *InputFile {
+		return &params.LivePhoto
+	})
 }
 
 // WithSendLivePhotoPhoto sets the Photo field.
@@ -17074,24 +15382,18 @@ func WithSendLivePhotoLivePhoto(value InputFile) SendLivePhotoOption {
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
 func WithSendLivePhotoPhoto(value InputFile) SendLivePhotoOption {
-	return func(params *SendLivePhotoParams) SendLivePhotoOption {
-		previous := params.Photo
-		params.Photo = value
-
-		return WithSendLivePhotoPhoto(previous)
-	}
+	return fieldOption(value, func(params *SendLivePhotoParams) *InputFile {
+		return &params.Photo
+	})
 }
 
 // WithSendLivePhotoCaption sets the Caption field.
 //
 // Video caption (may also be used when resending videos by file_id), 0-1024 characters after entities parsing
 func WithSendLivePhotoCaption(value string) SendLivePhotoOption {
-	return func(params *SendLivePhotoParams) SendLivePhotoOption {
-		previous := params.Caption
-		params.Caption = value
-
-		return WithSendLivePhotoCaption(previous)
-	}
+	return fieldOption(value, func(params *SendLivePhotoParams) *string {
+		return &params.Caption
+	})
 }
 
 // WithSendLivePhotoParseMode sets the ParseMode field.
@@ -17101,48 +15403,36 @@ func WithSendLivePhotoCaption(value string) SendLivePhotoOption {
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithSendLivePhotoParseMode(value string) SendLivePhotoOption {
-	return func(params *SendLivePhotoParams) SendLivePhotoOption {
-		previous := params.ParseMode
-		params.ParseMode = value
-
-		return WithSendLivePhotoParseMode(previous)
-	}
+	return fieldOption(value, func(params *SendLivePhotoParams) *string {
+		return &params.ParseMode
+	})
 }
 
 // WithSendLivePhotoCaptionEntities sets the CaptionEntities field.
 //
 // A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
 func WithSendLivePhotoCaptionEntities(value []MessageEntity) SendLivePhotoOption {
-	return func(params *SendLivePhotoParams) SendLivePhotoOption {
-		previous := params.CaptionEntities
-		params.CaptionEntities = value
-
-		return WithSendLivePhotoCaptionEntities(previous)
-	}
+	return fieldOption(value, func(params *SendLivePhotoParams) *[]MessageEntity {
+		return &params.CaptionEntities
+	})
 }
 
 // WithSendLivePhotoShowCaptionAboveMedia sets the ShowCaptionAboveMedia field.
 //
 // Pass True if the caption must be shown above the message media
 func WithSendLivePhotoShowCaptionAboveMedia(value bool) SendLivePhotoOption {
-	return func(params *SendLivePhotoParams) SendLivePhotoOption {
-		previous := params.ShowCaptionAboveMedia
-		params.ShowCaptionAboveMedia = value
-
-		return WithSendLivePhotoShowCaptionAboveMedia(previous)
-	}
+	return fieldOption(value, func(params *SendLivePhotoParams) *bool {
+		return &params.ShowCaptionAboveMedia
+	})
 }
 
 // WithSendLivePhotoHasSpoiler sets the HasSpoiler field.
 //
 // Pass True if the video needs to be covered with a spoiler animation
 func WithSendLivePhotoHasSpoiler(value bool) SendLivePhotoOption {
-	return func(params *SendLivePhotoParams) SendLivePhotoOption {
-		previous := params.HasSpoiler
-		params.HasSpoiler = value
-
-		return WithSendLivePhotoHasSpoiler(previous)
-	}
+	return fieldOption(value, func(params *SendLivePhotoParams) *bool {
+		return &params.HasSpoiler
+	})
 }
 
 // WithSendLivePhotoDisableNotification sets the DisableNotification field.
@@ -17152,24 +15442,18 @@ func WithSendLivePhotoHasSpoiler(value bool) SendLivePhotoOption {
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithSendLivePhotoDisableNotification(value bool) SendLivePhotoOption {
-	return func(params *SendLivePhotoParams) SendLivePhotoOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithSendLivePhotoDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *SendLivePhotoParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithSendLivePhotoProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the sent message from forwarding and saving
 func WithSendLivePhotoProtectContent(value bool) SendLivePhotoOption {
-	return func(params *SendLivePhotoParams) SendLivePhotoOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithSendLivePhotoProtectContent(previous)
-	}
+	return fieldOption(value, func(params *SendLivePhotoParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithSendLivePhotoAllowPaidBroadcast sets the AllowPaidBroadcast field.
@@ -17179,24 +15463,18 @@ func WithSendLivePhotoProtectContent(value bool) SendLivePhotoOption {
 //
 // [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
 func WithSendLivePhotoAllowPaidBroadcast(value bool) SendLivePhotoOption {
-	return func(params *SendLivePhotoParams) SendLivePhotoOption {
-		previous := params.AllowPaidBroadcast
-		params.AllowPaidBroadcast = value
-
-		return WithSendLivePhotoAllowPaidBroadcast(previous)
-	}
+	return fieldOption(value, func(params *SendLivePhotoParams) *bool {
+		return &params.AllowPaidBroadcast
+	})
 }
 
 // WithSendLivePhotoMessageEffectID sets the MessageEffectID field.
 //
 // Unique identifier of the message effect to be added to the message; for private chats only
 func WithSendLivePhotoMessageEffectID(value string) SendLivePhotoOption {
-	return func(params *SendLivePhotoParams) SendLivePhotoOption {
-		previous := params.MessageEffectID
-		params.MessageEffectID = value
-
-		return WithSendLivePhotoMessageEffectID(previous)
-	}
+	return fieldOption(value, func(params *SendLivePhotoParams) *string {
+		return &params.MessageEffectID
+	})
 }
 
 // WithSendLivePhotoSuggestedPostParameters sets the SuggestedPostParameters field.
@@ -17204,24 +15482,18 @@ func WithSendLivePhotoMessageEffectID(value string) SendLivePhotoOption {
 // A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only.
 // If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
 func WithSendLivePhotoSuggestedPostParameters(value *SuggestedPostParameters) SendLivePhotoOption {
-	return func(params *SendLivePhotoParams) SendLivePhotoOption {
-		previous := params.SuggestedPostParameters
-		params.SuggestedPostParameters = value
-
-		return WithSendLivePhotoSuggestedPostParameters(previous)
-	}
+	return fieldOption(value, func(params *SendLivePhotoParams) **SuggestedPostParameters {
+		return &params.SuggestedPostParameters
+	})
 }
 
 // WithSendLivePhotoReplyParameters sets the ReplyParameters field.
 //
 // Description of the message to reply to
 func WithSendLivePhotoReplyParameters(value *ReplyParameters) SendLivePhotoOption {
-	return func(params *SendLivePhotoParams) SendLivePhotoOption {
-		previous := params.ReplyParameters
-		params.ReplyParameters = value
-
-		return WithSendLivePhotoReplyParameters(previous)
-	}
+	return fieldOption(value, func(params *SendLivePhotoParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
 }
 
 // WithSendLivePhotoReplyMarkup sets the ReplyMarkup field.
@@ -17232,12 +15504,9 @@ func WithSendLivePhotoReplyParameters(value *ReplyParameters) SendLivePhotoOptio
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 // [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
 func WithSendLivePhotoReplyMarkup(value *ReplyMarkup) SendLivePhotoOption {
-	return func(params *SendLivePhotoParams) SendLivePhotoOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithSendLivePhotoReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *SendLivePhotoParams) **ReplyMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // SendLivePhoto calls the sendLivePhoto Telegram Bot API method.
@@ -17589,7 +15858,7 @@ type SendLocationParams struct {
 }
 
 // SendLocationOption configures SendLocationParams.
-type SendLocationOption func(params *SendLocationParams) SendLocationOption
+type SendLocationOption = Option[SendLocationParams]
 
 // Option applies one or more SendLocationOption values and returns the last rollback option.
 func (r *SendLocationParams) Option(opts ...SendLocationOption) (previous SendLocationOption) {
@@ -17603,48 +15872,36 @@ func (r *SendLocationParams) Option(opts ...SendLocationOption) (previous SendLo
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
 func WithSendLocationBusinessConnectionID(value string) SendLocationOption {
-	return func(params *SendLocationParams) SendLocationOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSendLocationBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SendLocationParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSendLocationChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithSendLocationChatID(value string) SendLocationOption {
-	return func(params *SendLocationParams) SendLocationOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendLocationChatID(previous)
-	}
+	return fieldOption(value, func(params *SendLocationParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSendLocationMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithSendLocationMessageThreadID(value int64) SendLocationOption {
-	return func(params *SendLocationParams) SendLocationOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithSendLocationMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *SendLocationParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithSendLocationDirectMessagesTopicID sets the DirectMessagesTopicID field.
 //
 // Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 func WithSendLocationDirectMessagesTopicID(value int64) SendLocationOption {
-	return func(params *SendLocationParams) SendLocationOption {
-		previous := params.DirectMessagesTopicID
-		params.DirectMessagesTopicID = value
-
-		return WithSendLocationDirectMessagesTopicID(previous)
-	}
+	return fieldOption(value, func(params *SendLocationParams) *int64 {
+		return &params.DirectMessagesTopicID
+	})
 }
 
 // WithSendLocationReceiverUserID sets the ReceiverUserID field.
@@ -17655,60 +15912,45 @@ func WithSendLocationDirectMessagesTopicID(value int64) SendLocationOption {
 //
 // [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
 func WithSendLocationReceiverUserID(value int64) SendLocationOption {
-	return func(params *SendLocationParams) SendLocationOption {
-		previous := params.ReceiverUserID
-		params.ReceiverUserID = value
-
-		return WithSendLocationReceiverUserID(previous)
-	}
+	return fieldOption(value, func(params *SendLocationParams) *int64 {
+		return &params.ReceiverUserID
+	})
 }
 
 // WithSendLocationCallbackQueryID sets the CallbackQueryID field.
 //
 // For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
 func WithSendLocationCallbackQueryID(value string) SendLocationOption {
-	return func(params *SendLocationParams) SendLocationOption {
-		previous := params.CallbackQueryID
-		params.CallbackQueryID = value
-
-		return WithSendLocationCallbackQueryID(previous)
-	}
+	return fieldOption(value, func(params *SendLocationParams) *string {
+		return &params.CallbackQueryID
+	})
 }
 
 // WithSendLocationLatitude sets the Latitude field.
 //
 // Latitude of the location
 func WithSendLocationLatitude(value float64) SendLocationOption {
-	return func(params *SendLocationParams) SendLocationOption {
-		previous := params.Latitude
-		params.Latitude = value
-
-		return WithSendLocationLatitude(previous)
-	}
+	return fieldOption(value, func(params *SendLocationParams) *float64 {
+		return &params.Latitude
+	})
 }
 
 // WithSendLocationLongitude sets the Longitude field.
 //
 // Longitude of the location
 func WithSendLocationLongitude(value float64) SendLocationOption {
-	return func(params *SendLocationParams) SendLocationOption {
-		previous := params.Longitude
-		params.Longitude = value
-
-		return WithSendLocationLongitude(previous)
-	}
+	return fieldOption(value, func(params *SendLocationParams) *float64 {
+		return &params.Longitude
+	})
 }
 
 // WithSendLocationHorizontalAccuracy sets the HorizontalAccuracy field.
 //
 // The radius of uncertainty for the location, measured in meters; 0-1500
 func WithSendLocationHorizontalAccuracy(value float64) SendLocationOption {
-	return func(params *SendLocationParams) SendLocationOption {
-		previous := params.HorizontalAccuracy
-		params.HorizontalAccuracy = value
-
-		return WithSendLocationHorizontalAccuracy(previous)
-	}
+	return fieldOption(value, func(params *SendLocationParams) *float64 {
+		return &params.HorizontalAccuracy
+	})
 }
 
 // WithSendLocationLivePeriod sets the LivePeriod field.
@@ -17718,12 +15960,9 @@ func WithSendLocationHorizontalAccuracy(value float64) SendLocationOption {
 //
 // [Live Locations]: https://telegram.org/blog/live-locations
 func WithSendLocationLivePeriod(value int64) SendLocationOption {
-	return func(params *SendLocationParams) SendLocationOption {
-		previous := params.LivePeriod
-		params.LivePeriod = value
-
-		return WithSendLocationLivePeriod(previous)
-	}
+	return fieldOption(value, func(params *SendLocationParams) *int64 {
+		return &params.LivePeriod
+	})
 }
 
 // WithSendLocationHeading sets the Heading field.
@@ -17731,12 +15970,9 @@ func WithSendLocationLivePeriod(value int64) SendLocationOption {
 // For live locations, a direction in which the user is moving, in degrees.
 // Must be between 1 and 360 if specified.
 func WithSendLocationHeading(value int64) SendLocationOption {
-	return func(params *SendLocationParams) SendLocationOption {
-		previous := params.Heading
-		params.Heading = value
-
-		return WithSendLocationHeading(previous)
-	}
+	return fieldOption(value, func(params *SendLocationParams) *int64 {
+		return &params.Heading
+	})
 }
 
 // WithSendLocationProximityAlertRadius sets the ProximityAlertRadius field.
@@ -17744,12 +15980,9 @@ func WithSendLocationHeading(value int64) SendLocationOption {
 // For live locations, a maximum distance for proximity alerts about approaching another chat member, in meters.
 // Must be between 1 and 100000 if specified.
 func WithSendLocationProximityAlertRadius(value int64) SendLocationOption {
-	return func(params *SendLocationParams) SendLocationOption {
-		previous := params.ProximityAlertRadius
-		params.ProximityAlertRadius = value
-
-		return WithSendLocationProximityAlertRadius(previous)
-	}
+	return fieldOption(value, func(params *SendLocationParams) *int64 {
+		return &params.ProximityAlertRadius
+	})
 }
 
 // WithSendLocationDisableNotification sets the DisableNotification field.
@@ -17759,24 +15992,18 @@ func WithSendLocationProximityAlertRadius(value int64) SendLocationOption {
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithSendLocationDisableNotification(value bool) SendLocationOption {
-	return func(params *SendLocationParams) SendLocationOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithSendLocationDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *SendLocationParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithSendLocationProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the sent message from forwarding and saving
 func WithSendLocationProtectContent(value bool) SendLocationOption {
-	return func(params *SendLocationParams) SendLocationOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithSendLocationProtectContent(previous)
-	}
+	return fieldOption(value, func(params *SendLocationParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithSendLocationAllowPaidBroadcast sets the AllowPaidBroadcast field.
@@ -17786,24 +16013,18 @@ func WithSendLocationProtectContent(value bool) SendLocationOption {
 //
 // [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
 func WithSendLocationAllowPaidBroadcast(value bool) SendLocationOption {
-	return func(params *SendLocationParams) SendLocationOption {
-		previous := params.AllowPaidBroadcast
-		params.AllowPaidBroadcast = value
-
-		return WithSendLocationAllowPaidBroadcast(previous)
-	}
+	return fieldOption(value, func(params *SendLocationParams) *bool {
+		return &params.AllowPaidBroadcast
+	})
 }
 
 // WithSendLocationMessageEffectID sets the MessageEffectID field.
 //
 // Unique identifier of the message effect to be added to the message; for private chats only
 func WithSendLocationMessageEffectID(value string) SendLocationOption {
-	return func(params *SendLocationParams) SendLocationOption {
-		previous := params.MessageEffectID
-		params.MessageEffectID = value
-
-		return WithSendLocationMessageEffectID(previous)
-	}
+	return fieldOption(value, func(params *SendLocationParams) *string {
+		return &params.MessageEffectID
+	})
 }
 
 // WithSendLocationSuggestedPostParameters sets the SuggestedPostParameters field.
@@ -17811,24 +16032,18 @@ func WithSendLocationMessageEffectID(value string) SendLocationOption {
 // A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only.
 // If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
 func WithSendLocationSuggestedPostParameters(value *SuggestedPostParameters) SendLocationOption {
-	return func(params *SendLocationParams) SendLocationOption {
-		previous := params.SuggestedPostParameters
-		params.SuggestedPostParameters = value
-
-		return WithSendLocationSuggestedPostParameters(previous)
-	}
+	return fieldOption(value, func(params *SendLocationParams) **SuggestedPostParameters {
+		return &params.SuggestedPostParameters
+	})
 }
 
 // WithSendLocationReplyParameters sets the ReplyParameters field.
 //
 // Description of the message to reply to
 func WithSendLocationReplyParameters(value *ReplyParameters) SendLocationOption {
-	return func(params *SendLocationParams) SendLocationOption {
-		previous := params.ReplyParameters
-		params.ReplyParameters = value
-
-		return WithSendLocationReplyParameters(previous)
-	}
+	return fieldOption(value, func(params *SendLocationParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
 }
 
 // WithSendLocationReplyMarkup sets the ReplyMarkup field.
@@ -17839,12 +16054,9 @@ func WithSendLocationReplyParameters(value *ReplyParameters) SendLocationOption 
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 // [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
 func WithSendLocationReplyMarkup(value *ReplyMarkup) SendLocationOption {
-	return func(params *SendLocationParams) SendLocationOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithSendLocationReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *SendLocationParams) **ReplyMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // SendLocation calls the sendLocation Telegram Bot API method.
@@ -17921,7 +16133,7 @@ type SendMediaGroupParams struct {
 }
 
 // SendMediaGroupOption configures SendMediaGroupParams.
-type SendMediaGroupOption func(params *SendMediaGroupParams) SendMediaGroupOption
+type SendMediaGroupOption = Option[SendMediaGroupParams]
 
 // Option applies one or more SendMediaGroupOption values and returns the last rollback option.
 func (r *SendMediaGroupParams) Option(opts ...SendMediaGroupOption) (previous SendMediaGroupOption) {
@@ -17935,60 +16147,45 @@ func (r *SendMediaGroupParams) Option(opts ...SendMediaGroupOption) (previous Se
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
 func WithSendMediaGroupBusinessConnectionID(value string) SendMediaGroupOption {
-	return func(params *SendMediaGroupParams) SendMediaGroupOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSendMediaGroupBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SendMediaGroupParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSendMediaGroupChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithSendMediaGroupChatID(value string) SendMediaGroupOption {
-	return func(params *SendMediaGroupParams) SendMediaGroupOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendMediaGroupChatID(previous)
-	}
+	return fieldOption(value, func(params *SendMediaGroupParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSendMediaGroupMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithSendMediaGroupMessageThreadID(value int64) SendMediaGroupOption {
-	return func(params *SendMediaGroupParams) SendMediaGroupOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithSendMediaGroupMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *SendMediaGroupParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithSendMediaGroupDirectMessagesTopicID sets the DirectMessagesTopicID field.
 //
 // Identifier of the direct messages topic to which the messages will be sent; required if the messages are sent to a direct messages chat
 func WithSendMediaGroupDirectMessagesTopicID(value int64) SendMediaGroupOption {
-	return func(params *SendMediaGroupParams) SendMediaGroupOption {
-		previous := params.DirectMessagesTopicID
-		params.DirectMessagesTopicID = value
-
-		return WithSendMediaGroupDirectMessagesTopicID(previous)
-	}
+	return fieldOption(value, func(params *SendMediaGroupParams) *int64 {
+		return &params.DirectMessagesTopicID
+	})
 }
 
 // WithSendMediaGroupMedia sets the Media field.
 //
 // A JSON-serialized Array describing messages to be sent, must include 2-10 items
 func WithSendMediaGroupMedia(value []InputMedia) SendMediaGroupOption {
-	return func(params *SendMediaGroupParams) SendMediaGroupOption {
-		previous := params.Media
-		params.Media = value
-
-		return WithSendMediaGroupMedia(previous)
-	}
+	return fieldOption(value, func(params *SendMediaGroupParams) *[]InputMedia {
+		return &params.Media
+	})
 }
 
 // WithSendMediaGroupDisableNotification sets the DisableNotification field.
@@ -17998,24 +16195,18 @@ func WithSendMediaGroupMedia(value []InputMedia) SendMediaGroupOption {
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithSendMediaGroupDisableNotification(value bool) SendMediaGroupOption {
-	return func(params *SendMediaGroupParams) SendMediaGroupOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithSendMediaGroupDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *SendMediaGroupParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithSendMediaGroupProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the sent messages from forwarding and saving
 func WithSendMediaGroupProtectContent(value bool) SendMediaGroupOption {
-	return func(params *SendMediaGroupParams) SendMediaGroupOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithSendMediaGroupProtectContent(previous)
-	}
+	return fieldOption(value, func(params *SendMediaGroupParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithSendMediaGroupAllowPaidBroadcast sets the AllowPaidBroadcast field.
@@ -18025,36 +16216,27 @@ func WithSendMediaGroupProtectContent(value bool) SendMediaGroupOption {
 //
 // [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
 func WithSendMediaGroupAllowPaidBroadcast(value bool) SendMediaGroupOption {
-	return func(params *SendMediaGroupParams) SendMediaGroupOption {
-		previous := params.AllowPaidBroadcast
-		params.AllowPaidBroadcast = value
-
-		return WithSendMediaGroupAllowPaidBroadcast(previous)
-	}
+	return fieldOption(value, func(params *SendMediaGroupParams) *bool {
+		return &params.AllowPaidBroadcast
+	})
 }
 
 // WithSendMediaGroupMessageEffectID sets the MessageEffectID field.
 //
 // Unique identifier of the message effect to be added to the message; for private chats only
 func WithSendMediaGroupMessageEffectID(value string) SendMediaGroupOption {
-	return func(params *SendMediaGroupParams) SendMediaGroupOption {
-		previous := params.MessageEffectID
-		params.MessageEffectID = value
-
-		return WithSendMediaGroupMessageEffectID(previous)
-	}
+	return fieldOption(value, func(params *SendMediaGroupParams) *string {
+		return &params.MessageEffectID
+	})
 }
 
 // WithSendMediaGroupReplyParameters sets the ReplyParameters field.
 //
 // Description of the message to reply to
 func WithSendMediaGroupReplyParameters(value *ReplyParameters) SendMediaGroupOption {
-	return func(params *SendMediaGroupParams) SendMediaGroupOption {
-		previous := params.ReplyParameters
-		params.ReplyParameters = value
-
-		return WithSendMediaGroupReplyParameters(previous)
-	}
+	return fieldOption(value, func(params *SendMediaGroupParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
 }
 
 // SendMediaGroup calls the sendMediaGroup Telegram Bot API method.
@@ -18406,7 +16588,7 @@ type SendMessageParams struct {
 }
 
 // SendMessageOption configures SendMessageParams.
-type SendMessageOption func(params *SendMessageParams) SendMessageOption
+type SendMessageOption = Option[SendMessageParams]
 
 // Option applies one or more SendMessageOption values and returns the last rollback option.
 func (r *SendMessageParams) Option(opts ...SendMessageOption) (previous SendMessageOption) {
@@ -18420,48 +16602,36 @@ func (r *SendMessageParams) Option(opts ...SendMessageOption) (previous SendMess
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
 func WithSendMessageBusinessConnectionID(value string) SendMessageOption {
-	return func(params *SendMessageParams) SendMessageOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSendMessageBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SendMessageParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSendMessageChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithSendMessageChatID(value string) SendMessageOption {
-	return func(params *SendMessageParams) SendMessageOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendMessageChatID(previous)
-	}
+	return fieldOption(value, func(params *SendMessageParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSendMessageMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithSendMessageMessageThreadID(value int64) SendMessageOption {
-	return func(params *SendMessageParams) SendMessageOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithSendMessageMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *SendMessageParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithSendMessageDirectMessagesTopicID sets the DirectMessagesTopicID field.
 //
 // Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 func WithSendMessageDirectMessagesTopicID(value int64) SendMessageOption {
-	return func(params *SendMessageParams) SendMessageOption {
-		previous := params.DirectMessagesTopicID
-		params.DirectMessagesTopicID = value
-
-		return WithSendMessageDirectMessagesTopicID(previous)
-	}
+	return fieldOption(value, func(params *SendMessageParams) *int64 {
+		return &params.DirectMessagesTopicID
+	})
 }
 
 // WithSendMessageReceiverUserID sets the ReceiverUserID field.
@@ -18472,36 +16642,27 @@ func WithSendMessageDirectMessagesTopicID(value int64) SendMessageOption {
 //
 // [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
 func WithSendMessageReceiverUserID(value int64) SendMessageOption {
-	return func(params *SendMessageParams) SendMessageOption {
-		previous := params.ReceiverUserID
-		params.ReceiverUserID = value
-
-		return WithSendMessageReceiverUserID(previous)
-	}
+	return fieldOption(value, func(params *SendMessageParams) *int64 {
+		return &params.ReceiverUserID
+	})
 }
 
 // WithSendMessageCallbackQueryID sets the CallbackQueryID field.
 //
 // For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
 func WithSendMessageCallbackQueryID(value string) SendMessageOption {
-	return func(params *SendMessageParams) SendMessageOption {
-		previous := params.CallbackQueryID
-		params.CallbackQueryID = value
-
-		return WithSendMessageCallbackQueryID(previous)
-	}
+	return fieldOption(value, func(params *SendMessageParams) *string {
+		return &params.CallbackQueryID
+	})
 }
 
 // WithSendMessageText sets the Text field.
 //
 // Text of the message to be sent, 1-4096 characters after entities parsing
 func WithSendMessageText(value string) SendMessageOption {
-	return func(params *SendMessageParams) SendMessageOption {
-		previous := params.Text
-		params.Text = value
-
-		return WithSendMessageText(previous)
-	}
+	return fieldOption(value, func(params *SendMessageParams) *string {
+		return &params.Text
+	})
 }
 
 // WithSendMessageParseMode sets the ParseMode field.
@@ -18511,36 +16672,27 @@ func WithSendMessageText(value string) SendMessageOption {
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithSendMessageParseMode(value string) SendMessageOption {
-	return func(params *SendMessageParams) SendMessageOption {
-		previous := params.ParseMode
-		params.ParseMode = value
-
-		return WithSendMessageParseMode(previous)
-	}
+	return fieldOption(value, func(params *SendMessageParams) *string {
+		return &params.ParseMode
+	})
 }
 
 // WithSendMessageEntities sets the Entities field.
 //
 // A JSON-serialized list of special entities that appear in message text, which can be specified instead of parse_mode
 func WithSendMessageEntities(value []MessageEntity) SendMessageOption {
-	return func(params *SendMessageParams) SendMessageOption {
-		previous := params.Entities
-		params.Entities = value
-
-		return WithSendMessageEntities(previous)
-	}
+	return fieldOption(value, func(params *SendMessageParams) *[]MessageEntity {
+		return &params.Entities
+	})
 }
 
 // WithSendMessageLinkPreviewOptions sets the LinkPreviewOptions field.
 //
 // Link preview generation options for the message
 func WithSendMessageLinkPreviewOptions(value *LinkPreviewOptions) SendMessageOption {
-	return func(params *SendMessageParams) SendMessageOption {
-		previous := params.LinkPreviewOptions
-		params.LinkPreviewOptions = value
-
-		return WithSendMessageLinkPreviewOptions(previous)
-	}
+	return fieldOption(value, func(params *SendMessageParams) **LinkPreviewOptions {
+		return &params.LinkPreviewOptions
+	})
 }
 
 // WithSendMessageDisableNotification sets the DisableNotification field.
@@ -18550,24 +16702,18 @@ func WithSendMessageLinkPreviewOptions(value *LinkPreviewOptions) SendMessageOpt
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithSendMessageDisableNotification(value bool) SendMessageOption {
-	return func(params *SendMessageParams) SendMessageOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithSendMessageDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *SendMessageParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithSendMessageProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the sent message from forwarding and saving
 func WithSendMessageProtectContent(value bool) SendMessageOption {
-	return func(params *SendMessageParams) SendMessageOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithSendMessageProtectContent(previous)
-	}
+	return fieldOption(value, func(params *SendMessageParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithSendMessageAllowPaidBroadcast sets the AllowPaidBroadcast field.
@@ -18577,24 +16723,18 @@ func WithSendMessageProtectContent(value bool) SendMessageOption {
 //
 // [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
 func WithSendMessageAllowPaidBroadcast(value bool) SendMessageOption {
-	return func(params *SendMessageParams) SendMessageOption {
-		previous := params.AllowPaidBroadcast
-		params.AllowPaidBroadcast = value
-
-		return WithSendMessageAllowPaidBroadcast(previous)
-	}
+	return fieldOption(value, func(params *SendMessageParams) *bool {
+		return &params.AllowPaidBroadcast
+	})
 }
 
 // WithSendMessageMessageEffectID sets the MessageEffectID field.
 //
 // Unique identifier of the message effect to be added to the message; for private chats only
 func WithSendMessageMessageEffectID(value string) SendMessageOption {
-	return func(params *SendMessageParams) SendMessageOption {
-		previous := params.MessageEffectID
-		params.MessageEffectID = value
-
-		return WithSendMessageMessageEffectID(previous)
-	}
+	return fieldOption(value, func(params *SendMessageParams) *string {
+		return &params.MessageEffectID
+	})
 }
 
 // WithSendMessageSuggestedPostParameters sets the SuggestedPostParameters field.
@@ -18602,24 +16742,18 @@ func WithSendMessageMessageEffectID(value string) SendMessageOption {
 // A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only.
 // If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
 func WithSendMessageSuggestedPostParameters(value *SuggestedPostParameters) SendMessageOption {
-	return func(params *SendMessageParams) SendMessageOption {
-		previous := params.SuggestedPostParameters
-		params.SuggestedPostParameters = value
-
-		return WithSendMessageSuggestedPostParameters(previous)
-	}
+	return fieldOption(value, func(params *SendMessageParams) **SuggestedPostParameters {
+		return &params.SuggestedPostParameters
+	})
 }
 
 // WithSendMessageReplyParameters sets the ReplyParameters field.
 //
 // Description of the message to reply to
 func WithSendMessageReplyParameters(value *ReplyParameters) SendMessageOption {
-	return func(params *SendMessageParams) SendMessageOption {
-		previous := params.ReplyParameters
-		params.ReplyParameters = value
-
-		return WithSendMessageReplyParameters(previous)
-	}
+	return fieldOption(value, func(params *SendMessageParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
 }
 
 // WithSendMessageReplyMarkup sets the ReplyMarkup field.
@@ -18630,12 +16764,9 @@ func WithSendMessageReplyParameters(value *ReplyParameters) SendMessageOption {
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 // [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
 func WithSendMessageReplyMarkup(value *ReplyMarkup) SendMessageOption {
-	return func(params *SendMessageParams) SendMessageOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithSendMessageReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *SendMessageParams) **ReplyMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // SendMessage calls the sendMessage Telegram Bot API method.
@@ -18699,7 +16830,7 @@ type SendMessageDraftParams struct {
 }
 
 // SendMessageDraftOption configures SendMessageDraftParams.
-type SendMessageDraftOption func(params *SendMessageDraftParams) SendMessageDraftOption
+type SendMessageDraftOption = Option[SendMessageDraftParams]
 
 // Option applies one or more SendMessageDraftOption values and returns the last rollback option.
 func (r *SendMessageDraftParams) Option(opts ...SendMessageDraftOption) (previous SendMessageDraftOption) {
@@ -18713,24 +16844,18 @@ func (r *SendMessageDraftParams) Option(opts ...SendMessageDraftOption) (previou
 //
 // Unique identifier for the target private chat
 func WithSendMessageDraftChatID(value int64) SendMessageDraftOption {
-	return func(params *SendMessageDraftParams) SendMessageDraftOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendMessageDraftChatID(previous)
-	}
+	return fieldOption(value, func(params *SendMessageDraftParams) *int64 {
+		return &params.ChatID
+	})
 }
 
 // WithSendMessageDraftMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread
 func WithSendMessageDraftMessageThreadID(value int64) SendMessageDraftOption {
-	return func(params *SendMessageDraftParams) SendMessageDraftOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithSendMessageDraftMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *SendMessageDraftParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithSendMessageDraftDraftID sets the DraftID field.
@@ -18738,12 +16863,9 @@ func WithSendMessageDraftMessageThreadID(value int64) SendMessageDraftOption {
 // Unique identifier of the message draft; must be non-zero.
 // Changes to drafts with the same identifier are animated.
 func WithSendMessageDraftDraftID(value int64) SendMessageDraftOption {
-	return func(params *SendMessageDraftParams) SendMessageDraftOption {
-		previous := params.DraftID
-		params.DraftID = value
-
-		return WithSendMessageDraftDraftID(previous)
-	}
+	return fieldOption(value, func(params *SendMessageDraftParams) *int64 {
+		return &params.DraftID
+	})
 }
 
 // WithSendMessageDraftText sets the Text field.
@@ -18751,12 +16873,9 @@ func WithSendMessageDraftDraftID(value int64) SendMessageDraftOption {
 // Text of the message to be sent, 0-4096 characters after entities parsing.
 // Pass an empty text to show a “Thinking…” placeholder.
 func WithSendMessageDraftText(value string) SendMessageDraftOption {
-	return func(params *SendMessageDraftParams) SendMessageDraftOption {
-		previous := params.Text
-		params.Text = value
-
-		return WithSendMessageDraftText(previous)
-	}
+	return fieldOption(value, func(params *SendMessageDraftParams) *string {
+		return &params.Text
+	})
 }
 
 // WithSendMessageDraftParseMode sets the ParseMode field.
@@ -18766,24 +16885,18 @@ func WithSendMessageDraftText(value string) SendMessageDraftOption {
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithSendMessageDraftParseMode(value string) SendMessageDraftOption {
-	return func(params *SendMessageDraftParams) SendMessageDraftOption {
-		previous := params.ParseMode
-		params.ParseMode = value
-
-		return WithSendMessageDraftParseMode(previous)
-	}
+	return fieldOption(value, func(params *SendMessageDraftParams) *string {
+		return &params.ParseMode
+	})
 }
 
 // WithSendMessageDraftEntities sets the Entities field.
 //
 // A JSON-serialized list of special entities that appear in message text, which can be specified instead of parse_mode
 func WithSendMessageDraftEntities(value []MessageEntity) SendMessageDraftOption {
-	return func(params *SendMessageDraftParams) SendMessageDraftOption {
-		previous := params.Entities
-		params.Entities = value
-
-		return WithSendMessageDraftEntities(previous)
-	}
+	return fieldOption(value, func(params *SendMessageDraftParams) *[]MessageEntity {
+		return &params.Entities
+	})
 }
 
 // SendMessageDraft calls the sendMessageDraft Telegram Bot API method.
@@ -18892,7 +17005,7 @@ type SendPaidMediaParams struct {
 }
 
 // SendPaidMediaOption configures SendPaidMediaParams.
-type SendPaidMediaOption func(params *SendPaidMediaParams) SendPaidMediaOption
+type SendPaidMediaOption = Option[SendPaidMediaParams]
 
 // Option applies one or more SendPaidMediaOption values and returns the last rollback option.
 func (r *SendPaidMediaParams) Option(opts ...SendPaidMediaOption) (previous SendPaidMediaOption) {
@@ -18906,12 +17019,9 @@ func (r *SendPaidMediaParams) Option(opts ...SendPaidMediaOption) (previous Send
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
 func WithSendPaidMediaBusinessConnectionID(value string) SendPaidMediaOption {
-	return func(params *SendPaidMediaParams) SendPaidMediaOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSendPaidMediaBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SendPaidMediaParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSendPaidMediaChatID sets the ChatID field.
@@ -18920,60 +17030,45 @@ func WithSendPaidMediaBusinessConnectionID(value string) SendPaidMediaOption {
 // If the chat is a channel, all Telegram Star proceeds from this media will be credited to the chat's balance.
 // Otherwise, they will be credited to the bot's balance.
 func WithSendPaidMediaChatID(value string) SendPaidMediaOption {
-	return func(params *SendPaidMediaParams) SendPaidMediaOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendPaidMediaChatID(previous)
-	}
+	return fieldOption(value, func(params *SendPaidMediaParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSendPaidMediaMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithSendPaidMediaMessageThreadID(value int64) SendPaidMediaOption {
-	return func(params *SendPaidMediaParams) SendPaidMediaOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithSendPaidMediaMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *SendPaidMediaParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithSendPaidMediaDirectMessagesTopicID sets the DirectMessagesTopicID field.
 //
 // Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 func WithSendPaidMediaDirectMessagesTopicID(value int64) SendPaidMediaOption {
-	return func(params *SendPaidMediaParams) SendPaidMediaOption {
-		previous := params.DirectMessagesTopicID
-		params.DirectMessagesTopicID = value
-
-		return WithSendPaidMediaDirectMessagesTopicID(previous)
-	}
+	return fieldOption(value, func(params *SendPaidMediaParams) *int64 {
+		return &params.DirectMessagesTopicID
+	})
 }
 
 // WithSendPaidMediaStarCount sets the StarCount field.
 //
 // The number of Telegram Stars that must be paid to buy access to the media; 1-25000
 func WithSendPaidMediaStarCount(value int64) SendPaidMediaOption {
-	return func(params *SendPaidMediaParams) SendPaidMediaOption {
-		previous := params.StarCount
-		params.StarCount = value
-
-		return WithSendPaidMediaStarCount(previous)
-	}
+	return fieldOption(value, func(params *SendPaidMediaParams) *int64 {
+		return &params.StarCount
+	})
 }
 
 // WithSendPaidMediaMedia sets the Media field.
 //
 // A JSON-serialized Array describing the media to be sent; up to 10 items
 func WithSendPaidMediaMedia(value []InputPaidMedia) SendPaidMediaOption {
-	return func(params *SendPaidMediaParams) SendPaidMediaOption {
-		previous := params.Media
-		params.Media = value
-
-		return WithSendPaidMediaMedia(previous)
-	}
+	return fieldOption(value, func(params *SendPaidMediaParams) *[]InputPaidMedia {
+		return &params.Media
+	})
 }
 
 // WithSendPaidMediaPayload sets the Payload field.
@@ -18981,24 +17076,18 @@ func WithSendPaidMediaMedia(value []InputPaidMedia) SendPaidMediaOption {
 // Bot-defined paid media payload, 0-128 bytes.
 // This will not be displayed to the user, use it for your internal processes.
 func WithSendPaidMediaPayload(value string) SendPaidMediaOption {
-	return func(params *SendPaidMediaParams) SendPaidMediaOption {
-		previous := params.Payload
-		params.Payload = value
-
-		return WithSendPaidMediaPayload(previous)
-	}
+	return fieldOption(value, func(params *SendPaidMediaParams) *string {
+		return &params.Payload
+	})
 }
 
 // WithSendPaidMediaCaption sets the Caption field.
 //
 // Media caption, 0-1024 characters after entities parsing
 func WithSendPaidMediaCaption(value string) SendPaidMediaOption {
-	return func(params *SendPaidMediaParams) SendPaidMediaOption {
-		previous := params.Caption
-		params.Caption = value
-
-		return WithSendPaidMediaCaption(previous)
-	}
+	return fieldOption(value, func(params *SendPaidMediaParams) *string {
+		return &params.Caption
+	})
 }
 
 // WithSendPaidMediaParseMode sets the ParseMode field.
@@ -19008,36 +17097,27 @@ func WithSendPaidMediaCaption(value string) SendPaidMediaOption {
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithSendPaidMediaParseMode(value string) SendPaidMediaOption {
-	return func(params *SendPaidMediaParams) SendPaidMediaOption {
-		previous := params.ParseMode
-		params.ParseMode = value
-
-		return WithSendPaidMediaParseMode(previous)
-	}
+	return fieldOption(value, func(params *SendPaidMediaParams) *string {
+		return &params.ParseMode
+	})
 }
 
 // WithSendPaidMediaCaptionEntities sets the CaptionEntities field.
 //
 // A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
 func WithSendPaidMediaCaptionEntities(value []MessageEntity) SendPaidMediaOption {
-	return func(params *SendPaidMediaParams) SendPaidMediaOption {
-		previous := params.CaptionEntities
-		params.CaptionEntities = value
-
-		return WithSendPaidMediaCaptionEntities(previous)
-	}
+	return fieldOption(value, func(params *SendPaidMediaParams) *[]MessageEntity {
+		return &params.CaptionEntities
+	})
 }
 
 // WithSendPaidMediaShowCaptionAboveMedia sets the ShowCaptionAboveMedia field.
 //
 // Pass True if the caption must be shown above the message media
 func WithSendPaidMediaShowCaptionAboveMedia(value bool) SendPaidMediaOption {
-	return func(params *SendPaidMediaParams) SendPaidMediaOption {
-		previous := params.ShowCaptionAboveMedia
-		params.ShowCaptionAboveMedia = value
-
-		return WithSendPaidMediaShowCaptionAboveMedia(previous)
-	}
+	return fieldOption(value, func(params *SendPaidMediaParams) *bool {
+		return &params.ShowCaptionAboveMedia
+	})
 }
 
 // WithSendPaidMediaDisableNotification sets the DisableNotification field.
@@ -19047,24 +17127,18 @@ func WithSendPaidMediaShowCaptionAboveMedia(value bool) SendPaidMediaOption {
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithSendPaidMediaDisableNotification(value bool) SendPaidMediaOption {
-	return func(params *SendPaidMediaParams) SendPaidMediaOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithSendPaidMediaDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *SendPaidMediaParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithSendPaidMediaProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the sent message from forwarding and saving
 func WithSendPaidMediaProtectContent(value bool) SendPaidMediaOption {
-	return func(params *SendPaidMediaParams) SendPaidMediaOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithSendPaidMediaProtectContent(previous)
-	}
+	return fieldOption(value, func(params *SendPaidMediaParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithSendPaidMediaAllowPaidBroadcast sets the AllowPaidBroadcast field.
@@ -19074,12 +17148,9 @@ func WithSendPaidMediaProtectContent(value bool) SendPaidMediaOption {
 //
 // [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
 func WithSendPaidMediaAllowPaidBroadcast(value bool) SendPaidMediaOption {
-	return func(params *SendPaidMediaParams) SendPaidMediaOption {
-		previous := params.AllowPaidBroadcast
-		params.AllowPaidBroadcast = value
-
-		return WithSendPaidMediaAllowPaidBroadcast(previous)
-	}
+	return fieldOption(value, func(params *SendPaidMediaParams) *bool {
+		return &params.AllowPaidBroadcast
+	})
 }
 
 // WithSendPaidMediaSuggestedPostParameters sets the SuggestedPostParameters field.
@@ -19087,24 +17158,18 @@ func WithSendPaidMediaAllowPaidBroadcast(value bool) SendPaidMediaOption {
 // A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only.
 // If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
 func WithSendPaidMediaSuggestedPostParameters(value *SuggestedPostParameters) SendPaidMediaOption {
-	return func(params *SendPaidMediaParams) SendPaidMediaOption {
-		previous := params.SuggestedPostParameters
-		params.SuggestedPostParameters = value
-
-		return WithSendPaidMediaSuggestedPostParameters(previous)
-	}
+	return fieldOption(value, func(params *SendPaidMediaParams) **SuggestedPostParameters {
+		return &params.SuggestedPostParameters
+	})
 }
 
 // WithSendPaidMediaReplyParameters sets the ReplyParameters field.
 //
 // Description of the message to reply to
 func WithSendPaidMediaReplyParameters(value *ReplyParameters) SendPaidMediaOption {
-	return func(params *SendPaidMediaParams) SendPaidMediaOption {
-		previous := params.ReplyParameters
-		params.ReplyParameters = value
-
-		return WithSendPaidMediaReplyParameters(previous)
-	}
+	return fieldOption(value, func(params *SendPaidMediaParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
 }
 
 // WithSendPaidMediaReplyMarkup sets the ReplyMarkup field.
@@ -19115,12 +17180,9 @@ func WithSendPaidMediaReplyParameters(value *ReplyParameters) SendPaidMediaOptio
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 // [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
 func WithSendPaidMediaReplyMarkup(value *ReplyMarkup) SendPaidMediaOption {
-	return func(params *SendPaidMediaParams) SendPaidMediaOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithSendPaidMediaReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *SendPaidMediaParams) **ReplyMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // SendPaidMedia calls the sendPaidMedia Telegram Bot API method.
@@ -19516,7 +17578,7 @@ type SendPhotoParams struct {
 }
 
 // SendPhotoOption configures SendPhotoParams.
-type SendPhotoOption func(params *SendPhotoParams) SendPhotoOption
+type SendPhotoOption = Option[SendPhotoParams]
 
 // Option applies one or more SendPhotoOption values and returns the last rollback option.
 func (r *SendPhotoParams) Option(opts ...SendPhotoOption) (previous SendPhotoOption) {
@@ -19530,48 +17592,36 @@ func (r *SendPhotoParams) Option(opts ...SendPhotoOption) (previous SendPhotoOpt
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
 func WithSendPhotoBusinessConnectionID(value string) SendPhotoOption {
-	return func(params *SendPhotoParams) SendPhotoOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSendPhotoBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SendPhotoParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSendPhotoChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithSendPhotoChatID(value string) SendPhotoOption {
-	return func(params *SendPhotoParams) SendPhotoOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendPhotoChatID(previous)
-	}
+	return fieldOption(value, func(params *SendPhotoParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSendPhotoMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithSendPhotoMessageThreadID(value int64) SendPhotoOption {
-	return func(params *SendPhotoParams) SendPhotoOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithSendPhotoMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *SendPhotoParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithSendPhotoDirectMessagesTopicID sets the DirectMessagesTopicID field.
 //
 // Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 func WithSendPhotoDirectMessagesTopicID(value int64) SendPhotoOption {
-	return func(params *SendPhotoParams) SendPhotoOption {
-		previous := params.DirectMessagesTopicID
-		params.DirectMessagesTopicID = value
-
-		return WithSendPhotoDirectMessagesTopicID(previous)
-	}
+	return fieldOption(value, func(params *SendPhotoParams) *int64 {
+		return &params.DirectMessagesTopicID
+	})
 }
 
 // WithSendPhotoReceiverUserID sets the ReceiverUserID field.
@@ -19582,24 +17632,18 @@ func WithSendPhotoDirectMessagesTopicID(value int64) SendPhotoOption {
 //
 // [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
 func WithSendPhotoReceiverUserID(value int64) SendPhotoOption {
-	return func(params *SendPhotoParams) SendPhotoOption {
-		previous := params.ReceiverUserID
-		params.ReceiverUserID = value
-
-		return WithSendPhotoReceiverUserID(previous)
-	}
+	return fieldOption(value, func(params *SendPhotoParams) *int64 {
+		return &params.ReceiverUserID
+	})
 }
 
 // WithSendPhotoCallbackQueryID sets the CallbackQueryID field.
 //
 // For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
 func WithSendPhotoCallbackQueryID(value string) SendPhotoOption {
-	return func(params *SendPhotoParams) SendPhotoOption {
-		previous := params.CallbackQueryID
-		params.CallbackQueryID = value
-
-		return WithSendPhotoCallbackQueryID(previous)
-	}
+	return fieldOption(value, func(params *SendPhotoParams) *string {
+		return &params.CallbackQueryID
+	})
 }
 
 // WithSendPhotoPhoto sets the Photo field.
@@ -19613,24 +17657,18 @@ func WithSendPhotoCallbackQueryID(value string) SendPhotoOption {
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
 func WithSendPhotoPhoto(value InputFile) SendPhotoOption {
-	return func(params *SendPhotoParams) SendPhotoOption {
-		previous := params.Photo
-		params.Photo = value
-
-		return WithSendPhotoPhoto(previous)
-	}
+	return fieldOption(value, func(params *SendPhotoParams) *InputFile {
+		return &params.Photo
+	})
 }
 
 // WithSendPhotoCaption sets the Caption field.
 //
 // Photo caption (may also be used when resending photos by file_id), 0-1024 characters after entities parsing
 func WithSendPhotoCaption(value string) SendPhotoOption {
-	return func(params *SendPhotoParams) SendPhotoOption {
-		previous := params.Caption
-		params.Caption = value
-
-		return WithSendPhotoCaption(previous)
-	}
+	return fieldOption(value, func(params *SendPhotoParams) *string {
+		return &params.Caption
+	})
 }
 
 // WithSendPhotoParseMode sets the ParseMode field.
@@ -19640,48 +17678,36 @@ func WithSendPhotoCaption(value string) SendPhotoOption {
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithSendPhotoParseMode(value string) SendPhotoOption {
-	return func(params *SendPhotoParams) SendPhotoOption {
-		previous := params.ParseMode
-		params.ParseMode = value
-
-		return WithSendPhotoParseMode(previous)
-	}
+	return fieldOption(value, func(params *SendPhotoParams) *string {
+		return &params.ParseMode
+	})
 }
 
 // WithSendPhotoCaptionEntities sets the CaptionEntities field.
 //
 // A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
 func WithSendPhotoCaptionEntities(value []MessageEntity) SendPhotoOption {
-	return func(params *SendPhotoParams) SendPhotoOption {
-		previous := params.CaptionEntities
-		params.CaptionEntities = value
-
-		return WithSendPhotoCaptionEntities(previous)
-	}
+	return fieldOption(value, func(params *SendPhotoParams) *[]MessageEntity {
+		return &params.CaptionEntities
+	})
 }
 
 // WithSendPhotoShowCaptionAboveMedia sets the ShowCaptionAboveMedia field.
 //
 // Pass True if the caption must be shown above the message media
 func WithSendPhotoShowCaptionAboveMedia(value bool) SendPhotoOption {
-	return func(params *SendPhotoParams) SendPhotoOption {
-		previous := params.ShowCaptionAboveMedia
-		params.ShowCaptionAboveMedia = value
-
-		return WithSendPhotoShowCaptionAboveMedia(previous)
-	}
+	return fieldOption(value, func(params *SendPhotoParams) *bool {
+		return &params.ShowCaptionAboveMedia
+	})
 }
 
 // WithSendPhotoHasSpoiler sets the HasSpoiler field.
 //
 // Pass True if the photo needs to be covered with a spoiler animation
 func WithSendPhotoHasSpoiler(value bool) SendPhotoOption {
-	return func(params *SendPhotoParams) SendPhotoOption {
-		previous := params.HasSpoiler
-		params.HasSpoiler = value
-
-		return WithSendPhotoHasSpoiler(previous)
-	}
+	return fieldOption(value, func(params *SendPhotoParams) *bool {
+		return &params.HasSpoiler
+	})
 }
 
 // WithSendPhotoDisableNotification sets the DisableNotification field.
@@ -19691,24 +17717,18 @@ func WithSendPhotoHasSpoiler(value bool) SendPhotoOption {
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithSendPhotoDisableNotification(value bool) SendPhotoOption {
-	return func(params *SendPhotoParams) SendPhotoOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithSendPhotoDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *SendPhotoParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithSendPhotoProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the sent message from forwarding and saving
 func WithSendPhotoProtectContent(value bool) SendPhotoOption {
-	return func(params *SendPhotoParams) SendPhotoOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithSendPhotoProtectContent(previous)
-	}
+	return fieldOption(value, func(params *SendPhotoParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithSendPhotoAllowPaidBroadcast sets the AllowPaidBroadcast field.
@@ -19718,24 +17738,18 @@ func WithSendPhotoProtectContent(value bool) SendPhotoOption {
 //
 // [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
 func WithSendPhotoAllowPaidBroadcast(value bool) SendPhotoOption {
-	return func(params *SendPhotoParams) SendPhotoOption {
-		previous := params.AllowPaidBroadcast
-		params.AllowPaidBroadcast = value
-
-		return WithSendPhotoAllowPaidBroadcast(previous)
-	}
+	return fieldOption(value, func(params *SendPhotoParams) *bool {
+		return &params.AllowPaidBroadcast
+	})
 }
 
 // WithSendPhotoMessageEffectID sets the MessageEffectID field.
 //
 // Unique identifier of the message effect to be added to the message; for private chats only
 func WithSendPhotoMessageEffectID(value string) SendPhotoOption {
-	return func(params *SendPhotoParams) SendPhotoOption {
-		previous := params.MessageEffectID
-		params.MessageEffectID = value
-
-		return WithSendPhotoMessageEffectID(previous)
-	}
+	return fieldOption(value, func(params *SendPhotoParams) *string {
+		return &params.MessageEffectID
+	})
 }
 
 // WithSendPhotoSuggestedPostParameters sets the SuggestedPostParameters field.
@@ -19743,24 +17757,18 @@ func WithSendPhotoMessageEffectID(value string) SendPhotoOption {
 // A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only.
 // If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
 func WithSendPhotoSuggestedPostParameters(value *SuggestedPostParameters) SendPhotoOption {
-	return func(params *SendPhotoParams) SendPhotoOption {
-		previous := params.SuggestedPostParameters
-		params.SuggestedPostParameters = value
-
-		return WithSendPhotoSuggestedPostParameters(previous)
-	}
+	return fieldOption(value, func(params *SendPhotoParams) **SuggestedPostParameters {
+		return &params.SuggestedPostParameters
+	})
 }
 
 // WithSendPhotoReplyParameters sets the ReplyParameters field.
 //
 // Description of the message to reply to
 func WithSendPhotoReplyParameters(value *ReplyParameters) SendPhotoOption {
-	return func(params *SendPhotoParams) SendPhotoOption {
-		previous := params.ReplyParameters
-		params.ReplyParameters = value
-
-		return WithSendPhotoReplyParameters(previous)
-	}
+	return fieldOption(value, func(params *SendPhotoParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
 }
 
 // WithSendPhotoReplyMarkup sets the ReplyMarkup field.
@@ -19771,12 +17779,9 @@ func WithSendPhotoReplyParameters(value *ReplyParameters) SendPhotoOption {
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 // [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
 func WithSendPhotoReplyMarkup(value *ReplyMarkup) SendPhotoOption {
-	return func(params *SendPhotoParams) SendPhotoOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithSendPhotoReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *SendPhotoParams) **ReplyMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // SendPhoto calls the sendPhoto Telegram Bot API method.
@@ -20172,7 +18177,7 @@ type SendPollParams struct {
 }
 
 // SendPollOption configures SendPollParams.
-type SendPollOption func(params *SendPollParams) SendPollOption
+type SendPollOption = Option[SendPollParams]
 
 // Option applies one or more SendPollOption values and returns the last rollback option.
 func (r *SendPollParams) Option(opts ...SendPollOption) (previous SendPollOption) {
@@ -20186,12 +18191,9 @@ func (r *SendPollParams) Option(opts ...SendPollOption) (previous SendPollOption
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
 func WithSendPollBusinessConnectionID(value string) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSendPollBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSendPollChatID sets the ChatID field.
@@ -20199,36 +18201,27 @@ func WithSendPollBusinessConnectionID(value string) SendPollOption {
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
 // Polls can't be sent to channel direct messages chats.
 func WithSendPollChatID(value string) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendPollChatID(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSendPollMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithSendPollMessageThreadID(value int64) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithSendPollMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithSendPollQuestion sets the Question field.
 //
 // Poll question, 1-300 characters
 func WithSendPollQuestion(value string) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.Question
-		params.Question = value
-
-		return WithSendPollQuestion(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *string {
+		return &params.Question
+	})
 }
 
 // WithSendPollQuestionParseMode sets the QuestionParseMode field.
@@ -20239,12 +18232,9 @@ func WithSendPollQuestion(value string) SendPollOption {
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithSendPollQuestionParseMode(value string) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.QuestionParseMode
-		params.QuestionParseMode = value
-
-		return WithSendPollQuestionParseMode(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *string {
+		return &params.QuestionParseMode
+	})
 }
 
 // WithSendPollQuestionEntities sets the QuestionEntities field.
@@ -20252,120 +18242,90 @@ func WithSendPollQuestionParseMode(value string) SendPollOption {
 // A JSON-serialized list of special entities that appear in the poll question.
 // It can be specified instead of question_parse_mode.
 func WithSendPollQuestionEntities(value []MessageEntity) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.QuestionEntities
-		params.QuestionEntities = value
-
-		return WithSendPollQuestionEntities(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *[]MessageEntity {
+		return &params.QuestionEntities
+	})
 }
 
 // WithSendPollOptions sets the Options field.
 //
 // A JSON-serialized list of 1-12 answer options
 func WithSendPollOptions(value []InputPollOption) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.Options
-		params.Options = value
-
-		return WithSendPollOptions(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *[]InputPollOption {
+		return &params.Options
+	})
 }
 
 // WithSendPollIsAnonymous sets the IsAnonymous field.
 //
 // True, if the poll needs to be anonymous, defaults to True
 func WithSendPollIsAnonymous(value bool) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.IsAnonymous
-		params.IsAnonymous = value
-
-		return WithSendPollIsAnonymous(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *bool {
+		return &params.IsAnonymous
+	})
 }
 
 // WithSendPollType sets the Type field.
 //
 // Poll type, “quiz” or “regular”, defaults to “regular”
 func WithSendPollType(value string) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.Type
-		params.Type = value
-
-		return WithSendPollType(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *string {
+		return &params.Type
+	})
 }
 
 // WithSendPollAllowsMultipleAnswers sets the AllowsMultipleAnswers field.
 //
 // Pass True if the poll allows multiple answers, defaults to False
 func WithSendPollAllowsMultipleAnswers(value bool) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.AllowsMultipleAnswers
-		params.AllowsMultipleAnswers = value
-
-		return WithSendPollAllowsMultipleAnswers(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *bool {
+		return &params.AllowsMultipleAnswers
+	})
 }
 
 // WithSendPollAllowsRevoting sets the AllowsRevoting field.
 //
 // Pass True if the poll allows to change chosen answer options, defaults to False for quizzes and to True for regular polls
 func WithSendPollAllowsRevoting(value bool) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.AllowsRevoting
-		params.AllowsRevoting = value
-
-		return WithSendPollAllowsRevoting(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *bool {
+		return &params.AllowsRevoting
+	})
 }
 
 // WithSendPollShuffleOptions sets the ShuffleOptions field.
 //
 // Pass True if the poll options must be shown in random order
 func WithSendPollShuffleOptions(value bool) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.ShuffleOptions
-		params.ShuffleOptions = value
-
-		return WithSendPollShuffleOptions(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *bool {
+		return &params.ShuffleOptions
+	})
 }
 
 // WithSendPollAllowAddingOptions sets the AllowAddingOptions field.
 //
 // Pass True if answer options can be added to the poll after creation; not supported for anonymous polls and quizzes
 func WithSendPollAllowAddingOptions(value bool) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.AllowAddingOptions
-		params.AllowAddingOptions = value
-
-		return WithSendPollAllowAddingOptions(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *bool {
+		return &params.AllowAddingOptions
+	})
 }
 
 // WithSendPollHideResultsUntilCloses sets the HideResultsUntilCloses field.
 //
 // Pass True if poll results must be shown only after the poll closes
 func WithSendPollHideResultsUntilCloses(value bool) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.HideResultsUntilCloses
-		params.HideResultsUntilCloses = value
-
-		return WithSendPollHideResultsUntilCloses(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *bool {
+		return &params.HideResultsUntilCloses
+	})
 }
 
 // WithSendPollMembersOnly sets the MembersOnly field.
 //
 // Pass True if voting is limited to users who have been members of the chat where the poll is being sent for more than 24 hours; for channel chats only
 func WithSendPollMembersOnly(value bool) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.MembersOnly
-		params.MembersOnly = value
-
-		return WithSendPollMembersOnly(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *bool {
+		return &params.MembersOnly
+	})
 }
 
 // WithSendPollCountryCodes sets the CountryCodes field.
@@ -20376,36 +18336,27 @@ func WithSendPollMembersOnly(value bool) SendPollOption {
 //
 // [ISO 3166-1 alpha-2]: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
 func WithSendPollCountryCodes(value []string) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.CountryCodes
-		params.CountryCodes = value
-
-		return WithSendPollCountryCodes(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *[]string {
+		return &params.CountryCodes
+	})
 }
 
 // WithSendPollCorrectOptionIDs sets the CorrectOptionIDs field.
 //
 // A JSON-serialized list of monotonically increasing 0-based identifiers of the correct answer options, required for polls in quiz mode
 func WithSendPollCorrectOptionIDs(value []int64) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.CorrectOptionIDs
-		params.CorrectOptionIDs = value
-
-		return WithSendPollCorrectOptionIDs(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *[]int64 {
+		return &params.CorrectOptionIDs
+	})
 }
 
 // WithSendPollExplanation sets the Explanation field.
 //
 // Text that is shown when a user chooses an incorrect answer or taps on the lamp icon in a quiz-style poll, 0-200 characters with at most 2 line feeds after entities parsing
 func WithSendPollExplanation(value string) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.Explanation
-		params.Explanation = value
-
-		return WithSendPollExplanation(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *string {
+		return &params.Explanation
+	})
 }
 
 // WithSendPollExplanationParseMode sets the ExplanationParseMode field.
@@ -20415,12 +18366,9 @@ func WithSendPollExplanation(value string) SendPollOption {
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithSendPollExplanationParseMode(value string) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.ExplanationParseMode
-		params.ExplanationParseMode = value
-
-		return WithSendPollExplanationParseMode(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *string {
+		return &params.ExplanationParseMode
+	})
 }
 
 // WithSendPollExplanationEntities sets the ExplanationEntities field.
@@ -20428,24 +18376,18 @@ func WithSendPollExplanationParseMode(value string) SendPollOption {
 // A JSON-serialized list of special entities that appear in the poll explanation.
 // It can be specified instead of explanation_parse_mode.
 func WithSendPollExplanationEntities(value []MessageEntity) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.ExplanationEntities
-		params.ExplanationEntities = value
-
-		return WithSendPollExplanationEntities(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *[]MessageEntity {
+		return &params.ExplanationEntities
+	})
 }
 
 // WithSendPollExplanationMedia sets the ExplanationMedia field.
 //
 // Media added to the quiz explanation
 func WithSendPollExplanationMedia(value *InputPollMedia) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.ExplanationMedia
-		params.ExplanationMedia = value
-
-		return WithSendPollExplanationMedia(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) **InputPollMedia {
+		return &params.ExplanationMedia
+	})
 }
 
 // WithSendPollOpenPeriod sets the OpenPeriod field.
@@ -20453,12 +18395,9 @@ func WithSendPollExplanationMedia(value *InputPollMedia) SendPollOption {
 // Amount of time in seconds the poll will be active after creation, 5-2628000.
 // Can't be used together with close_date.
 func WithSendPollOpenPeriod(value int64) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.OpenPeriod
-		params.OpenPeriod = value
-
-		return WithSendPollOpenPeriod(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *int64 {
+		return &params.OpenPeriod
+	})
 }
 
 // WithSendPollCloseDate sets the CloseDate field.
@@ -20467,12 +18406,9 @@ func WithSendPollOpenPeriod(value int64) SendPollOption {
 // Must be at least 5 and no more than 2628000 seconds in the future.
 // Can't be used together with open_period.
 func WithSendPollCloseDate(value int64) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.CloseDate
-		params.CloseDate = value
-
-		return WithSendPollCloseDate(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *int64 {
+		return &params.CloseDate
+	})
 }
 
 // WithSendPollIsClosed sets the IsClosed field.
@@ -20480,24 +18416,18 @@ func WithSendPollCloseDate(value int64) SendPollOption {
 // Pass True if the poll needs to be immediately closed.
 // This can be useful for poll preview.
 func WithSendPollIsClosed(value bool) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.IsClosed
-		params.IsClosed = value
-
-		return WithSendPollIsClosed(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *bool {
+		return &params.IsClosed
+	})
 }
 
 // WithSendPollDescription sets the Description field.
 //
 // Description of the poll to be sent, 0-1024 characters after entities parsing
 func WithSendPollDescription(value string) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.Description
-		params.Description = value
-
-		return WithSendPollDescription(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *string {
+		return &params.Description
+	})
 }
 
 // WithSendPollDescriptionParseMode sets the DescriptionParseMode field.
@@ -20507,36 +18437,27 @@ func WithSendPollDescription(value string) SendPollOption {
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithSendPollDescriptionParseMode(value string) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.DescriptionParseMode
-		params.DescriptionParseMode = value
-
-		return WithSendPollDescriptionParseMode(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *string {
+		return &params.DescriptionParseMode
+	})
 }
 
 // WithSendPollDescriptionEntities sets the DescriptionEntities field.
 //
 // A JSON-serialized list of special entities that appear in the poll description, which can be specified instead of description_parse_mode
 func WithSendPollDescriptionEntities(value []MessageEntity) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.DescriptionEntities
-		params.DescriptionEntities = value
-
-		return WithSendPollDescriptionEntities(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *[]MessageEntity {
+		return &params.DescriptionEntities
+	})
 }
 
 // WithSendPollMedia sets the Media field.
 //
 // Media added to the poll description
 func WithSendPollMedia(value *InputPollMedia) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.Media
-		params.Media = value
-
-		return WithSendPollMedia(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) **InputPollMedia {
+		return &params.Media
+	})
 }
 
 // WithSendPollDisableNotification sets the DisableNotification field.
@@ -20546,24 +18467,18 @@ func WithSendPollMedia(value *InputPollMedia) SendPollOption {
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithSendPollDisableNotification(value bool) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithSendPollDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithSendPollProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the sent message from forwarding and saving
 func WithSendPollProtectContent(value bool) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithSendPollProtectContent(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithSendPollAllowPaidBroadcast sets the AllowPaidBroadcast field.
@@ -20573,36 +18488,27 @@ func WithSendPollProtectContent(value bool) SendPollOption {
 //
 // [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
 func WithSendPollAllowPaidBroadcast(value bool) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.AllowPaidBroadcast
-		params.AllowPaidBroadcast = value
-
-		return WithSendPollAllowPaidBroadcast(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *bool {
+		return &params.AllowPaidBroadcast
+	})
 }
 
 // WithSendPollMessageEffectID sets the MessageEffectID field.
 //
 // Unique identifier of the message effect to be added to the message; for private chats only
 func WithSendPollMessageEffectID(value string) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.MessageEffectID
-		params.MessageEffectID = value
-
-		return WithSendPollMessageEffectID(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) *string {
+		return &params.MessageEffectID
+	})
 }
 
 // WithSendPollReplyParameters sets the ReplyParameters field.
 //
 // Description of the message to reply to
 func WithSendPollReplyParameters(value *ReplyParameters) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.ReplyParameters
-		params.ReplyParameters = value
-
-		return WithSendPollReplyParameters(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
 }
 
 // WithSendPollReplyMarkup sets the ReplyMarkup field.
@@ -20613,12 +18519,9 @@ func WithSendPollReplyParameters(value *ReplyParameters) SendPollOption {
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 // [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
 func WithSendPollReplyMarkup(value *ReplyMarkup) SendPollOption {
-	return func(params *SendPollParams) SendPollOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithSendPollReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *SendPollParams) **ReplyMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // SendPoll calls the sendPoll Telegram Bot API method.
@@ -21345,7 +19248,7 @@ type SendRichMessageParams struct {
 }
 
 // SendRichMessageOption configures SendRichMessageParams.
-type SendRichMessageOption func(params *SendRichMessageParams) SendRichMessageOption
+type SendRichMessageOption = Option[SendRichMessageParams]
 
 // Option applies one or more SendRichMessageOption values and returns the last rollback option.
 func (r *SendRichMessageParams) Option(opts ...SendRichMessageOption) (previous SendRichMessageOption) {
@@ -21360,60 +19263,45 @@ func (r *SendRichMessageParams) Option(opts ...SendRichMessageOption) (previous 
 // Unique identifier of the business connection on behalf of which the message will be sent.
 // Bot can send rich messages on behalf of a business account only if the corresponding user can send rich messages.
 func WithSendRichMessageBusinessConnectionID(value string) SendRichMessageOption {
-	return func(params *SendRichMessageParams) SendRichMessageOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSendRichMessageBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SendRichMessageParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSendRichMessageChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithSendRichMessageChatID(value string) SendRichMessageOption {
-	return func(params *SendRichMessageParams) SendRichMessageOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendRichMessageChatID(previous)
-	}
+	return fieldOption(value, func(params *SendRichMessageParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSendRichMessageMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithSendRichMessageMessageThreadID(value int64) SendRichMessageOption {
-	return func(params *SendRichMessageParams) SendRichMessageOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithSendRichMessageMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *SendRichMessageParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithSendRichMessageDirectMessagesTopicID sets the DirectMessagesTopicID field.
 //
 // Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 func WithSendRichMessageDirectMessagesTopicID(value int64) SendRichMessageOption {
-	return func(params *SendRichMessageParams) SendRichMessageOption {
-		previous := params.DirectMessagesTopicID
-		params.DirectMessagesTopicID = value
-
-		return WithSendRichMessageDirectMessagesTopicID(previous)
-	}
+	return fieldOption(value, func(params *SendRichMessageParams) *int64 {
+		return &params.DirectMessagesTopicID
+	})
 }
 
 // WithSendRichMessageRichMessage sets the RichMessage field.
 //
 // The message to be sent
 func WithSendRichMessageRichMessage(value InputRichMessage) SendRichMessageOption {
-	return func(params *SendRichMessageParams) SendRichMessageOption {
-		previous := params.RichMessage
-		params.RichMessage = value
-
-		return WithSendRichMessageRichMessage(previous)
-	}
+	return fieldOption(value, func(params *SendRichMessageParams) *InputRichMessage {
+		return &params.RichMessage
+	})
 }
 
 // WithSendRichMessageDisableNotification sets the DisableNotification field.
@@ -21423,24 +19311,18 @@ func WithSendRichMessageRichMessage(value InputRichMessage) SendRichMessageOptio
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithSendRichMessageDisableNotification(value bool) SendRichMessageOption {
-	return func(params *SendRichMessageParams) SendRichMessageOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithSendRichMessageDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *SendRichMessageParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithSendRichMessageProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the sent message from forwarding and saving
 func WithSendRichMessageProtectContent(value bool) SendRichMessageOption {
-	return func(params *SendRichMessageParams) SendRichMessageOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithSendRichMessageProtectContent(previous)
-	}
+	return fieldOption(value, func(params *SendRichMessageParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithSendRichMessageAllowPaidBroadcast sets the AllowPaidBroadcast field.
@@ -21450,24 +19332,18 @@ func WithSendRichMessageProtectContent(value bool) SendRichMessageOption {
 //
 // [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
 func WithSendRichMessageAllowPaidBroadcast(value bool) SendRichMessageOption {
-	return func(params *SendRichMessageParams) SendRichMessageOption {
-		previous := params.AllowPaidBroadcast
-		params.AllowPaidBroadcast = value
-
-		return WithSendRichMessageAllowPaidBroadcast(previous)
-	}
+	return fieldOption(value, func(params *SendRichMessageParams) *bool {
+		return &params.AllowPaidBroadcast
+	})
 }
 
 // WithSendRichMessageMessageEffectID sets the MessageEffectID field.
 //
 // Unique identifier of the message effect to be added to the message; for private chats only
 func WithSendRichMessageMessageEffectID(value string) SendRichMessageOption {
-	return func(params *SendRichMessageParams) SendRichMessageOption {
-		previous := params.MessageEffectID
-		params.MessageEffectID = value
-
-		return WithSendRichMessageMessageEffectID(previous)
-	}
+	return fieldOption(value, func(params *SendRichMessageParams) *string {
+		return &params.MessageEffectID
+	})
 }
 
 // WithSendRichMessageSuggestedPostParameters sets the SuggestedPostParameters field.
@@ -21475,24 +19351,18 @@ func WithSendRichMessageMessageEffectID(value string) SendRichMessageOption {
 // A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only.
 // If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
 func WithSendRichMessageSuggestedPostParameters(value *SuggestedPostParameters) SendRichMessageOption {
-	return func(params *SendRichMessageParams) SendRichMessageOption {
-		previous := params.SuggestedPostParameters
-		params.SuggestedPostParameters = value
-
-		return WithSendRichMessageSuggestedPostParameters(previous)
-	}
+	return fieldOption(value, func(params *SendRichMessageParams) **SuggestedPostParameters {
+		return &params.SuggestedPostParameters
+	})
 }
 
 // WithSendRichMessageReplyParameters sets the ReplyParameters field.
 //
 // Description of the message to reply to
 func WithSendRichMessageReplyParameters(value *ReplyParameters) SendRichMessageOption {
-	return func(params *SendRichMessageParams) SendRichMessageOption {
-		previous := params.ReplyParameters
-		params.ReplyParameters = value
-
-		return WithSendRichMessageReplyParameters(previous)
-	}
+	return fieldOption(value, func(params *SendRichMessageParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
 }
 
 // WithSendRichMessageReplyMarkup sets the ReplyMarkup field.
@@ -21503,12 +19373,9 @@ func WithSendRichMessageReplyParameters(value *ReplyParameters) SendRichMessageO
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 // [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
 func WithSendRichMessageReplyMarkup(value *ReplyMarkup) SendRichMessageOption {
-	return func(params *SendRichMessageParams) SendRichMessageOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithSendRichMessageReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *SendRichMessageParams) **ReplyMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // SendRichMessage calls the sendRichMessage Telegram Bot API method.
@@ -21564,7 +19431,7 @@ type SendRichMessageDraftParams struct {
 }
 
 // SendRichMessageDraftOption configures SendRichMessageDraftParams.
-type SendRichMessageDraftOption func(params *SendRichMessageDraftParams) SendRichMessageDraftOption
+type SendRichMessageDraftOption = Option[SendRichMessageDraftParams]
 
 // Option applies one or more SendRichMessageDraftOption values and returns the last rollback option.
 func (r *SendRichMessageDraftParams) Option(opts ...SendRichMessageDraftOption) (previous SendRichMessageDraftOption) {
@@ -21578,24 +19445,18 @@ func (r *SendRichMessageDraftParams) Option(opts ...SendRichMessageDraftOption) 
 //
 // Unique identifier for the target private chat
 func WithSendRichMessageDraftChatID(value int64) SendRichMessageDraftOption {
-	return func(params *SendRichMessageDraftParams) SendRichMessageDraftOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendRichMessageDraftChatID(previous)
-	}
+	return fieldOption(value, func(params *SendRichMessageDraftParams) *int64 {
+		return &params.ChatID
+	})
 }
 
 // WithSendRichMessageDraftMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread
 func WithSendRichMessageDraftMessageThreadID(value int64) SendRichMessageDraftOption {
-	return func(params *SendRichMessageDraftParams) SendRichMessageDraftOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithSendRichMessageDraftMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *SendRichMessageDraftParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithSendRichMessageDraftDraftID sets the DraftID field.
@@ -21603,12 +19464,9 @@ func WithSendRichMessageDraftMessageThreadID(value int64) SendRichMessageDraftOp
 // Unique identifier of the message draft; must be non-zero.
 // Changes to drafts with the same identifier are animated.
 func WithSendRichMessageDraftDraftID(value int64) SendRichMessageDraftOption {
-	return func(params *SendRichMessageDraftParams) SendRichMessageDraftOption {
-		previous := params.DraftID
-		params.DraftID = value
-
-		return WithSendRichMessageDraftDraftID(previous)
-	}
+	return fieldOption(value, func(params *SendRichMessageDraftParams) *int64 {
+		return &params.DraftID
+	})
 }
 
 // WithSendRichMessageDraftRichMessage sets the RichMessage field.
@@ -21616,12 +19474,9 @@ func WithSendRichMessageDraftDraftID(value int64) SendRichMessageDraftOption {
 // The partial message to be streamed.
 // Direct upload of new files isn't supported.
 func WithSendRichMessageDraftRichMessage(value InputRichMessage) SendRichMessageDraftOption {
-	return func(params *SendRichMessageDraftParams) SendRichMessageDraftOption {
-		previous := params.RichMessage
-		params.RichMessage = value
-
-		return WithSendRichMessageDraftRichMessage(previous)
-	}
+	return fieldOption(value, func(params *SendRichMessageDraftParams) *InputRichMessage {
+		return &params.RichMessage
+	})
 }
 
 // SendRichMessageDraft calls the sendRichMessageDraft Telegram Bot API method.
@@ -21727,7 +19582,7 @@ type SendStickerParams struct {
 }
 
 // SendStickerOption configures SendStickerParams.
-type SendStickerOption func(params *SendStickerParams) SendStickerOption
+type SendStickerOption = Option[SendStickerParams]
 
 // Option applies one or more SendStickerOption values and returns the last rollback option.
 func (r *SendStickerParams) Option(opts ...SendStickerOption) (previous SendStickerOption) {
@@ -21741,48 +19596,36 @@ func (r *SendStickerParams) Option(opts ...SendStickerOption) (previous SendStic
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
 func WithSendStickerBusinessConnectionID(value string) SendStickerOption {
-	return func(params *SendStickerParams) SendStickerOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSendStickerBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SendStickerParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSendStickerChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithSendStickerChatID(value string) SendStickerOption {
-	return func(params *SendStickerParams) SendStickerOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendStickerChatID(previous)
-	}
+	return fieldOption(value, func(params *SendStickerParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSendStickerMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithSendStickerMessageThreadID(value int64) SendStickerOption {
-	return func(params *SendStickerParams) SendStickerOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithSendStickerMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *SendStickerParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithSendStickerDirectMessagesTopicID sets the DirectMessagesTopicID field.
 //
 // Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 func WithSendStickerDirectMessagesTopicID(value int64) SendStickerOption {
-	return func(params *SendStickerParams) SendStickerOption {
-		previous := params.DirectMessagesTopicID
-		params.DirectMessagesTopicID = value
-
-		return WithSendStickerDirectMessagesTopicID(previous)
-	}
+	return fieldOption(value, func(params *SendStickerParams) *int64 {
+		return &params.DirectMessagesTopicID
+	})
 }
 
 // WithSendStickerReceiverUserID sets the ReceiverUserID field.
@@ -21793,24 +19636,18 @@ func WithSendStickerDirectMessagesTopicID(value int64) SendStickerOption {
 //
 // [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
 func WithSendStickerReceiverUserID(value int64) SendStickerOption {
-	return func(params *SendStickerParams) SendStickerOption {
-		previous := params.ReceiverUserID
-		params.ReceiverUserID = value
-
-		return WithSendStickerReceiverUserID(previous)
-	}
+	return fieldOption(value, func(params *SendStickerParams) *int64 {
+		return &params.ReceiverUserID
+	})
 }
 
 // WithSendStickerCallbackQueryID sets the CallbackQueryID field.
 //
 // For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
 func WithSendStickerCallbackQueryID(value string) SendStickerOption {
-	return func(params *SendStickerParams) SendStickerOption {
-		previous := params.CallbackQueryID
-		params.CallbackQueryID = value
-
-		return WithSendStickerCallbackQueryID(previous)
-	}
+	return fieldOption(value, func(params *SendStickerParams) *string {
+		return &params.CallbackQueryID
+	})
 }
 
 // WithSendStickerSticker sets the Sticker field.
@@ -21822,24 +19659,18 @@ func WithSendStickerCallbackQueryID(value string) SendStickerOption {
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
 func WithSendStickerSticker(value InputFile) SendStickerOption {
-	return func(params *SendStickerParams) SendStickerOption {
-		previous := params.Sticker
-		params.Sticker = value
-
-		return WithSendStickerSticker(previous)
-	}
+	return fieldOption(value, func(params *SendStickerParams) *InputFile {
+		return &params.Sticker
+	})
 }
 
 // WithSendStickerEmoji sets the Emoji field.
 //
 // Emoji associated with the sticker; only for just uploaded stickers
 func WithSendStickerEmoji(value string) SendStickerOption {
-	return func(params *SendStickerParams) SendStickerOption {
-		previous := params.Emoji
-		params.Emoji = value
-
-		return WithSendStickerEmoji(previous)
-	}
+	return fieldOption(value, func(params *SendStickerParams) *string {
+		return &params.Emoji
+	})
 }
 
 // WithSendStickerDisableNotification sets the DisableNotification field.
@@ -21849,24 +19680,18 @@ func WithSendStickerEmoji(value string) SendStickerOption {
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithSendStickerDisableNotification(value bool) SendStickerOption {
-	return func(params *SendStickerParams) SendStickerOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithSendStickerDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *SendStickerParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithSendStickerProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the sent message from forwarding and saving
 func WithSendStickerProtectContent(value bool) SendStickerOption {
-	return func(params *SendStickerParams) SendStickerOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithSendStickerProtectContent(previous)
-	}
+	return fieldOption(value, func(params *SendStickerParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithSendStickerAllowPaidBroadcast sets the AllowPaidBroadcast field.
@@ -21876,24 +19701,18 @@ func WithSendStickerProtectContent(value bool) SendStickerOption {
 //
 // [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
 func WithSendStickerAllowPaidBroadcast(value bool) SendStickerOption {
-	return func(params *SendStickerParams) SendStickerOption {
-		previous := params.AllowPaidBroadcast
-		params.AllowPaidBroadcast = value
-
-		return WithSendStickerAllowPaidBroadcast(previous)
-	}
+	return fieldOption(value, func(params *SendStickerParams) *bool {
+		return &params.AllowPaidBroadcast
+	})
 }
 
 // WithSendStickerMessageEffectID sets the MessageEffectID field.
 //
 // Unique identifier of the message effect to be added to the message; for private chats only
 func WithSendStickerMessageEffectID(value string) SendStickerOption {
-	return func(params *SendStickerParams) SendStickerOption {
-		previous := params.MessageEffectID
-		params.MessageEffectID = value
-
-		return WithSendStickerMessageEffectID(previous)
-	}
+	return fieldOption(value, func(params *SendStickerParams) *string {
+		return &params.MessageEffectID
+	})
 }
 
 // WithSendStickerSuggestedPostParameters sets the SuggestedPostParameters field.
@@ -21901,24 +19720,18 @@ func WithSendStickerMessageEffectID(value string) SendStickerOption {
 // A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only.
 // If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
 func WithSendStickerSuggestedPostParameters(value *SuggestedPostParameters) SendStickerOption {
-	return func(params *SendStickerParams) SendStickerOption {
-		previous := params.SuggestedPostParameters
-		params.SuggestedPostParameters = value
-
-		return WithSendStickerSuggestedPostParameters(previous)
-	}
+	return fieldOption(value, func(params *SendStickerParams) **SuggestedPostParameters {
+		return &params.SuggestedPostParameters
+	})
 }
 
 // WithSendStickerReplyParameters sets the ReplyParameters field.
 //
 // Description of the message to reply to
 func WithSendStickerReplyParameters(value *ReplyParameters) SendStickerOption {
-	return func(params *SendStickerParams) SendStickerOption {
-		previous := params.ReplyParameters
-		params.ReplyParameters = value
-
-		return WithSendStickerReplyParameters(previous)
-	}
+	return fieldOption(value, func(params *SendStickerParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
 }
 
 // WithSendStickerReplyMarkup sets the ReplyMarkup field.
@@ -21929,12 +19742,9 @@ func WithSendStickerReplyParameters(value *ReplyParameters) SendStickerOption {
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 // [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
 func WithSendStickerReplyMarkup(value *ReplyMarkup) SendStickerOption {
-	return func(params *SendStickerParams) SendStickerOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithSendStickerReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *SendStickerParams) **ReplyMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // SendSticker calls the sendSticker Telegram Bot API method.
@@ -22238,7 +20048,7 @@ type SendVenueParams struct {
 }
 
 // SendVenueOption configures SendVenueParams.
-type SendVenueOption func(params *SendVenueParams) SendVenueOption
+type SendVenueOption = Option[SendVenueParams]
 
 // Option applies one or more SendVenueOption values and returns the last rollback option.
 func (r *SendVenueParams) Option(opts ...SendVenueOption) (previous SendVenueOption) {
@@ -22252,48 +20062,36 @@ func (r *SendVenueParams) Option(opts ...SendVenueOption) (previous SendVenueOpt
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
 func WithSendVenueBusinessConnectionID(value string) SendVenueOption {
-	return func(params *SendVenueParams) SendVenueOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSendVenueBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SendVenueParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSendVenueChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithSendVenueChatID(value string) SendVenueOption {
-	return func(params *SendVenueParams) SendVenueOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendVenueChatID(previous)
-	}
+	return fieldOption(value, func(params *SendVenueParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSendVenueMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithSendVenueMessageThreadID(value int64) SendVenueOption {
-	return func(params *SendVenueParams) SendVenueOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithSendVenueMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *SendVenueParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithSendVenueDirectMessagesTopicID sets the DirectMessagesTopicID field.
 //
 // Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 func WithSendVenueDirectMessagesTopicID(value int64) SendVenueOption {
-	return func(params *SendVenueParams) SendVenueOption {
-		previous := params.DirectMessagesTopicID
-		params.DirectMessagesTopicID = value
-
-		return WithSendVenueDirectMessagesTopicID(previous)
-	}
+	return fieldOption(value, func(params *SendVenueParams) *int64 {
+		return &params.DirectMessagesTopicID
+	})
 }
 
 // WithSendVenueReceiverUserID sets the ReceiverUserID field.
@@ -22304,84 +20102,63 @@ func WithSendVenueDirectMessagesTopicID(value int64) SendVenueOption {
 //
 // [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
 func WithSendVenueReceiverUserID(value int64) SendVenueOption {
-	return func(params *SendVenueParams) SendVenueOption {
-		previous := params.ReceiverUserID
-		params.ReceiverUserID = value
-
-		return WithSendVenueReceiverUserID(previous)
-	}
+	return fieldOption(value, func(params *SendVenueParams) *int64 {
+		return &params.ReceiverUserID
+	})
 }
 
 // WithSendVenueCallbackQueryID sets the CallbackQueryID field.
 //
 // For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
 func WithSendVenueCallbackQueryID(value string) SendVenueOption {
-	return func(params *SendVenueParams) SendVenueOption {
-		previous := params.CallbackQueryID
-		params.CallbackQueryID = value
-
-		return WithSendVenueCallbackQueryID(previous)
-	}
+	return fieldOption(value, func(params *SendVenueParams) *string {
+		return &params.CallbackQueryID
+	})
 }
 
 // WithSendVenueLatitude sets the Latitude field.
 //
 // Latitude of the venue
 func WithSendVenueLatitude(value float64) SendVenueOption {
-	return func(params *SendVenueParams) SendVenueOption {
-		previous := params.Latitude
-		params.Latitude = value
-
-		return WithSendVenueLatitude(previous)
-	}
+	return fieldOption(value, func(params *SendVenueParams) *float64 {
+		return &params.Latitude
+	})
 }
 
 // WithSendVenueLongitude sets the Longitude field.
 //
 // Longitude of the venue
 func WithSendVenueLongitude(value float64) SendVenueOption {
-	return func(params *SendVenueParams) SendVenueOption {
-		previous := params.Longitude
-		params.Longitude = value
-
-		return WithSendVenueLongitude(previous)
-	}
+	return fieldOption(value, func(params *SendVenueParams) *float64 {
+		return &params.Longitude
+	})
 }
 
 // WithSendVenueTitle sets the Title field.
 //
 // Name of the venue
 func WithSendVenueTitle(value string) SendVenueOption {
-	return func(params *SendVenueParams) SendVenueOption {
-		previous := params.Title
-		params.Title = value
-
-		return WithSendVenueTitle(previous)
-	}
+	return fieldOption(value, func(params *SendVenueParams) *string {
+		return &params.Title
+	})
 }
 
 // WithSendVenueAddress sets the Address field.
 //
 // Address of the venue
 func WithSendVenueAddress(value string) SendVenueOption {
-	return func(params *SendVenueParams) SendVenueOption {
-		previous := params.Address
-		params.Address = value
-
-		return WithSendVenueAddress(previous)
-	}
+	return fieldOption(value, func(params *SendVenueParams) *string {
+		return &params.Address
+	})
 }
 
 // WithSendVenueFoursquareID sets the FoursquareID field.
 //
 // Foursquare identifier of the venue
 func WithSendVenueFoursquareID(value string) SendVenueOption {
-	return func(params *SendVenueParams) SendVenueOption {
-		previous := params.FoursquareID
-		params.FoursquareID = value
-
-		return WithSendVenueFoursquareID(previous)
-	}
+	return fieldOption(value, func(params *SendVenueParams) *string {
+		return &params.FoursquareID
+	})
 }
 
 // WithSendVenueFoursquareType sets the FoursquareType field.
@@ -22389,24 +20166,18 @@ func WithSendVenueFoursquareID(value string) SendVenueOption {
 // Foursquare type of the venue, if known.
 // (For example, “arts_entertainment/default”, “arts_entertainment/aquarium” or “food/icecream”.)
 func WithSendVenueFoursquareType(value string) SendVenueOption {
-	return func(params *SendVenueParams) SendVenueOption {
-		previous := params.FoursquareType
-		params.FoursquareType = value
-
-		return WithSendVenueFoursquareType(previous)
-	}
+	return fieldOption(value, func(params *SendVenueParams) *string {
+		return &params.FoursquareType
+	})
 }
 
 // WithSendVenueGooglePlaceID sets the GooglePlaceID field.
 //
 // Google Places identifier of the venue
 func WithSendVenueGooglePlaceID(value string) SendVenueOption {
-	return func(params *SendVenueParams) SendVenueOption {
-		previous := params.GooglePlaceID
-		params.GooglePlaceID = value
-
-		return WithSendVenueGooglePlaceID(previous)
-	}
+	return fieldOption(value, func(params *SendVenueParams) *string {
+		return &params.GooglePlaceID
+	})
 }
 
 // WithSendVenueGooglePlaceType sets the GooglePlaceType field.
@@ -22416,12 +20187,9 @@ func WithSendVenueGooglePlaceID(value string) SendVenueOption {
 //
 // [supported types]: https://developers.google.com/places/web-service/supported_types
 func WithSendVenueGooglePlaceType(value string) SendVenueOption {
-	return func(params *SendVenueParams) SendVenueOption {
-		previous := params.GooglePlaceType
-		params.GooglePlaceType = value
-
-		return WithSendVenueGooglePlaceType(previous)
-	}
+	return fieldOption(value, func(params *SendVenueParams) *string {
+		return &params.GooglePlaceType
+	})
 }
 
 // WithSendVenueDisableNotification sets the DisableNotification field.
@@ -22431,24 +20199,18 @@ func WithSendVenueGooglePlaceType(value string) SendVenueOption {
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithSendVenueDisableNotification(value bool) SendVenueOption {
-	return func(params *SendVenueParams) SendVenueOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithSendVenueDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *SendVenueParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithSendVenueProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the sent message from forwarding and saving
 func WithSendVenueProtectContent(value bool) SendVenueOption {
-	return func(params *SendVenueParams) SendVenueOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithSendVenueProtectContent(previous)
-	}
+	return fieldOption(value, func(params *SendVenueParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithSendVenueAllowPaidBroadcast sets the AllowPaidBroadcast field.
@@ -22458,24 +20220,18 @@ func WithSendVenueProtectContent(value bool) SendVenueOption {
 //
 // [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
 func WithSendVenueAllowPaidBroadcast(value bool) SendVenueOption {
-	return func(params *SendVenueParams) SendVenueOption {
-		previous := params.AllowPaidBroadcast
-		params.AllowPaidBroadcast = value
-
-		return WithSendVenueAllowPaidBroadcast(previous)
-	}
+	return fieldOption(value, func(params *SendVenueParams) *bool {
+		return &params.AllowPaidBroadcast
+	})
 }
 
 // WithSendVenueMessageEffectID sets the MessageEffectID field.
 //
 // Unique identifier of the message effect to be added to the message; for private chats only
 func WithSendVenueMessageEffectID(value string) SendVenueOption {
-	return func(params *SendVenueParams) SendVenueOption {
-		previous := params.MessageEffectID
-		params.MessageEffectID = value
-
-		return WithSendVenueMessageEffectID(previous)
-	}
+	return fieldOption(value, func(params *SendVenueParams) *string {
+		return &params.MessageEffectID
+	})
 }
 
 // WithSendVenueSuggestedPostParameters sets the SuggestedPostParameters field.
@@ -22483,24 +20239,18 @@ func WithSendVenueMessageEffectID(value string) SendVenueOption {
 // A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only.
 // If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
 func WithSendVenueSuggestedPostParameters(value *SuggestedPostParameters) SendVenueOption {
-	return func(params *SendVenueParams) SendVenueOption {
-		previous := params.SuggestedPostParameters
-		params.SuggestedPostParameters = value
-
-		return WithSendVenueSuggestedPostParameters(previous)
-	}
+	return fieldOption(value, func(params *SendVenueParams) **SuggestedPostParameters {
+		return &params.SuggestedPostParameters
+	})
 }
 
 // WithSendVenueReplyParameters sets the ReplyParameters field.
 //
 // Description of the message to reply to
 func WithSendVenueReplyParameters(value *ReplyParameters) SendVenueOption {
-	return func(params *SendVenueParams) SendVenueOption {
-		previous := params.ReplyParameters
-		params.ReplyParameters = value
-
-		return WithSendVenueReplyParameters(previous)
-	}
+	return fieldOption(value, func(params *SendVenueParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
 }
 
 // WithSendVenueReplyMarkup sets the ReplyMarkup field.
@@ -22511,12 +20261,9 @@ func WithSendVenueReplyParameters(value *ReplyParameters) SendVenueOption {
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 // [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
 func WithSendVenueReplyMarkup(value *ReplyMarkup) SendVenueOption {
-	return func(params *SendVenueParams) SendVenueOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithSendVenueReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *SendVenueParams) **ReplyMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // SendVenue calls the sendVenue Telegram Bot API method.
@@ -22668,7 +20415,7 @@ type SendVideoParams struct {
 }
 
 // SendVideoOption configures SendVideoParams.
-type SendVideoOption func(params *SendVideoParams) SendVideoOption
+type SendVideoOption = Option[SendVideoParams]
 
 // Option applies one or more SendVideoOption values and returns the last rollback option.
 func (r *SendVideoParams) Option(opts ...SendVideoOption) (previous SendVideoOption) {
@@ -22682,48 +20429,36 @@ func (r *SendVideoParams) Option(opts ...SendVideoOption) (previous SendVideoOpt
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
 func WithSendVideoBusinessConnectionID(value string) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSendVideoBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSendVideoChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithSendVideoChatID(value string) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendVideoChatID(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSendVideoMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithSendVideoMessageThreadID(value int64) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithSendVideoMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithSendVideoDirectMessagesTopicID sets the DirectMessagesTopicID field.
 //
 // Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 func WithSendVideoDirectMessagesTopicID(value int64) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.DirectMessagesTopicID
-		params.DirectMessagesTopicID = value
-
-		return WithSendVideoDirectMessagesTopicID(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) *int64 {
+		return &params.DirectMessagesTopicID
+	})
 }
 
 // WithSendVideoReceiverUserID sets the ReceiverUserID field.
@@ -22734,24 +20469,18 @@ func WithSendVideoDirectMessagesTopicID(value int64) SendVideoOption {
 //
 // [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
 func WithSendVideoReceiverUserID(value int64) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.ReceiverUserID
-		params.ReceiverUserID = value
-
-		return WithSendVideoReceiverUserID(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) *int64 {
+		return &params.ReceiverUserID
+	})
 }
 
 // WithSendVideoCallbackQueryID sets the CallbackQueryID field.
 //
 // For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
 func WithSendVideoCallbackQueryID(value string) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.CallbackQueryID
-		params.CallbackQueryID = value
-
-		return WithSendVideoCallbackQueryID(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) *string {
+		return &params.CallbackQueryID
+	})
 }
 
 // WithSendVideoVideo sets the Video field.
@@ -22762,48 +20491,36 @@ func WithSendVideoCallbackQueryID(value string) SendVideoOption {
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
 func WithSendVideoVideo(value InputFile) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.Video
-		params.Video = value
-
-		return WithSendVideoVideo(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) *InputFile {
+		return &params.Video
+	})
 }
 
 // WithSendVideoDuration sets the Duration field.
 //
 // Duration of sent video in seconds
 func WithSendVideoDuration(value int64) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.Duration
-		params.Duration = value
-
-		return WithSendVideoDuration(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) *int64 {
+		return &params.Duration
+	})
 }
 
 // WithSendVideoWidth sets the Width field.
 //
 // Video width
 func WithSendVideoWidth(value int64) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.Width
-		params.Width = value
-
-		return WithSendVideoWidth(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) *int64 {
+		return &params.Width
+	})
 }
 
 // WithSendVideoHeight sets the Height field.
 //
 // Video height
 func WithSendVideoHeight(value int64) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.Height
-		params.Height = value
-
-		return WithSendVideoHeight(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) *int64 {
+		return &params.Height
+	})
 }
 
 // WithSendVideoThumbnail sets the Thumbnail field.
@@ -22817,12 +20534,9 @@ func WithSendVideoHeight(value int64) SendVideoOption {
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
 func WithSendVideoThumbnail(value *InputFile) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.Thumbnail
-		params.Thumbnail = value
-
-		return WithSendVideoThumbnail(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) **InputFile {
+		return &params.Thumbnail
+	})
 }
 
 // WithSendVideoCover sets the Cover field.
@@ -22833,36 +20547,27 @@ func WithSendVideoThumbnail(value *InputFile) SendVideoOption {
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
 func WithSendVideoCover(value *InputFile) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.Cover
-		params.Cover = value
-
-		return WithSendVideoCover(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) **InputFile {
+		return &params.Cover
+	})
 }
 
 // WithSendVideoStartTimestamp sets the StartTimestamp field.
 //
 // Start timestamp for the video in the message
 func WithSendVideoStartTimestamp(value int64) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.StartTimestamp
-		params.StartTimestamp = value
-
-		return WithSendVideoStartTimestamp(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) *int64 {
+		return &params.StartTimestamp
+	})
 }
 
 // WithSendVideoCaption sets the Caption field.
 //
 // Video caption (may also be used when resending videos by file_id), 0-1024 characters after entities parsing
 func WithSendVideoCaption(value string) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.Caption
-		params.Caption = value
-
-		return WithSendVideoCaption(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) *string {
+		return &params.Caption
+	})
 }
 
 // WithSendVideoParseMode sets the ParseMode field.
@@ -22872,60 +20577,45 @@ func WithSendVideoCaption(value string) SendVideoOption {
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithSendVideoParseMode(value string) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.ParseMode
-		params.ParseMode = value
-
-		return WithSendVideoParseMode(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) *string {
+		return &params.ParseMode
+	})
 }
 
 // WithSendVideoCaptionEntities sets the CaptionEntities field.
 //
 // A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
 func WithSendVideoCaptionEntities(value []MessageEntity) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.CaptionEntities
-		params.CaptionEntities = value
-
-		return WithSendVideoCaptionEntities(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) *[]MessageEntity {
+		return &params.CaptionEntities
+	})
 }
 
 // WithSendVideoShowCaptionAboveMedia sets the ShowCaptionAboveMedia field.
 //
 // Pass True if the caption must be shown above the message media
 func WithSendVideoShowCaptionAboveMedia(value bool) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.ShowCaptionAboveMedia
-		params.ShowCaptionAboveMedia = value
-
-		return WithSendVideoShowCaptionAboveMedia(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) *bool {
+		return &params.ShowCaptionAboveMedia
+	})
 }
 
 // WithSendVideoHasSpoiler sets the HasSpoiler field.
 //
 // Pass True if the video needs to be covered with a spoiler animation
 func WithSendVideoHasSpoiler(value bool) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.HasSpoiler
-		params.HasSpoiler = value
-
-		return WithSendVideoHasSpoiler(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) *bool {
+		return &params.HasSpoiler
+	})
 }
 
 // WithSendVideoSupportsStreaming sets the SupportsStreaming field.
 //
 // Pass True if the uploaded video is suitable for streaming
 func WithSendVideoSupportsStreaming(value bool) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.SupportsStreaming
-		params.SupportsStreaming = value
-
-		return WithSendVideoSupportsStreaming(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) *bool {
+		return &params.SupportsStreaming
+	})
 }
 
 // WithSendVideoDisableNotification sets the DisableNotification field.
@@ -22935,24 +20625,18 @@ func WithSendVideoSupportsStreaming(value bool) SendVideoOption {
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithSendVideoDisableNotification(value bool) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithSendVideoDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithSendVideoProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the sent message from forwarding and saving
 func WithSendVideoProtectContent(value bool) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithSendVideoProtectContent(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithSendVideoAllowPaidBroadcast sets the AllowPaidBroadcast field.
@@ -22962,24 +20646,18 @@ func WithSendVideoProtectContent(value bool) SendVideoOption {
 //
 // [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
 func WithSendVideoAllowPaidBroadcast(value bool) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.AllowPaidBroadcast
-		params.AllowPaidBroadcast = value
-
-		return WithSendVideoAllowPaidBroadcast(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) *bool {
+		return &params.AllowPaidBroadcast
+	})
 }
 
 // WithSendVideoMessageEffectID sets the MessageEffectID field.
 //
 // Unique identifier of the message effect to be added to the message; for private chats only
 func WithSendVideoMessageEffectID(value string) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.MessageEffectID
-		params.MessageEffectID = value
-
-		return WithSendVideoMessageEffectID(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) *string {
+		return &params.MessageEffectID
+	})
 }
 
 // WithSendVideoSuggestedPostParameters sets the SuggestedPostParameters field.
@@ -22987,24 +20665,18 @@ func WithSendVideoMessageEffectID(value string) SendVideoOption {
 // A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only.
 // If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
 func WithSendVideoSuggestedPostParameters(value *SuggestedPostParameters) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.SuggestedPostParameters
-		params.SuggestedPostParameters = value
-
-		return WithSendVideoSuggestedPostParameters(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) **SuggestedPostParameters {
+		return &params.SuggestedPostParameters
+	})
 }
 
 // WithSendVideoReplyParameters sets the ReplyParameters field.
 //
 // Description of the message to reply to
 func WithSendVideoReplyParameters(value *ReplyParameters) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.ReplyParameters
-		params.ReplyParameters = value
-
-		return WithSendVideoReplyParameters(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
 }
 
 // WithSendVideoReplyMarkup sets the ReplyMarkup field.
@@ -23015,12 +20687,9 @@ func WithSendVideoReplyParameters(value *ReplyParameters) SendVideoOption {
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 // [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
 func WithSendVideoReplyMarkup(value *ReplyMarkup) SendVideoOption {
-	return func(params *SendVideoParams) SendVideoOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithSendVideoReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *SendVideoParams) **ReplyMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // SendVideo calls the sendVideo Telegram Bot API method.
@@ -23432,7 +21101,7 @@ type SendVideoNoteParams struct {
 }
 
 // SendVideoNoteOption configures SendVideoNoteParams.
-type SendVideoNoteOption func(params *SendVideoNoteParams) SendVideoNoteOption
+type SendVideoNoteOption = Option[SendVideoNoteParams]
 
 // Option applies one or more SendVideoNoteOption values and returns the last rollback option.
 func (r *SendVideoNoteParams) Option(opts ...SendVideoNoteOption) (previous SendVideoNoteOption) {
@@ -23446,48 +21115,36 @@ func (r *SendVideoNoteParams) Option(opts ...SendVideoNoteOption) (previous Send
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
 func WithSendVideoNoteBusinessConnectionID(value string) SendVideoNoteOption {
-	return func(params *SendVideoNoteParams) SendVideoNoteOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSendVideoNoteBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SendVideoNoteParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSendVideoNoteChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithSendVideoNoteChatID(value string) SendVideoNoteOption {
-	return func(params *SendVideoNoteParams) SendVideoNoteOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendVideoNoteChatID(previous)
-	}
+	return fieldOption(value, func(params *SendVideoNoteParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSendVideoNoteMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithSendVideoNoteMessageThreadID(value int64) SendVideoNoteOption {
-	return func(params *SendVideoNoteParams) SendVideoNoteOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithSendVideoNoteMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *SendVideoNoteParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithSendVideoNoteDirectMessagesTopicID sets the DirectMessagesTopicID field.
 //
 // Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 func WithSendVideoNoteDirectMessagesTopicID(value int64) SendVideoNoteOption {
-	return func(params *SendVideoNoteParams) SendVideoNoteOption {
-		previous := params.DirectMessagesTopicID
-		params.DirectMessagesTopicID = value
-
-		return WithSendVideoNoteDirectMessagesTopicID(previous)
-	}
+	return fieldOption(value, func(params *SendVideoNoteParams) *int64 {
+		return &params.DirectMessagesTopicID
+	})
 }
 
 // WithSendVideoNoteReceiverUserID sets the ReceiverUserID field.
@@ -23498,24 +21155,18 @@ func WithSendVideoNoteDirectMessagesTopicID(value int64) SendVideoNoteOption {
 //
 // [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
 func WithSendVideoNoteReceiverUserID(value int64) SendVideoNoteOption {
-	return func(params *SendVideoNoteParams) SendVideoNoteOption {
-		previous := params.ReceiverUserID
-		params.ReceiverUserID = value
-
-		return WithSendVideoNoteReceiverUserID(previous)
-	}
+	return fieldOption(value, func(params *SendVideoNoteParams) *int64 {
+		return &params.ReceiverUserID
+	})
 }
 
 // WithSendVideoNoteCallbackQueryID sets the CallbackQueryID field.
 //
 // For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
 func WithSendVideoNoteCallbackQueryID(value string) SendVideoNoteOption {
-	return func(params *SendVideoNoteParams) SendVideoNoteOption {
-		previous := params.CallbackQueryID
-		params.CallbackQueryID = value
-
-		return WithSendVideoNoteCallbackQueryID(previous)
-	}
+	return fieldOption(value, func(params *SendVideoNoteParams) *string {
+		return &params.CallbackQueryID
+	})
 }
 
 // WithSendVideoNoteVideoNote sets the VideoNote field.
@@ -23527,24 +21178,18 @@ func WithSendVideoNoteCallbackQueryID(value string) SendVideoNoteOption {
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
 func WithSendVideoNoteVideoNote(value InputFile) SendVideoNoteOption {
-	return func(params *SendVideoNoteParams) SendVideoNoteOption {
-		previous := params.VideoNote
-		params.VideoNote = value
-
-		return WithSendVideoNoteVideoNote(previous)
-	}
+	return fieldOption(value, func(params *SendVideoNoteParams) *InputFile {
+		return &params.VideoNote
+	})
 }
 
 // WithSendVideoNoteDuration sets the Duration field.
 //
 // Duration of sent video in seconds
 func WithSendVideoNoteDuration(value int64) SendVideoNoteOption {
-	return func(params *SendVideoNoteParams) SendVideoNoteOption {
-		previous := params.Duration
-		params.Duration = value
-
-		return WithSendVideoNoteDuration(previous)
-	}
+	return fieldOption(value, func(params *SendVideoNoteParams) *int64 {
+		return &params.Duration
+	})
 }
 
 // WithSendVideoNoteLength sets the Length field.
@@ -23552,12 +21197,9 @@ func WithSendVideoNoteDuration(value int64) SendVideoNoteOption {
 // Video width and height, i.e.
 // diameter of the video message
 func WithSendVideoNoteLength(value int64) SendVideoNoteOption {
-	return func(params *SendVideoNoteParams) SendVideoNoteOption {
-		previous := params.Length
-		params.Length = value
-
-		return WithSendVideoNoteLength(previous)
-	}
+	return fieldOption(value, func(params *SendVideoNoteParams) *int64 {
+		return &params.Length
+	})
 }
 
 // WithSendVideoNoteThumbnail sets the Thumbnail field.
@@ -23571,12 +21213,9 @@ func WithSendVideoNoteLength(value int64) SendVideoNoteOption {
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
 func WithSendVideoNoteThumbnail(value *InputFile) SendVideoNoteOption {
-	return func(params *SendVideoNoteParams) SendVideoNoteOption {
-		previous := params.Thumbnail
-		params.Thumbnail = value
-
-		return WithSendVideoNoteThumbnail(previous)
-	}
+	return fieldOption(value, func(params *SendVideoNoteParams) **InputFile {
+		return &params.Thumbnail
+	})
 }
 
 // WithSendVideoNoteDisableNotification sets the DisableNotification field.
@@ -23586,24 +21225,18 @@ func WithSendVideoNoteThumbnail(value *InputFile) SendVideoNoteOption {
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithSendVideoNoteDisableNotification(value bool) SendVideoNoteOption {
-	return func(params *SendVideoNoteParams) SendVideoNoteOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithSendVideoNoteDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *SendVideoNoteParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithSendVideoNoteProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the sent message from forwarding and saving
 func WithSendVideoNoteProtectContent(value bool) SendVideoNoteOption {
-	return func(params *SendVideoNoteParams) SendVideoNoteOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithSendVideoNoteProtectContent(previous)
-	}
+	return fieldOption(value, func(params *SendVideoNoteParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithSendVideoNoteAllowPaidBroadcast sets the AllowPaidBroadcast field.
@@ -23613,24 +21246,18 @@ func WithSendVideoNoteProtectContent(value bool) SendVideoNoteOption {
 //
 // [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
 func WithSendVideoNoteAllowPaidBroadcast(value bool) SendVideoNoteOption {
-	return func(params *SendVideoNoteParams) SendVideoNoteOption {
-		previous := params.AllowPaidBroadcast
-		params.AllowPaidBroadcast = value
-
-		return WithSendVideoNoteAllowPaidBroadcast(previous)
-	}
+	return fieldOption(value, func(params *SendVideoNoteParams) *bool {
+		return &params.AllowPaidBroadcast
+	})
 }
 
 // WithSendVideoNoteMessageEffectID sets the MessageEffectID field.
 //
 // Unique identifier of the message effect to be added to the message; for private chats only
 func WithSendVideoNoteMessageEffectID(value string) SendVideoNoteOption {
-	return func(params *SendVideoNoteParams) SendVideoNoteOption {
-		previous := params.MessageEffectID
-		params.MessageEffectID = value
-
-		return WithSendVideoNoteMessageEffectID(previous)
-	}
+	return fieldOption(value, func(params *SendVideoNoteParams) *string {
+		return &params.MessageEffectID
+	})
 }
 
 // WithSendVideoNoteSuggestedPostParameters sets the SuggestedPostParameters field.
@@ -23638,24 +21265,18 @@ func WithSendVideoNoteMessageEffectID(value string) SendVideoNoteOption {
 // A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only.
 // If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
 func WithSendVideoNoteSuggestedPostParameters(value *SuggestedPostParameters) SendVideoNoteOption {
-	return func(params *SendVideoNoteParams) SendVideoNoteOption {
-		previous := params.SuggestedPostParameters
-		params.SuggestedPostParameters = value
-
-		return WithSendVideoNoteSuggestedPostParameters(previous)
-	}
+	return fieldOption(value, func(params *SendVideoNoteParams) **SuggestedPostParameters {
+		return &params.SuggestedPostParameters
+	})
 }
 
 // WithSendVideoNoteReplyParameters sets the ReplyParameters field.
 //
 // Description of the message to reply to
 func WithSendVideoNoteReplyParameters(value *ReplyParameters) SendVideoNoteOption {
-	return func(params *SendVideoNoteParams) SendVideoNoteOption {
-		previous := params.ReplyParameters
-		params.ReplyParameters = value
-
-		return WithSendVideoNoteReplyParameters(previous)
-	}
+	return fieldOption(value, func(params *SendVideoNoteParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
 }
 
 // WithSendVideoNoteReplyMarkup sets the ReplyMarkup field.
@@ -23666,12 +21287,9 @@ func WithSendVideoNoteReplyParameters(value *ReplyParameters) SendVideoNoteOptio
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 // [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
 func WithSendVideoNoteReplyMarkup(value *ReplyMarkup) SendVideoNoteOption {
-	return func(params *SendVideoNoteParams) SendVideoNoteOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithSendVideoNoteReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *SendVideoNoteParams) **ReplyMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // SendVideoNote calls the sendVideoNote Telegram Bot API method.
@@ -23991,7 +21609,7 @@ type SendVoiceParams struct {
 }
 
 // SendVoiceOption configures SendVoiceParams.
-type SendVoiceOption func(params *SendVoiceParams) SendVoiceOption
+type SendVoiceOption = Option[SendVoiceParams]
 
 // Option applies one or more SendVoiceOption values and returns the last rollback option.
 func (r *SendVoiceParams) Option(opts ...SendVoiceOption) (previous SendVoiceOption) {
@@ -24005,48 +21623,36 @@ func (r *SendVoiceParams) Option(opts ...SendVoiceOption) (previous SendVoiceOpt
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
 func WithSendVoiceBusinessConnectionID(value string) SendVoiceOption {
-	return func(params *SendVoiceParams) SendVoiceOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSendVoiceBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SendVoiceParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSendVoiceChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithSendVoiceChatID(value string) SendVoiceOption {
-	return func(params *SendVoiceParams) SendVoiceOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSendVoiceChatID(previous)
-	}
+	return fieldOption(value, func(params *SendVoiceParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSendVoiceMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 func WithSendVoiceMessageThreadID(value int64) SendVoiceOption {
-	return func(params *SendVoiceParams) SendVoiceOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithSendVoiceMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *SendVoiceParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // WithSendVoiceDirectMessagesTopicID sets the DirectMessagesTopicID field.
 //
 // Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 func WithSendVoiceDirectMessagesTopicID(value int64) SendVoiceOption {
-	return func(params *SendVoiceParams) SendVoiceOption {
-		previous := params.DirectMessagesTopicID
-		params.DirectMessagesTopicID = value
-
-		return WithSendVoiceDirectMessagesTopicID(previous)
-	}
+	return fieldOption(value, func(params *SendVoiceParams) *int64 {
+		return &params.DirectMessagesTopicID
+	})
 }
 
 // WithSendVoiceReceiverUserID sets the ReceiverUserID field.
@@ -24057,24 +21663,18 @@ func WithSendVoiceDirectMessagesTopicID(value int64) SendVoiceOption {
 //
 // [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
 func WithSendVoiceReceiverUserID(value int64) SendVoiceOption {
-	return func(params *SendVoiceParams) SendVoiceOption {
-		previous := params.ReceiverUserID
-		params.ReceiverUserID = value
-
-		return WithSendVoiceReceiverUserID(previous)
-	}
+	return fieldOption(value, func(params *SendVoiceParams) *int64 {
+		return &params.ReceiverUserID
+	})
 }
 
 // WithSendVoiceCallbackQueryID sets the CallbackQueryID field.
 //
 // For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
 func WithSendVoiceCallbackQueryID(value string) SendVoiceOption {
-	return func(params *SendVoiceParams) SendVoiceOption {
-		previous := params.CallbackQueryID
-		params.CallbackQueryID = value
-
-		return WithSendVoiceCallbackQueryID(previous)
-	}
+	return fieldOption(value, func(params *SendVoiceParams) *string {
+		return &params.CallbackQueryID
+	})
 }
 
 // WithSendVoiceVoice sets the Voice field.
@@ -24085,24 +21685,18 @@ func WithSendVoiceCallbackQueryID(value string) SendVoiceOption {
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
 func WithSendVoiceVoice(value InputFile) SendVoiceOption {
-	return func(params *SendVoiceParams) SendVoiceOption {
-		previous := params.Voice
-		params.Voice = value
-
-		return WithSendVoiceVoice(previous)
-	}
+	return fieldOption(value, func(params *SendVoiceParams) *InputFile {
+		return &params.Voice
+	})
 }
 
 // WithSendVoiceCaption sets the Caption field.
 //
 // Voice message caption, 0-1024 characters after entities parsing
 func WithSendVoiceCaption(value string) SendVoiceOption {
-	return func(params *SendVoiceParams) SendVoiceOption {
-		previous := params.Caption
-		params.Caption = value
-
-		return WithSendVoiceCaption(previous)
-	}
+	return fieldOption(value, func(params *SendVoiceParams) *string {
+		return &params.Caption
+	})
 }
 
 // WithSendVoiceParseMode sets the ParseMode field.
@@ -24112,36 +21706,27 @@ func WithSendVoiceCaption(value string) SendVoiceOption {
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
 func WithSendVoiceParseMode(value string) SendVoiceOption {
-	return func(params *SendVoiceParams) SendVoiceOption {
-		previous := params.ParseMode
-		params.ParseMode = value
-
-		return WithSendVoiceParseMode(previous)
-	}
+	return fieldOption(value, func(params *SendVoiceParams) *string {
+		return &params.ParseMode
+	})
 }
 
 // WithSendVoiceCaptionEntities sets the CaptionEntities field.
 //
 // A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
 func WithSendVoiceCaptionEntities(value []MessageEntity) SendVoiceOption {
-	return func(params *SendVoiceParams) SendVoiceOption {
-		previous := params.CaptionEntities
-		params.CaptionEntities = value
-
-		return WithSendVoiceCaptionEntities(previous)
-	}
+	return fieldOption(value, func(params *SendVoiceParams) *[]MessageEntity {
+		return &params.CaptionEntities
+	})
 }
 
 // WithSendVoiceDuration sets the Duration field.
 //
 // Duration of the voice message in seconds
 func WithSendVoiceDuration(value int64) SendVoiceOption {
-	return func(params *SendVoiceParams) SendVoiceOption {
-		previous := params.Duration
-		params.Duration = value
-
-		return WithSendVoiceDuration(previous)
-	}
+	return fieldOption(value, func(params *SendVoiceParams) *int64 {
+		return &params.Duration
+	})
 }
 
 // WithSendVoiceDisableNotification sets the DisableNotification field.
@@ -24151,24 +21736,18 @@ func WithSendVoiceDuration(value int64) SendVoiceOption {
 //
 // [silently]: https://telegram.org/blog/channels-2-0#silent-messages
 func WithSendVoiceDisableNotification(value bool) SendVoiceOption {
-	return func(params *SendVoiceParams) SendVoiceOption {
-		previous := params.DisableNotification
-		params.DisableNotification = value
-
-		return WithSendVoiceDisableNotification(previous)
-	}
+	return fieldOption(value, func(params *SendVoiceParams) *bool {
+		return &params.DisableNotification
+	})
 }
 
 // WithSendVoiceProtectContent sets the ProtectContent field.
 //
 // Protects the contents of the sent message from forwarding and saving
 func WithSendVoiceProtectContent(value bool) SendVoiceOption {
-	return func(params *SendVoiceParams) SendVoiceOption {
-		previous := params.ProtectContent
-		params.ProtectContent = value
-
-		return WithSendVoiceProtectContent(previous)
-	}
+	return fieldOption(value, func(params *SendVoiceParams) *bool {
+		return &params.ProtectContent
+	})
 }
 
 // WithSendVoiceAllowPaidBroadcast sets the AllowPaidBroadcast field.
@@ -24178,24 +21757,18 @@ func WithSendVoiceProtectContent(value bool) SendVoiceOption {
 //
 // [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
 func WithSendVoiceAllowPaidBroadcast(value bool) SendVoiceOption {
-	return func(params *SendVoiceParams) SendVoiceOption {
-		previous := params.AllowPaidBroadcast
-		params.AllowPaidBroadcast = value
-
-		return WithSendVoiceAllowPaidBroadcast(previous)
-	}
+	return fieldOption(value, func(params *SendVoiceParams) *bool {
+		return &params.AllowPaidBroadcast
+	})
 }
 
 // WithSendVoiceMessageEffectID sets the MessageEffectID field.
 //
 // Unique identifier of the message effect to be added to the message; for private chats only
 func WithSendVoiceMessageEffectID(value string) SendVoiceOption {
-	return func(params *SendVoiceParams) SendVoiceOption {
-		previous := params.MessageEffectID
-		params.MessageEffectID = value
-
-		return WithSendVoiceMessageEffectID(previous)
-	}
+	return fieldOption(value, func(params *SendVoiceParams) *string {
+		return &params.MessageEffectID
+	})
 }
 
 // WithSendVoiceSuggestedPostParameters sets the SuggestedPostParameters field.
@@ -24203,24 +21776,18 @@ func WithSendVoiceMessageEffectID(value string) SendVoiceOption {
 // A JSON-serialized object containing the parameters of the suggested post to send; for direct messages chats only.
 // If the message is sent as a reply to another suggested post, then that suggested post is automatically declined.
 func WithSendVoiceSuggestedPostParameters(value *SuggestedPostParameters) SendVoiceOption {
-	return func(params *SendVoiceParams) SendVoiceOption {
-		previous := params.SuggestedPostParameters
-		params.SuggestedPostParameters = value
-
-		return WithSendVoiceSuggestedPostParameters(previous)
-	}
+	return fieldOption(value, func(params *SendVoiceParams) **SuggestedPostParameters {
+		return &params.SuggestedPostParameters
+	})
 }
 
 // WithSendVoiceReplyParameters sets the ReplyParameters field.
 //
 // Description of the message to reply to
 func WithSendVoiceReplyParameters(value *ReplyParameters) SendVoiceOption {
-	return func(params *SendVoiceParams) SendVoiceOption {
-		previous := params.ReplyParameters
-		params.ReplyParameters = value
-
-		return WithSendVoiceReplyParameters(previous)
-	}
+	return fieldOption(value, func(params *SendVoiceParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
 }
 
 // WithSendVoiceReplyMarkup sets the ReplyMarkup field.
@@ -24231,12 +21798,9 @@ func WithSendVoiceReplyParameters(value *ReplyParameters) SendVoiceOption {
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 // [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
 func WithSendVoiceReplyMarkup(value *ReplyMarkup) SendVoiceOption {
-	return func(params *SendVoiceParams) SendVoiceOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithSendVoiceReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *SendVoiceParams) **ReplyMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // SendVoice calls the sendVoice Telegram Bot API method.
@@ -24501,7 +22065,7 @@ type SetBusinessAccountBioParams struct {
 }
 
 // SetBusinessAccountBioOption configures SetBusinessAccountBioParams.
-type SetBusinessAccountBioOption func(params *SetBusinessAccountBioParams) SetBusinessAccountBioOption
+type SetBusinessAccountBioOption = Option[SetBusinessAccountBioParams]
 
 // Option applies one or more SetBusinessAccountBioOption values and returns the last rollback option.
 func (r *SetBusinessAccountBioParams) Option(opts ...SetBusinessAccountBioOption) (previous SetBusinessAccountBioOption) {
@@ -24515,24 +22079,18 @@ func (r *SetBusinessAccountBioParams) Option(opts ...SetBusinessAccountBioOption
 //
 // Unique identifier of the business connection
 func WithSetBusinessAccountBioBusinessConnectionID(value string) SetBusinessAccountBioOption {
-	return func(params *SetBusinessAccountBioParams) SetBusinessAccountBioOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSetBusinessAccountBioBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SetBusinessAccountBioParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSetBusinessAccountBioBio sets the Bio field.
 //
 // The new value of the bio for the business account; 0-140 characters
 func WithSetBusinessAccountBioBio(value string) SetBusinessAccountBioOption {
-	return func(params *SetBusinessAccountBioParams) SetBusinessAccountBioOption {
-		previous := params.Bio
-		params.Bio = value
-
-		return WithSetBusinessAccountBioBio(previous)
-	}
+	return fieldOption(value, func(params *SetBusinessAccountBioParams) *string {
+		return &params.Bio
+	})
 }
 
 // SetBusinessAccountBio calls the setBusinessAccountBio Telegram Bot API method.
@@ -24580,7 +22138,7 @@ type SetBusinessAccountGiftSettingsParams struct {
 }
 
 // SetBusinessAccountGiftSettingsOption configures SetBusinessAccountGiftSettingsParams.
-type SetBusinessAccountGiftSettingsOption func(params *SetBusinessAccountGiftSettingsParams) SetBusinessAccountGiftSettingsOption
+type SetBusinessAccountGiftSettingsOption = Option[SetBusinessAccountGiftSettingsParams]
 
 // Option applies one or more SetBusinessAccountGiftSettingsOption values and returns the last rollback option.
 func (r *SetBusinessAccountGiftSettingsParams) Option(opts ...SetBusinessAccountGiftSettingsOption) (previous SetBusinessAccountGiftSettingsOption) {
@@ -24594,36 +22152,27 @@ func (r *SetBusinessAccountGiftSettingsParams) Option(opts ...SetBusinessAccount
 //
 // Unique identifier of the business connection
 func WithSetBusinessAccountGiftSettingsBusinessConnectionID(value string) SetBusinessAccountGiftSettingsOption {
-	return func(params *SetBusinessAccountGiftSettingsParams) SetBusinessAccountGiftSettingsOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSetBusinessAccountGiftSettingsBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SetBusinessAccountGiftSettingsParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSetBusinessAccountGiftSettingsShowGiftButton sets the ShowGiftButton field.
 //
 // Pass True if a button for sending a gift to the user or by the business account must always be shown in the input field
 func WithSetBusinessAccountGiftSettingsShowGiftButton(value bool) SetBusinessAccountGiftSettingsOption {
-	return func(params *SetBusinessAccountGiftSettingsParams) SetBusinessAccountGiftSettingsOption {
-		previous := params.ShowGiftButton
-		params.ShowGiftButton = value
-
-		return WithSetBusinessAccountGiftSettingsShowGiftButton(previous)
-	}
+	return fieldOption(value, func(params *SetBusinessAccountGiftSettingsParams) *bool {
+		return &params.ShowGiftButton
+	})
 }
 
 // WithSetBusinessAccountGiftSettingsAcceptedGiftTypes sets the AcceptedGiftTypes field.
 //
 // Types of gifts accepted by the business account
 func WithSetBusinessAccountGiftSettingsAcceptedGiftTypes(value AcceptedGiftTypes) SetBusinessAccountGiftSettingsOption {
-	return func(params *SetBusinessAccountGiftSettingsParams) SetBusinessAccountGiftSettingsOption {
-		previous := params.AcceptedGiftTypes
-		params.AcceptedGiftTypes = value
-
-		return WithSetBusinessAccountGiftSettingsAcceptedGiftTypes(previous)
-	}
+	return fieldOption(value, func(params *SetBusinessAccountGiftSettingsParams) *AcceptedGiftTypes {
+		return &params.AcceptedGiftTypes
+	})
 }
 
 // SetBusinessAccountGiftSettings calls the setBusinessAccountGiftSettings Telegram Bot API method.
@@ -24671,7 +22220,7 @@ type SetBusinessAccountNameParams struct {
 }
 
 // SetBusinessAccountNameOption configures SetBusinessAccountNameParams.
-type SetBusinessAccountNameOption func(params *SetBusinessAccountNameParams) SetBusinessAccountNameOption
+type SetBusinessAccountNameOption = Option[SetBusinessAccountNameParams]
 
 // Option applies one or more SetBusinessAccountNameOption values and returns the last rollback option.
 func (r *SetBusinessAccountNameParams) Option(opts ...SetBusinessAccountNameOption) (previous SetBusinessAccountNameOption) {
@@ -24685,36 +22234,27 @@ func (r *SetBusinessAccountNameParams) Option(opts ...SetBusinessAccountNameOpti
 //
 // Unique identifier of the business connection
 func WithSetBusinessAccountNameBusinessConnectionID(value string) SetBusinessAccountNameOption {
-	return func(params *SetBusinessAccountNameParams) SetBusinessAccountNameOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSetBusinessAccountNameBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SetBusinessAccountNameParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSetBusinessAccountNameFirstName sets the FirstName field.
 //
 // The new value of the first name for the business account; 1-64 characters
 func WithSetBusinessAccountNameFirstName(value string) SetBusinessAccountNameOption {
-	return func(params *SetBusinessAccountNameParams) SetBusinessAccountNameOption {
-		previous := params.FirstName
-		params.FirstName = value
-
-		return WithSetBusinessAccountNameFirstName(previous)
-	}
+	return fieldOption(value, func(params *SetBusinessAccountNameParams) *string {
+		return &params.FirstName
+	})
 }
 
 // WithSetBusinessAccountNameLastName sets the LastName field.
 //
 // The new value of the last name for the business account; 0-64 characters
 func WithSetBusinessAccountNameLastName(value string) SetBusinessAccountNameOption {
-	return func(params *SetBusinessAccountNameParams) SetBusinessAccountNameOption {
-		previous := params.LastName
-		params.LastName = value
-
-		return WithSetBusinessAccountNameLastName(previous)
-	}
+	return fieldOption(value, func(params *SetBusinessAccountNameParams) *string {
+		return &params.LastName
+	})
 }
 
 // SetBusinessAccountName calls the setBusinessAccountName Telegram Bot API method.
@@ -24763,7 +22303,7 @@ type SetBusinessAccountProfilePhotoParams struct {
 }
 
 // SetBusinessAccountProfilePhotoOption configures SetBusinessAccountProfilePhotoParams.
-type SetBusinessAccountProfilePhotoOption func(params *SetBusinessAccountProfilePhotoParams) SetBusinessAccountProfilePhotoOption
+type SetBusinessAccountProfilePhotoOption = Option[SetBusinessAccountProfilePhotoParams]
 
 // Option applies one or more SetBusinessAccountProfilePhotoOption values and returns the last rollback option.
 func (r *SetBusinessAccountProfilePhotoParams) Option(opts ...SetBusinessAccountProfilePhotoOption) (previous SetBusinessAccountProfilePhotoOption) {
@@ -24777,24 +22317,18 @@ func (r *SetBusinessAccountProfilePhotoParams) Option(opts ...SetBusinessAccount
 //
 // Unique identifier of the business connection
 func WithSetBusinessAccountProfilePhotoBusinessConnectionID(value string) SetBusinessAccountProfilePhotoOption {
-	return func(params *SetBusinessAccountProfilePhotoParams) SetBusinessAccountProfilePhotoOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSetBusinessAccountProfilePhotoBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SetBusinessAccountProfilePhotoParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSetBusinessAccountProfilePhotoPhoto sets the Photo field.
 //
 // The new profile photo to set
 func WithSetBusinessAccountProfilePhotoPhoto(value InputProfilePhoto) SetBusinessAccountProfilePhotoOption {
-	return func(params *SetBusinessAccountProfilePhotoParams) SetBusinessAccountProfilePhotoOption {
-		previous := params.Photo
-		params.Photo = value
-
-		return WithSetBusinessAccountProfilePhotoPhoto(previous)
-	}
+	return fieldOption(value, func(params *SetBusinessAccountProfilePhotoParams) *InputProfilePhoto {
+		return &params.Photo
+	})
 }
 
 // WithSetBusinessAccountProfilePhotoIsPublic sets the IsPublic field.
@@ -24802,12 +22336,9 @@ func WithSetBusinessAccountProfilePhotoPhoto(value InputProfilePhoto) SetBusines
 // Pass True to set the public photo, which will be visible even if the main photo is hidden by the business account's privacy settings.
 // An account can have only one public photo.
 func WithSetBusinessAccountProfilePhotoIsPublic(value bool) SetBusinessAccountProfilePhotoOption {
-	return func(params *SetBusinessAccountProfilePhotoParams) SetBusinessAccountProfilePhotoOption {
-		previous := params.IsPublic
-		params.IsPublic = value
-
-		return WithSetBusinessAccountProfilePhotoIsPublic(previous)
-	}
+	return fieldOption(value, func(params *SetBusinessAccountProfilePhotoParams) *bool {
+		return &params.IsPublic
+	})
 }
 
 // SetBusinessAccountProfilePhoto calls the setBusinessAccountProfilePhoto Telegram Bot API method.
@@ -24930,7 +22461,7 @@ type SetBusinessAccountUsernameParams struct {
 }
 
 // SetBusinessAccountUsernameOption configures SetBusinessAccountUsernameParams.
-type SetBusinessAccountUsernameOption func(params *SetBusinessAccountUsernameParams) SetBusinessAccountUsernameOption
+type SetBusinessAccountUsernameOption = Option[SetBusinessAccountUsernameParams]
 
 // Option applies one or more SetBusinessAccountUsernameOption values and returns the last rollback option.
 func (r *SetBusinessAccountUsernameParams) Option(opts ...SetBusinessAccountUsernameOption) (previous SetBusinessAccountUsernameOption) {
@@ -24944,24 +22475,18 @@ func (r *SetBusinessAccountUsernameParams) Option(opts ...SetBusinessAccountUser
 //
 // Unique identifier of the business connection
 func WithSetBusinessAccountUsernameBusinessConnectionID(value string) SetBusinessAccountUsernameOption {
-	return func(params *SetBusinessAccountUsernameParams) SetBusinessAccountUsernameOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithSetBusinessAccountUsernameBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *SetBusinessAccountUsernameParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithSetBusinessAccountUsernameUsername sets the Username field.
 //
 // The new value of the username for the business account; 0-32 characters
 func WithSetBusinessAccountUsernameUsername(value string) SetBusinessAccountUsernameOption {
-	return func(params *SetBusinessAccountUsernameParams) SetBusinessAccountUsernameOption {
-		previous := params.Username
-		params.Username = value
-
-		return WithSetBusinessAccountUsernameUsername(previous)
-	}
+	return fieldOption(value, func(params *SetBusinessAccountUsernameParams) *string {
+		return &params.Username
+	})
 }
 
 // SetBusinessAccountUsername calls the setBusinessAccountUsername Telegram Bot API method.
@@ -25009,7 +22534,7 @@ type SetChatAdministratorCustomTitleParams struct {
 }
 
 // SetChatAdministratorCustomTitleOption configures SetChatAdministratorCustomTitleParams.
-type SetChatAdministratorCustomTitleOption func(params *SetChatAdministratorCustomTitleParams) SetChatAdministratorCustomTitleOption
+type SetChatAdministratorCustomTitleOption = Option[SetChatAdministratorCustomTitleParams]
 
 // Option applies one or more SetChatAdministratorCustomTitleOption values and returns the last rollback option.
 func (r *SetChatAdministratorCustomTitleParams) Option(opts ...SetChatAdministratorCustomTitleOption) (previous SetChatAdministratorCustomTitleOption) {
@@ -25023,36 +22548,27 @@ func (r *SetChatAdministratorCustomTitleParams) Option(opts ...SetChatAdministra
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithSetChatAdministratorCustomTitleChatID(value string) SetChatAdministratorCustomTitleOption {
-	return func(params *SetChatAdministratorCustomTitleParams) SetChatAdministratorCustomTitleOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSetChatAdministratorCustomTitleChatID(previous)
-	}
+	return fieldOption(value, func(params *SetChatAdministratorCustomTitleParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSetChatAdministratorCustomTitleUserID sets the UserID field.
 //
 // Unique identifier of the target user
 func WithSetChatAdministratorCustomTitleUserID(value int64) SetChatAdministratorCustomTitleOption {
-	return func(params *SetChatAdministratorCustomTitleParams) SetChatAdministratorCustomTitleOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithSetChatAdministratorCustomTitleUserID(previous)
-	}
+	return fieldOption(value, func(params *SetChatAdministratorCustomTitleParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithSetChatAdministratorCustomTitleCustomTitle sets the CustomTitle field.
 //
 // New custom title for the administrator; 0-16 characters, emoji are not allowed
 func WithSetChatAdministratorCustomTitleCustomTitle(value string) SetChatAdministratorCustomTitleOption {
-	return func(params *SetChatAdministratorCustomTitleParams) SetChatAdministratorCustomTitleOption {
-		previous := params.CustomTitle
-		params.CustomTitle = value
-
-		return WithSetChatAdministratorCustomTitleCustomTitle(previous)
-	}
+	return fieldOption(value, func(params *SetChatAdministratorCustomTitleParams) *string {
+		return &params.CustomTitle
+	})
 }
 
 // SetChatAdministratorCustomTitle calls the setChatAdministratorCustomTitle Telegram Bot API method.
@@ -25096,7 +22612,7 @@ type SetChatDescriptionParams struct {
 }
 
 // SetChatDescriptionOption configures SetChatDescriptionParams.
-type SetChatDescriptionOption func(params *SetChatDescriptionParams) SetChatDescriptionOption
+type SetChatDescriptionOption = Option[SetChatDescriptionParams]
 
 // Option applies one or more SetChatDescriptionOption values and returns the last rollback option.
 func (r *SetChatDescriptionParams) Option(opts ...SetChatDescriptionOption) (previous SetChatDescriptionOption) {
@@ -25110,24 +22626,18 @@ func (r *SetChatDescriptionParams) Option(opts ...SetChatDescriptionOption) (pre
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
 func WithSetChatDescriptionChatID(value string) SetChatDescriptionOption {
-	return func(params *SetChatDescriptionParams) SetChatDescriptionOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSetChatDescriptionChatID(previous)
-	}
+	return fieldOption(value, func(params *SetChatDescriptionParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSetChatDescriptionDescription sets the Description field.
 //
 // New chat description, 0-255 characters
 func WithSetChatDescriptionDescription(value string) SetChatDescriptionOption {
-	return func(params *SetChatDescriptionParams) SetChatDescriptionOption {
-		previous := params.Description
-		params.Description = value
-
-		return WithSetChatDescriptionDescription(previous)
-	}
+	return fieldOption(value, func(params *SetChatDescriptionParams) *string {
+		return &params.Description
+	})
 }
 
 // SetChatDescription calls the setChatDescription Telegram Bot API method.
@@ -25175,7 +22685,7 @@ type SetChatMemberTagParams struct {
 }
 
 // SetChatMemberTagOption configures SetChatMemberTagParams.
-type SetChatMemberTagOption func(params *SetChatMemberTagParams) SetChatMemberTagOption
+type SetChatMemberTagOption = Option[SetChatMemberTagParams]
 
 // Option applies one or more SetChatMemberTagOption values and returns the last rollback option.
 func (r *SetChatMemberTagParams) Option(opts ...SetChatMemberTagOption) (previous SetChatMemberTagOption) {
@@ -25189,36 +22699,27 @@ func (r *SetChatMemberTagParams) Option(opts ...SetChatMemberTagOption) (previou
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithSetChatMemberTagChatID(value string) SetChatMemberTagOption {
-	return func(params *SetChatMemberTagParams) SetChatMemberTagOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSetChatMemberTagChatID(previous)
-	}
+	return fieldOption(value, func(params *SetChatMemberTagParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSetChatMemberTagUserID sets the UserID field.
 //
 // Unique identifier of the target user
 func WithSetChatMemberTagUserID(value int64) SetChatMemberTagOption {
-	return func(params *SetChatMemberTagParams) SetChatMemberTagOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithSetChatMemberTagUserID(previous)
-	}
+	return fieldOption(value, func(params *SetChatMemberTagParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithSetChatMemberTagTag sets the Tag field.
 //
 // New tag for the member; 0-16 characters, emoji are not allowed
 func WithSetChatMemberTagTag(value string) SetChatMemberTagOption {
-	return func(params *SetChatMemberTagParams) SetChatMemberTagOption {
-		previous := params.Tag
-		params.Tag = value
-
-		return WithSetChatMemberTagTag(previous)
-	}
+	return fieldOption(value, func(params *SetChatMemberTagParams) *string {
+		return &params.Tag
+	})
 }
 
 // SetChatMemberTag calls the setChatMemberTag Telegram Bot API method.
@@ -25267,7 +22768,7 @@ type SetChatMenuButtonParams struct {
 }
 
 // SetChatMenuButtonOption configures SetChatMenuButtonParams.
-type SetChatMenuButtonOption func(params *SetChatMenuButtonParams) SetChatMenuButtonOption
+type SetChatMenuButtonOption = Option[SetChatMenuButtonParams]
 
 // Option applies one or more SetChatMenuButtonOption values and returns the last rollback option.
 func (r *SetChatMenuButtonParams) Option(opts ...SetChatMenuButtonOption) (previous SetChatMenuButtonOption) {
@@ -25282,12 +22783,9 @@ func (r *SetChatMenuButtonParams) Option(opts ...SetChatMenuButtonOption) (previ
 // Unique identifier for the target private chat.
 // If not specified, the bot's default menu button will be changed.
 func WithSetChatMenuButtonChatID(value int64) SetChatMenuButtonOption {
-	return func(params *SetChatMenuButtonParams) SetChatMenuButtonOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSetChatMenuButtonChatID(previous)
-	}
+	return fieldOption(value, func(params *SetChatMenuButtonParams) *int64 {
+		return &params.ChatID
+	})
 }
 
 // WithSetChatMenuButtonMenuButton sets the MenuButton field.
@@ -25297,12 +22795,9 @@ func WithSetChatMenuButtonChatID(value int64) SetChatMenuButtonOption {
 //
 // [MenuButtonDefault]: https://core.telegram.org/bots/api#menubuttondefault
 func WithSetChatMenuButtonMenuButton(value *MenuButton) SetChatMenuButtonOption {
-	return func(params *SetChatMenuButtonParams) SetChatMenuButtonOption {
-		previous := params.MenuButton
-		params.MenuButton = value
-
-		return WithSetChatMenuButtonMenuButton(previous)
-	}
+	return fieldOption(value, func(params *SetChatMenuButtonParams) **MenuButton {
+		return &params.MenuButton
+	})
 }
 
 // SetChatMenuButton calls the setChatMenuButton Telegram Bot API method.
@@ -25350,7 +22845,7 @@ type SetChatPermissionsParams struct {
 }
 
 // SetChatPermissionsOption configures SetChatPermissionsParams.
-type SetChatPermissionsOption func(params *SetChatPermissionsParams) SetChatPermissionsOption
+type SetChatPermissionsOption = Option[SetChatPermissionsParams]
 
 // Option applies one or more SetChatPermissionsOption values and returns the last rollback option.
 func (r *SetChatPermissionsParams) Option(opts ...SetChatPermissionsOption) (previous SetChatPermissionsOption) {
@@ -25364,24 +22859,18 @@ func (r *SetChatPermissionsParams) Option(opts ...SetChatPermissionsOption) (pre
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithSetChatPermissionsChatID(value string) SetChatPermissionsOption {
-	return func(params *SetChatPermissionsParams) SetChatPermissionsOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSetChatPermissionsChatID(previous)
-	}
+	return fieldOption(value, func(params *SetChatPermissionsParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSetChatPermissionsPermissions sets the Permissions field.
 //
 // A JSON-serialized object for new default chat permissions
 func WithSetChatPermissionsPermissions(value ChatPermissions) SetChatPermissionsOption {
-	return func(params *SetChatPermissionsParams) SetChatPermissionsOption {
-		previous := params.Permissions
-		params.Permissions = value
-
-		return WithSetChatPermissionsPermissions(previous)
-	}
+	return fieldOption(value, func(params *SetChatPermissionsParams) *ChatPermissions {
+		return &params.Permissions
+	})
 }
 
 // WithSetChatPermissionsUseIndependentChatPermissions sets the UseIndependentChatPermissions field.
@@ -25389,12 +22878,9 @@ func WithSetChatPermissionsPermissions(value ChatPermissions) SetChatPermissions
 // Pass True if chat permissions are set independently.
 // Otherwise, the can_send_other_messages and can_add_web_page_previews permissions will imply the can_send_messages, can_send_audios, can_send_documents, can_send_photos, can_send_videos, can_send_video_notes, and can_send_voice_notes permissions; the can_send_polls permission will imply the can_send_messages permission.
 func WithSetChatPermissionsUseIndependentChatPermissions(value bool) SetChatPermissionsOption {
-	return func(params *SetChatPermissionsParams) SetChatPermissionsOption {
-		previous := params.UseIndependentChatPermissions
-		params.UseIndependentChatPermissions = value
-
-		return WithSetChatPermissionsUseIndependentChatPermissions(previous)
-	}
+	return fieldOption(value, func(params *SetChatPermissionsParams) *bool {
+		return &params.UseIndependentChatPermissions
+	})
 }
 
 // SetChatPermissions calls the setChatPermissions Telegram Bot API method.
@@ -25439,7 +22925,7 @@ type SetChatPhotoParams struct {
 }
 
 // SetChatPhotoOption configures SetChatPhotoParams.
-type SetChatPhotoOption func(params *SetChatPhotoParams) SetChatPhotoOption
+type SetChatPhotoOption = Option[SetChatPhotoParams]
 
 // Option applies one or more SetChatPhotoOption values and returns the last rollback option.
 func (r *SetChatPhotoParams) Option(opts ...SetChatPhotoOption) (previous SetChatPhotoOption) {
@@ -25453,24 +22939,18 @@ func (r *SetChatPhotoParams) Option(opts ...SetChatPhotoOption) (previous SetCha
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
 func WithSetChatPhotoChatID(value string) SetChatPhotoOption {
-	return func(params *SetChatPhotoParams) SetChatPhotoOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSetChatPhotoChatID(previous)
-	}
+	return fieldOption(value, func(params *SetChatPhotoParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSetChatPhotoPhoto sets the Photo field.
 //
 // New chat photo, uploaded using multipart/form-data
 func WithSetChatPhotoPhoto(value InputFile) SetChatPhotoOption {
-	return func(params *SetChatPhotoParams) SetChatPhotoOption {
-		previous := params.Photo
-		params.Photo = value
-
-		return WithSetChatPhotoPhoto(previous)
-	}
+	return fieldOption(value, func(params *SetChatPhotoParams) *InputFile {
+		return &params.Photo
+	})
 }
 
 // SetChatPhoto calls the setChatPhoto Telegram Bot API method.
@@ -25558,7 +23038,7 @@ type SetChatStickerSetParams struct {
 }
 
 // SetChatStickerSetOption configures SetChatStickerSetParams.
-type SetChatStickerSetOption func(params *SetChatStickerSetParams) SetChatStickerSetOption
+type SetChatStickerSetOption = Option[SetChatStickerSetParams]
 
 // Option applies one or more SetChatStickerSetOption values and returns the last rollback option.
 func (r *SetChatStickerSetParams) Option(opts ...SetChatStickerSetOption) (previous SetChatStickerSetOption) {
@@ -25572,24 +23052,18 @@ func (r *SetChatStickerSetParams) Option(opts ...SetChatStickerSetOption) (previ
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithSetChatStickerSetChatID(value string) SetChatStickerSetOption {
-	return func(params *SetChatStickerSetParams) SetChatStickerSetOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSetChatStickerSetChatID(previous)
-	}
+	return fieldOption(value, func(params *SetChatStickerSetParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSetChatStickerSetStickerSetName sets the StickerSetName field.
 //
 // Name of the sticker set to be set as the group sticker set
 func WithSetChatStickerSetStickerSetName(value string) SetChatStickerSetOption {
-	return func(params *SetChatStickerSetParams) SetChatStickerSetOption {
-		previous := params.StickerSetName
-		params.StickerSetName = value
-
-		return WithSetChatStickerSetStickerSetName(previous)
-	}
+	return fieldOption(value, func(params *SetChatStickerSetParams) *string {
+		return &params.StickerSetName
+	})
 }
 
 // SetChatStickerSet calls the setChatStickerSet Telegram Bot API method.
@@ -25637,7 +23111,7 @@ type SetChatTitleParams struct {
 }
 
 // SetChatTitleOption configures SetChatTitleParams.
-type SetChatTitleOption func(params *SetChatTitleParams) SetChatTitleOption
+type SetChatTitleOption = Option[SetChatTitleParams]
 
 // Option applies one or more SetChatTitleOption values and returns the last rollback option.
 func (r *SetChatTitleParams) Option(opts ...SetChatTitleOption) (previous SetChatTitleOption) {
@@ -25651,24 +23125,18 @@ func (r *SetChatTitleParams) Option(opts ...SetChatTitleOption) (previous SetCha
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
 func WithSetChatTitleChatID(value string) SetChatTitleOption {
-	return func(params *SetChatTitleParams) SetChatTitleOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSetChatTitleChatID(previous)
-	}
+	return fieldOption(value, func(params *SetChatTitleParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSetChatTitleTitle sets the Title field.
 //
 // New chat title, 1-128 characters
 func WithSetChatTitleTitle(value string) SetChatTitleOption {
-	return func(params *SetChatTitleParams) SetChatTitleOption {
-		previous := params.Title
-		params.Title = value
-
-		return WithSetChatTitleTitle(previous)
-	}
+	return fieldOption(value, func(params *SetChatTitleParams) *string {
+		return &params.Title
+	})
 }
 
 // SetChatTitle calls the setChatTitle Telegram Bot API method.
@@ -25714,7 +23182,7 @@ type SetCustomEmojiStickerSetThumbnailParams struct {
 }
 
 // SetCustomEmojiStickerSetThumbnailOption configures SetCustomEmojiStickerSetThumbnailParams.
-type SetCustomEmojiStickerSetThumbnailOption func(params *SetCustomEmojiStickerSetThumbnailParams) SetCustomEmojiStickerSetThumbnailOption
+type SetCustomEmojiStickerSetThumbnailOption = Option[SetCustomEmojiStickerSetThumbnailParams]
 
 // Option applies one or more SetCustomEmojiStickerSetThumbnailOption values and returns the last rollback option.
 func (r *SetCustomEmojiStickerSetThumbnailParams) Option(opts ...SetCustomEmojiStickerSetThumbnailOption) (previous SetCustomEmojiStickerSetThumbnailOption) {
@@ -25728,24 +23196,18 @@ func (r *SetCustomEmojiStickerSetThumbnailParams) Option(opts ...SetCustomEmojiS
 //
 // Sticker set name
 func WithSetCustomEmojiStickerSetThumbnailName(value string) SetCustomEmojiStickerSetThumbnailOption {
-	return func(params *SetCustomEmojiStickerSetThumbnailParams) SetCustomEmojiStickerSetThumbnailOption {
-		previous := params.Name
-		params.Name = value
-
-		return WithSetCustomEmojiStickerSetThumbnailName(previous)
-	}
+	return fieldOption(value, func(params *SetCustomEmojiStickerSetThumbnailParams) *string {
+		return &params.Name
+	})
 }
 
 // WithSetCustomEmojiStickerSetThumbnailCustomEmojiID sets the CustomEmojiID field.
 //
 // Custom emoji identifier of a sticker from the sticker set; pass an empty string to drop the thumbnail and use the first sticker as the thumbnail
 func WithSetCustomEmojiStickerSetThumbnailCustomEmojiID(value string) SetCustomEmojiStickerSetThumbnailOption {
-	return func(params *SetCustomEmojiStickerSetThumbnailParams) SetCustomEmojiStickerSetThumbnailOption {
-		previous := params.CustomEmojiID
-		params.CustomEmojiID = value
-
-		return WithSetCustomEmojiStickerSetThumbnailCustomEmojiID(previous)
-	}
+	return fieldOption(value, func(params *SetCustomEmojiStickerSetThumbnailParams) *string {
+		return &params.CustomEmojiID
+	})
 }
 
 // SetCustomEmojiStickerSetThumbnail calls the setCustomEmojiStickerSetThumbnail Telegram Bot API method.
@@ -25808,7 +23270,7 @@ type SetGameScoreParams struct {
 }
 
 // SetGameScoreOption configures SetGameScoreParams.
-type SetGameScoreOption func(params *SetGameScoreParams) SetGameScoreOption
+type SetGameScoreOption = Option[SetGameScoreParams]
 
 // Option applies one or more SetGameScoreOption values and returns the last rollback option.
 func (r *SetGameScoreParams) Option(opts ...SetGameScoreOption) (previous SetGameScoreOption) {
@@ -25822,24 +23284,18 @@ func (r *SetGameScoreParams) Option(opts ...SetGameScoreOption) (previous SetGam
 //
 // User identifier
 func WithSetGameScoreUserID(value int64) SetGameScoreOption {
-	return func(params *SetGameScoreParams) SetGameScoreOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithSetGameScoreUserID(previous)
-	}
+	return fieldOption(value, func(params *SetGameScoreParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithSetGameScoreScore sets the Score field.
 //
 // New score, must be non-negative
 func WithSetGameScoreScore(value int64) SetGameScoreOption {
-	return func(params *SetGameScoreParams) SetGameScoreOption {
-		previous := params.Score
-		params.Score = value
-
-		return WithSetGameScoreScore(previous)
-	}
+	return fieldOption(value, func(params *SetGameScoreParams) *int64 {
+		return &params.Score
+	})
 }
 
 // WithSetGameScoreForce sets the Force field.
@@ -25847,24 +23303,18 @@ func WithSetGameScoreScore(value int64) SetGameScoreOption {
 // Pass True if the high score is allowed to decrease.
 // This can be useful when fixing mistakes or banning cheaters.
 func WithSetGameScoreForce(value bool) SetGameScoreOption {
-	return func(params *SetGameScoreParams) SetGameScoreOption {
-		previous := params.Force
-		params.Force = value
-
-		return WithSetGameScoreForce(previous)
-	}
+	return fieldOption(value, func(params *SetGameScoreParams) *bool {
+		return &params.Force
+	})
 }
 
 // WithSetGameScoreDisableEditMessage sets the DisableEditMessage field.
 //
 // Pass True if the game message should not be automatically edited to include the current scoreboard
 func WithSetGameScoreDisableEditMessage(value bool) SetGameScoreOption {
-	return func(params *SetGameScoreParams) SetGameScoreOption {
-		previous := params.DisableEditMessage
-		params.DisableEditMessage = value
-
-		return WithSetGameScoreDisableEditMessage(previous)
-	}
+	return fieldOption(value, func(params *SetGameScoreParams) *bool {
+		return &params.DisableEditMessage
+	})
 }
 
 // WithSetGameScoreChatID sets the ChatID field.
@@ -25872,12 +23322,9 @@ func WithSetGameScoreDisableEditMessage(value bool) SetGameScoreOption {
 // Required if inline_message_id is not specified.
 // Unique identifier for the target chat.
 func WithSetGameScoreChatID(value int64) SetGameScoreOption {
-	return func(params *SetGameScoreParams) SetGameScoreOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSetGameScoreChatID(previous)
-	}
+	return fieldOption(value, func(params *SetGameScoreParams) *int64 {
+		return &params.ChatID
+	})
 }
 
 // WithSetGameScoreMessageID sets the MessageID field.
@@ -25885,12 +23332,9 @@ func WithSetGameScoreChatID(value int64) SetGameScoreOption {
 // Required if inline_message_id is not specified.
 // Identifier of the sent message.
 func WithSetGameScoreMessageID(value int64) SetGameScoreOption {
-	return func(params *SetGameScoreParams) SetGameScoreOption {
-		previous := params.MessageID
-		params.MessageID = value
-
-		return WithSetGameScoreMessageID(previous)
-	}
+	return fieldOption(value, func(params *SetGameScoreParams) *int64 {
+		return &params.MessageID
+	})
 }
 
 // WithSetGameScoreInlineMessageID sets the InlineMessageID field.
@@ -25898,12 +23342,9 @@ func WithSetGameScoreMessageID(value int64) SetGameScoreOption {
 // Required if chat_id and message_id are not specified.
 // Identifier of the inline message.
 func WithSetGameScoreInlineMessageID(value string) SetGameScoreOption {
-	return func(params *SetGameScoreParams) SetGameScoreOption {
-		previous := params.InlineMessageID
-		params.InlineMessageID = value
-
-		return WithSetGameScoreInlineMessageID(previous)
-	}
+	return fieldOption(value, func(params *SetGameScoreParams) *string {
+		return &params.InlineMessageID
+	})
 }
 
 // SetGameScore calls the setGameScore Telegram Bot API method.
@@ -25956,7 +23397,7 @@ type SetManagedBotAccessSettingsParams struct {
 }
 
 // SetManagedBotAccessSettingsOption configures SetManagedBotAccessSettingsParams.
-type SetManagedBotAccessSettingsOption func(params *SetManagedBotAccessSettingsParams) SetManagedBotAccessSettingsOption
+type SetManagedBotAccessSettingsOption = Option[SetManagedBotAccessSettingsParams]
 
 // Option applies one or more SetManagedBotAccessSettingsOption values and returns the last rollback option.
 func (r *SetManagedBotAccessSettingsParams) Option(opts ...SetManagedBotAccessSettingsOption) (previous SetManagedBotAccessSettingsOption) {
@@ -25970,12 +23411,9 @@ func (r *SetManagedBotAccessSettingsParams) Option(opts ...SetManagedBotAccessSe
 //
 // User identifier of the managed bot whose access settings will be changed
 func WithSetManagedBotAccessSettingsUserID(value int64) SetManagedBotAccessSettingsOption {
-	return func(params *SetManagedBotAccessSettingsParams) SetManagedBotAccessSettingsOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithSetManagedBotAccessSettingsUserID(previous)
-	}
+	return fieldOption(value, func(params *SetManagedBotAccessSettingsParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithSetManagedBotAccessSettingsIsAccessRestricted sets the IsAccessRestricted field.
@@ -25983,12 +23421,9 @@ func WithSetManagedBotAccessSettingsUserID(value int64) SetManagedBotAccessSetti
 // Pass True if only selected users can access the bot.
 // The bot's owner can always access it.
 func WithSetManagedBotAccessSettingsIsAccessRestricted(value bool) SetManagedBotAccessSettingsOption {
-	return func(params *SetManagedBotAccessSettingsParams) SetManagedBotAccessSettingsOption {
-		previous := params.IsAccessRestricted
-		params.IsAccessRestricted = value
-
-		return WithSetManagedBotAccessSettingsIsAccessRestricted(previous)
-	}
+	return fieldOption(value, func(params *SetManagedBotAccessSettingsParams) *bool {
+		return &params.IsAccessRestricted
+	})
 }
 
 // WithSetManagedBotAccessSettingsAddedUserIDs sets the AddedUserIDs field.
@@ -25996,12 +23431,9 @@ func WithSetManagedBotAccessSettingsIsAccessRestricted(value bool) SetManagedBot
 // A JSON-serialized list of up to 10 identifiers of users who will have access to the bot in addition to its owner.
 // Ignored if is_access_restricted is False.
 func WithSetManagedBotAccessSettingsAddedUserIDs(value []int64) SetManagedBotAccessSettingsOption {
-	return func(params *SetManagedBotAccessSettingsParams) SetManagedBotAccessSettingsOption {
-		previous := params.AddedUserIDs
-		params.AddedUserIDs = value
-
-		return WithSetManagedBotAccessSettingsAddedUserIDs(previous)
-	}
+	return fieldOption(value, func(params *SetManagedBotAccessSettingsParams) *[]int64 {
+		return &params.AddedUserIDs
+	})
 }
 
 // SetManagedBotAccessSettings calls the setManagedBotAccessSettings Telegram Bot API method.
@@ -26055,7 +23487,7 @@ type SetMessageReactionParams struct {
 }
 
 // SetMessageReactionOption configures SetMessageReactionParams.
-type SetMessageReactionOption func(params *SetMessageReactionParams) SetMessageReactionOption
+type SetMessageReactionOption = Option[SetMessageReactionParams]
 
 // Option applies one or more SetMessageReactionOption values and returns the last rollback option.
 func (r *SetMessageReactionParams) Option(opts ...SetMessageReactionOption) (previous SetMessageReactionOption) {
@@ -26069,12 +23501,9 @@ func (r *SetMessageReactionParams) Option(opts ...SetMessageReactionOption) (pre
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithSetMessageReactionChatID(value string) SetMessageReactionOption {
-	return func(params *SetMessageReactionParams) SetMessageReactionOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithSetMessageReactionChatID(previous)
-	}
+	return fieldOption(value, func(params *SetMessageReactionParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithSetMessageReactionMessageID sets the MessageID field.
@@ -26082,12 +23511,9 @@ func WithSetMessageReactionChatID(value string) SetMessageReactionOption {
 // Identifier of the target message.
 // If the message belongs to a media group, the reaction is set to the first non-deleted message in the group instead.
 func WithSetMessageReactionMessageID(value int64) SetMessageReactionOption {
-	return func(params *SetMessageReactionParams) SetMessageReactionOption {
-		previous := params.MessageID
-		params.MessageID = value
-
-		return WithSetMessageReactionMessageID(previous)
-	}
+	return fieldOption(value, func(params *SetMessageReactionParams) *int64 {
+		return &params.MessageID
+	})
 }
 
 // WithSetMessageReactionReaction sets the Reaction field.
@@ -26097,24 +23523,18 @@ func WithSetMessageReactionMessageID(value int64) SetMessageReactionOption {
 // A custom emoji reaction can be used if it is either already present on the message or explicitly allowed by chat administrators.
 // Paid reactions can't be used by bots.
 func WithSetMessageReactionReaction(value []ReactionType) SetMessageReactionOption {
-	return func(params *SetMessageReactionParams) SetMessageReactionOption {
-		previous := params.Reaction
-		params.Reaction = value
-
-		return WithSetMessageReactionReaction(previous)
-	}
+	return fieldOption(value, func(params *SetMessageReactionParams) *[]ReactionType {
+		return &params.Reaction
+	})
 }
 
 // WithSetMessageReactionIsBig sets the IsBig field.
 //
 // Pass True to set the reaction with a big animation
 func WithSetMessageReactionIsBig(value bool) SetMessageReactionOption {
-	return func(params *SetMessageReactionParams) SetMessageReactionOption {
-		previous := params.IsBig
-		params.IsBig = value
-
-		return WithSetMessageReactionIsBig(previous)
-	}
+	return fieldOption(value, func(params *SetMessageReactionParams) *bool {
+		return &params.IsBig
+	})
 }
 
 // SetMessageReaction calls the setMessageReaction Telegram Bot API method.
@@ -26169,7 +23589,7 @@ type SetMyCommandsParams struct {
 }
 
 // SetMyCommandsOption configures SetMyCommandsParams.
-type SetMyCommandsOption func(params *SetMyCommandsParams) SetMyCommandsOption
+type SetMyCommandsOption = Option[SetMyCommandsParams]
 
 // Option applies one or more SetMyCommandsOption values and returns the last rollback option.
 func (r *SetMyCommandsParams) Option(opts ...SetMyCommandsOption) (previous SetMyCommandsOption) {
@@ -26184,12 +23604,9 @@ func (r *SetMyCommandsParams) Option(opts ...SetMyCommandsOption) (previous SetM
 // A JSON-serialized list of bot commands to be set as the list of the bot's commands.
 // At most 100 commands can be specified.
 func WithSetMyCommandsCommands(value []BotCommand) SetMyCommandsOption {
-	return func(params *SetMyCommandsParams) SetMyCommandsOption {
-		previous := params.Commands
-		params.Commands = value
-
-		return WithSetMyCommandsCommands(previous)
-	}
+	return fieldOption(value, func(params *SetMyCommandsParams) *[]BotCommand {
+		return &params.Commands
+	})
 }
 
 // WithSetMyCommandsScope sets the Scope field.
@@ -26199,12 +23616,9 @@ func WithSetMyCommandsCommands(value []BotCommand) SetMyCommandsOption {
 //
 // [BotCommandScopeDefault]: https://core.telegram.org/bots/api#botcommandscopedefault
 func WithSetMyCommandsScope(value *BotCommandScope) SetMyCommandsOption {
-	return func(params *SetMyCommandsParams) SetMyCommandsOption {
-		previous := params.Scope
-		params.Scope = value
-
-		return WithSetMyCommandsScope(previous)
-	}
+	return fieldOption(value, func(params *SetMyCommandsParams) **BotCommandScope {
+		return &params.Scope
+	})
 }
 
 // WithSetMyCommandsLanguageCode sets the LanguageCode field.
@@ -26212,12 +23626,9 @@ func WithSetMyCommandsScope(value *BotCommandScope) SetMyCommandsOption {
 // A two-letter ISO 639-1 language code.
 // If empty, commands will be applied to all users from the given scope, for whose language there are no dedicated commands.
 func WithSetMyCommandsLanguageCode(value string) SetMyCommandsOption {
-	return func(params *SetMyCommandsParams) SetMyCommandsOption {
-		previous := params.LanguageCode
-		params.LanguageCode = value
-
-		return WithSetMyCommandsLanguageCode(previous)
-	}
+	return fieldOption(value, func(params *SetMyCommandsParams) *string {
+		return &params.LanguageCode
+	})
 }
 
 // SetMyCommands calls the setMyCommands Telegram Bot API method.
@@ -26266,7 +23677,7 @@ type SetMyDefaultAdministratorRightsParams struct {
 }
 
 // SetMyDefaultAdministratorRightsOption configures SetMyDefaultAdministratorRightsParams.
-type SetMyDefaultAdministratorRightsOption func(params *SetMyDefaultAdministratorRightsParams) SetMyDefaultAdministratorRightsOption
+type SetMyDefaultAdministratorRightsOption = Option[SetMyDefaultAdministratorRightsParams]
 
 // Option applies one or more SetMyDefaultAdministratorRightsOption values and returns the last rollback option.
 func (r *SetMyDefaultAdministratorRightsParams) Option(opts ...SetMyDefaultAdministratorRightsOption) (previous SetMyDefaultAdministratorRightsOption) {
@@ -26281,12 +23692,9 @@ func (r *SetMyDefaultAdministratorRightsParams) Option(opts ...SetMyDefaultAdmin
 // A JSON-serialized object describing new default administrator rights.
 // If not specified, the default administrator rights will be cleared.
 func WithSetMyDefaultAdministratorRightsRights(value *ChatAdministratorRights) SetMyDefaultAdministratorRightsOption {
-	return func(params *SetMyDefaultAdministratorRightsParams) SetMyDefaultAdministratorRightsOption {
-		previous := params.Rights
-		params.Rights = value
-
-		return WithSetMyDefaultAdministratorRightsRights(previous)
-	}
+	return fieldOption(value, func(params *SetMyDefaultAdministratorRightsParams) **ChatAdministratorRights {
+		return &params.Rights
+	})
 }
 
 // WithSetMyDefaultAdministratorRightsForChannels sets the ForChannels field.
@@ -26294,12 +23702,9 @@ func WithSetMyDefaultAdministratorRightsRights(value *ChatAdministratorRights) S
 // Pass True to change the default administrator rights of the bot in channels.
 // Otherwise, the default administrator rights of the bot for groups and supergroups will be changed.
 func WithSetMyDefaultAdministratorRightsForChannels(value bool) SetMyDefaultAdministratorRightsOption {
-	return func(params *SetMyDefaultAdministratorRightsParams) SetMyDefaultAdministratorRightsOption {
-		previous := params.ForChannels
-		params.ForChannels = value
-
-		return WithSetMyDefaultAdministratorRightsForChannels(previous)
-	}
+	return fieldOption(value, func(params *SetMyDefaultAdministratorRightsParams) *bool {
+		return &params.ForChannels
+	})
 }
 
 // SetMyDefaultAdministratorRights calls the setMyDefaultAdministratorRights Telegram Bot API method.
@@ -26346,7 +23751,7 @@ type SetMyDescriptionParams struct {
 }
 
 // SetMyDescriptionOption configures SetMyDescriptionParams.
-type SetMyDescriptionOption func(params *SetMyDescriptionParams) SetMyDescriptionOption
+type SetMyDescriptionOption = Option[SetMyDescriptionParams]
 
 // Option applies one or more SetMyDescriptionOption values and returns the last rollback option.
 func (r *SetMyDescriptionParams) Option(opts ...SetMyDescriptionOption) (previous SetMyDescriptionOption) {
@@ -26361,12 +23766,9 @@ func (r *SetMyDescriptionParams) Option(opts ...SetMyDescriptionOption) (previou
 // New bot description; 0-512 characters.
 // Pass an empty string to remove the dedicated description for the given language.
 func WithSetMyDescriptionDescription(value string) SetMyDescriptionOption {
-	return func(params *SetMyDescriptionParams) SetMyDescriptionOption {
-		previous := params.Description
-		params.Description = value
-
-		return WithSetMyDescriptionDescription(previous)
-	}
+	return fieldOption(value, func(params *SetMyDescriptionParams) *string {
+		return &params.Description
+	})
 }
 
 // WithSetMyDescriptionLanguageCode sets the LanguageCode field.
@@ -26374,12 +23776,9 @@ func WithSetMyDescriptionDescription(value string) SetMyDescriptionOption {
 // A two-letter ISO 639-1 language code.
 // If empty, the description will be applied to all users for whose language there is no dedicated description.
 func WithSetMyDescriptionLanguageCode(value string) SetMyDescriptionOption {
-	return func(params *SetMyDescriptionParams) SetMyDescriptionOption {
-		previous := params.LanguageCode
-		params.LanguageCode = value
-
-		return WithSetMyDescriptionLanguageCode(previous)
-	}
+	return fieldOption(value, func(params *SetMyDescriptionParams) *string {
+		return &params.LanguageCode
+	})
 }
 
 // SetMyDescription calls the setMyDescription Telegram Bot API method.
@@ -26425,7 +23824,7 @@ type SetMyNameParams struct {
 }
 
 // SetMyNameOption configures SetMyNameParams.
-type SetMyNameOption func(params *SetMyNameParams) SetMyNameOption
+type SetMyNameOption = Option[SetMyNameParams]
 
 // Option applies one or more SetMyNameOption values and returns the last rollback option.
 func (r *SetMyNameParams) Option(opts ...SetMyNameOption) (previous SetMyNameOption) {
@@ -26440,12 +23839,9 @@ func (r *SetMyNameParams) Option(opts ...SetMyNameOption) (previous SetMyNameOpt
 // New bot name; 0-64 characters.
 // Pass an empty string to remove the dedicated name for the given language.
 func WithSetMyNameName(value string) SetMyNameOption {
-	return func(params *SetMyNameParams) SetMyNameOption {
-		previous := params.Name
-		params.Name = value
-
-		return WithSetMyNameName(previous)
-	}
+	return fieldOption(value, func(params *SetMyNameParams) *string {
+		return &params.Name
+	})
 }
 
 // WithSetMyNameLanguageCode sets the LanguageCode field.
@@ -26453,12 +23849,9 @@ func WithSetMyNameName(value string) SetMyNameOption {
 // A two-letter ISO 639-1 language code.
 // If empty, the name will be shown to all users for whose language there is no dedicated name.
 func WithSetMyNameLanguageCode(value string) SetMyNameOption {
-	return func(params *SetMyNameParams) SetMyNameOption {
-		previous := params.LanguageCode
-		params.LanguageCode = value
-
-		return WithSetMyNameLanguageCode(previous)
-	}
+	return fieldOption(value, func(params *SetMyNameParams) *string {
+		return &params.LanguageCode
+	})
 }
 
 // SetMyName calls the setMyName Telegram Bot API method.
@@ -26499,7 +23892,7 @@ type SetMyProfilePhotoParams struct {
 }
 
 // SetMyProfilePhotoOption configures SetMyProfilePhotoParams.
-type SetMyProfilePhotoOption func(params *SetMyProfilePhotoParams) SetMyProfilePhotoOption
+type SetMyProfilePhotoOption = Option[SetMyProfilePhotoParams]
 
 // Option applies one or more SetMyProfilePhotoOption values and returns the last rollback option.
 func (r *SetMyProfilePhotoParams) Option(opts ...SetMyProfilePhotoOption) (previous SetMyProfilePhotoOption) {
@@ -26513,12 +23906,9 @@ func (r *SetMyProfilePhotoParams) Option(opts ...SetMyProfilePhotoOption) (previ
 //
 // The new profile photo to set
 func WithSetMyProfilePhotoPhoto(value InputProfilePhoto) SetMyProfilePhotoOption {
-	return func(params *SetMyProfilePhotoParams) SetMyProfilePhotoOption {
-		previous := params.Photo
-		params.Photo = value
-
-		return WithSetMyProfilePhotoPhoto(previous)
-	}
+	return fieldOption(value, func(params *SetMyProfilePhotoParams) *InputProfilePhoto {
+		return &params.Photo
+	})
 }
 
 // SetMyProfilePhoto calls the setMyProfilePhoto Telegram Bot API method.
@@ -26626,7 +24016,7 @@ type SetMyShortDescriptionParams struct {
 }
 
 // SetMyShortDescriptionOption configures SetMyShortDescriptionParams.
-type SetMyShortDescriptionOption func(params *SetMyShortDescriptionParams) SetMyShortDescriptionOption
+type SetMyShortDescriptionOption = Option[SetMyShortDescriptionParams]
 
 // Option applies one or more SetMyShortDescriptionOption values and returns the last rollback option.
 func (r *SetMyShortDescriptionParams) Option(opts ...SetMyShortDescriptionOption) (previous SetMyShortDescriptionOption) {
@@ -26641,12 +24031,9 @@ func (r *SetMyShortDescriptionParams) Option(opts ...SetMyShortDescriptionOption
 // New short description for the bot; 0-120 characters.
 // Pass an empty string to remove the dedicated short description for the given language.
 func WithSetMyShortDescriptionShortDescription(value string) SetMyShortDescriptionOption {
-	return func(params *SetMyShortDescriptionParams) SetMyShortDescriptionOption {
-		previous := params.ShortDescription
-		params.ShortDescription = value
-
-		return WithSetMyShortDescriptionShortDescription(previous)
-	}
+	return fieldOption(value, func(params *SetMyShortDescriptionParams) *string {
+		return &params.ShortDescription
+	})
 }
 
 // WithSetMyShortDescriptionLanguageCode sets the LanguageCode field.
@@ -26654,12 +24041,9 @@ func WithSetMyShortDescriptionShortDescription(value string) SetMyShortDescripti
 // A two-letter ISO 639-1 language code.
 // If empty, the short description will be applied to all users for whose language there is no dedicated short description.
 func WithSetMyShortDescriptionLanguageCode(value string) SetMyShortDescriptionOption {
-	return func(params *SetMyShortDescriptionParams) SetMyShortDescriptionOption {
-		previous := params.LanguageCode
-		params.LanguageCode = value
-
-		return WithSetMyShortDescriptionLanguageCode(previous)
-	}
+	return fieldOption(value, func(params *SetMyShortDescriptionParams) *string {
+		return &params.LanguageCode
+	})
 }
 
 // SetMyShortDescription calls the setMyShortDescription Telegram Bot API method.
@@ -26703,7 +24087,7 @@ type SetPassportDataErrorsParams struct {
 }
 
 // SetPassportDataErrorsOption configures SetPassportDataErrorsParams.
-type SetPassportDataErrorsOption func(params *SetPassportDataErrorsParams) SetPassportDataErrorsOption
+type SetPassportDataErrorsOption = Option[SetPassportDataErrorsParams]
 
 // Option applies one or more SetPassportDataErrorsOption values and returns the last rollback option.
 func (r *SetPassportDataErrorsParams) Option(opts ...SetPassportDataErrorsOption) (previous SetPassportDataErrorsOption) {
@@ -26717,24 +24101,18 @@ func (r *SetPassportDataErrorsParams) Option(opts ...SetPassportDataErrorsOption
 //
 // User identifier
 func WithSetPassportDataErrorsUserID(value int64) SetPassportDataErrorsOption {
-	return func(params *SetPassportDataErrorsParams) SetPassportDataErrorsOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithSetPassportDataErrorsUserID(previous)
-	}
+	return fieldOption(value, func(params *SetPassportDataErrorsParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithSetPassportDataErrorsErrors sets the Errors field.
 //
 // A JSON-serialized Array describing the errors
 func WithSetPassportDataErrorsErrors(value []PassportElementError) SetPassportDataErrorsOption {
-	return func(params *SetPassportDataErrorsParams) SetPassportDataErrorsOption {
-		previous := params.Errors
-		params.Errors = value
-
-		return WithSetPassportDataErrorsErrors(previous)
-	}
+	return fieldOption(value, func(params *SetPassportDataErrorsParams) *[]PassportElementError {
+		return &params.Errors
+	})
 }
 
 // SetPassportDataErrors calls the setPassportDataErrors Telegram Bot API method.
@@ -26782,7 +24160,7 @@ type SetStickerEmojiListParams struct {
 }
 
 // SetStickerEmojiListOption configures SetStickerEmojiListParams.
-type SetStickerEmojiListOption func(params *SetStickerEmojiListParams) SetStickerEmojiListOption
+type SetStickerEmojiListOption = Option[SetStickerEmojiListParams]
 
 // Option applies one or more SetStickerEmojiListOption values and returns the last rollback option.
 func (r *SetStickerEmojiListParams) Option(opts ...SetStickerEmojiListOption) (previous SetStickerEmojiListOption) {
@@ -26796,24 +24174,18 @@ func (r *SetStickerEmojiListParams) Option(opts ...SetStickerEmojiListOption) (p
 //
 // File identifier of the sticker
 func WithSetStickerEmojiListSticker(value string) SetStickerEmojiListOption {
-	return func(params *SetStickerEmojiListParams) SetStickerEmojiListOption {
-		previous := params.Sticker
-		params.Sticker = value
-
-		return WithSetStickerEmojiListSticker(previous)
-	}
+	return fieldOption(value, func(params *SetStickerEmojiListParams) *string {
+		return &params.Sticker
+	})
 }
 
 // WithSetStickerEmojiListEmojiList sets the EmojiList field.
 //
 // A JSON-serialized list of 1-20 emoji associated with the sticker
 func WithSetStickerEmojiListEmojiList(value []string) SetStickerEmojiListOption {
-	return func(params *SetStickerEmojiListParams) SetStickerEmojiListOption {
-		previous := params.EmojiList
-		params.EmojiList = value
-
-		return WithSetStickerEmojiListEmojiList(previous)
-	}
+	return fieldOption(value, func(params *SetStickerEmojiListParams) *[]string {
+		return &params.EmojiList
+	})
 }
 
 // SetStickerEmojiList calls the setStickerEmojiList Telegram Bot API method.
@@ -26858,7 +24230,7 @@ type SetStickerKeywordsParams struct {
 }
 
 // SetStickerKeywordsOption configures SetStickerKeywordsParams.
-type SetStickerKeywordsOption func(params *SetStickerKeywordsParams) SetStickerKeywordsOption
+type SetStickerKeywordsOption = Option[SetStickerKeywordsParams]
 
 // Option applies one or more SetStickerKeywordsOption values and returns the last rollback option.
 func (r *SetStickerKeywordsParams) Option(opts ...SetStickerKeywordsOption) (previous SetStickerKeywordsOption) {
@@ -26872,24 +24244,18 @@ func (r *SetStickerKeywordsParams) Option(opts ...SetStickerKeywordsOption) (pre
 //
 // File identifier of the sticker
 func WithSetStickerKeywordsSticker(value string) SetStickerKeywordsOption {
-	return func(params *SetStickerKeywordsParams) SetStickerKeywordsOption {
-		previous := params.Sticker
-		params.Sticker = value
-
-		return WithSetStickerKeywordsSticker(previous)
-	}
+	return fieldOption(value, func(params *SetStickerKeywordsParams) *string {
+		return &params.Sticker
+	})
 }
 
 // WithSetStickerKeywordsKeywords sets the Keywords field.
 //
 // A JSON-serialized list of 0-20 search keywords for the sticker with total length of up to 64 characters
 func WithSetStickerKeywordsKeywords(value []string) SetStickerKeywordsOption {
-	return func(params *SetStickerKeywordsParams) SetStickerKeywordsOption {
-		previous := params.Keywords
-		params.Keywords = value
-
-		return WithSetStickerKeywordsKeywords(previous)
-	}
+	return fieldOption(value, func(params *SetStickerKeywordsParams) *[]string {
+		return &params.Keywords
+	})
 }
 
 // SetStickerKeywords calls the setStickerKeywords Telegram Bot API method.
@@ -26935,7 +24301,7 @@ type SetStickerMaskPositionParams struct {
 }
 
 // SetStickerMaskPositionOption configures SetStickerMaskPositionParams.
-type SetStickerMaskPositionOption func(params *SetStickerMaskPositionParams) SetStickerMaskPositionOption
+type SetStickerMaskPositionOption = Option[SetStickerMaskPositionParams]
 
 // Option applies one or more SetStickerMaskPositionOption values and returns the last rollback option.
 func (r *SetStickerMaskPositionParams) Option(opts ...SetStickerMaskPositionOption) (previous SetStickerMaskPositionOption) {
@@ -26949,12 +24315,9 @@ func (r *SetStickerMaskPositionParams) Option(opts ...SetStickerMaskPositionOpti
 //
 // File identifier of the sticker
 func WithSetStickerMaskPositionSticker(value string) SetStickerMaskPositionOption {
-	return func(params *SetStickerMaskPositionParams) SetStickerMaskPositionOption {
-		previous := params.Sticker
-		params.Sticker = value
-
-		return WithSetStickerMaskPositionSticker(previous)
-	}
+	return fieldOption(value, func(params *SetStickerMaskPositionParams) *string {
+		return &params.Sticker
+	})
 }
 
 // WithSetStickerMaskPositionMaskPosition sets the MaskPosition field.
@@ -26962,12 +24325,9 @@ func WithSetStickerMaskPositionSticker(value string) SetStickerMaskPositionOptio
 // A JSON-serialized object with the position where the mask should be placed on faces.
 // Omit the parameter to remove the mask position.
 func WithSetStickerMaskPositionMaskPosition(value *MaskPosition) SetStickerMaskPositionOption {
-	return func(params *SetStickerMaskPositionParams) SetStickerMaskPositionOption {
-		previous := params.MaskPosition
-		params.MaskPosition = value
-
-		return WithSetStickerMaskPositionMaskPosition(previous)
-	}
+	return fieldOption(value, func(params *SetStickerMaskPositionParams) **MaskPosition {
+		return &params.MaskPosition
+	})
 }
 
 // SetStickerMaskPosition calls the setStickerMaskPosition Telegram Bot API method.
@@ -27014,7 +24374,7 @@ type SetStickerPositionInSetParams struct {
 }
 
 // SetStickerPositionInSetOption configures SetStickerPositionInSetParams.
-type SetStickerPositionInSetOption func(params *SetStickerPositionInSetParams) SetStickerPositionInSetOption
+type SetStickerPositionInSetOption = Option[SetStickerPositionInSetParams]
 
 // Option applies one or more SetStickerPositionInSetOption values and returns the last rollback option.
 func (r *SetStickerPositionInSetParams) Option(opts ...SetStickerPositionInSetOption) (previous SetStickerPositionInSetOption) {
@@ -27028,24 +24388,18 @@ func (r *SetStickerPositionInSetParams) Option(opts ...SetStickerPositionInSetOp
 //
 // File identifier of the sticker
 func WithSetStickerPositionInSetSticker(value string) SetStickerPositionInSetOption {
-	return func(params *SetStickerPositionInSetParams) SetStickerPositionInSetOption {
-		previous := params.Sticker
-		params.Sticker = value
-
-		return WithSetStickerPositionInSetSticker(previous)
-	}
+	return fieldOption(value, func(params *SetStickerPositionInSetParams) *string {
+		return &params.Sticker
+	})
 }
 
 // WithSetStickerPositionInSetPosition sets the Position field.
 //
 // New sticker position in the set, zero-based
 func WithSetStickerPositionInSetPosition(value int64) SetStickerPositionInSetOption {
-	return func(params *SetStickerPositionInSetParams) SetStickerPositionInSetOption {
-		previous := params.Position
-		params.Position = value
-
-		return WithSetStickerPositionInSetPosition(previous)
-	}
+	return fieldOption(value, func(params *SetStickerPositionInSetParams) *int64 {
+		return &params.Position
+	})
 }
 
 // SetStickerPositionInSet calls the setStickerPositionInSet Telegram Bot API method.
@@ -27103,7 +24457,7 @@ type SetStickerSetThumbnailParams struct {
 }
 
 // SetStickerSetThumbnailOption configures SetStickerSetThumbnailParams.
-type SetStickerSetThumbnailOption func(params *SetStickerSetThumbnailParams) SetStickerSetThumbnailOption
+type SetStickerSetThumbnailOption = Option[SetStickerSetThumbnailParams]
 
 // Option applies one or more SetStickerSetThumbnailOption values and returns the last rollback option.
 func (r *SetStickerSetThumbnailParams) Option(opts ...SetStickerSetThumbnailOption) (previous SetStickerSetThumbnailOption) {
@@ -27117,24 +24471,18 @@ func (r *SetStickerSetThumbnailParams) Option(opts ...SetStickerSetThumbnailOpti
 //
 // Sticker set name
 func WithSetStickerSetThumbnailName(value string) SetStickerSetThumbnailOption {
-	return func(params *SetStickerSetThumbnailParams) SetStickerSetThumbnailOption {
-		previous := params.Name
-		params.Name = value
-
-		return WithSetStickerSetThumbnailName(previous)
-	}
+	return fieldOption(value, func(params *SetStickerSetThumbnailParams) *string {
+		return &params.Name
+	})
 }
 
 // WithSetStickerSetThumbnailUserID sets the UserID field.
 //
 // User identifier of the sticker set owner
 func WithSetStickerSetThumbnailUserID(value int64) SetStickerSetThumbnailOption {
-	return func(params *SetStickerSetThumbnailParams) SetStickerSetThumbnailOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithSetStickerSetThumbnailUserID(previous)
-	}
+	return fieldOption(value, func(params *SetStickerSetThumbnailParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithSetStickerSetThumbnailThumbnail sets the Thumbnail field.
@@ -27149,24 +24497,18 @@ func WithSetStickerSetThumbnailUserID(value int64) SetStickerSetThumbnailOption 
 // [https://core.telegram.org/stickers#video-requirements]: https://core.telegram.org/stickers#video-requirements
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
 func WithSetStickerSetThumbnailThumbnail(value *InputFile) SetStickerSetThumbnailOption {
-	return func(params *SetStickerSetThumbnailParams) SetStickerSetThumbnailOption {
-		previous := params.Thumbnail
-		params.Thumbnail = value
-
-		return WithSetStickerSetThumbnailThumbnail(previous)
-	}
+	return fieldOption(value, func(params *SetStickerSetThumbnailParams) **InputFile {
+		return &params.Thumbnail
+	})
 }
 
 // WithSetStickerSetThumbnailFormat sets the Format field.
 //
 // Format of the thumbnail, must be one of “static” for a .WEBP or .PNG image, “animated” for a .TGS animation, or “video” for a .WEBM video
 func WithSetStickerSetThumbnailFormat(value string) SetStickerSetThumbnailOption {
-	return func(params *SetStickerSetThumbnailParams) SetStickerSetThumbnailOption {
-		previous := params.Format
-		params.Format = value
-
-		return WithSetStickerSetThumbnailFormat(previous)
-	}
+	return fieldOption(value, func(params *SetStickerSetThumbnailParams) *string {
+		return &params.Format
+	})
 }
 
 // SetStickerSetThumbnail calls the setStickerSetThumbnail Telegram Bot API method.
@@ -27271,7 +24613,7 @@ type SetStickerSetTitleParams struct {
 }
 
 // SetStickerSetTitleOption configures SetStickerSetTitleParams.
-type SetStickerSetTitleOption func(params *SetStickerSetTitleParams) SetStickerSetTitleOption
+type SetStickerSetTitleOption = Option[SetStickerSetTitleParams]
 
 // Option applies one or more SetStickerSetTitleOption values and returns the last rollback option.
 func (r *SetStickerSetTitleParams) Option(opts ...SetStickerSetTitleOption) (previous SetStickerSetTitleOption) {
@@ -27285,24 +24627,18 @@ func (r *SetStickerSetTitleParams) Option(opts ...SetStickerSetTitleOption) (pre
 //
 // Sticker set name
 func WithSetStickerSetTitleName(value string) SetStickerSetTitleOption {
-	return func(params *SetStickerSetTitleParams) SetStickerSetTitleOption {
-		previous := params.Name
-		params.Name = value
-
-		return WithSetStickerSetTitleName(previous)
-	}
+	return fieldOption(value, func(params *SetStickerSetTitleParams) *string {
+		return &params.Name
+	})
 }
 
 // WithSetStickerSetTitleTitle sets the Title field.
 //
 // Sticker set title, 1-64 characters
 func WithSetStickerSetTitleTitle(value string) SetStickerSetTitleOption {
-	return func(params *SetStickerSetTitleParams) SetStickerSetTitleOption {
-		previous := params.Title
-		params.Title = value
-
-		return WithSetStickerSetTitleTitle(previous)
-	}
+	return fieldOption(value, func(params *SetStickerSetTitleParams) *string {
+		return &params.Title
+	})
 }
 
 // SetStickerSetTitle calls the setStickerSetTitle Telegram Bot API method.
@@ -27350,7 +24686,7 @@ type SetUserEmojiStatusParams struct {
 }
 
 // SetUserEmojiStatusOption configures SetUserEmojiStatusParams.
-type SetUserEmojiStatusOption func(params *SetUserEmojiStatusParams) SetUserEmojiStatusOption
+type SetUserEmojiStatusOption = Option[SetUserEmojiStatusParams]
 
 // Option applies one or more SetUserEmojiStatusOption values and returns the last rollback option.
 func (r *SetUserEmojiStatusParams) Option(opts ...SetUserEmojiStatusOption) (previous SetUserEmojiStatusOption) {
@@ -27364,12 +24700,9 @@ func (r *SetUserEmojiStatusParams) Option(opts ...SetUserEmojiStatusOption) (pre
 //
 // Unique identifier of the target user
 func WithSetUserEmojiStatusUserID(value int64) SetUserEmojiStatusOption {
-	return func(params *SetUserEmojiStatusParams) SetUserEmojiStatusOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithSetUserEmojiStatusUserID(previous)
-	}
+	return fieldOption(value, func(params *SetUserEmojiStatusParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithSetUserEmojiStatusEmojiStatusCustomEmojiID sets the EmojiStatusCustomEmojiID field.
@@ -27377,24 +24710,18 @@ func WithSetUserEmojiStatusUserID(value int64) SetUserEmojiStatusOption {
 // Custom emoji identifier of the emoji status to set.
 // Pass an empty string to remove the status.
 func WithSetUserEmojiStatusEmojiStatusCustomEmojiID(value string) SetUserEmojiStatusOption {
-	return func(params *SetUserEmojiStatusParams) SetUserEmojiStatusOption {
-		previous := params.EmojiStatusCustomEmojiID
-		params.EmojiStatusCustomEmojiID = value
-
-		return WithSetUserEmojiStatusEmojiStatusCustomEmojiID(previous)
-	}
+	return fieldOption(value, func(params *SetUserEmojiStatusParams) *string {
+		return &params.EmojiStatusCustomEmojiID
+	})
 }
 
 // WithSetUserEmojiStatusEmojiStatusExpirationDate sets the EmojiStatusExpirationDate field.
 //
 // Expiration date of the emoji status, if any
 func WithSetUserEmojiStatusEmojiStatusExpirationDate(value int64) SetUserEmojiStatusOption {
-	return func(params *SetUserEmojiStatusParams) SetUserEmojiStatusOption {
-		previous := params.EmojiStatusExpirationDate
-		params.EmojiStatusExpirationDate = value
-
-		return WithSetUserEmojiStatusEmojiStatusExpirationDate(previous)
-	}
+	return fieldOption(value, func(params *SetUserEmojiStatusParams) *int64 {
+		return &params.EmojiStatusExpirationDate
+	})
 }
 
 // SetUserEmojiStatus calls the setUserEmojiStatus Telegram Bot API method.
@@ -27470,7 +24797,7 @@ type SetWebhookParams struct {
 }
 
 // SetWebhookOption configures SetWebhookParams.
-type SetWebhookOption func(params *SetWebhookParams) SetWebhookOption
+type SetWebhookOption = Option[SetWebhookParams]
 
 // Option applies one or more SetWebhookOption values and returns the last rollback option.
 func (r *SetWebhookParams) Option(opts ...SetWebhookOption) (previous SetWebhookOption) {
@@ -27485,12 +24812,9 @@ func (r *SetWebhookParams) Option(opts ...SetWebhookOption) (previous SetWebhook
 // HTTPS URL to send updates to.
 // Use an empty string to remove webhook integration.
 func WithSetWebhookURL(value string) SetWebhookOption {
-	return func(params *SetWebhookParams) SetWebhookOption {
-		previous := params.URL
-		params.URL = value
-
-		return WithSetWebhookURL(previous)
-	}
+	return fieldOption(value, func(params *SetWebhookParams) *string {
+		return &params.URL
+	})
 }
 
 // WithSetWebhookCertificate sets the Certificate field.
@@ -27500,24 +24824,18 @@ func WithSetWebhookURL(value string) SetWebhookOption {
 //
 // [self-signed guide]: https://core.telegram.org/bots/self-signed
 func WithSetWebhookCertificate(value *InputFile) SetWebhookOption {
-	return func(params *SetWebhookParams) SetWebhookOption {
-		previous := params.Certificate
-		params.Certificate = value
-
-		return WithSetWebhookCertificate(previous)
-	}
+	return fieldOption(value, func(params *SetWebhookParams) **InputFile {
+		return &params.Certificate
+	})
 }
 
 // WithSetWebhookIpAddress sets the IpAddress field.
 //
 // The fixed IP address which will be used to send webhook requests instead of the IP address resolved through DNS
 func WithSetWebhookIpAddress(value string) SetWebhookOption {
-	return func(params *SetWebhookParams) SetWebhookOption {
-		previous := params.IpAddress
-		params.IpAddress = value
-
-		return WithSetWebhookIpAddress(previous)
-	}
+	return fieldOption(value, func(params *SetWebhookParams) *string {
+		return &params.IpAddress
+	})
 }
 
 // WithSetWebhookMaxConnections sets the MaxConnections field.
@@ -27526,12 +24844,9 @@ func WithSetWebhookIpAddress(value string) SetWebhookOption {
 // Defaults to 40.
 // Use lower values to limit the load on your bot's server, and higher values to increase your bot's throughput.
 func WithSetWebhookMaxConnections(value int64) SetWebhookOption {
-	return func(params *SetWebhookParams) SetWebhookOption {
-		previous := params.MaxConnections
-		params.MaxConnections = value
-
-		return WithSetWebhookMaxConnections(previous)
-	}
+	return fieldOption(value, func(params *SetWebhookParams) *int64 {
+		return &params.MaxConnections
+	})
 }
 
 // WithSetWebhookAllowedUpdates sets the AllowedUpdates field.
@@ -27545,24 +24860,18 @@ func WithSetWebhookMaxConnections(value int64) SetWebhookOption {
 //
 // [Update]: https://core.telegram.org/bots/api#update
 func WithSetWebhookAllowedUpdates(value []string) SetWebhookOption {
-	return func(params *SetWebhookParams) SetWebhookOption {
-		previous := params.AllowedUpdates
-		params.AllowedUpdates = value
-
-		return WithSetWebhookAllowedUpdates(previous)
-	}
+	return fieldOption(value, func(params *SetWebhookParams) *[]string {
+		return &params.AllowedUpdates
+	})
 }
 
 // WithSetWebhookDropPendingUpdates sets the DropPendingUpdates field.
 //
 // Pass True to drop all pending updates
 func WithSetWebhookDropPendingUpdates(value bool) SetWebhookOption {
-	return func(params *SetWebhookParams) SetWebhookOption {
-		previous := params.DropPendingUpdates
-		params.DropPendingUpdates = value
-
-		return WithSetWebhookDropPendingUpdates(previous)
-	}
+	return fieldOption(value, func(params *SetWebhookParams) *bool {
+		return &params.DropPendingUpdates
+	})
 }
 
 // WithSetWebhookSecretToken sets the SecretToken field.
@@ -27571,12 +24880,9 @@ func WithSetWebhookDropPendingUpdates(value bool) SetWebhookOption {
 // Only characters A-Z, a-z, 0-9, _ and - are allowed.
 // The header is useful to ensure that the request comes from a webhook set by you.
 func WithSetWebhookSecretToken(value string) SetWebhookOption {
-	return func(params *SetWebhookParams) SetWebhookOption {
-		previous := params.SecretToken
-		params.SecretToken = value
-
-		return WithSetWebhookSecretToken(previous)
-	}
+	return fieldOption(value, func(params *SetWebhookParams) *string {
+		return &params.SecretToken
+	})
 }
 
 // SetWebhook calls the setWebhook Telegram Bot API method.
@@ -27736,7 +25042,7 @@ type StopMessageLiveLocationParams struct {
 }
 
 // StopMessageLiveLocationOption configures StopMessageLiveLocationParams.
-type StopMessageLiveLocationOption func(params *StopMessageLiveLocationParams) StopMessageLiveLocationOption
+type StopMessageLiveLocationOption = Option[StopMessageLiveLocationParams]
 
 // Option applies one or more StopMessageLiveLocationOption values and returns the last rollback option.
 func (r *StopMessageLiveLocationParams) Option(opts ...StopMessageLiveLocationOption) (previous StopMessageLiveLocationOption) {
@@ -27750,12 +25056,9 @@ func (r *StopMessageLiveLocationParams) Option(opts ...StopMessageLiveLocationOp
 //
 // Unique identifier of the business connection on behalf of which the message to be edited was sent
 func WithStopMessageLiveLocationBusinessConnectionID(value string) StopMessageLiveLocationOption {
-	return func(params *StopMessageLiveLocationParams) StopMessageLiveLocationOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithStopMessageLiveLocationBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *StopMessageLiveLocationParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithStopMessageLiveLocationChatID sets the ChatID field.
@@ -27763,12 +25066,9 @@ func WithStopMessageLiveLocationBusinessConnectionID(value string) StopMessageLi
 // Required if inline_message_id is not specified.
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
 func WithStopMessageLiveLocationChatID(value string) StopMessageLiveLocationOption {
-	return func(params *StopMessageLiveLocationParams) StopMessageLiveLocationOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithStopMessageLiveLocationChatID(previous)
-	}
+	return fieldOption(value, func(params *StopMessageLiveLocationParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithStopMessageLiveLocationMessageID sets the MessageID field.
@@ -27776,12 +25076,9 @@ func WithStopMessageLiveLocationChatID(value string) StopMessageLiveLocationOpti
 // Required if inline_message_id is not specified.
 // Identifier of the message with live location to stop.
 func WithStopMessageLiveLocationMessageID(value int64) StopMessageLiveLocationOption {
-	return func(params *StopMessageLiveLocationParams) StopMessageLiveLocationOption {
-		previous := params.MessageID
-		params.MessageID = value
-
-		return WithStopMessageLiveLocationMessageID(previous)
-	}
+	return fieldOption(value, func(params *StopMessageLiveLocationParams) *int64 {
+		return &params.MessageID
+	})
 }
 
 // WithStopMessageLiveLocationInlineMessageID sets the InlineMessageID field.
@@ -27789,12 +25086,9 @@ func WithStopMessageLiveLocationMessageID(value int64) StopMessageLiveLocationOp
 // Required if chat_id and message_id are not specified.
 // Identifier of the inline message.
 func WithStopMessageLiveLocationInlineMessageID(value string) StopMessageLiveLocationOption {
-	return func(params *StopMessageLiveLocationParams) StopMessageLiveLocationOption {
-		previous := params.InlineMessageID
-		params.InlineMessageID = value
-
-		return WithStopMessageLiveLocationInlineMessageID(previous)
-	}
+	return fieldOption(value, func(params *StopMessageLiveLocationParams) *string {
+		return &params.InlineMessageID
+	})
 }
 
 // WithStopMessageLiveLocationReplyMarkup sets the ReplyMarkup field.
@@ -27803,12 +25097,9 @@ func WithStopMessageLiveLocationInlineMessageID(value string) StopMessageLiveLoc
 //
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 func WithStopMessageLiveLocationReplyMarkup(value *InlineKeyboardMarkup) StopMessageLiveLocationOption {
-	return func(params *StopMessageLiveLocationParams) StopMessageLiveLocationOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithStopMessageLiveLocationReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *StopMessageLiveLocationParams) **InlineKeyboardMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // StopMessageLiveLocation calls the stopMessageLiveLocation Telegram Bot API method.
@@ -27863,7 +25154,7 @@ type StopPollParams struct {
 }
 
 // StopPollOption configures StopPollParams.
-type StopPollOption func(params *StopPollParams) StopPollOption
+type StopPollOption = Option[StopPollParams]
 
 // Option applies one or more StopPollOption values and returns the last rollback option.
 func (r *StopPollParams) Option(opts ...StopPollOption) (previous StopPollOption) {
@@ -27877,36 +25168,27 @@ func (r *StopPollParams) Option(opts ...StopPollOption) (previous StopPollOption
 //
 // Unique identifier of the business connection on behalf of which the message to be edited was sent
 func WithStopPollBusinessConnectionID(value string) StopPollOption {
-	return func(params *StopPollParams) StopPollOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithStopPollBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *StopPollParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithStopPollChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
 func WithStopPollChatID(value string) StopPollOption {
-	return func(params *StopPollParams) StopPollOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithStopPollChatID(previous)
-	}
+	return fieldOption(value, func(params *StopPollParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithStopPollMessageID sets the MessageID field.
 //
 // Identifier of the original message with the poll
 func WithStopPollMessageID(value int64) StopPollOption {
-	return func(params *StopPollParams) StopPollOption {
-		previous := params.MessageID
-		params.MessageID = value
-
-		return WithStopPollMessageID(previous)
-	}
+	return fieldOption(value, func(params *StopPollParams) *int64 {
+		return &params.MessageID
+	})
 }
 
 // WithStopPollReplyMarkup sets the ReplyMarkup field.
@@ -27915,12 +25197,9 @@ func WithStopPollMessageID(value int64) StopPollOption {
 //
 // [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
 func WithStopPollReplyMarkup(value *InlineKeyboardMarkup) StopPollOption {
-	return func(params *StopPollParams) StopPollOption {
-		previous := params.ReplyMarkup
-		params.ReplyMarkup = value
-
-		return WithStopPollReplyMarkup(previous)
-	}
+	return fieldOption(value, func(params *StopPollParams) **InlineKeyboardMarkup {
+		return &params.ReplyMarkup
+	})
 }
 
 // StopPoll calls the stopPoll Telegram Bot API method.
@@ -27967,7 +25246,7 @@ type TransferBusinessAccountStarsParams struct {
 }
 
 // TransferBusinessAccountStarsOption configures TransferBusinessAccountStarsParams.
-type TransferBusinessAccountStarsOption func(params *TransferBusinessAccountStarsParams) TransferBusinessAccountStarsOption
+type TransferBusinessAccountStarsOption = Option[TransferBusinessAccountStarsParams]
 
 // Option applies one or more TransferBusinessAccountStarsOption values and returns the last rollback option.
 func (r *TransferBusinessAccountStarsParams) Option(opts ...TransferBusinessAccountStarsOption) (previous TransferBusinessAccountStarsOption) {
@@ -27981,24 +25260,18 @@ func (r *TransferBusinessAccountStarsParams) Option(opts ...TransferBusinessAcco
 //
 // Unique identifier of the business connection
 func WithTransferBusinessAccountStarsBusinessConnectionID(value string) TransferBusinessAccountStarsOption {
-	return func(params *TransferBusinessAccountStarsParams) TransferBusinessAccountStarsOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithTransferBusinessAccountStarsBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *TransferBusinessAccountStarsParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithTransferBusinessAccountStarsStarCount sets the StarCount field.
 //
 // Number of Telegram Stars to transfer; 1-10000
 func WithTransferBusinessAccountStarsStarCount(value int64) TransferBusinessAccountStarsOption {
-	return func(params *TransferBusinessAccountStarsParams) TransferBusinessAccountStarsOption {
-		previous := params.StarCount
-		params.StarCount = value
-
-		return WithTransferBusinessAccountStarsStarCount(previous)
-	}
+	return fieldOption(value, func(params *TransferBusinessAccountStarsParams) *int64 {
+		return &params.StarCount
+	})
 }
 
 // TransferBusinessAccountStars calls the transferBusinessAccountStars Telegram Bot API method.
@@ -28051,7 +25324,7 @@ type TransferGiftParams struct {
 }
 
 // TransferGiftOption configures TransferGiftParams.
-type TransferGiftOption func(params *TransferGiftParams) TransferGiftOption
+type TransferGiftOption = Option[TransferGiftParams]
 
 // Option applies one or more TransferGiftOption values and returns the last rollback option.
 func (r *TransferGiftParams) Option(opts ...TransferGiftOption) (previous TransferGiftOption) {
@@ -28065,24 +25338,18 @@ func (r *TransferGiftParams) Option(opts ...TransferGiftOption) (previous Transf
 //
 // Unique identifier of the business connection
 func WithTransferGiftBusinessConnectionID(value string) TransferGiftOption {
-	return func(params *TransferGiftParams) TransferGiftOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithTransferGiftBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *TransferGiftParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithTransferGiftOwnedGiftID sets the OwnedGiftID field.
 //
 // Unique identifier of the regular gift that should be transferred
 func WithTransferGiftOwnedGiftID(value string) TransferGiftOption {
-	return func(params *TransferGiftParams) TransferGiftOption {
-		previous := params.OwnedGiftID
-		params.OwnedGiftID = value
-
-		return WithTransferGiftOwnedGiftID(previous)
-	}
+	return fieldOption(value, func(params *TransferGiftParams) *string {
+		return &params.OwnedGiftID
+	})
 }
 
 // WithTransferGiftNewOwnerChatID sets the NewOwnerChatID field.
@@ -28090,12 +25357,9 @@ func WithTransferGiftOwnedGiftID(value string) TransferGiftOption {
 // Unique identifier of the chat which will own the gift.
 // The chat must be active in the last 24 hours.
 func WithTransferGiftNewOwnerChatID(value int64) TransferGiftOption {
-	return func(params *TransferGiftParams) TransferGiftOption {
-		previous := params.NewOwnerChatID
-		params.NewOwnerChatID = value
-
-		return WithTransferGiftNewOwnerChatID(previous)
-	}
+	return fieldOption(value, func(params *TransferGiftParams) *int64 {
+		return &params.NewOwnerChatID
+	})
 }
 
 // WithTransferGiftStarCount sets the StarCount field.
@@ -28103,12 +25367,9 @@ func WithTransferGiftNewOwnerChatID(value int64) TransferGiftOption {
 // The amount of Telegram Stars that will be paid for the transfer from the business account balance.
 // If positive, then the can_transfer_stars business bot right is required.
 func WithTransferGiftStarCount(value int64) TransferGiftOption {
-	return func(params *TransferGiftParams) TransferGiftOption {
-		previous := params.StarCount
-		params.StarCount = value
-
-		return WithTransferGiftStarCount(previous)
-	}
+	return fieldOption(value, func(params *TransferGiftParams) *int64 {
+		return &params.StarCount
+	})
 }
 
 // TransferGift calls the transferGift Telegram Bot API method.
@@ -28157,7 +25418,7 @@ type UnbanChatMemberParams struct {
 }
 
 // UnbanChatMemberOption configures UnbanChatMemberParams.
-type UnbanChatMemberOption func(params *UnbanChatMemberParams) UnbanChatMemberOption
+type UnbanChatMemberOption = Option[UnbanChatMemberParams]
 
 // Option applies one or more UnbanChatMemberOption values and returns the last rollback option.
 func (r *UnbanChatMemberParams) Option(opts ...UnbanChatMemberOption) (previous UnbanChatMemberOption) {
@@ -28171,36 +25432,27 @@ func (r *UnbanChatMemberParams) Option(opts ...UnbanChatMemberOption) (previous 
 //
 // Unique identifier for the target group or username of the target supergroup or channel in the format @username
 func WithUnbanChatMemberChatID(value string) UnbanChatMemberOption {
-	return func(params *UnbanChatMemberParams) UnbanChatMemberOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithUnbanChatMemberChatID(previous)
-	}
+	return fieldOption(value, func(params *UnbanChatMemberParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithUnbanChatMemberUserID sets the UserID field.
 //
 // Unique identifier of the target user
 func WithUnbanChatMemberUserID(value int64) UnbanChatMemberOption {
-	return func(params *UnbanChatMemberParams) UnbanChatMemberOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithUnbanChatMemberUserID(previous)
-	}
+	return fieldOption(value, func(params *UnbanChatMemberParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithUnbanChatMemberOnlyIfBanned sets the OnlyIfBanned field.
 //
 // Do nothing if the user is not banned
 func WithUnbanChatMemberOnlyIfBanned(value bool) UnbanChatMemberOption {
-	return func(params *UnbanChatMemberParams) UnbanChatMemberOption {
-		previous := params.OnlyIfBanned
-		params.OnlyIfBanned = value
-
-		return WithUnbanChatMemberOnlyIfBanned(previous)
-	}
+	return fieldOption(value, func(params *UnbanChatMemberParams) *bool {
+		return &params.OnlyIfBanned
+	})
 }
 
 // UnbanChatMember calls the unbanChatMember Telegram Bot API method.
@@ -28249,7 +25501,7 @@ type UnbanChatSenderChatParams struct {
 }
 
 // UnbanChatSenderChatOption configures UnbanChatSenderChatParams.
-type UnbanChatSenderChatOption func(params *UnbanChatSenderChatParams) UnbanChatSenderChatOption
+type UnbanChatSenderChatOption = Option[UnbanChatSenderChatParams]
 
 // Option applies one or more UnbanChatSenderChatOption values and returns the last rollback option.
 func (r *UnbanChatSenderChatParams) Option(opts ...UnbanChatSenderChatOption) (previous UnbanChatSenderChatOption) {
@@ -28263,24 +25515,18 @@ func (r *UnbanChatSenderChatParams) Option(opts ...UnbanChatSenderChatOption) (p
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
 func WithUnbanChatSenderChatChatID(value string) UnbanChatSenderChatOption {
-	return func(params *UnbanChatSenderChatParams) UnbanChatSenderChatOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithUnbanChatSenderChatChatID(previous)
-	}
+	return fieldOption(value, func(params *UnbanChatSenderChatParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithUnbanChatSenderChatSenderChatID sets the SenderChatID field.
 //
 // Unique identifier of the target sender chat
 func WithUnbanChatSenderChatSenderChatID(value int64) UnbanChatSenderChatOption {
-	return func(params *UnbanChatSenderChatParams) UnbanChatSenderChatOption {
-		previous := params.SenderChatID
-		params.SenderChatID = value
-
-		return WithUnbanChatSenderChatSenderChatID(previous)
-	}
+	return fieldOption(value, func(params *UnbanChatSenderChatParams) *int64 {
+		return &params.SenderChatID
+	})
 }
 
 // UnbanChatSenderChat calls the unbanChatSenderChat Telegram Bot API method.
@@ -28322,7 +25568,7 @@ type UnhideGeneralForumTopicParams struct {
 }
 
 // UnhideGeneralForumTopicOption configures UnhideGeneralForumTopicParams.
-type UnhideGeneralForumTopicOption func(params *UnhideGeneralForumTopicParams) UnhideGeneralForumTopicOption
+type UnhideGeneralForumTopicOption = Option[UnhideGeneralForumTopicParams]
 
 // Option applies one or more UnhideGeneralForumTopicOption values and returns the last rollback option.
 func (r *UnhideGeneralForumTopicParams) Option(opts ...UnhideGeneralForumTopicOption) (previous UnhideGeneralForumTopicOption) {
@@ -28336,12 +25582,9 @@ func (r *UnhideGeneralForumTopicParams) Option(opts ...UnhideGeneralForumTopicOp
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithUnhideGeneralForumTopicChatID(value string) UnhideGeneralForumTopicOption {
-	return func(params *UnhideGeneralForumTopicParams) UnhideGeneralForumTopicOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithUnhideGeneralForumTopicChatID(previous)
-	}
+	return fieldOption(value, func(params *UnhideGeneralForumTopicParams) *string {
+		return &params.ChatID
+	})
 }
 
 // UnhideGeneralForumTopic calls the unhideGeneralForumTopic Telegram Bot API method.
@@ -28383,7 +25626,7 @@ type UnpinAllChatMessagesParams struct {
 }
 
 // UnpinAllChatMessagesOption configures UnpinAllChatMessagesParams.
-type UnpinAllChatMessagesOption func(params *UnpinAllChatMessagesParams) UnpinAllChatMessagesOption
+type UnpinAllChatMessagesOption = Option[UnpinAllChatMessagesParams]
 
 // Option applies one or more UnpinAllChatMessagesOption values and returns the last rollback option.
 func (r *UnpinAllChatMessagesParams) Option(opts ...UnpinAllChatMessagesOption) (previous UnpinAllChatMessagesOption) {
@@ -28397,12 +25640,9 @@ func (r *UnpinAllChatMessagesParams) Option(opts ...UnpinAllChatMessagesOption) 
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
 func WithUnpinAllChatMessagesChatID(value string) UnpinAllChatMessagesOption {
-	return func(params *UnpinAllChatMessagesParams) UnpinAllChatMessagesOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithUnpinAllChatMessagesChatID(previous)
-	}
+	return fieldOption(value, func(params *UnpinAllChatMessagesParams) *string {
+		return &params.ChatID
+	})
 }
 
 // UnpinAllChatMessages calls the unpinAllChatMessages Telegram Bot API method.
@@ -28448,7 +25688,7 @@ type UnpinAllForumTopicMessagesParams struct {
 }
 
 // UnpinAllForumTopicMessagesOption configures UnpinAllForumTopicMessagesParams.
-type UnpinAllForumTopicMessagesOption func(params *UnpinAllForumTopicMessagesParams) UnpinAllForumTopicMessagesOption
+type UnpinAllForumTopicMessagesOption = Option[UnpinAllForumTopicMessagesParams]
 
 // Option applies one or more UnpinAllForumTopicMessagesOption values and returns the last rollback option.
 func (r *UnpinAllForumTopicMessagesParams) Option(opts ...UnpinAllForumTopicMessagesOption) (previous UnpinAllForumTopicMessagesOption) {
@@ -28462,24 +25702,18 @@ func (r *UnpinAllForumTopicMessagesParams) Option(opts ...UnpinAllForumTopicMess
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithUnpinAllForumTopicMessagesChatID(value string) UnpinAllForumTopicMessagesOption {
-	return func(params *UnpinAllForumTopicMessagesParams) UnpinAllForumTopicMessagesOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithUnpinAllForumTopicMessagesChatID(previous)
-	}
+	return fieldOption(value, func(params *UnpinAllForumTopicMessagesParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithUnpinAllForumTopicMessagesMessageThreadID sets the MessageThreadID field.
 //
 // Unique identifier for the target message thread of the forum topic
 func WithUnpinAllForumTopicMessagesMessageThreadID(value int64) UnpinAllForumTopicMessagesOption {
-	return func(params *UnpinAllForumTopicMessagesParams) UnpinAllForumTopicMessagesOption {
-		previous := params.MessageThreadID
-		params.MessageThreadID = value
-
-		return WithUnpinAllForumTopicMessagesMessageThreadID(previous)
-	}
+	return fieldOption(value, func(params *UnpinAllForumTopicMessagesParams) *int64 {
+		return &params.MessageThreadID
+	})
 }
 
 // UnpinAllForumTopicMessages calls the unpinAllForumTopicMessages Telegram Bot API method.
@@ -28521,7 +25755,7 @@ type UnpinAllGeneralForumTopicMessagesParams struct {
 }
 
 // UnpinAllGeneralForumTopicMessagesOption configures UnpinAllGeneralForumTopicMessagesParams.
-type UnpinAllGeneralForumTopicMessagesOption func(params *UnpinAllGeneralForumTopicMessagesParams) UnpinAllGeneralForumTopicMessagesOption
+type UnpinAllGeneralForumTopicMessagesOption = Option[UnpinAllGeneralForumTopicMessagesParams]
 
 // Option applies one or more UnpinAllGeneralForumTopicMessagesOption values and returns the last rollback option.
 func (r *UnpinAllGeneralForumTopicMessagesParams) Option(opts ...UnpinAllGeneralForumTopicMessagesOption) (previous UnpinAllGeneralForumTopicMessagesOption) {
@@ -28535,12 +25769,9 @@ func (r *UnpinAllGeneralForumTopicMessagesParams) Option(opts ...UnpinAllGeneral
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
 func WithUnpinAllGeneralForumTopicMessagesChatID(value string) UnpinAllGeneralForumTopicMessagesOption {
-	return func(params *UnpinAllGeneralForumTopicMessagesParams) UnpinAllGeneralForumTopicMessagesOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithUnpinAllGeneralForumTopicMessagesChatID(previous)
-	}
+	return fieldOption(value, func(params *UnpinAllGeneralForumTopicMessagesParams) *string {
+		return &params.ChatID
+	})
 }
 
 // UnpinAllGeneralForumTopicMessages calls the unpinAllGeneralForumTopicMessages Telegram Bot API method.
@@ -28590,7 +25821,7 @@ type UnpinChatMessageParams struct {
 }
 
 // UnpinChatMessageOption configures UnpinChatMessageParams.
-type UnpinChatMessageOption func(params *UnpinChatMessageParams) UnpinChatMessageOption
+type UnpinChatMessageOption = Option[UnpinChatMessageParams]
 
 // Option applies one or more UnpinChatMessageOption values and returns the last rollback option.
 func (r *UnpinChatMessageParams) Option(opts ...UnpinChatMessageOption) (previous UnpinChatMessageOption) {
@@ -28604,24 +25835,18 @@ func (r *UnpinChatMessageParams) Option(opts ...UnpinChatMessageOption) (previou
 //
 // Unique identifier of the business connection on behalf of which the message will be unpinned
 func WithUnpinChatMessageBusinessConnectionID(value string) UnpinChatMessageOption {
-	return func(params *UnpinChatMessageParams) UnpinChatMessageOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithUnpinChatMessageBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *UnpinChatMessageParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithUnpinChatMessageChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
 func WithUnpinChatMessageChatID(value string) UnpinChatMessageOption {
-	return func(params *UnpinChatMessageParams) UnpinChatMessageOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithUnpinChatMessageChatID(previous)
-	}
+	return fieldOption(value, func(params *UnpinChatMessageParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithUnpinChatMessageMessageID sets the MessageID field.
@@ -28630,12 +25855,9 @@ func WithUnpinChatMessageChatID(value string) UnpinChatMessageOption {
 // Required if business_connection_id is specified.
 // If not specified, the most recent pinned message (by sending date) will be unpinned.
 func WithUnpinChatMessageMessageID(value int64) UnpinChatMessageOption {
-	return func(params *UnpinChatMessageParams) UnpinChatMessageOption {
-		previous := params.MessageID
-		params.MessageID = value
-
-		return WithUnpinChatMessageMessageID(previous)
-	}
+	return fieldOption(value, func(params *UnpinChatMessageParams) *int64 {
+		return &params.MessageID
+	})
 }
 
 // UnpinChatMessage calls the unpinChatMessage Telegram Bot API method.
@@ -28688,7 +25910,7 @@ type UpgradeGiftParams struct {
 }
 
 // UpgradeGiftOption configures UpgradeGiftParams.
-type UpgradeGiftOption func(params *UpgradeGiftParams) UpgradeGiftOption
+type UpgradeGiftOption = Option[UpgradeGiftParams]
 
 // Option applies one or more UpgradeGiftOption values and returns the last rollback option.
 func (r *UpgradeGiftParams) Option(opts ...UpgradeGiftOption) (previous UpgradeGiftOption) {
@@ -28702,36 +25924,27 @@ func (r *UpgradeGiftParams) Option(opts ...UpgradeGiftOption) (previous UpgradeG
 //
 // Unique identifier of the business connection
 func WithUpgradeGiftBusinessConnectionID(value string) UpgradeGiftOption {
-	return func(params *UpgradeGiftParams) UpgradeGiftOption {
-		previous := params.BusinessConnectionID
-		params.BusinessConnectionID = value
-
-		return WithUpgradeGiftBusinessConnectionID(previous)
-	}
+	return fieldOption(value, func(params *UpgradeGiftParams) *string {
+		return &params.BusinessConnectionID
+	})
 }
 
 // WithUpgradeGiftOwnedGiftID sets the OwnedGiftID field.
 //
 // Unique identifier of the regular gift that should be upgraded to a unique one
 func WithUpgradeGiftOwnedGiftID(value string) UpgradeGiftOption {
-	return func(params *UpgradeGiftParams) UpgradeGiftOption {
-		previous := params.OwnedGiftID
-		params.OwnedGiftID = value
-
-		return WithUpgradeGiftOwnedGiftID(previous)
-	}
+	return fieldOption(value, func(params *UpgradeGiftParams) *string {
+		return &params.OwnedGiftID
+	})
 }
 
 // WithUpgradeGiftKeepOriginalDetails sets the KeepOriginalDetails field.
 //
 // Pass True to keep the original gift text, sender and receiver in the upgraded gift
 func WithUpgradeGiftKeepOriginalDetails(value bool) UpgradeGiftOption {
-	return func(params *UpgradeGiftParams) UpgradeGiftOption {
-		previous := params.KeepOriginalDetails
-		params.KeepOriginalDetails = value
-
-		return WithUpgradeGiftKeepOriginalDetails(previous)
-	}
+	return fieldOption(value, func(params *UpgradeGiftParams) *bool {
+		return &params.KeepOriginalDetails
+	})
 }
 
 // WithUpgradeGiftStarCount sets the StarCount field.
@@ -28739,12 +25952,9 @@ func WithUpgradeGiftKeepOriginalDetails(value bool) UpgradeGiftOption {
 // The amount of Telegram Stars that will be paid for the upgrade from the business account balance.
 // If gift.prepaid_upgrade_star_count > 0, then pass 0, otherwise, the can_transfer_stars business bot right is required and gift.upgrade_star_count must be passed.
 func WithUpgradeGiftStarCount(value int64) UpgradeGiftOption {
-	return func(params *UpgradeGiftParams) UpgradeGiftOption {
-		previous := params.StarCount
-		params.StarCount = value
-
-		return WithUpgradeGiftStarCount(previous)
-	}
+	return fieldOption(value, func(params *UpgradeGiftParams) *int64 {
+		return &params.StarCount
+	})
 }
 
 // UpgradeGift calls the upgradeGift Telegram Bot API method.
@@ -28798,7 +26008,7 @@ type UploadStickerFileParams struct {
 }
 
 // UploadStickerFileOption configures UploadStickerFileParams.
-type UploadStickerFileOption func(params *UploadStickerFileParams) UploadStickerFileOption
+type UploadStickerFileOption = Option[UploadStickerFileParams]
 
 // Option applies one or more UploadStickerFileOption values and returns the last rollback option.
 func (r *UploadStickerFileParams) Option(opts ...UploadStickerFileOption) (previous UploadStickerFileOption) {
@@ -28812,12 +26022,9 @@ func (r *UploadStickerFileParams) Option(opts ...UploadStickerFileOption) (previ
 //
 // User identifier of sticker file owner
 func WithUploadStickerFileUserID(value int64) UploadStickerFileOption {
-	return func(params *UploadStickerFileParams) UploadStickerFileOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithUploadStickerFileUserID(previous)
-	}
+	return fieldOption(value, func(params *UploadStickerFileParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithUploadStickerFileSticker sets the Sticker field.
@@ -28829,24 +26036,18 @@ func WithUploadStickerFileUserID(value int64) UploadStickerFileOption {
 // [https://core.telegram.org/stickers]: https://core.telegram.org/stickers
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
 func WithUploadStickerFileSticker(value InputFile) UploadStickerFileOption {
-	return func(params *UploadStickerFileParams) UploadStickerFileOption {
-		previous := params.Sticker
-		params.Sticker = value
-
-		return WithUploadStickerFileSticker(previous)
-	}
+	return fieldOption(value, func(params *UploadStickerFileParams) *InputFile {
+		return &params.Sticker
+	})
 }
 
 // WithUploadStickerFileStickerFormat sets the StickerFormat field.
 //
 // Format of the sticker, must be one of “static”, “animated”, “video”
 func WithUploadStickerFileStickerFormat(value string) UploadStickerFileOption {
-	return func(params *UploadStickerFileParams) UploadStickerFileOption {
-		previous := params.StickerFormat
-		params.StickerFormat = value
-
-		return WithUploadStickerFileStickerFormat(previous)
-	}
+	return fieldOption(value, func(params *UploadStickerFileParams) *string {
+		return &params.StickerFormat
+	})
 }
 
 // UploadStickerFile calls the uploadStickerFile Telegram Bot API method.
@@ -28948,7 +26149,7 @@ type VerifyChatParams struct {
 }
 
 // VerifyChatOption configures VerifyChatParams.
-type VerifyChatOption func(params *VerifyChatParams) VerifyChatOption
+type VerifyChatOption = Option[VerifyChatParams]
 
 // Option applies one or more VerifyChatOption values and returns the last rollback option.
 func (r *VerifyChatParams) Option(opts ...VerifyChatOption) (previous VerifyChatOption) {
@@ -28963,12 +26164,9 @@ func (r *VerifyChatParams) Option(opts ...VerifyChatOption) (previous VerifyChat
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
 // Channel direct messages chats can't be verified.
 func WithVerifyChatChatID(value string) VerifyChatOption {
-	return func(params *VerifyChatParams) VerifyChatOption {
-		previous := params.ChatID
-		params.ChatID = value
-
-		return WithVerifyChatChatID(previous)
-	}
+	return fieldOption(value, func(params *VerifyChatParams) *string {
+		return &params.ChatID
+	})
 }
 
 // WithVerifyChatCustomDescription sets the CustomDescription field.
@@ -28976,12 +26174,9 @@ func WithVerifyChatChatID(value string) VerifyChatOption {
 // Custom description for the verification; 0-70 characters.
 // Must be empty if the organization isn't allowed to provide a custom verification description.
 func WithVerifyChatCustomDescription(value string) VerifyChatOption {
-	return func(params *VerifyChatParams) VerifyChatOption {
-		previous := params.CustomDescription
-		params.CustomDescription = value
-
-		return WithVerifyChatCustomDescription(previous)
-	}
+	return fieldOption(value, func(params *VerifyChatParams) *string {
+		return &params.CustomDescription
+	})
 }
 
 // VerifyChat calls the verifyChat Telegram Bot API method.
@@ -29028,7 +26223,7 @@ type VerifyUserParams struct {
 }
 
 // VerifyUserOption configures VerifyUserParams.
-type VerifyUserOption func(params *VerifyUserParams) VerifyUserOption
+type VerifyUserOption = Option[VerifyUserParams]
 
 // Option applies one or more VerifyUserOption values and returns the last rollback option.
 func (r *VerifyUserParams) Option(opts ...VerifyUserOption) (previous VerifyUserOption) {
@@ -29042,12 +26237,9 @@ func (r *VerifyUserParams) Option(opts ...VerifyUserOption) (previous VerifyUser
 //
 // Unique identifier of the target user
 func WithVerifyUserUserID(value int64) VerifyUserOption {
-	return func(params *VerifyUserParams) VerifyUserOption {
-		previous := params.UserID
-		params.UserID = value
-
-		return WithVerifyUserUserID(previous)
-	}
+	return fieldOption(value, func(params *VerifyUserParams) *int64 {
+		return &params.UserID
+	})
 }
 
 // WithVerifyUserCustomDescription sets the CustomDescription field.
@@ -29055,12 +26247,9 @@ func WithVerifyUserUserID(value int64) VerifyUserOption {
 // Custom description for the verification; 0-70 characters.
 // Must be empty if the organization isn't allowed to provide a custom verification description.
 func WithVerifyUserCustomDescription(value string) VerifyUserOption {
-	return func(params *VerifyUserParams) VerifyUserOption {
-		previous := params.CustomDescription
-		params.CustomDescription = value
-
-		return WithVerifyUserCustomDescription(previous)
-	}
+	return fieldOption(value, func(params *VerifyUserParams) *string {
+		return &params.CustomDescription
+	})
 }
 
 // VerifyUser calls the verifyUser Telegram Bot API method.
