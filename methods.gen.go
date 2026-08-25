@@ -186,7 +186,6 @@ type AnswerCallbackQueryParams struct {
 	URL string `json:"url,omitempty"`
 
 	// The maximum amount of time in seconds that the result of the callback query may be cached client-side.
-	// Telegram apps will support caching starting in version 3.14.
 	// Defaults to 0.
 	CacheTime int64 `json:"cache_time,omitempty"`
 }
@@ -250,7 +249,6 @@ func WithAnswerCallbackQueryURL(value string) AnswerCallbackQueryOption {
 // WithAnswerCallbackQueryCacheTime sets the CacheTime field.
 //
 // The maximum amount of time in seconds that the result of the callback query may be cached client-side.
-// Telegram apps will support caching starting in version 3.14.
 // Defaults to 0.
 func WithAnswerCallbackQueryCacheTime(value int64) AnswerCallbackQueryOption {
 	return fieldOption(value, func(params *AnswerCallbackQueryParams) *int64 {
@@ -4200,6 +4198,10 @@ type EditEphemeralMessageCaptionParams struct {
 	// A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 
+	// Pass True if the caption must be shown above the message media.
+	// Supported only for animation, photo and video messages.
+	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
+
 	// A JSON-serialized object for an [inline keyboard]
 	//
 	// [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
@@ -4274,6 +4276,16 @@ func WithEditEphemeralMessageCaptionCaptionEntities(value []MessageEntity) EditE
 	})
 }
 
+// WithEditEphemeralMessageCaptionShowCaptionAboveMedia sets the ShowCaptionAboveMedia field.
+//
+// Pass True if the caption must be shown above the message media.
+// Supported only for animation, photo and video messages.
+func WithEditEphemeralMessageCaptionShowCaptionAboveMedia(value bool) EditEphemeralMessageCaptionOption {
+	return fieldOption(value, func(params *EditEphemeralMessageCaptionParams) *bool {
+		return &params.ShowCaptionAboveMedia
+	})
+}
+
 // WithEditEphemeralMessageCaptionReplyMarkup sets the ReplyMarkup field.
 //
 // A JSON-serialized object for an [inline keyboard]
@@ -4328,8 +4340,7 @@ type EditEphemeralMessageMediaParams struct {
 	// Identifier of the ephemeral message to edit
 	EphemeralMessageID int64 `json:"ephemeral_message_id"`
 
-	// A JSON-serialized object for the new media content of the message.
-	// A new file can't be uploaded; use a previously uploaded file via its file_id or specify a URL.
+	// A JSON-serialized object for the new media content of the message
 	Media InputMedia `json:"media"`
 
 	// A JSON-serialized object for an [inline keyboard]
@@ -4378,8 +4389,7 @@ func WithEditEphemeralMessageMediaEphemeralMessageID(value int64) EditEphemeralM
 
 // WithEditEphemeralMessageMediaMedia sets the Media field.
 //
-// A JSON-serialized object for the new media content of the message.
-// A new file can't be uploaded; use a previously uploaded file via its file_id or specify a URL.
+// A JSON-serialized object for the new media content of the message
 func WithEditEphemeralMessageMediaMedia(value InputMedia) EditEphemeralMessageMediaOption {
 	return fieldOption(value, func(params *EditEphemeralMessageMediaParams) *InputMedia {
 		return &params.Media
@@ -4737,8 +4747,8 @@ type EditEphemeralMessageTextParams struct {
 	// Identifier of the ephemeral message to edit
 	EphemeralMessageID int64 `json:"ephemeral_message_id"`
 
-	// New text of the message, 1-4096 characters after entity parsing
-	Text string `json:"text"`
+	// New text of the message, 1-4096 characters after entity parsing; required if rich_message isn't specified
+	Text string `json:"text,omitempty"`
 
 	// Mode for parsing entities in the message text.
 	// See [formatting options] for more details.
@@ -4748,6 +4758,9 @@ type EditEphemeralMessageTextParams struct {
 
 	// A JSON-serialized list of special entities that appear in message text, which can be specified instead of parse_mode
 	Entities []MessageEntity `json:"entities,omitempty"`
+
+	// New rich content of the message; required if text isn't specified
+	RichMessage *InputRichMessage `json:"rich_message,omitempty"`
 
 	// Link preview generation options for the message
 	LinkPreviewOptions *LinkPreviewOptions `json:"link_preview_options,omitempty"`
@@ -4798,7 +4811,7 @@ func WithEditEphemeralMessageTextEphemeralMessageID(value int64) EditEphemeralMe
 
 // WithEditEphemeralMessageTextText sets the Text field.
 //
-// New text of the message, 1-4096 characters after entity parsing
+// New text of the message, 1-4096 characters after entity parsing; required if rich_message isn't specified
 func WithEditEphemeralMessageTextText(value string) EditEphemeralMessageTextOption {
 	return fieldOption(value, func(params *EditEphemeralMessageTextParams) *string {
 		return &params.Text
@@ -4826,6 +4839,15 @@ func WithEditEphemeralMessageTextEntities(value []MessageEntity) EditEphemeralMe
 	})
 }
 
+// WithEditEphemeralMessageTextRichMessage sets the RichMessage field.
+//
+// New rich content of the message; required if text isn't specified
+func WithEditEphemeralMessageTextRichMessage(value *InputRichMessage) EditEphemeralMessageTextOption {
+	return fieldOption(value, func(params *EditEphemeralMessageTextParams) **InputRichMessage {
+		return &params.RichMessage
+	})
+}
+
 // WithEditEphemeralMessageTextLinkPreviewOptions sets the LinkPreviewOptions field.
 //
 // Link preview generation options for the message
@@ -4848,7 +4870,7 @@ func WithEditEphemeralMessageTextReplyMarkup(value *InlineKeyboardMarkup) EditEp
 
 // EditEphemeralMessageText calls the editEphemeralMessageText Telegram Bot API method.
 //
-// Use this method to edit an ephemeral text message.
+// Use this method to edit an ephemeral text or rich message.
 // Note that it is not guaranteed that the user will receive the message edit event, especially if they are offline.
 // On success, True is returned.
 func (c *Client) EditEphemeralMessageText(ctx context.Context, params *EditEphemeralMessageTextParams) (ret bool, err error) {
@@ -6035,7 +6057,7 @@ type EditMessageTextParams struct {
 	LinkPreviewOptions *LinkPreviewOptions `json:"link_preview_options,omitempty"`
 
 	// New rich content of the message; required if text isn't specified.
-	// Direct upload of new files isn't supported when an inline message is edited.
+	// Direct upload of new files and explicit upload of files by a URL isn't supported when an inline message is edited.
 	RichMessage *InputRichMessage `json:"rich_message,omitempty"`
 
 	// A JSON-serialized object for an [inline keyboard]
@@ -6136,7 +6158,7 @@ func WithEditMessageTextLinkPreviewOptions(value *LinkPreviewOptions) EditMessag
 // WithEditMessageTextRichMessage sets the RichMessage field.
 //
 // New rich content of the message; required if text isn't specified.
-// Direct upload of new files isn't supported when an inline message is edited.
+// Direct upload of new files and explicit upload of files by a URL isn't supported when an inline message is edited.
 func WithEditMessageTextRichMessage(value *InputRichMessage) EditMessageTextOption {
 	return fieldOption(value, func(params *EditMessageTextParams) **InputRichMessage {
 		return &params.RichMessage
@@ -10184,6 +10206,9 @@ type PromoteChatMemberParams struct {
 
 	// Pass True if the administrator can edit the tags of regular members; for groups and supergroups only
 	CanManageTags bool `json:"can_manage_tags,omitempty"`
+
+	// Pass True if the administrator can manage chat welcome messages or directly send them in the case of bots
+	CanSendWelcomeMessages bool `json:"can_send_welcome_messages,omitempty"`
 }
 
 // PromoteChatMemberOption configures PromoteChatMemberParams.
@@ -10367,6 +10392,15 @@ func WithPromoteChatMemberCanManageDirectMessages(value bool) PromoteChatMemberO
 func WithPromoteChatMemberCanManageTags(value bool) PromoteChatMemberOption {
 	return fieldOption(value, func(params *PromoteChatMemberParams) *bool {
 		return &params.CanManageTags
+	})
+}
+
+// WithPromoteChatMemberCanSendWelcomeMessages sets the CanSendWelcomeMessages field.
+//
+// Pass True if the administrator can manage chat welcome messages or directly send them in the case of bots
+func WithPromoteChatMemberCanSendWelcomeMessages(value bool) PromoteChatMemberOption {
+	return fieldOption(value, func(params *PromoteChatMemberParams) *bool {
+		return &params.CanSendWelcomeMessages
 	})
 }
 
@@ -11670,15 +11704,8 @@ type SendAnimationParams struct {
 	// Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
 
-	// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-	// It is not guaranteed that the user will receive the message, especially if they are offline.
-	// See [ephemeral message sending] for more details.
-	//
-	// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-	ReceiverUserID int64 `json:"receiver_user_id,omitempty"`
-
-	// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-	CallbackQueryID string `json:"callback_query_id,omitempty"`
+	// A JSON-serialized object containing the parameters of the ephemeral message to send
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
 
 	// Animation to send.
 	// Pass a file_id as String to send an animation that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get an animation from the Internet, or upload a new animation using multipart/form-data.
@@ -11804,25 +11831,12 @@ func WithSendAnimationDirectMessagesTopicID(value int64) SendAnimationOption {
 	})
 }
 
-// WithSendAnimationReceiverUserID sets the ReceiverUserID field.
+// WithSendAnimationEphemeralMessageParameters sets the EphemeralMessageParameters field.
 //
-// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-// It is not guaranteed that the user will receive the message, especially if they are offline.
-// See [ephemeral message sending] for more details.
-//
-// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-func WithSendAnimationReceiverUserID(value int64) SendAnimationOption {
-	return fieldOption(value, func(params *SendAnimationParams) *int64 {
-		return &params.ReceiverUserID
-	})
-}
-
-// WithSendAnimationCallbackQueryID sets the CallbackQueryID field.
-//
-// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-func WithSendAnimationCallbackQueryID(value string) SendAnimationOption {
-	return fieldOption(value, func(params *SendAnimationParams) *string {
-		return &params.CallbackQueryID
+// A JSON-serialized object containing the parameters of the ephemeral message to send
+func WithSendAnimationEphemeralMessageParameters(value *EphemeralMessageParameters) SendAnimationOption {
+	return fieldOption(value, func(params *SendAnimationParams) **EphemeralMessageParameters {
+		return &params.EphemeralMessageParameters
 	})
 }
 
@@ -12068,17 +12082,20 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 			}
 		}
 
-		if params.ReceiverUserID != 0 {
-			v := strconv.FormatInt(params.ReceiverUserID, 10)
-			err = writer.WriteField("receiver_user_id", v)
+		if params.EphemeralMessageParameters != nil {
+			var bs []byte
+			bs, err = json.Marshal(&params.EphemeralMessageParameters)
 			if err != nil {
 				return
 			}
-		}
 
-		if params.CallbackQueryID != "" {
-			v := params.CallbackQueryID
-			err = writer.WriteField("callback_query_id", v)
+			var p io.Writer
+			p, err = writer.CreateFormField("ephemeral_message_parameters")
+			if err != nil {
+				return
+			}
+
+			_, err = p.Write(bs)
 			if err != nil {
 				return
 			}
@@ -12313,15 +12330,8 @@ type SendAudioParams struct {
 	// Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
 
-	// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-	// It is not guaranteed that the user will receive the message, especially if they are offline.
-	// See [ephemeral message sending] for more details.
-	//
-	// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-	ReceiverUserID int64 `json:"receiver_user_id,omitempty"`
-
-	// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-	CallbackQueryID string `json:"callback_query_id,omitempty"`
+	// A JSON-serialized object containing the parameters of the ephemeral message to send
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
 
 	// Audio file to send.
 	// Pass a file_id as String to send an audio file that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get an audio file from the Internet, or upload a new one using multipart/form-data.
@@ -12441,25 +12451,12 @@ func WithSendAudioDirectMessagesTopicID(value int64) SendAudioOption {
 	})
 }
 
-// WithSendAudioReceiverUserID sets the ReceiverUserID field.
+// WithSendAudioEphemeralMessageParameters sets the EphemeralMessageParameters field.
 //
-// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-// It is not guaranteed that the user will receive the message, especially if they are offline.
-// See [ephemeral message sending] for more details.
-//
-// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-func WithSendAudioReceiverUserID(value int64) SendAudioOption {
-	return fieldOption(value, func(params *SendAudioParams) *int64 {
-		return &params.ReceiverUserID
-	})
-}
-
-// WithSendAudioCallbackQueryID sets the CallbackQueryID field.
-//
-// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-func WithSendAudioCallbackQueryID(value string) SendAudioOption {
-	return fieldOption(value, func(params *SendAudioParams) *string {
-		return &params.CallbackQueryID
+// A JSON-serialized object containing the parameters of the ephemeral message to send
+func WithSendAudioEphemeralMessageParameters(value *EphemeralMessageParameters) SendAudioOption {
+	return fieldOption(value, func(params *SendAudioParams) **EphemeralMessageParameters {
+		return &params.EphemeralMessageParameters
 	})
 }
 
@@ -12690,17 +12687,20 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 			}
 		}
 
-		if params.ReceiverUserID != 0 {
-			v := strconv.FormatInt(params.ReceiverUserID, 10)
-			err = writer.WriteField("receiver_user_id", v)
+		if params.EphemeralMessageParameters != nil {
+			var bs []byte
+			bs, err = json.Marshal(&params.EphemeralMessageParameters)
 			if err != nil {
 				return
 			}
-		}
 
-		if params.CallbackQueryID != "" {
-			v := params.CallbackQueryID
-			err = writer.WriteField("callback_query_id", v)
+			var p io.Writer
+			p, err = writer.CreateFormField("ephemeral_message_parameters")
+			if err != nil {
+				return
+			}
+
+			_, err = p.Write(bs)
 			if err != nil {
 				return
 			}
@@ -13262,15 +13262,8 @@ type SendContactParams struct {
 	// Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
 
-	// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-	// It is not guaranteed that the user will receive the message, especially if they are offline.
-	// See [ephemeral message sending] for more details.
-	//
-	// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-	ReceiverUserID int64 `json:"receiver_user_id,omitempty"`
-
-	// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-	CallbackQueryID string `json:"callback_query_id,omitempty"`
+	// A JSON-serialized object containing the parameters of the ephemeral message to send
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
 
 	// Contact's phone number
 	PhoneNumber string `json:"phone_number"`
@@ -13366,25 +13359,12 @@ func WithSendContactDirectMessagesTopicID(value int64) SendContactOption {
 	})
 }
 
-// WithSendContactReceiverUserID sets the ReceiverUserID field.
+// WithSendContactEphemeralMessageParameters sets the EphemeralMessageParameters field.
 //
-// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-// It is not guaranteed that the user will receive the message, especially if they are offline.
-// See [ephemeral message sending] for more details.
-//
-// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-func WithSendContactReceiverUserID(value int64) SendContactOption {
-	return fieldOption(value, func(params *SendContactParams) *int64 {
-		return &params.ReceiverUserID
-	})
-}
-
-// WithSendContactCallbackQueryID sets the CallbackQueryID field.
-//
-// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-func WithSendContactCallbackQueryID(value string) SendContactOption {
-	return fieldOption(value, func(params *SendContactParams) *string {
-		return &params.CallbackQueryID
+// A JSON-serialized object containing the parameters of the ephemeral message to send
+func WithSendContactEphemeralMessageParameters(value *EphemeralMessageParameters) SendContactOption {
+	return fieldOption(value, func(params *SendContactParams) **EphemeralMessageParameters {
+		return &params.EphemeralMessageParameters
 	})
 }
 
@@ -13768,15 +13748,8 @@ type SendDocumentParams struct {
 	// Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
 
-	// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-	// It is not guaranteed that the user will receive the message, especially if they are offline.
-	// See [ephemeral message sending] for more details.
-	//
-	// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-	ReceiverUserID int64 `json:"receiver_user_id,omitempty"`
-
-	// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-	CallbackQueryID string `json:"callback_query_id,omitempty"`
+	// A JSON-serialized object containing the parameters of the ephemeral message to send
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
 
 	// File to send.
 	// Pass a file_id as String to send a file that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data.
@@ -13890,25 +13863,12 @@ func WithSendDocumentDirectMessagesTopicID(value int64) SendDocumentOption {
 	})
 }
 
-// WithSendDocumentReceiverUserID sets the ReceiverUserID field.
+// WithSendDocumentEphemeralMessageParameters sets the EphemeralMessageParameters field.
 //
-// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-// It is not guaranteed that the user will receive the message, especially if they are offline.
-// See [ephemeral message sending] for more details.
-//
-// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-func WithSendDocumentReceiverUserID(value int64) SendDocumentOption {
-	return fieldOption(value, func(params *SendDocumentParams) *int64 {
-		return &params.ReceiverUserID
-	})
-}
-
-// WithSendDocumentCallbackQueryID sets the CallbackQueryID field.
-//
-// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-func WithSendDocumentCallbackQueryID(value string) SendDocumentOption {
-	return fieldOption(value, func(params *SendDocumentParams) *string {
-		return &params.CallbackQueryID
+// A JSON-serialized object containing the parameters of the ephemeral message to send
+func WithSendDocumentEphemeralMessageParameters(value *EphemeralMessageParameters) SendDocumentOption {
+	return fieldOption(value, func(params *SendDocumentParams) **EphemeralMessageParameters {
+		return &params.EphemeralMessageParameters
 	})
 }
 
@@ -14118,17 +14078,20 @@ func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (
 			}
 		}
 
-		if params.ReceiverUserID != 0 {
-			v := strconv.FormatInt(params.ReceiverUserID, 10)
-			err = writer.WriteField("receiver_user_id", v)
+		if params.EphemeralMessageParameters != nil {
+			var bs []byte
+			bs, err = json.Marshal(&params.EphemeralMessageParameters)
 			if err != nil {
 				return
 			}
-		}
 
-		if params.CallbackQueryID != "" {
-			v := params.CallbackQueryID
-			err = writer.WriteField("callback_query_id", v)
+			var p io.Writer
+			p, err = writer.CreateFormField("ephemeral_message_parameters")
+			if err != nil {
+				return
+			}
+
+			_, err = p.Write(bs)
 			if err != nil {
 				return
 			}
@@ -15211,15 +15174,8 @@ type SendLivePhotoParams struct {
 	// Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
 
-	// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-	// It is not guaranteed that the user will receive the message, especially if they are offline.
-	// See [ephemeral message sending] for more details.
-	//
-	// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-	ReceiverUserID int64 `json:"receiver_user_id,omitempty"`
-
-	// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-	CallbackQueryID string `json:"callback_query_id,omitempty"`
+	// A JSON-serialized object containing the parameters of the ephemeral message to send
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
 
 	// Live photo video to send.
 	// The video must be no longer than 10 seconds and must not exceed 10 MB in size.
@@ -15336,25 +15292,12 @@ func WithSendLivePhotoDirectMessagesTopicID(value int64) SendLivePhotoOption {
 	})
 }
 
-// WithSendLivePhotoReceiverUserID sets the ReceiverUserID field.
+// WithSendLivePhotoEphemeralMessageParameters sets the EphemeralMessageParameters field.
 //
-// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-// It is not guaranteed that the user will receive the message, especially if they are offline.
-// See [ephemeral message sending] for more details.
-//
-// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-func WithSendLivePhotoReceiverUserID(value int64) SendLivePhotoOption {
-	return fieldOption(value, func(params *SendLivePhotoParams) *int64 {
-		return &params.ReceiverUserID
-	})
-}
-
-// WithSendLivePhotoCallbackQueryID sets the CallbackQueryID field.
-//
-// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-func WithSendLivePhotoCallbackQueryID(value string) SendLivePhotoOption {
-	return fieldOption(value, func(params *SendLivePhotoParams) *string {
-		return &params.CallbackQueryID
+// A JSON-serialized object containing the parameters of the ephemeral message to send
+func WithSendLivePhotoEphemeralMessageParameters(value *EphemeralMessageParameters) SendLivePhotoOption {
+	return fieldOption(value, func(params *SendLivePhotoParams) **EphemeralMessageParameters {
+		return &params.EphemeralMessageParameters
 	})
 }
 
@@ -15572,17 +15515,20 @@ func (c *Client) SendLivePhoto(ctx context.Context, params *SendLivePhotoParams)
 			}
 		}
 
-		if params.ReceiverUserID != 0 {
-			v := strconv.FormatInt(params.ReceiverUserID, 10)
-			err = writer.WriteField("receiver_user_id", v)
+		if params.EphemeralMessageParameters != nil {
+			var bs []byte
+			bs, err = json.Marshal(&params.EphemeralMessageParameters)
 			if err != nil {
 				return
 			}
-		}
 
-		if params.CallbackQueryID != "" {
-			v := params.CallbackQueryID
-			err = writer.WriteField("callback_query_id", v)
+			var p io.Writer
+			p, err = writer.CreateFormField("ephemeral_message_parameters")
+			if err != nil {
+				return
+			}
+
+			_, err = p.Write(bs)
 			if err != nil {
 				return
 			}
@@ -15791,15 +15737,8 @@ type SendLocationParams struct {
 	// Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
 
-	// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-	// It is not guaranteed that the user will receive the message, especially if they are offline.
-	// See [ephemeral message sending] for more details.
-	//
-	// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-	ReceiverUserID int64 `json:"receiver_user_id,omitempty"`
-
-	// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-	CallbackQueryID string `json:"callback_query_id,omitempty"`
+	// A JSON-serialized object containing the parameters of the ephemeral message to send
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
 
 	// Latitude of the location
 	Latitude float64 `json:"latitude"`
@@ -15904,25 +15843,12 @@ func WithSendLocationDirectMessagesTopicID(value int64) SendLocationOption {
 	})
 }
 
-// WithSendLocationReceiverUserID sets the ReceiverUserID field.
+// WithSendLocationEphemeralMessageParameters sets the EphemeralMessageParameters field.
 //
-// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-// It is not guaranteed that the user will receive the message, especially if they are offline.
-// See [ephemeral message sending] for more details.
-//
-// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-func WithSendLocationReceiverUserID(value int64) SendLocationOption {
-	return fieldOption(value, func(params *SendLocationParams) *int64 {
-		return &params.ReceiverUserID
-	})
-}
-
-// WithSendLocationCallbackQueryID sets the CallbackQueryID field.
-//
-// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-func WithSendLocationCallbackQueryID(value string) SendLocationOption {
-	return fieldOption(value, func(params *SendLocationParams) *string {
-		return &params.CallbackQueryID
+// A JSON-serialized object containing the parameters of the ephemeral message to send
+func WithSendLocationEphemeralMessageParameters(value *EphemeralMessageParameters) SendLocationOption {
+	return fieldOption(value, func(params *SendLocationParams) **EphemeralMessageParameters {
+		return &params.EphemeralMessageParameters
 	})
 }
 
@@ -16529,15 +16455,8 @@ type SendMessageParams struct {
 	// Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
 
-	// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-	// It is not guaranteed that the user will receive the message, especially if they are offline.
-	// See [ephemeral message sending] for more details.
-	//
-	// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-	ReceiverUserID int64 `json:"receiver_user_id,omitempty"`
-
-	// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-	CallbackQueryID string `json:"callback_query_id,omitempty"`
+	// A JSON-serialized object containing the parameters of the ephemeral message to send
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
 
 	// Text of the message to be sent, 1-4096 characters after entities parsing
 	Text string `json:"text"`
@@ -16634,25 +16553,12 @@ func WithSendMessageDirectMessagesTopicID(value int64) SendMessageOption {
 	})
 }
 
-// WithSendMessageReceiverUserID sets the ReceiverUserID field.
+// WithSendMessageEphemeralMessageParameters sets the EphemeralMessageParameters field.
 //
-// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-// It is not guaranteed that the user will receive the message, especially if they are offline.
-// See [ephemeral message sending] for more details.
-//
-// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-func WithSendMessageReceiverUserID(value int64) SendMessageOption {
-	return fieldOption(value, func(params *SendMessageParams) *int64 {
-		return &params.ReceiverUserID
-	})
-}
-
-// WithSendMessageCallbackQueryID sets the CallbackQueryID field.
-//
-// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-func WithSendMessageCallbackQueryID(value string) SendMessageOption {
-	return fieldOption(value, func(params *SendMessageParams) *string {
-		return &params.CallbackQueryID
+// A JSON-serialized object containing the parameters of the ephemeral message to send
+func WithSendMessageEphemeralMessageParameters(value *EphemeralMessageParameters) SendMessageOption {
+	return fieldOption(value, func(params *SendMessageParams) **EphemeralMessageParameters {
+		return &params.EphemeralMessageParameters
 	})
 }
 
@@ -16813,6 +16719,7 @@ type SendMessageDraftParams struct {
 
 	// Unique identifier of the message draft; must be non-zero.
 	// Changes to drafts with the same identifier are animated.
+	// Otherwise, the draft is replaced without animation.
 	DraftID int64 `json:"draft_id"`
 
 	// Text of the message to be sent, 0-4096 characters after entities parsing.
@@ -16827,6 +16734,17 @@ type SendMessageDraftParams struct {
 
 	// A JSON-serialized list of special entities that appear in message text, which can be specified instead of parse_mode
 	Entities []MessageEntity `json:"entities,omitempty"`
+
+	// Pass True to show the user a button to stop further drafts.
+	// The bot will receive an [Update] “stopped_message_generation” if the user presses the button.
+	//
+	// [Update]: https://core.telegram.org/bots/api#update
+	CanStop bool `json:"can_stop,omitempty"`
+
+	// Pass True to keep the draft in the chat when the button is pressed.
+	// The draft will still disappear after a short time or if the bot sends a message.
+	// To fully preserve the partial draft, the bot should send it as a new message.
+	KeepOnStop bool `json:"keep_on_stop,omitempty"`
 }
 
 // SendMessageDraftOption configures SendMessageDraftParams.
@@ -16862,6 +16780,7 @@ func WithSendMessageDraftMessageThreadID(value int64) SendMessageDraftOption {
 //
 // Unique identifier of the message draft; must be non-zero.
 // Changes to drafts with the same identifier are animated.
+// Otherwise, the draft is replaced without animation.
 func WithSendMessageDraftDraftID(value int64) SendMessageDraftOption {
 	return fieldOption(value, func(params *SendMessageDraftParams) *int64 {
 		return &params.DraftID
@@ -16896,6 +16815,29 @@ func WithSendMessageDraftParseMode(value string) SendMessageDraftOption {
 func WithSendMessageDraftEntities(value []MessageEntity) SendMessageDraftOption {
 	return fieldOption(value, func(params *SendMessageDraftParams) *[]MessageEntity {
 		return &params.Entities
+	})
+}
+
+// WithSendMessageDraftCanStop sets the CanStop field.
+//
+// Pass True to show the user a button to stop further drafts.
+// The bot will receive an [Update] “stopped_message_generation” if the user presses the button.
+//
+// [Update]: https://core.telegram.org/bots/api#update
+func WithSendMessageDraftCanStop(value bool) SendMessageDraftOption {
+	return fieldOption(value, func(params *SendMessageDraftParams) *bool {
+		return &params.CanStop
+	})
+}
+
+// WithSendMessageDraftKeepOnStop sets the KeepOnStop field.
+//
+// Pass True to keep the draft in the chat when the button is pressed.
+// The draft will still disappear after a short time or if the bot sends a message.
+// To fully preserve the partial draft, the bot should send it as a new message.
+func WithSendMessageDraftKeepOnStop(value bool) SendMessageDraftOption {
+	return fieldOption(value, func(params *SendMessageDraftParams) *bool {
+		return &params.KeepOnStop
 	})
 }
 
@@ -17506,15 +17448,8 @@ type SendPhotoParams struct {
 	// Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
 
-	// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-	// It is not guaranteed that the user will receive the message, especially if they are offline.
-	// See [ephemeral message sending] for more details.
-	//
-	// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-	ReceiverUserID int64 `json:"receiver_user_id,omitempty"`
-
-	// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-	CallbackQueryID string `json:"callback_query_id,omitempty"`
+	// A JSON-serialized object containing the parameters of the ephemeral message to send
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
 
 	// Photo to send.
 	// Pass a file_id as String to send a photo that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get a photo from the Internet, or upload a new photo using multipart/form-data.
@@ -17624,25 +17559,12 @@ func WithSendPhotoDirectMessagesTopicID(value int64) SendPhotoOption {
 	})
 }
 
-// WithSendPhotoReceiverUserID sets the ReceiverUserID field.
+// WithSendPhotoEphemeralMessageParameters sets the EphemeralMessageParameters field.
 //
-// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-// It is not guaranteed that the user will receive the message, especially if they are offline.
-// See [ephemeral message sending] for more details.
-//
-// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-func WithSendPhotoReceiverUserID(value int64) SendPhotoOption {
-	return fieldOption(value, func(params *SendPhotoParams) *int64 {
-		return &params.ReceiverUserID
-	})
-}
-
-// WithSendPhotoCallbackQueryID sets the CallbackQueryID field.
-//
-// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-func WithSendPhotoCallbackQueryID(value string) SendPhotoOption {
-	return fieldOption(value, func(params *SendPhotoParams) *string {
-		return &params.CallbackQueryID
+// A JSON-serialized object containing the parameters of the ephemeral message to send
+func WithSendPhotoEphemeralMessageParameters(value *EphemeralMessageParameters) SendPhotoOption {
+	return fieldOption(value, func(params *SendPhotoParams) **EphemeralMessageParameters {
+		return &params.EphemeralMessageParameters
 	})
 }
 
@@ -17847,17 +17769,20 @@ func (c *Client) SendPhoto(ctx context.Context, params *SendPhotoParams) (ret *M
 			}
 		}
 
-		if params.ReceiverUserID != 0 {
-			v := strconv.FormatInt(params.ReceiverUserID, 10)
-			err = writer.WriteField("receiver_user_id", v)
+		if params.EphemeralMessageParameters != nil {
+			var bs []byte
+			bs, err = json.Marshal(&params.EphemeralMessageParameters)
 			if err != nil {
 				return
 			}
-		}
 
-		if params.CallbackQueryID != "" {
-			v := params.CallbackQueryID
-			err = writer.WriteField("callback_query_id", v)
+			var p io.Writer
+			p, err = writer.CreateFormField("ephemeral_message_parameters")
+			if err != nil {
+				return
+			}
+
+			_, err = p.Write(bs)
 			if err != nil {
 				return
 			}
@@ -19211,6 +19136,9 @@ type SendRichMessageParams struct {
 	// Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
 
+	// A JSON-serialized object containing the parameters of the ephemeral message to send
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
+
 	// The message to be sent
 	RichMessage InputRichMessage `json:"rich_message"`
 
@@ -19292,6 +19220,15 @@ func WithSendRichMessageMessageThreadID(value int64) SendRichMessageOption {
 func WithSendRichMessageDirectMessagesTopicID(value int64) SendRichMessageOption {
 	return fieldOption(value, func(params *SendRichMessageParams) *int64 {
 		return &params.DirectMessagesTopicID
+	})
+}
+
+// WithSendRichMessageEphemeralMessageParameters sets the EphemeralMessageParameters field.
+//
+// A JSON-serialized object containing the parameters of the ephemeral message to send
+func WithSendRichMessageEphemeralMessageParameters(value *EphemeralMessageParameters) SendRichMessageOption {
+	return fieldOption(value, func(params *SendRichMessageParams) **EphemeralMessageParameters {
+		return &params.EphemeralMessageParameters
 	})
 }
 
@@ -19423,11 +19360,23 @@ type SendRichMessageDraftParams struct {
 
 	// Unique identifier of the message draft; must be non-zero.
 	// Changes to drafts with the same identifier are animated.
+	// Otherwise, the draft is replaced without animation.
 	DraftID int64 `json:"draft_id"`
 
 	// The partial message to be streamed.
-	// Direct upload of new files isn't supported.
+	// Direct upload of new files and explicit upload of files by a URL isn't supported.
 	RichMessage InputRichMessage `json:"rich_message"`
+
+	// Pass True to show the user a button to stop further drafts.
+	// The bot will receive an [Update] “stopped_message_generation” if the user presses the button.
+	//
+	// [Update]: https://core.telegram.org/bots/api#update
+	CanStop bool `json:"can_stop,omitempty"`
+
+	// Pass True to keep the draft in the chat when the button is pressed.
+	// The draft will still disappear after a short time or if the bot sends a message.
+	// To fully preserve the partial draft, the bot should send it as a new message.
+	KeepOnStop bool `json:"keep_on_stop,omitempty"`
 }
 
 // SendRichMessageDraftOption configures SendRichMessageDraftParams.
@@ -19463,6 +19412,7 @@ func WithSendRichMessageDraftMessageThreadID(value int64) SendRichMessageDraftOp
 //
 // Unique identifier of the message draft; must be non-zero.
 // Changes to drafts with the same identifier are animated.
+// Otherwise, the draft is replaced without animation.
 func WithSendRichMessageDraftDraftID(value int64) SendRichMessageDraftOption {
 	return fieldOption(value, func(params *SendRichMessageDraftParams) *int64 {
 		return &params.DraftID
@@ -19472,10 +19422,33 @@ func WithSendRichMessageDraftDraftID(value int64) SendRichMessageDraftOption {
 // WithSendRichMessageDraftRichMessage sets the RichMessage field.
 //
 // The partial message to be streamed.
-// Direct upload of new files isn't supported.
+// Direct upload of new files and explicit upload of files by a URL isn't supported.
 func WithSendRichMessageDraftRichMessage(value InputRichMessage) SendRichMessageDraftOption {
 	return fieldOption(value, func(params *SendRichMessageDraftParams) *InputRichMessage {
 		return &params.RichMessage
+	})
+}
+
+// WithSendRichMessageDraftCanStop sets the CanStop field.
+//
+// Pass True to show the user a button to stop further drafts.
+// The bot will receive an [Update] “stopped_message_generation” if the user presses the button.
+//
+// [Update]: https://core.telegram.org/bots/api#update
+func WithSendRichMessageDraftCanStop(value bool) SendRichMessageDraftOption {
+	return fieldOption(value, func(params *SendRichMessageDraftParams) *bool {
+		return &params.CanStop
+	})
+}
+
+// WithSendRichMessageDraftKeepOnStop sets the KeepOnStop field.
+//
+// Pass True to keep the draft in the chat when the button is pressed.
+// The draft will still disappear after a short time or if the bot sends a message.
+// To fully preserve the partial draft, the bot should send it as a new message.
+func WithSendRichMessageDraftKeepOnStop(value bool) SendRichMessageDraftOption {
+	return fieldOption(value, func(params *SendRichMessageDraftParams) *bool {
+		return &params.KeepOnStop
 	})
 }
 
@@ -19527,15 +19500,8 @@ type SendStickerParams struct {
 	// Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
 
-	// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-	// It is not guaranteed that the user will receive the message, especially if they are offline.
-	// See [ephemeral message sending] for more details.
-	//
-	// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-	ReceiverUserID int64 `json:"receiver_user_id,omitempty"`
-
-	// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-	CallbackQueryID string `json:"callback_query_id,omitempty"`
+	// A JSON-serialized object containing the parameters of the ephemeral message to send
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
 
 	// Sticker to send.
 	// Pass a file_id as String to send a file that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get a .WEBP sticker from the Internet, or upload a new .WEBP, .TGS, or .WEBM sticker using multipart/form-data.
@@ -19628,25 +19594,12 @@ func WithSendStickerDirectMessagesTopicID(value int64) SendStickerOption {
 	})
 }
 
-// WithSendStickerReceiverUserID sets the ReceiverUserID field.
+// WithSendStickerEphemeralMessageParameters sets the EphemeralMessageParameters field.
 //
-// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-// It is not guaranteed that the user will receive the message, especially if they are offline.
-// See [ephemeral message sending] for more details.
-//
-// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-func WithSendStickerReceiverUserID(value int64) SendStickerOption {
-	return fieldOption(value, func(params *SendStickerParams) *int64 {
-		return &params.ReceiverUserID
-	})
-}
-
-// WithSendStickerCallbackQueryID sets the CallbackQueryID field.
-//
-// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-func WithSendStickerCallbackQueryID(value string) SendStickerOption {
-	return fieldOption(value, func(params *SendStickerParams) *string {
-		return &params.CallbackQueryID
+// A JSON-serialized object containing the parameters of the ephemeral message to send
+func WithSendStickerEphemeralMessageParameters(value *EphemeralMessageParameters) SendStickerOption {
+	return fieldOption(value, func(params *SendStickerParams) **EphemeralMessageParameters {
+		return &params.EphemeralMessageParameters
 	})
 }
 
@@ -19812,17 +19765,20 @@ func (c *Client) SendSticker(ctx context.Context, params *SendStickerParams) (re
 			}
 		}
 
-		if params.ReceiverUserID != 0 {
-			v := strconv.FormatInt(params.ReceiverUserID, 10)
-			err = writer.WriteField("receiver_user_id", v)
+		if params.EphemeralMessageParameters != nil {
+			var bs []byte
+			bs, err = json.Marshal(&params.EphemeralMessageParameters)
 			if err != nil {
 				return
 			}
-		}
 
-		if params.CallbackQueryID != "" {
-			v := params.CallbackQueryID
-			err = writer.WriteField("callback_query_id", v)
+			var p io.Writer
+			p, err = writer.CreateFormField("ephemeral_message_parameters")
+			if err != nil {
+				return
+			}
+
+			_, err = p.Write(bs)
 			if err != nil {
 				return
 			}
@@ -19976,15 +19932,8 @@ type SendVenueParams struct {
 	// Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
 
-	// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-	// It is not guaranteed that the user will receive the message, especially if they are offline.
-	// See [ephemeral message sending] for more details.
-	//
-	// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-	ReceiverUserID int64 `json:"receiver_user_id,omitempty"`
-
-	// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-	CallbackQueryID string `json:"callback_query_id,omitempty"`
+	// A JSON-serialized object containing the parameters of the ephemeral message to send
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
 
 	// Latitude of the venue
 	Latitude float64 `json:"latitude"`
@@ -20094,25 +20043,12 @@ func WithSendVenueDirectMessagesTopicID(value int64) SendVenueOption {
 	})
 }
 
-// WithSendVenueReceiverUserID sets the ReceiverUserID field.
+// WithSendVenueEphemeralMessageParameters sets the EphemeralMessageParameters field.
 //
-// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-// It is not guaranteed that the user will receive the message, especially if they are offline.
-// See [ephemeral message sending] for more details.
-//
-// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-func WithSendVenueReceiverUserID(value int64) SendVenueOption {
-	return fieldOption(value, func(params *SendVenueParams) *int64 {
-		return &params.ReceiverUserID
-	})
-}
-
-// WithSendVenueCallbackQueryID sets the CallbackQueryID field.
-//
-// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-func WithSendVenueCallbackQueryID(value string) SendVenueOption {
-	return fieldOption(value, func(params *SendVenueParams) *string {
-		return &params.CallbackQueryID
+// A JSON-serialized object containing the parameters of the ephemeral message to send
+func WithSendVenueEphemeralMessageParameters(value *EphemeralMessageParameters) SendVenueOption {
+	return fieldOption(value, func(params *SendVenueParams) **EphemeralMessageParameters {
+		return &params.EphemeralMessageParameters
 	})
 }
 
@@ -20314,15 +20250,8 @@ type SendVideoParams struct {
 	// Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
 
-	// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-	// It is not guaranteed that the user will receive the message, especially if they are offline.
-	// See [ephemeral message sending] for more details.
-	//
-	// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-	ReceiverUserID int64 `json:"receiver_user_id,omitempty"`
-
-	// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-	CallbackQueryID string `json:"callback_query_id,omitempty"`
+	// A JSON-serialized object containing the parameters of the ephemeral message to send
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
 
 	// Video to send.
 	// Pass a file_id as String to send a video that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get a video from the Internet, or upload a new video using multipart/form-data.
@@ -20461,25 +20390,12 @@ func WithSendVideoDirectMessagesTopicID(value int64) SendVideoOption {
 	})
 }
 
-// WithSendVideoReceiverUserID sets the ReceiverUserID field.
+// WithSendVideoEphemeralMessageParameters sets the EphemeralMessageParameters field.
 //
-// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-// It is not guaranteed that the user will receive the message, especially if they are offline.
-// See [ephemeral message sending] for more details.
-//
-// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-func WithSendVideoReceiverUserID(value int64) SendVideoOption {
-	return fieldOption(value, func(params *SendVideoParams) *int64 {
-		return &params.ReceiverUserID
-	})
-}
-
-// WithSendVideoCallbackQueryID sets the CallbackQueryID field.
-//
-// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-func WithSendVideoCallbackQueryID(value string) SendVideoOption {
-	return fieldOption(value, func(params *SendVideoParams) *string {
-		return &params.CallbackQueryID
+// A JSON-serialized object containing the parameters of the ephemeral message to send
+func WithSendVideoEphemeralMessageParameters(value *EphemeralMessageParameters) SendVideoOption {
+	return fieldOption(value, func(params *SendVideoParams) **EphemeralMessageParameters {
+		return &params.EphemeralMessageParameters
 	})
 }
 
@@ -20757,17 +20673,20 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 			}
 		}
 
-		if params.ReceiverUserID != 0 {
-			v := strconv.FormatInt(params.ReceiverUserID, 10)
-			err = writer.WriteField("receiver_user_id", v)
+		if params.EphemeralMessageParameters != nil {
+			var bs []byte
+			bs, err = json.Marshal(&params.EphemeralMessageParameters)
 			if err != nil {
 				return
 			}
-		}
 
-		if params.CallbackQueryID != "" {
-			v := params.CallbackQueryID
-			err = writer.WriteField("callback_query_id", v)
+			var p io.Writer
+			p, err = writer.CreateFormField("ephemeral_message_parameters")
+			if err != nil {
+				return
+			}
+
+			_, err = p.Write(bs)
 			if err != nil {
 				return
 			}
@@ -21032,15 +20951,8 @@ type SendVideoNoteParams struct {
 	// Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
 
-	// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-	// It is not guaranteed that the user will receive the message, especially if they are offline.
-	// See [ephemeral message sending] for more details.
-	//
-	// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-	ReceiverUserID int64 `json:"receiver_user_id,omitempty"`
-
-	// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-	CallbackQueryID string `json:"callback_query_id,omitempty"`
+	// A JSON-serialized object containing the parameters of the ephemeral message to send
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
 
 	// Video note to send.
 	// Pass a file_id as String to send a video note that exists on the Telegram servers (recommended) or upload a new video using multipart/form-data.
@@ -21147,25 +21059,12 @@ func WithSendVideoNoteDirectMessagesTopicID(value int64) SendVideoNoteOption {
 	})
 }
 
-// WithSendVideoNoteReceiverUserID sets the ReceiverUserID field.
+// WithSendVideoNoteEphemeralMessageParameters sets the EphemeralMessageParameters field.
 //
-// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-// It is not guaranteed that the user will receive the message, especially if they are offline.
-// See [ephemeral message sending] for more details.
-//
-// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-func WithSendVideoNoteReceiverUserID(value int64) SendVideoNoteOption {
-	return fieldOption(value, func(params *SendVideoNoteParams) *int64 {
-		return &params.ReceiverUserID
-	})
-}
-
-// WithSendVideoNoteCallbackQueryID sets the CallbackQueryID field.
-//
-// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-func WithSendVideoNoteCallbackQueryID(value string) SendVideoNoteOption {
-	return fieldOption(value, func(params *SendVideoNoteParams) *string {
-		return &params.CallbackQueryID
+// A JSON-serialized object containing the parameters of the ephemeral message to send
+func WithSendVideoNoteEphemeralMessageParameters(value *EphemeralMessageParameters) SendVideoNoteOption {
+	return fieldOption(value, func(params *SendVideoNoteParams) **EphemeralMessageParameters {
+		return &params.EphemeralMessageParameters
 	})
 }
 
@@ -21294,11 +21193,9 @@ func WithSendVideoNoteReplyMarkup(value *ReplyMarkup) SendVideoNoteOption {
 
 // SendVideoNote calls the sendVideoNote Telegram Bot API method.
 //
-// As of [v.4.0], Telegram clients support rounded square MPEG4 videos of up to 1 minute long.
-// Use this method to send video messages.
+// Use this method to send a rounded square MPEG4 video of up to 1 minute long.
 // On success, the sent [Message] is returned.
 //
-// [v.4.0]: https://telegram.org/blog/video-messages-and-telescope
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams) (ret *Message, err error) {
 	reader, pw := io.Pipe()
@@ -21357,17 +21254,20 @@ func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams)
 			}
 		}
 
-		if params.ReceiverUserID != 0 {
-			v := strconv.FormatInt(params.ReceiverUserID, 10)
-			err = writer.WriteField("receiver_user_id", v)
+		if params.EphemeralMessageParameters != nil {
+			var bs []byte
+			bs, err = json.Marshal(&params.EphemeralMessageParameters)
 			if err != nil {
 				return
 			}
-		}
 
-		if params.CallbackQueryID != "" {
-			v := params.CallbackQueryID
-			err = writer.WriteField("callback_query_id", v)
+			var p io.Writer
+			p, err = writer.CreateFormField("ephemeral_message_parameters")
+			if err != nil {
+				return
+			}
+
+			_, err = p.Write(bs)
 			if err != nil {
 				return
 			}
@@ -21543,15 +21443,8 @@ type SendVoiceParams struct {
 	// Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
 
-	// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-	// It is not guaranteed that the user will receive the message, especially if they are offline.
-	// See [ephemeral message sending] for more details.
-	//
-	// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-	ReceiverUserID int64 `json:"receiver_user_id,omitempty"`
-
-	// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-	CallbackQueryID string `json:"callback_query_id,omitempty"`
+	// A JSON-serialized object containing the parameters of the ephemeral message to send
+	EphemeralMessageParameters *EphemeralMessageParameters `json:"ephemeral_message_parameters,omitempty"`
 
 	// Audio file to send.
 	// Pass a file_id as String to send a file that exists on the Telegram servers (recommended), pass an HTTP URL as a String for Telegram to get a file from the Internet, or upload a new one using multipart/form-data.
@@ -21655,25 +21548,12 @@ func WithSendVoiceDirectMessagesTopicID(value int64) SendVoiceOption {
 	})
 }
 
-// WithSendVoiceReceiverUserID sets the ReceiverUserID field.
+// WithSendVoiceEphemeralMessageParameters sets the EphemeralMessageParameters field.
 //
-// For outgoing ephemeral messages, unique identifier of the user who will receive the message; for group and supergroup chats only.
-// It is not guaranteed that the user will receive the message, especially if they are offline.
-// See [ephemeral message sending] for more details.
-//
-// [ephemeral message sending]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
-func WithSendVoiceReceiverUserID(value int64) SendVoiceOption {
-	return fieldOption(value, func(params *SendVoiceParams) *int64 {
-		return &params.ReceiverUserID
-	})
-}
-
-// WithSendVoiceCallbackQueryID sets the CallbackQueryID field.
-//
-// For outgoing ephemeral messages, identifier of the callback query which triggered the message if any
-func WithSendVoiceCallbackQueryID(value string) SendVoiceOption {
-	return fieldOption(value, func(params *SendVoiceParams) *string {
-		return &params.CallbackQueryID
+// A JSON-serialized object containing the parameters of the ephemeral message to send
+func WithSendVoiceEphemeralMessageParameters(value *EphemeralMessageParameters) SendVoiceOption {
+	return fieldOption(value, func(params *SendVoiceParams) **EphemeralMessageParameters {
+		return &params.EphemeralMessageParameters
 	})
 }
 
@@ -21870,17 +21750,20 @@ func (c *Client) SendVoice(ctx context.Context, params *SendVoiceParams) (ret *M
 			}
 		}
 
-		if params.ReceiverUserID != 0 {
-			v := strconv.FormatInt(params.ReceiverUserID, 10)
-			err = writer.WriteField("receiver_user_id", v)
+		if params.EphemeralMessageParameters != nil {
+			var bs []byte
+			bs, err = json.Marshal(&params.EphemeralMessageParameters)
 			if err != nil {
 				return
 			}
-		}
 
-		if params.CallbackQueryID != "" {
-			v := params.CallbackQueryID
-			err = writer.WriteField("callback_query_id", v)
+			var p io.Writer
+			p, err = writer.CreateFormField("ephemeral_message_parameters")
+			if err != nil {
+				return
+			}
+
+			_, err = p.Write(bs)
 			if err != nil {
 				return
 			}
