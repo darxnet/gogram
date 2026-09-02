@@ -21,6 +21,7 @@ linters:
     - cyclop
     - depguard
     - exhaustruct
+    - exhaustruct_v5
     - forcetypeassert
     - funcorder
     - funlen

@@ -64,6 +64,8 @@ func (ctx *Context) findHandlerOn() handleOn {
 		return handleOnManagedBot
 	case ctx.update.Subscription != nil:
 		return handleOnSubscription
+	case ctx.update.StoppedMessageGeneration != nil:
+		return handleOnStoppedMessageGeneration
 	}
 
 	return 0
@@ -162,6 +164,8 @@ func (ctx *Context) Chat() *Chat {
 		return &ctx.update.ChatBoost.Chat
 	case ctx.update.RemovedChatBoost != nil:
 		return &ctx.update.RemovedChatBoost.Chat
+	case ctx.update.StoppedMessageGeneration != nil:
+		return &ctx.update.StoppedMessageGeneration.Chat
 	case ctx.update.CallbackQuery != nil && ctx.update.CallbackQuery.Message != nil:
 		return ctx.update.CallbackQuery.Message.Chat()
 	}
@@ -1680,12 +1684,11 @@ func (ctx *Context) EditEphemeralMessageReplyMarkup(
 
 // EditEphemeralMessageText calls Client.EditEphemeralMessageText with context-derived defaults.
 //
-// Use this method to edit an ephemeral text message.
+// Use this method to edit an ephemeral text or rich message.
 // Note that it is not guaranteed that the user will receive the message edit event, especially if they are offline.
 // On success, True is returned.
 func (ctx *Context) EditEphemeralMessageText(
 	receiverUserID int64,
-	text string,
 	opts ...EditEphemeralMessageTextOption,
 ) error {
 	params := &EditEphemeralMessageTextParams{
@@ -1706,7 +1709,6 @@ func (ctx *Context) EditEphemeralMessageText(
 
 			return m.EphemeralMessageID
 		}(ctx),
-		Text: text,
 	}
 
 	params.Option(opts...)
@@ -3911,17 +3913,6 @@ func (ctx *Context) SendAnimation(
 
 			return m.DirectMessagesTopic.TopicID
 		}(ctx),
-		CallbackQueryID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.CallbackQuery == nil {
-				return ""
-			}
-
-			return ctx.update.CallbackQuery.ID
-		}(ctx),
 		Animation: animation,
 	}
 
@@ -3991,17 +3982,6 @@ func (ctx *Context) SendAudio(
 			}
 
 			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		CallbackQueryID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.CallbackQuery == nil {
-				return ""
-			}
-
-			return ctx.update.CallbackQuery.ID
 		}(ctx),
 		Audio: audio,
 	}
@@ -4179,17 +4159,6 @@ func (ctx *Context) SendContact(
 
 			return m.DirectMessagesTopic.TopicID
 		}(ctx),
-		CallbackQueryID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.CallbackQuery == nil {
-				return ""
-			}
-
-			return ctx.update.CallbackQuery.ID
-		}(ctx),
 		PhoneNumber: phoneNumber,
 		FirstName:   firstName,
 	}
@@ -4305,17 +4274,6 @@ func (ctx *Context) SendDocument(
 			}
 
 			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		CallbackQueryID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.CallbackQuery == nil {
-				return ""
-			}
-
-			return ctx.update.CallbackQuery.ID
 		}(ctx),
 		Document: document,
 	}
@@ -4530,17 +4488,6 @@ func (ctx *Context) SendLivePhoto(
 
 			return m.DirectMessagesTopic.TopicID
 		}(ctx),
-		CallbackQueryID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.CallbackQuery == nil {
-				return ""
-			}
-
-			return ctx.update.CallbackQuery.ID
-		}(ctx),
 		LivePhoto: livePhoto,
 		Photo:     photo,
 	}
@@ -4608,17 +4555,6 @@ func (ctx *Context) SendLocation(
 			}
 
 			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		CallbackQueryID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.CallbackQuery == nil {
-				return ""
-			}
-
-			return ctx.update.CallbackQuery.ID
 		}(ctx),
 		Latitude:  latitude,
 		Longitude: longitude,
@@ -4745,17 +4681,6 @@ func (ctx *Context) SendMessage(
 			}
 
 			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		CallbackQueryID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.CallbackQuery == nil {
-				return ""
-			}
-
-			return ctx.update.CallbackQuery.ID
 		}(ctx),
 		Text: text,
 	}
@@ -4937,17 +4862,6 @@ func (ctx *Context) SendPhoto(
 			}
 
 			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		CallbackQueryID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.CallbackQuery == nil {
-				return ""
-			}
-
-			return ctx.update.CallbackQuery.ID
 		}(ctx),
 		Photo: photo,
 	}
@@ -5170,17 +5084,6 @@ func (ctx *Context) SendSticker(
 
 			return m.DirectMessagesTopic.TopicID
 		}(ctx),
-		CallbackQueryID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.CallbackQuery == nil {
-				return ""
-			}
-
-			return ctx.update.CallbackQuery.ID
-		}(ctx),
 		Sticker: sticker,
 	}
 
@@ -5241,17 +5144,6 @@ func (ctx *Context) SendVenue(
 			}
 
 			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		CallbackQueryID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.CallbackQuery == nil {
-				return ""
-			}
-
-			return ctx.update.CallbackQuery.ID
 		}(ctx),
 		Latitude:  latitude,
 		Longitude: longitude,
@@ -5316,17 +5208,6 @@ func (ctx *Context) SendVideo(
 
 			return m.DirectMessagesTopic.TopicID
 		}(ctx),
-		CallbackQueryID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.CallbackQuery == nil {
-				return ""
-			}
-
-			return ctx.update.CallbackQuery.ID
-		}(ctx),
 		Video: video,
 	}
 
@@ -5348,11 +5229,9 @@ func (ctx *Context) SendVideo(
 
 // SendVideoNote calls Client.SendVideoNote with context-derived defaults.
 //
-// As of [v.4.0], Telegram clients support rounded square MPEG4 videos of up to 1 minute long.
-// Use this method to send video messages.
+// Use this method to send a rounded square MPEG4 video of up to 1 minute long.
 // On success, the sent [Message] is returned.
 //
-// [v.4.0]: https://telegram.org/blog/video-messages-and-telescope
 // [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SendVideoNote(
 	videoNote InputFile,
@@ -5394,17 +5273,6 @@ func (ctx *Context) SendVideoNote(
 			}
 
 			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		CallbackQueryID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.CallbackQuery == nil {
-				return ""
-			}
-
-			return ctx.update.CallbackQuery.ID
 		}(ctx),
 		VideoNote: videoNote,
 	}
@@ -5467,17 +5335,6 @@ func (ctx *Context) SendVoice(
 			}
 
 			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		CallbackQueryID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
-
-			if ctx.update.CallbackQuery == nil {
-				return ""
-			}
-
-			return ctx.update.CallbackQuery.ID
 		}(ctx),
 		Voice: voice,
 	}

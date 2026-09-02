@@ -906,7 +906,7 @@ type CallbackQuery struct {
 	// Optional.
 	// Short name of a [Game] to be returned, serves as the unique identifier for the game
 	//
-	// [Game]: https://core.telegram.org/bots/api#games
+	// [Game]: https://core.telegram.org/bots/api#game
 	GameShortName string `json:"game_short_name,omitempty"`
 }
 
@@ -1008,9 +1008,11 @@ type ChatAdministratorRights struct {
 	CanManageDirectMessages bool `json:"can_manage_direct_messages,omitempty"`
 
 	// Optional.
-	// True, if the administrator can edit the tags of regular members; for groups and supergroups only.
-	// If omitted, defaults to the value of can_pin_messages.
+	// True, if the administrator can edit the tags of regular members; for groups and supergroups only
 	CanManageTags bool `json:"can_manage_tags,omitempty"`
+
+	// True, if the administrator can manage chat welcome messages or directly send them in the case of bots
+	CanSendWelcomeMessages bool `json:"can_send_welcome_messages"`
 }
 
 // ChatBackground
@@ -1712,9 +1714,11 @@ type ChatMemberAdministrator struct {
 	CanManageDirectMessages bool `json:"can_manage_direct_messages,omitempty"`
 
 	// Optional.
-	// True, if the administrator can edit the tags of regular members; for groups and supergroups only.
-	// If omitted, defaults to the value of can_pin_messages.
+	// True, if the administrator can edit the tags of regular members; for groups and supergroups only
 	CanManageTags bool `json:"can_manage_tags,omitempty"`
+
+	// True, if the administrator can manage chat welcome messages or directly send them in the case of bots
+	CanSendWelcomeMessages bool `json:"can_send_welcome_messages"`
 
 	// Optional.
 	// Custom title for this user
@@ -2170,15 +2174,23 @@ type Community struct {
 
 // CommunityChatAdded
 //
-// Describes a service message about a chat being added to a community.
+// Describes a service message about a chat or a bot being added to a community.
 type CommunityChatAdded struct {
-	// The new community to which the chat belongs
+	// The new community to which the chat or the bot belongs
+	Community Community `json:"community"`
+}
+
+// CommunityChatJoined
+//
+// Describes a service message about a chat being joined by a user from a community.
+type CommunityChatJoined struct {
+	// The community from which the chat was joined
 	Community Community `json:"community"`
 }
 
 // CommunityChatRemoved
 //
-// Describes a service message about a chat being removed from a community.
+// Describes a service message about a chat or a bot being removed from a community.
 // Currently holds no information.
 type CommunityChatRemoved struct {
 }
@@ -2256,6 +2268,13 @@ type DirectMessagesTopic struct {
 	// Information about the user that created the topic.
 	// Currently, it is always present.
 	User *User `json:"user,omitempty"`
+}
+
+// DisabledButton
+//
+// This object represents a disabled button which does nothing.
+// Currently holds no information.
+type DisabledButton struct {
 }
 
 // Document
@@ -2374,6 +2393,26 @@ type EncryptedPassportElement struct {
 	//
 	// [PassportElementErrorUnspecified]: https://core.telegram.org/bots/api#passportelementerrorunspecified
 	Hash string `json:"hash"`
+}
+
+// EphemeralMessageParameters
+//
+type EphemeralMessageParameters struct {
+	// Identifier of the user who will receive the message.
+	// It is not guaranteed that the user will receive the message, especially if they are offline.
+	// See [here] for more details.
+	//
+	// [here]: https://core.telegram.org/bots/api#ephemeral-messages-and-commands
+	ReceiverUserID int64 `json:"receiver_user_id"`
+
+	// Optional.
+	// Identifier of the callback query which triggered the message, if any
+	CallbackQueryID string `json:"callback_query_id,omitempty"`
+
+	// Optional.
+	// Pass True if the ephemeral message must be shown in place of the original message.
+	// Must be False for callback queries from ephemeral messages, which must be edited using regular editEphemeralMessage… methods.
+	ReplaceCallbackQueryMessage bool `json:"replace_callback_query_message,omitempty"`
 }
 
 // ExternalReplyInfo
@@ -2531,7 +2570,7 @@ type File struct {
 //
 // [privacy mode]: https://core.telegram.org/bots/features#privacy-mode
 type ForceReply struct {
-	// Shows reply interface to the user, as if they manually selected the bot's message and tapped 'Reply'
+	// Shows reply interface to the user, as if they had manually selected the bot's message and tapped 'Reply'
 	ForceReply bool `json:"force_reply"`
 
 	// Optional.
@@ -2980,6 +3019,7 @@ type InlineKeyboardButton struct {
 	// Optional.
 	// An HTTPS URL used to automatically authorize the user.
 	// Can be used as a replacement for the [Telegram Login Widget].
+	// Not supported for ephemeral messages.
 	//
 	// [Telegram Login Widget]: https://core.telegram.org/widgets/login
 	LoginUrl *LoginUrl `json:"login_url,omitempty"`
@@ -3021,6 +3061,10 @@ type InlineKeyboardButton struct {
 	//
 	// [Pay button]: https://core.telegram.org/bots/api#payments
 	Pay bool `json:"pay,omitempty"`
+
+	// Optional.
+	// If set, then the button is disabled and does nothing
+	Disabled *DisabledButton `json:"disabled,omitempty"`
 }
 
 // InlineKeyboardMarkup
@@ -3033,6 +3077,11 @@ type InlineKeyboardMarkup struct {
 	//
 	// [InlineKeyboardButton]: https://core.telegram.org/bots/api#inlinekeyboardbutton
 	InlineKeyboard [][]InlineKeyboardButton `json:"inline_keyboard"`
+
+	// Optional.
+	// Pass True if the reply interface must be shown to the user, as if they had manually selected the bot's message and tapped 'Reply'.
+	// The value of the field can't be changed when the inline keyboard is edited.
+	ForceReply bool `json:"force_reply,omitempty"`
 }
 
 // InlineQuery
@@ -3835,7 +3884,7 @@ type InlineQueryResultDocument struct {
 //
 // Represents a [Game].
 //
-// [Game]: https://core.telegram.org/bots/api#games
+// [Game]: https://core.telegram.org/bots/api#game
 type InlineQueryResultGame struct {
 	// Type of the result, must be game
 	Type string `json:"type"`
@@ -5790,6 +5839,8 @@ type InputProfilePhotoStatic struct {
 //
 // [InputRichBlockBlockQuotation]
 //
+// [InputRichBlockExpandableBlockQuotation]
+//
 // [InputRichBlockPullQuotation]
 //
 // [InputRichBlockCollage]
@@ -5802,9 +5853,13 @@ type InputProfilePhotoStatic struct {
 //
 // [InputRichBlockMap]
 //
+// [InputRichBlockButtons]
+//
 // [InputRichBlockAnimation]
 //
 // [InputRichBlockAudio]
+//
+// [InputRichBlockDocument]
 //
 // [InputRichBlockPhoto]
 //
@@ -5824,14 +5879,17 @@ type InputProfilePhotoStatic struct {
 // [InputRichBlockAnchor]: https://core.telegram.org/bots/api#inputrichblockanchor
 // [InputRichBlockList]: https://core.telegram.org/bots/api#inputrichblocklist
 // [InputRichBlockBlockQuotation]: https://core.telegram.org/bots/api#inputrichblockblockquotation
+// [InputRichBlockExpandableBlockQuotation]: https://core.telegram.org/bots/api#inputrichblockexpandableblockquotation
 // [InputRichBlockPullQuotation]: https://core.telegram.org/bots/api#inputrichblockpullquotation
 // [InputRichBlockCollage]: https://core.telegram.org/bots/api#inputrichblockcollage
 // [InputRichBlockSlideshow]: https://core.telegram.org/bots/api#inputrichblockslideshow
 // [InputRichBlockTable]: https://core.telegram.org/bots/api#inputrichblocktable
 // [InputRichBlockDetails]: https://core.telegram.org/bots/api#inputrichblockdetails
 // [InputRichBlockMap]: https://core.telegram.org/bots/api#inputrichblockmap
+// [InputRichBlockButtons]: https://core.telegram.org/bots/api#inputrichblockbuttons
 // [InputRichBlockAnimation]: https://core.telegram.org/bots/api#inputrichblockanimation
 // [InputRichBlockAudio]: https://core.telegram.org/bots/api#inputrichblockaudio
+// [InputRichBlockDocument]: https://core.telegram.org/bots/api#inputrichblockdocument
 // [InputRichBlockPhoto]: https://core.telegram.org/bots/api#inputrichblockphoto
 // [InputRichBlockVideo]: https://core.telegram.org/bots/api#inputrichblockvideo
 // [InputRichBlockVoiceNote]: https://core.telegram.org/bots/api#inputrichblockvoicenote
@@ -5846,14 +5904,17 @@ type InputRichBlock struct {
 	*InputRichBlockAnchor
 	*InputRichBlockList
 	*InputRichBlockBlockQuotation
+	*InputRichBlockExpandableBlockQuotation
 	*InputRichBlockPullQuotation
 	*InputRichBlockCollage
 	*InputRichBlockSlideshow
 	*InputRichBlockTable
 	*InputRichBlockDetails
 	*InputRichBlockMap
+	*InputRichBlockButtons
 	*InputRichBlockAnimation
 	*InputRichBlockAudio
+	*InputRichBlockDocument
 	*InputRichBlockPhoto
 	*InputRichBlockVideo
 	*InputRichBlockVoiceNote
@@ -5907,6 +5968,11 @@ func (r *InputRichBlock) MarshalJSON() ([]byte, error) {
 		return json.Marshal(r.InputRichBlockBlockQuotation)
 	}
 
+	if r.InputRichBlockExpandableBlockQuotation != nil {
+		r.InputRichBlockExpandableBlockQuotation.Type = "expandable_blockquote"
+		return json.Marshal(r.InputRichBlockExpandableBlockQuotation)
+	}
+
 	if r.InputRichBlockPullQuotation != nil {
 		r.InputRichBlockPullQuotation.Type = "pullquote"
 		return json.Marshal(r.InputRichBlockPullQuotation)
@@ -5937,6 +6003,11 @@ func (r *InputRichBlock) MarshalJSON() ([]byte, error) {
 		return json.Marshal(r.InputRichBlockMap)
 	}
 
+	if r.InputRichBlockButtons != nil {
+		r.InputRichBlockButtons.Type = "buttons"
+		return json.Marshal(r.InputRichBlockButtons)
+	}
+
 	if r.InputRichBlockAnimation != nil {
 		r.InputRichBlockAnimation.Type = "animation"
 		return json.Marshal(r.InputRichBlockAnimation)
@@ -5945,6 +6016,11 @@ func (r *InputRichBlock) MarshalJSON() ([]byte, error) {
 	if r.InputRichBlockAudio != nil {
 		r.InputRichBlockAudio.Type = "audio"
 		return json.Marshal(r.InputRichBlockAudio)
+	}
+
+	if r.InputRichBlockDocument != nil {
+		r.InputRichBlockDocument.Type = "document"
+		return json.Marshal(r.InputRichBlockDocument)
 	}
 
 	if r.InputRichBlockPhoto != nil {
@@ -6023,6 +6099,10 @@ func (r *InputRichBlock) UnmarshalJSON(data []byte) error {
 		r.InputRichBlockBlockQuotation = new(InputRichBlockBlockQuotation)
 		return json.Unmarshal(data, r.InputRichBlockBlockQuotation)
 
+	case "expandable_blockquote":
+		r.InputRichBlockExpandableBlockQuotation = new(InputRichBlockExpandableBlockQuotation)
+		return json.Unmarshal(data, r.InputRichBlockExpandableBlockQuotation)
+
 	case "pullquote":
 		r.InputRichBlockPullQuotation = new(InputRichBlockPullQuotation)
 		return json.Unmarshal(data, r.InputRichBlockPullQuotation)
@@ -6047,6 +6127,10 @@ func (r *InputRichBlock) UnmarshalJSON(data []byte) error {
 		r.InputRichBlockMap = new(InputRichBlockMap)
 		return json.Unmarshal(data, r.InputRichBlockMap)
 
+	case "buttons":
+		r.InputRichBlockButtons = new(InputRichBlockButtons)
+		return json.Unmarshal(data, r.InputRichBlockButtons)
+
 	case "animation":
 		r.InputRichBlockAnimation = new(InputRichBlockAnimation)
 		return json.Unmarshal(data, r.InputRichBlockAnimation)
@@ -6054,6 +6138,10 @@ func (r *InputRichBlock) UnmarshalJSON(data []byte) error {
 	case "audio":
 		r.InputRichBlockAudio = new(InputRichBlockAudio)
 		return json.Unmarshal(data, r.InputRichBlockAudio)
+
+	case "document":
+		r.InputRichBlockDocument = new(InputRichBlockDocument)
+		return json.Unmarshal(data, r.InputRichBlockDocument)
 
 	case "photo":
 		r.InputRichBlockPhoto = new(InputRichBlockPhoto)
@@ -6134,6 +6222,22 @@ type InputRichBlockBlockQuotation struct {
 	Credit *RichText `json:"credit,omitempty"`
 }
 
+// InputRichBlockButtons
+//
+// A block containing a list of buttons that are shown in one row, corresponding to the custom HTML tag <tg-button-row>.
+type InputRichBlockButtons struct {
+	// Type of the block, always “buttons”
+	Type string `json:"type"`
+
+	// List of 1-8 buttons to send
+	Buttons []RichMessageButton `json:"buttons"`
+
+	// Optional.
+	// Horizontal alignment of the buttons.
+	// Currently, must be one of “left”, “center”, or “right”.
+	Align string `json:"align,omitempty"`
+}
+
 // InputRichBlockCollage
 //
 // A collage, corresponding to the custom HTML tag <tg-collage>.
@@ -6173,6 +6277,37 @@ type InputRichBlockDetails struct {
 type InputRichBlockDivider struct {
 	// Type of the block, always “divider”
 	Type string `json:"type"`
+}
+
+// InputRichBlockDocument
+//
+// A block with a general file, corresponding to the custom HTML tag <tg-document>.
+type InputRichBlockDocument struct {
+	// Type of the block, always “document”
+	Type string `json:"type"`
+
+	// The document.
+	// Caption is ignored.
+	Document InputMedia `json:"document"`
+
+	// Optional.
+	// Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// InputRichBlockExpandableBlockQuotation
+//
+// A block quotation, corresponding to the HTML tag <blockquote> with custom attribute "expandable".
+type InputRichBlockExpandableBlockQuotation struct {
+	// Type of the block, always “expandable_blockquote”
+	Type string `json:"type"`
+
+	// Content of the block
+	Text RichText `json:"text"`
+
+	// Optional.
+	// Credit of the block
+	Credit *RichText `json:"credit,omitempty"`
 }
 
 // InputRichBlockFooter
@@ -6233,14 +6368,17 @@ type InputRichBlockMap struct {
 	// Location of the center of the map
 	Location Location `json:"location"`
 
+	// Optional.
 	// Map zoom level; 0-24
-	Zoom int64 `json:"zoom"`
+	Zoom int64 `json:"zoom,omitempty"`
 
+	// Optional.
 	// Map width; 0-10000
-	Width int64 `json:"width"`
+	Width int64 `json:"width,omitempty"`
 
+	// Optional.
 	// Map height; 0-10000
-	Height int64 `json:"height"`
+	Height int64 `json:"height,omitempty"`
 
 	// Optional.
 	// Caption of the block
@@ -6363,6 +6501,10 @@ type InputRichBlockTable struct {
 	IsStriped bool `json:"is_striped,omitempty"`
 
 	// Optional.
+	// Pass True if table cells must have smaller indents
+	IsCompact bool `json:"is_compact,omitempty"`
+
+	// Optional.
 	// Caption of the table
 	Caption *RichText `json:"caption,omitempty"`
 }
@@ -6444,7 +6586,7 @@ type InputRichMessage struct {
 	Markdown string `json:"markdown,omitempty"`
 
 	// Optional.
-	// List of media that are specified in the markdown or html fields using tg://photo?id=, tg://video?id=, and tg://audio?id= links
+	// List of media that are specified in the markdown or html fields using tg://photo?id=, tg://video?id=, tg://document?id=, and tg://audio?id= links
 	Media []InputRichMessageMedia `json:"media,omitempty"`
 
 	// Optional.
@@ -6462,7 +6604,8 @@ type InputRichMessage struct {
 //
 // [content]: https://core.telegram.org/bots/api#inputmessagecontent
 type InputRichMessageContent struct {
-	// The message to be sent
+	// The message to be sent.
+	// Only previously uploaded files may be used in the message.
 	RichMessage InputRichMessage `json:"rich_message"`
 }
 
@@ -6470,7 +6613,7 @@ type InputRichMessageContent struct {
 //
 // Describes a media element embedded in an outgoing rich message.
 type InputRichMessageMedia struct {
-	// Unique identifier of the media used in a tg://photo?id=, tg://video?id=, or tg://audio?id= link.
+	// Unique identifier of the media used in a tg://photo?id=, tg://video?id=, tg://document?id=, or tg://audio?id= link.
 	// 1-64 characters, only A-Z, a-z, 0-9, _ and - are allowed.
 	ID string `json:"id"`
 
@@ -7048,12 +7191,10 @@ type LocationAddress struct {
 // LoginUrl
 //
 // This object represents a parameter of the inline keyboard button used to automatically authorize a user.
-// Serves as a great replacement for the [Telegram Login Widget] when the user is coming from Telegram.
+// It serves as a great replacement for the [Telegram Login Widget] when the user is coming from Telegram.
 // All the user needs to do is tap/click a button and confirm that they want to log in:
-// Telegram apps support these buttons as of [version 5.7].
 //
 // [Telegram Login Widget]: https://core.telegram.org/widgets/login
-// [version 5.7]: https://telegram.org/blog/privacy-discussions-web-bots#meet-seamless-web-bots
 type LoginUrl struct {
 	// An HTTPS URL to be opened with user authorization data added to the query string when the button is pressed.
 	// If the user refuses to provide authorization data, the original URL without information about the user will be opened.
@@ -7070,12 +7211,13 @@ type LoginUrl struct {
 	ForwardText string `json:"forward_text,omitempty"`
 
 	// Optional.
-	// Username of a bot, which will be used for user authorization.
+	// Username of a bot, which will be used for user authorization; not supported in [RichMessageButton].
 	// See [Setting up a bot] for more details.
 	// If not specified, the current bot's username will be assumed.
 	// The url's domain must be the same as the domain linked with the bot.
 	// See [Linking your domain to the bot] for more details.
 	//
+	// [RichMessageButton]: https://core.telegram.org/bots/api#richmessagebutton
 	// [Setting up a bot]: https://core.telegram.org/widgets/login#setting-up-a-bot
 	// [Linking your domain to the bot]: https://core.telegram.org/widgets/login#linking-your-domain-to-the-bot
 	BotUsername string `json:"bot_username,omitempty"`
@@ -7699,13 +7841,19 @@ type Message struct {
 	ChecklistTasksAdded *ChecklistTasksAdded `json:"checklist_tasks_added,omitempty"`
 
 	// Optional.
-	// Service message: chat added to a [Community]
+	// Service message: chat or bot added to a [Community]
 	//
 	// [Community]: https://core.telegram.org/bots/api#community
 	CommunityChatAdded *CommunityChatAdded `json:"community_chat_added,omitempty"`
 
 	// Optional.
-	// Service message: chat removed from a [Community]
+	// Service message: chat was joined by a user from a [Community]
+	//
+	// [Community]: https://core.telegram.org/bots/api#community
+	CommunityChatJoined *CommunityChatJoined `json:"community_chat_joined,omitempty"`
+
+	// Optional.
+	// Service message: chat or bot removed from a [Community]
 	//
 	// [Community]: https://core.telegram.org/bots/api#community
 	CommunityChatRemoved *CommunityChatRemoved `json:"community_chat_removed,omitempty"`
@@ -7876,6 +8024,21 @@ type MessageEntity struct {
 	//
 	// [date-time entity formatting]: https://core.telegram.org/bots/api#date-time-entity-formatting
 	DateTimeFormat string `json:"date_time_format,omitempty"`
+}
+
+// MessageGenerationStopped
+//
+// This object describes an update about a user stopping message generation.
+type MessageGenerationStopped struct {
+	// Chat in which the message is generated
+	Chat Chat `json:"chat"`
+
+	// Optional.
+	// Unique identifier of the message thread in which the message is generated
+	MessageThreadID int64 `json:"message_thread_id,omitempty"`
+
+	// Unique identifier of the message draft which was stopped
+	DraftID int64 `json:"draft_id"`
 }
 
 // MessageId
@@ -9338,6 +9501,10 @@ type ReplyKeyboardMarkup struct {
 	//
 	// [Message]: https://core.telegram.org/bots/api#message
 	Selective bool `json:"selective,omitempty"`
+
+	// Optional.
+	// Pass True if the reply interface must be shown to the user, as if they had manually selected the bot's message and tapped 'Reply'
+	ForceReply bool `json:"force_reply,omitempty"`
 }
 
 // ReplyKeyboardRemove
@@ -9568,6 +9735,8 @@ type RevenueWithdrawalStateSucceeded struct {
 //
 // [RichBlockBlockQuotation]
 //
+// [RichBlockExpandableBlockQuotation]
+//
 // [RichBlockPullQuotation]
 //
 // [RichBlockCollage]
@@ -9580,9 +9749,13 @@ type RevenueWithdrawalStateSucceeded struct {
 //
 // [RichBlockMap]
 //
+// [RichBlockButtons]
+//
 // [RichBlockAnimation]
 //
 // [RichBlockAudio]
+//
+// [RichBlockDocument]
 //
 // [RichBlockPhoto]
 //
@@ -9602,14 +9775,17 @@ type RevenueWithdrawalStateSucceeded struct {
 // [RichBlockAnchor]: https://core.telegram.org/bots/api#richblockanchor
 // [RichBlockList]: https://core.telegram.org/bots/api#richblocklist
 // [RichBlockBlockQuotation]: https://core.telegram.org/bots/api#richblockblockquotation
+// [RichBlockExpandableBlockQuotation]: https://core.telegram.org/bots/api#richblockexpandableblockquotation
 // [RichBlockPullQuotation]: https://core.telegram.org/bots/api#richblockpullquotation
 // [RichBlockCollage]: https://core.telegram.org/bots/api#richblockcollage
 // [RichBlockSlideshow]: https://core.telegram.org/bots/api#richblockslideshow
 // [RichBlockTable]: https://core.telegram.org/bots/api#richblocktable
 // [RichBlockDetails]: https://core.telegram.org/bots/api#richblockdetails
 // [RichBlockMap]: https://core.telegram.org/bots/api#richblockmap
+// [RichBlockButtons]: https://core.telegram.org/bots/api#richblockbuttons
 // [RichBlockAnimation]: https://core.telegram.org/bots/api#richblockanimation
 // [RichBlockAudio]: https://core.telegram.org/bots/api#richblockaudio
+// [RichBlockDocument]: https://core.telegram.org/bots/api#richblockdocument
 // [RichBlockPhoto]: https://core.telegram.org/bots/api#richblockphoto
 // [RichBlockVideo]: https://core.telegram.org/bots/api#richblockvideo
 // [RichBlockVoiceNote]: https://core.telegram.org/bots/api#richblockvoicenote
@@ -9624,14 +9800,17 @@ type RichBlock struct {
 	*RichBlockAnchor
 	*RichBlockList
 	*RichBlockBlockQuotation
+	*RichBlockExpandableBlockQuotation
 	*RichBlockPullQuotation
 	*RichBlockCollage
 	*RichBlockSlideshow
 	*RichBlockTable
 	*RichBlockDetails
 	*RichBlockMap
+	*RichBlockButtons
 	*RichBlockAnimation
 	*RichBlockAudio
+	*RichBlockDocument
 	*RichBlockPhoto
 	*RichBlockVideo
 	*RichBlockVoiceNote
@@ -9685,6 +9864,11 @@ func (r *RichBlock) MarshalJSON() ([]byte, error) {
 		return json.Marshal(r.RichBlockBlockQuotation)
 	}
 
+	if r.RichBlockExpandableBlockQuotation != nil {
+		r.RichBlockExpandableBlockQuotation.Type = "expandable_blockquote"
+		return json.Marshal(r.RichBlockExpandableBlockQuotation)
+	}
+
 	if r.RichBlockPullQuotation != nil {
 		r.RichBlockPullQuotation.Type = "pullquote"
 		return json.Marshal(r.RichBlockPullQuotation)
@@ -9715,6 +9899,11 @@ func (r *RichBlock) MarshalJSON() ([]byte, error) {
 		return json.Marshal(r.RichBlockMap)
 	}
 
+	if r.RichBlockButtons != nil {
+		r.RichBlockButtons.Type = "buttons"
+		return json.Marshal(r.RichBlockButtons)
+	}
+
 	if r.RichBlockAnimation != nil {
 		r.RichBlockAnimation.Type = "animation"
 		return json.Marshal(r.RichBlockAnimation)
@@ -9723,6 +9912,11 @@ func (r *RichBlock) MarshalJSON() ([]byte, error) {
 	if r.RichBlockAudio != nil {
 		r.RichBlockAudio.Type = "audio"
 		return json.Marshal(r.RichBlockAudio)
+	}
+
+	if r.RichBlockDocument != nil {
+		r.RichBlockDocument.Type = "document"
+		return json.Marshal(r.RichBlockDocument)
 	}
 
 	if r.RichBlockPhoto != nil {
@@ -9801,6 +9995,10 @@ func (r *RichBlock) UnmarshalJSON(data []byte) error {
 		r.RichBlockBlockQuotation = new(RichBlockBlockQuotation)
 		return json.Unmarshal(data, r.RichBlockBlockQuotation)
 
+	case "expandable_blockquote":
+		r.RichBlockExpandableBlockQuotation = new(RichBlockExpandableBlockQuotation)
+		return json.Unmarshal(data, r.RichBlockExpandableBlockQuotation)
+
 	case "pullquote":
 		r.RichBlockPullQuotation = new(RichBlockPullQuotation)
 		return json.Unmarshal(data, r.RichBlockPullQuotation)
@@ -9825,6 +10023,10 @@ func (r *RichBlock) UnmarshalJSON(data []byte) error {
 		r.RichBlockMap = new(RichBlockMap)
 		return json.Unmarshal(data, r.RichBlockMap)
 
+	case "buttons":
+		r.RichBlockButtons = new(RichBlockButtons)
+		return json.Unmarshal(data, r.RichBlockButtons)
+
 	case "animation":
 		r.RichBlockAnimation = new(RichBlockAnimation)
 		return json.Unmarshal(data, r.RichBlockAnimation)
@@ -9832,6 +10034,10 @@ func (r *RichBlock) UnmarshalJSON(data []byte) error {
 	case "audio":
 		r.RichBlockAudio = new(RichBlockAudio)
 		return json.Unmarshal(data, r.RichBlockAudio)
+
+	case "document":
+		r.RichBlockDocument = new(RichBlockDocument)
+		return json.Unmarshal(data, r.RichBlockDocument)
 
 	case "photo":
 		r.RichBlockPhoto = new(RichBlockPhoto)
@@ -9914,6 +10120,22 @@ type RichBlockBlockQuotation struct {
 	Credit *RichText `json:"credit,omitempty"`
 }
 
+// RichBlockButtons
+//
+// A block containing a list of buttons that are shown in one row, corresponding to the custom HTML tag <tg-button-row>.
+type RichBlockButtons struct {
+	// Type of the block, always “buttons”
+	Type string `json:"type"`
+
+	// The buttons
+	Buttons []RichMessageButton `json:"buttons"`
+
+	// Optional.
+	// Horizontal alignment of the buttons.
+	// Currently, must be one of “left”, “center”, or “right”.
+	Align string `json:"align,omitempty"`
+}
+
 // RichBlockCaption
 //
 // Caption of a rich formatted block.
@@ -9965,6 +10187,36 @@ type RichBlockDetails struct {
 type RichBlockDivider struct {
 	// Type of the block, always “divider”
 	Type string `json:"type"`
+}
+
+// RichBlockDocument
+//
+// A block with a general file, corresponding to the custom HTML tag <tg-document>.
+type RichBlockDocument struct {
+	// Type of the block, always “document”
+	Type string `json:"type"`
+
+	// The document
+	Document Document `json:"document"`
+
+	// Optional.
+	// Caption of the block
+	Caption *RichBlockCaption `json:"caption,omitempty"`
+}
+
+// RichBlockExpandableBlockQuotation
+//
+// A block quotation, corresponding to the HTML tag <blockquote> with custom attribute "expandable".
+type RichBlockExpandableBlockQuotation struct {
+	// Type of the block, always “expandable_blockquote”
+	Type string `json:"type"`
+
+	// Content of the block
+	Text RichText `json:"text"`
+
+	// Optional.
+	// Credit of the block
+	Credit *RichText `json:"credit,omitempty"`
 }
 
 // RichBlockFooter
@@ -10026,7 +10278,7 @@ type RichBlockMap struct {
 	// Location of the center of the map
 	Location Location `json:"location"`
 
-	// Map zoom level; 13-20
+	// Map zoom level
 	Zoom int64 `json:"zoom"`
 
 	// Expected width of the map
@@ -10159,6 +10411,10 @@ type RichBlockTable struct {
 	IsStriped bool `json:"is_striped,omitempty"`
 
 	// Optional.
+	// True, if table cells have smaller indents
+	IsCompact bool `json:"is_compact,omitempty"`
+
+	// Optional.
 	// Caption of the table
 	Caption *RichText `json:"caption,omitempty"`
 }
@@ -10258,6 +10514,82 @@ type RichMessage struct {
 	IsRtl bool `json:"is_rtl,omitempty"`
 }
 
+// RichMessageButton
+//
+// This object represents a button in a [RichMessage].
+// Exactly one of the fields other than text and style must be used to specify the type of the button.
+//
+// [RichMessage]: https://core.telegram.org/bots/api#richmessage
+type RichMessageButton struct {
+	// Text of the button.
+	// May contain only plain text, [RichTextCustomEmoji] and [RichTextDateTime] entities.
+	//
+	// [RichTextCustomEmoji]: https://core.telegram.org/bots/api#richtextcustomemoji
+	// [RichTextDateTime]: https://core.telegram.org/bots/api#richtextdatetime
+	Text RichText `json:"text"`
+
+	// Optional.
+	// Style of the button.
+	// Must be one of “danger”, “success”, “primary”, or “link” (the button is shown as a regular link without borders).
+	// Apps may use theme-specific colors for the button background and text based on the style.
+	// The style “link” is allowed only for callback buttons.
+	Style string `json:"style,omitempty"`
+
+	// Optional.
+	// HTTP or tg:// URL to be opened when the button is pressed.
+	// Links tg://user?id=<user_id> can be used to mention a user by their identifier without using a username, if this is allowed by their privacy settings.
+	URL string `json:"url,omitempty"`
+
+	// Optional.
+	// Data to be sent in a [callback query] to the bot when the button is pressed, 1-64 bytes
+	//
+	// [callback query]: https://core.telegram.org/bots/api#callbackquery
+	CallbackData string `json:"callback_data,omitempty"`
+
+	// Optional.
+	// Description of the [Web App] that will be launched when the user presses the button.
+	// The Web App will be able to send an arbitrary message on behalf of the user using the method [answerWebAppQuery].
+	// Available only in private chats between a user and the bot.
+	// Not supported for messages sent on behalf of a business account.
+	//
+	// [Web App]: https://core.telegram.org/bots/webapps
+	// [answerWebAppQuery]: https://core.telegram.org/bots/api#answerwebappquery
+	WebApp *WebAppInfo `json:"web_app,omitempty"`
+
+	// Optional.
+	// An HTTPS URL used to automatically authorize the user.
+	// Can be used as a replacement for the [Telegram Login Widget].
+	// Not supported for ephemeral messages.
+	//
+	// [Telegram Login Widget]: https://core.telegram.org/widgets/login
+	LoginUrl *LoginUrl `json:"login_url,omitempty"`
+
+	// Optional.
+	// If set, pressing the button will prompt the user to select one of their chats, open that chat and insert the bot's username and the specified inline query in the input field.
+	// May be empty, in which case just the bot's username will be inserted.
+	// Not supported for messages sent in channel direct messages chats and on behalf of a business account.
+	SwitchInlineQuery string `json:"switch_inline_query,omitempty"`
+
+	// Optional.
+	// If set, pressing the button will insert the bot's username and the specified inline query in the current chat's input field.
+	// May be empty, in which case only the bot's username will be inserted.
+	// Not supported in channels and for messages sent in channel direct messages chats and on behalf of a business account.
+	SwitchInlineQueryCurrentChat string `json:"switch_inline_query_current_chat,omitempty"`
+
+	// Optional.
+	// If set, pressing the button will prompt the user to select one of their chats of the specified type, open that chat and insert the bot's username and the specified inline query in the input field.
+	// Not supported for messages sent in channel direct messages chats and on behalf of a business account.
+	SwitchInlineQueryChosenChat *SwitchInlineQueryChosenChat `json:"switch_inline_query_chosen_chat,omitempty"`
+
+	// Optional.
+	// A button that copies the specified text to the clipboard
+	CopyText *CopyTextButton `json:"copy_text,omitempty"`
+
+	// Optional.
+	// If set, then the button is disabled and does nothing
+	Disabled *DisabledButton `json:"disabled,omitempty"`
+}
+
 // RichText
 //
 // This object represents a rich formatted text.
@@ -10306,6 +10638,8 @@ type RichMessage struct {
 //
 // [RichTextBotCommand]
 //
+// [RichTextButton]
+//
 // [RichTextAnchor]
 //
 // [RichTextAnchorLink]
@@ -10337,6 +10671,7 @@ type RichMessage struct {
 // [RichTextHashtag]: https://core.telegram.org/bots/api#richtexthashtag
 // [RichTextCashtag]: https://core.telegram.org/bots/api#richtextcashtag
 // [RichTextBotCommand]: https://core.telegram.org/bots/api#richtextbotcommand
+// [RichTextButton]: https://core.telegram.org/bots/api#richtextbutton
 // [RichTextAnchor]: https://core.telegram.org/bots/api#richtextanchor
 // [RichTextAnchorLink]: https://core.telegram.org/bots/api#richtextanchorlink
 // [RichTextReference]: https://core.telegram.org/bots/api#richtextreference
@@ -10367,6 +10702,7 @@ type RichText struct {
 	*RichTextHashtag
 	*RichTextCashtag
 	*RichTextBotCommand
+	*RichTextButton
 	*RichTextAnchor
 	*RichTextAnchorLink
 	*RichTextReference
@@ -10484,6 +10820,11 @@ func (r *RichText) MarshalJSON() ([]byte, error) {
 	if r.RichTextBotCommand != nil {
 		r.RichTextBotCommand.Type = "bot_command"
 		return json.Marshal(r.RichTextBotCommand)
+	}
+
+	if r.RichTextButton != nil {
+		r.RichTextButton.Type = "button"
+		return json.Marshal(r.RichTextButton)
 	}
 
 	if r.RichTextAnchor != nil {
@@ -10617,6 +10958,10 @@ func (r *RichText) UnmarshalJSON(data []byte) error {
 		r.RichTextBotCommand = new(RichTextBotCommand)
 		return json.Unmarshal(data, r.RichTextBotCommand)
 
+	case "button":
+		r.RichTextButton = new(RichTextButton)
+		return json.Unmarshal(data, r.RichTextButton)
+
 	case "anchor":
 		r.RichTextAnchor = new(RichTextAnchor)
 		return json.Unmarshal(data, r.RichTextAnchor)
@@ -10701,6 +11046,17 @@ type RichTextBotCommand struct {
 
 	// The bot command
 	BotCommand string `json:"bot_command"`
+}
+
+// RichTextButton
+//
+// A button.
+type RichTextButton struct {
+	// Type of the rich text, always “button”
+	Type string `json:"type"`
+
+	// The button
+	Button RichMessageButton `json:"button"`
 }
 
 // RichTextCashtag
@@ -12031,6 +12387,18 @@ type UniqueGiftInfo struct {
 	Origin string `json:"origin"`
 
 	// Optional.
+	// Text of the message that was added to the gift
+	Text string `json:"text,omitempty"`
+
+	// Optional.
+	// Special entities that appear in the text
+	Entities []MessageEntity `json:"entities,omitempty"`
+
+	// Optional.
+	// True, if the sender and gift text are shown only to the gift receiver; otherwise, everyone will be able to see them
+	IsPrivate bool `json:"is_private,omitempty"`
+
+	// Optional.
 	// For gifts bought from other users, the currency in which the payment for the gift was done.
 	// Currently, one of “XTR” for Telegram Stars or “TON” for TON grams.
 	LastResaleCurrency string `json:"last_resale_currency,omitempty"`
@@ -12229,6 +12597,10 @@ type Update struct {
 	// Optional.
 	// User payment subscription has changed
 	Subscription *BotSubscriptionUpdated `json:"subscription,omitempty"`
+
+	// Optional.
+	// A user asked the bot to stop the generation of a message
+	StoppedMessageGeneration *MessageGenerationStopped `json:"stopped_message_generation,omitempty"`
 }
 
 // User
@@ -12521,10 +12893,9 @@ type VideoChatStarted struct {
 
 // VideoNote
 //
-// This object represents a [video message] (available in Telegram apps as of [v.4.0]).
+// This object represents a [video message].
 //
 // [video message]: https://telegram.org/blog/video-messages-and-telescope
-// [v.4.0]: https://telegram.org/blog/video-messages-and-telescope
 type VideoNote struct {
 	// Identifier for this file, which can be used to download or reuse the file
 	FileID string `json:"file_id"`
