@@ -64,6 +64,13 @@ func TestClient_StartPolling_Success(t *testing.T) {
 			t.Errorf("unexpected URL path: %s", r.URL.Path)
 		}
 
+		var params gogram.GetUpdatesParams
+		if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
+			t.Errorf("decode getUpdates params: %v", err)
+		} else if params.Timeout == 0 {
+			t.Errorf("expected non zero timeout")
+		}
+
 		// Send one real update on the first request, empty lists thereafter.
 		currentID := atomic.AddInt64(&updateIDCounter, 1)
 		var updates []gogram.Update

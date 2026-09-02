@@ -162,7 +162,7 @@ func (ctx *Context) Chat() *Chat {
 		return &ctx.update.ChatBoost.Chat
 	case ctx.update.RemovedChatBoost != nil:
 		return &ctx.update.RemovedChatBoost.Chat
-	case ctx.update.CallbackQuery != nil:
+	case ctx.update.CallbackQuery != nil && ctx.update.CallbackQuery.Message != nil:
 		return ctx.update.CallbackQuery.Message.Chat()
 	}
 	return nil
@@ -189,7 +189,7 @@ func (ctx *Context) Message() *Message {
 		return ctx.update.EditedBusinessMessage
 	case ctx.update.GuestMessage != nil:
 		return ctx.update.GuestMessage
-	case ctx.update.CallbackQuery != nil:
+	case ctx.update.CallbackQuery != nil && ctx.update.CallbackQuery.Message != nil:
 		return ctx.update.CallbackQuery.Message.Message
 	}
 

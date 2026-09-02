@@ -60,6 +60,56 @@ func TestRouter_HandleCommand_FastPath(t *testing.T) {
 		t.Error("Fast path handled unknown command")
 	}
 }
+func TestRouter_HandleCallback_FilterRunsOnceWithoutPayload(t *testing.T) {
+	t.Parallel()
+
+	r := gogram.NewRouter()
+	filterCalls := 0
+	group := r.Group(func(*gogram.Context) bool {
+		filterCalls++
+		return false
+	})
+	group.HandleInlineKeyboardButton(
+		&gogram.InlineKeyboardButton{CallbackData: "action"},
+		func(*gogram.Context, *gogram.CallbackQuery) error { return nil },
+	)
+
+	client, err := gogram.NewClient(testToken)
+	if err != nil {
+		t.Fatalf("NewClient: %v", err)
+	}
+	update := &gogram.Update{CallbackQuery: &gogram.CallbackQuery{Data: "action"}}
+	r.Process(gogram.NewTestContext(t.Context(), client, update))
+
+	if filterCalls != 1 {
+		t.Fatalf("filter calls = %d, want 1", filterCalls)
+	}
+}
+
+func TestRouter_HandleCallback_PrefixWithPayload(t *testing.T) {
+	t.Parallel()
+
+	r := gogram.NewRouter()
+	handled := false
+	r.HandleInlineKeyboardButton(
+		&gogram.InlineKeyboardButton{CallbackData: "action"},
+		func(_ *gogram.Context, callback *gogram.CallbackQuery) error {
+			handled = callback.Data == "action payload"
+			return nil
+		},
+	)
+
+	client, err := gogram.NewClient(testToken)
+	if err != nil {
+		t.Fatalf("NewClient: %v", err)
+	}
+	update := &gogram.Update{CallbackQuery: &gogram.CallbackQuery{Data: "action payload"}}
+	r.Process(gogram.NewTestContext(t.Context(), client, update))
+
+	if !handled {
+		t.Fatal("callback prefix route was not called")
+	}
+}
 
 func TestRouter_HandleCommand_Middleware(t *testing.T) {
 	t.Parallel()

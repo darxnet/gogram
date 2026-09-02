@@ -34,6 +34,8 @@ func (c *Client) releaseContext(ctx *Context) {
 }
 
 // Context wraps context.Context and adds Telegram-specific methods.
+//
+// Forbidding to keep a reference to a Context.
 type Context struct {
 	context context.Context
 	client  *Client

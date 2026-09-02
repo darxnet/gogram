@@ -24,6 +24,10 @@ func (c *Client) Start(ctx context.Context, params *GetUpdatesParams) error {
 		localParams.Limit = defaultUpdates
 	}
 
+	if localParams.Timeout == 0 {
+		localParams.Timeout = int64(defaultTimeout.Seconds())
+	}
+
 	numWorkers := localParams.Limit
 	if c.cfg.numWorkers > 0 {
 		numWorkers = int64(c.cfg.numWorkers)

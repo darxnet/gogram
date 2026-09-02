@@ -29,6 +29,9 @@ var _ Processor = (*Router)(nil)
 
 // Router dispatches updates to registered handlers.
 //
+// Command and callback routes take priority over routes
+// with custom filters regardless of registration order.
+//
 // Router is not thread-safe. Register all routes before calling [Client.Start].
 type Router struct {
 	*RouterGroup
@@ -126,12 +129,13 @@ func (r *Router) Process(ctx *Context) {
 			}
 		}
 
-		key, _, _ := strings.Cut(cq.Data, " ")
-		if routes, ok := r.handlersCallbacks[key]; ok {
-			for i := range routes {
-				if routes[i].filter(ctx) {
-					r.handleErr(ctx, routes[i].handler(ctx))
-					return
+		if key, _, hasPayload := strings.Cut(cq.Data, " "); hasPayload {
+			if routes, ok := r.handlersCallbacks[key]; ok {
+				for i := range routes {
+					if routes[i].filter(ctx) {
+						r.handleErr(ctx, routes[i].handler(ctx))
+						return
+					}
 				}
 			}
 		}
@@ -268,7 +272,7 @@ func (rg *RouterGroup) HandleCommand(command string, handler func(*Context, *Mes
 	}
 
 	fn := func(ctx *Context) error {
-		return handler(ctx, ctx.Update().Message)
+		return handler(ctx, ctx.Message())
 	}
 
 	rg.router.handlersCommands[command] = append(rg.router.handlersCommands[command], route{

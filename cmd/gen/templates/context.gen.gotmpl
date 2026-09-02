@@ -71,7 +71,7 @@ func (ctx *Context) Chat() *Chat {
             {{- end }}
         {{- end }}
     {{- end }}
-    case ctx.update.CallbackQuery != nil:
+    case ctx.update.CallbackQuery != nil && ctx.update.CallbackQuery.Message != nil:
         return ctx.update.CallbackQuery.Message.Chat()
     }
     return nil
@@ -92,7 +92,7 @@ func (ctx *Context) Message() *Message {
                 return ctx.update.{{ $name }}
         {{- end }}
     {{- end }}
-    case ctx.update.CallbackQuery != nil:
+    case ctx.update.CallbackQuery != nil && ctx.update.CallbackQuery.Message != nil:
         return ctx.update.CallbackQuery.Message.Message
     }
 
