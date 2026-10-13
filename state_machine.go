@@ -168,10 +168,12 @@ func invalidateState(ctx context.Context) {
 	}
 }
 
-// FSM returns a state machine controller for the current context.
-// The ok result is false when storer is nil or the update carries no user.
-func (ctx *Context) FSM(storer Storer) (f FSM, ok bool) {
-	if storer == nil {
+// FSM returns a state machine controller for the current context, backed
+// by storer or, when omitted, by the client's storer from [WithStorer].
+// The ok result is false when the update carries no user.
+func (ctx *Context) FSM(storer ...Storer) (f FSM, ok bool) {
+	s := ctx.storer(storer)
+	if s == nil {
 		return FSM{}, false
 	}
 
@@ -186,7 +188,16 @@ func (ctx *Context) FSM(storer Storer) (f FSM, ok bool) {
 		chatID = chat.ID
 	}
 
-	return FSM{storer: storer, userID: user.ID, chatID: chatID}, true
+	return FSM{storer: s, userID: user.ID, chatID: chatID}, true
+}
+
+// storer picks the explicit storer, if any, else the client's.
+func (ctx *Context) storer(explicit []Storer) Storer {
+	if len(explicit) != 0 && explicit[0] != nil {
+		return explicit[0]
+	}
+
+	return ctx.client.cfg.storer
 }
 
 // fsmMemo caches the state looked up while routing one update, so N
@@ -218,11 +229,23 @@ func (ctx *Context) loadState(storer Storer) (State, bool) {
 	return state, true
 }
 
-// FilterState creates a filter that checks if a user is in a specific state.
+// FilterState creates a filter that matches when the user is in the expected
+// state, in storer or, when omitted, in the client's storer from [WithStorer].
 // This is the primary way to integrate the FSM with the router.
-func FilterState(storer Storer, expected State) Filter {
+func FilterState(expected State, storer ...Storer) Filter {
+	var explicit Storer
+	if len(storer) != 0 {
+		explicit = storer[0]
+	}
+
 	return func(ctx *Context) bool {
-		state, ok := ctx.loadState(storer)
+		s := explicit
+		if s == nil {
+			s = ctx.client.cfg.storer
+		}
+
+		state, ok := ctx.loadState(s)
+
 		return ok && state == expected
 	}
 }

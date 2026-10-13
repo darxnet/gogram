@@ -1,3 +1,5 @@
+GOLANGCI_LINT_VERSION ?= v2.14.0
+
 .PHONY: all generate lint test bench update deps
 
 all: generate lint test
@@ -8,8 +10,8 @@ generate:
 
 ## lint: vet and golangci-lint
 lint:
-	go vet ./...
-	golangci-lint run ./...
+	go vet ./... && go vet -C cmd/gen ./...
+	golangci-lint run ./... && cd cmd/gen && golangci-lint run ./...
 
 ## test: race tests with coverage
 test:
@@ -23,6 +25,6 @@ bench:
 update:
 	go get -u ./... && go mod tidy
 
-## deps: install golangci-lint
+## deps: install the pinned golangci-lint (the script verifies the archive checksum)
 deps:
-	curl -sSfL https://golangci-lint.run/install.sh | sh -s -- -b $$(go env GOPATH)/bin
+	curl -sSfL https://golangci-lint.run/install.sh | sh -s -- -b $$(go env GOPATH)/bin $(GOLANGCI_LINT_VERSION)

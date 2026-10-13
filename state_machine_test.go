@@ -85,7 +85,7 @@ func TestFilterState_MemoizesPerUpdate(t *testing.T) {
 		r.HandleOnMessage(func(*gogram.Context, *gogram.Message) error {
 			handled = state
 			return nil
-		}, gogram.FilterState(storer, state))
+		}, gogram.FilterState(state, storer))
 	}
 
 	client, err := gogram.NewClient(testToken)
@@ -118,7 +118,7 @@ func TestContext_FSM_SetInvalidatesMemo(t *testing.T) {
 	update := &gogram.Update{Message: &gogram.Message{From: &gogram.User{ID: 7}, Chat: gogram.Chat{ID: 7}}}
 	ctx := gogram.NewTestContext(t.Context(), client, update)
 
-	filter := gogram.FilterState(storer, "a")
+	filter := gogram.FilterState("a", storer)
 
 	filter(ctx)
 	filter(ctx)
@@ -140,5 +140,49 @@ func TestContext_FSM_SetInvalidatesMemo(t *testing.T) {
 
 	if gets := storer.gets.Load(); gets != 2 {
 		t.Fatalf("GetState calls after Set = %d, want 2 (memo invalidated)", gets)
+	}
+}
+
+func TestWithStorer_Default(t *testing.T) {
+	t.Parallel()
+
+	storer := &countingStorer{state: "x"}
+
+	client, err := gogram.NewClient(testToken, gogram.WithStorer(storer))
+	if err != nil {
+		t.Fatalf("NewClient: %v", err)
+	}
+
+	update := &gogram.Update{Message: &gogram.Message{From: &gogram.User{ID: 7}, Chat: gogram.Chat{ID: 7}}}
+	ctx := gogram.NewTestContext(t.Context(), client, update)
+
+	if !gogram.FilterState("x")(ctx) || gogram.FilterState("y")(ctx) {
+		t.Fatal("FilterState must use the client's storer")
+	}
+
+	fsm, ok := ctx.FSM()
+	if !ok || fsm.Set(ctx, "y") != nil {
+		t.Fatal("FSM() must use the client's storer")
+	}
+
+	// Without WithStorer an in-memory storer is the default.
+	plain, err := gogram.NewClient(testToken)
+	if err != nil {
+		t.Fatalf("NewClient: %v", err)
+	}
+
+	ctx = gogram.NewTestContext(t.Context(), plain, update)
+
+	fsm, ok = ctx.FSM()
+	if !ok {
+		t.Fatal("default storer expected")
+	}
+
+	if err = fsm.Set(ctx, "z"); err != nil {
+		t.Fatal(err)
+	}
+
+	if !gogram.FilterState("z")(ctx) {
+		t.Fatal("state must round-trip through the default storer")
 	}
 }

@@ -129,21 +129,24 @@ the button is built; data from an older build fails with
 ## State machine
 
 ```go
-storer := gogram.NewInMemoryStorer(gogram.WithTTL(time.Hour)) // or sqlstore.New(ctx, sqlstore.PostgreSQL, db)
-
 router.HandleCommand("/register", func(ctx *gogram.Context, _ *gogram.Message) error {
-	fsm, _ := ctx.FSM(storer)
+	fsm, _ := ctx.FSM()
 	return errors.Join(fsm.Set(ctx, "name"), ctx.SendMessage("Your name?"))
 })
 
 router.HandleOnMessage(func(ctx *gogram.Context, m *gogram.Message) error {
-	fsm, _ := ctx.FSM(storer)
+	fsm, _ := ctx.FSM()
 	return errors.Join(fsm.Finish(ctx), ctx.SendMessage("Hi, "+m.Text))
-}, gogram.FilterState(storer, "name"))
+}, gogram.FilterState("name"))
+
+client, err := gogram.NewClient(token,
+	gogram.WithRouter(router),
+	gogram.WithStorer(gogram.NewInMemoryStorer(gogram.WithTTL(time.Hour))), // or sqlstore.New(ctx, sqlstore.PostgreSQL, db)
+)
 ```
 
-The state is loaded once per update however many `FilterState` routes
-there are.
+Without `WithStorer` an in-memory storer is used. The state is loaded once
+per update however many `FilterState` routes there are.
 
 ## Flood control, logging, custom transports
 

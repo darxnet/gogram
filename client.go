@@ -19,7 +19,8 @@ import (
 	"golang.org/x/time/rate"
 )
 
-//go:generate go run ./cmd/gen
+// The generator is its own module so that golang.org/x/net stays out of the library's dependencies.
+//go:generate go run -C ./cmd/gen . -out ../..
 
 const (
 	defaultHost    = "api.telegram.org"
@@ -57,6 +58,7 @@ type clientConfig struct {
 	numWorkers       int
 	caller           Caller
 	transformers     []Transformer
+	storer           Storer
 }
 
 // WithHost sets the host for the Client.
@@ -126,6 +128,14 @@ func WithCaller(caller Caller) ClientOption {
 func WithTransformers(transformers ...Transformer) ClientOption {
 	return func(c *Client) {
 		c.cfg.transformers = append(c.cfg.transformers, transformers...)
+	}
+}
+
+// WithStorer sets the state storer used by [Context.FSM] and [FilterState]
+// when none is passed explicitly. Default: [NewInMemoryStorer] without TTL.
+func WithStorer(storer Storer) ClientOption {
+	return func(c *Client) {
+		c.cfg.storer = storer
 	}
 }
 
@@ -232,6 +242,7 @@ func NewClient(token string, opts ...ClientOption) (*Client, error) {
 			timeout:    defaultTimeout,
 			httpClient: http.DefaultClient,
 			router:     NewRouter(), // one per client, never shared
+			storer:     NewInMemoryStorer(),
 		},
 	}
 
@@ -318,14 +329,29 @@ func (c *Client) Do(req *http.Request) (*http.Response, error) {
 	return c.cfg.httpClient.Do(req) //nolint:gosec // G107: client can send request to user-defined hosts
 }
 
-// Call posts body to a Bot API method and decodes the result into T.
-// It is the typed escape hatch for methods without a generated wrapper:
+// Call invokes a Bot API method with params encoded as JSON and decodes
+// the result into result, a pointer to the method's return type. It is the
+// escape hatch for methods without a generated wrapper:
 //
-//	msg, err := gogram.Call[*gogram.Message](ctx, c, "sendMessage", body, "application/json")
+//	var msg gogram.Message
+//	err := client.Call(ctx, "sendMessage", map[string]any{"chat_id": 7, "text": "hi"}, &msg)
 //
-// Retryable API errors are retried when body implements io.Seeker.
-func Call[T any](ctx context.Context, c *Client, method string, body io.Reader, contentType string) (T, error) {
-	return call[T](ctx, c, method, nil, body, contentType, c.cfg.timeout)
+// Transient errors are retried like for generated methods.
+func (c *Client) Call(ctx context.Context, method string, params, result any) error {
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
+	if err := json.NewEncoder(buffer).Encode(params); err != nil {
+		return err
+	}
+
+	return c.caller.Call(ctx, Request{
+		Method:      method,
+		Params:      params,
+		Body:        bytes.NewReader(buffer.B),
+		ContentType: contentTypeJSON,
+		Timeout:     c.cfg.timeout,
+	}, result)
 }
 
 // call is the generated methods' entry point: it routes the request through
@@ -353,9 +379,7 @@ func call[T any](
 // Raw sends a raw request to the Telegram Bot API and returns the result
 // appended to dst.
 //
-// Deprecated: use [Call] with json.RawMessage.
-//
-//go:fix inline
+// Deprecated: use [Client.Call].
 func (c *Client) Raw(
 	ctx context.Context,
 	method string,
@@ -363,7 +387,7 @@ func (c *Client) Raw(
 	contentType string,
 	dst []byte,
 ) (json.RawMessage, error) {
-	result, err := Call[json.RawMessage](ctx, c, method, reader, contentType)
+	result, err := call[json.RawMessage](ctx, c, method, nil, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		return nil, err
 	}

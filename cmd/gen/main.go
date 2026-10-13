@@ -2,11 +2,13 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 	"time"
@@ -187,6 +189,9 @@ type Info struct {
 func main() {
 	log.SetFlags(log.Flags() | log.Lshortfile)
 
+	outDir := flag.String("out", ".", "directory to write the generated files into")
+	flag.Parse()
+
 	tmpl := parseTemplates()
 
 	pageRC := retrievePageRC()
@@ -204,14 +209,14 @@ func main() {
 		template string
 		data     any
 	}{
-		{path: "./types.gen.go", template: "types.gen.gotmpl", data: info},
-		{path: "./methods.gen.go", template: "methods.gen.gotmpl", data: info},
-		{path: "./context.gen.go", template: "context.gen.gotmpl", data: info},
-		{path: "./router.gen.go", template: "router.gen.gotmpl", data: info},
+		{path: "types.gen.go", template: "types.gen.gotmpl", data: info},
+		{path: "methods.gen.go", template: "methods.gen.gotmpl", data: info},
+		{path: "context.gen.go", template: "context.gen.gotmpl", data: info},
+		{path: "router.gen.go", template: "router.gen.gotmpl", data: info},
 	}
 
 	for _, output := range outputs {
-		writeFile(output.path, renderTemplate(tmpl, output.template, output.data))
+		writeFile(filepath.Join(*outDir, output.path), renderTemplate(tmpl, output.template, output.data))
 	}
 }
 
