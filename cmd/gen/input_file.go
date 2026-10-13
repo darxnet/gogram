@@ -12,11 +12,7 @@ func inputFileUploadCode(buffer *bytes.Buffer, expr, name string, required bool)
 		expr = "&" + expr
 	}
 
-	_, _ = fmt.Fprintf(buffer, `err = createFormFileFromInputFile(
-	        writer,
-			%s,
-			%s,
-		)
+	_, _ = fmt.Fprintf(buffer, `err = createFormFileFromInputFile(ctx, writer, body, %s, %s)
 		if err != nil {
 		    return
 		}

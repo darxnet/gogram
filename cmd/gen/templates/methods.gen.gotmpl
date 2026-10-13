@@ -63,29 +63,7 @@ import (
     func (c *Client) {{ $method }}(ctx context.Context, params *{{ $params }}) (ret {{ toType .Result false }}, err error) {
         {{- $multipart := .Multipart $root.Types }}
         {{- if $multipart }}
-            reader, pw := io.Pipe()
-            writer := multipart.NewWriter(pw)
-            contentType := writer.FormDataContentType()
-            writeErr := make(chan error, 1)
-
-            go func() {
-                var err error
-                defer func() {
-                    if err != nil {
-                        _ = pw.CloseWithError(err)
-                        writeErr <- err
-                        return
-                    }
-
-                    err = writer.Close()
-                    if err != nil {
-                        _ = pw.CloseWithError(err)
-                        writeErr <- err
-                        return
-                    }
-
-                    writeErr <- pw.Close()
-                }()
+            body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
             {{ range .Params }}
                 {{- $goTitle := toTitle .Name }}
                 {{- $goType := toType .Type true }}
@@ -159,7 +137,11 @@ import (
                 {{- end }}
             {{- end }}
 
-            }()
+                return nil
+            })
+            defer body.Close() //nolint:errcheck
+
+            reader, contentType := body, body.ContentType()
         {{- else }}
             buffer := acquireBuffer()
             defer releaseBuffer(buffer)
@@ -174,34 +156,12 @@ import (
 
         ret, err = call[{{ toType .Result false }}](ctx, c, "{{ .Name }}", params, reader, contentType, c.cfg.timeout)
         {{- if $multipart }}
-            if err != nil {
-                _ = reader.CloseWithError(err)
-                <-writeErr
-                return
+            if writeErr := body.Err(); writeErr != nil {
+                err = writeErr // the root cause behind a broken-body transport error
             }
-
-            err = <-writeErr
         {{- end }}
 
         return ret, err
     }
 {{ end }}
 
-// createFormFileFromInputFile streams f.File into the multipart body.
-// The caller owns f.File and closes it after the API call returns.
-func createFormFileFromInputFile(writer *multipart.Writer, f *InputFile, name string) error {
-	if f.File == nil {
-		return nil
-	}
-
-	f.fieldName = name
-
-	w, err := writer.CreateFormFile(f.fieldName, f.FileName)
-	if err != nil {
-		return err
-	}
-
-	_, err = io.Copy(w, f.File)
-
-	return err
-}

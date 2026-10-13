@@ -202,9 +202,15 @@ err := client.DownloadFile(ctx, file, "/tmp/photo.jpg")
 
 _, err = client.SendDocument(ctx, &gogram.SendDocumentParams{
 	ChatID:   gogram.ChatID{ID: 7},
-	Document: gogram.InputFile{File: f, FileName: "report.pdf"}, // streamed, not buffered
+	Document: gogram.FromDisk("/data/report.pdf"), // streamed, never buffered; reopened on retry
 })
 ```
+
+`FromDisk`, `FromBytes`, `FromURL` and `FromOpener` (any `func(ctx) (io.ReadCloser, error)`,
+e.g. an S3/MinIO/Backblaze `GetObject`) can be retried after a 429 or 5xx;
+`FromReader` streams a one-shot reader and fails fast instead. Public URLs
+and existing files go as `InputFile{FileURL: url}` / `InputFile{FileID: id}`
+without an upload.
 
 ## Regenerating the API
 

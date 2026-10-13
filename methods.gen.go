@@ -69,29 +69,7 @@ func WithAddStickerToSetSticker(value InputSticker) AddStickerToSetOption {
 // Other sticker sets can have up to 120 stickers.
 // Returns True on success.
 func (c *Client) AddStickerToSet(ctx context.Context, params *AddStickerToSetParams) (ret bool, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		{
 			v := strconv.FormatInt(params.UserID, 10)
@@ -110,11 +88,7 @@ func (c *Client) AddStickerToSet(ctx context.Context, params *AddStickerToSetPar
 		}
 
 		{
-			err = createFormFileFromInputFile(
-				writer,
-				&params.Sticker.Sticker,
-				"sticker__sticker",
-			)
+			err = createFormFileFromInputFile(ctx, writer, body, &params.Sticker.Sticker, "sticker__sticker")
 			if err != nil {
 				return
 			}
@@ -130,16 +104,16 @@ func (c *Client) AddStickerToSet(ctx context.Context, params *AddStickerToSetPar
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[bool](ctx, c, "addStickerToSet", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -2471,29 +2445,7 @@ func WithCreateNewStickerSetNeedsRepainting(value bool) CreateNewStickerSetOptio
 // The bot will be able to edit the sticker set thus created.
 // Returns True on success.
 func (c *Client) CreateNewStickerSet(ctx context.Context, params *CreateNewStickerSetParams) (ret bool, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		{
 			v := strconv.FormatInt(params.UserID, 10)
@@ -2521,11 +2473,7 @@ func (c *Client) CreateNewStickerSet(ctx context.Context, params *CreateNewStick
 
 		{
 			for i := range params.Stickers {
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Stickers[i].Sticker,
-					"stickers__sticker"+strconv.Itoa(i),
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Stickers[i].Sticker, "stickers__sticker"+strconv.Itoa(i))
 				if err != nil {
 					return
 				}
@@ -2558,16 +2506,16 @@ func (c *Client) CreateNewStickerSet(ctx context.Context, params *CreateNewStick
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[bool](ctx, c, "createNewStickerSet", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -4012,29 +3960,7 @@ func WithEditEphemeralMessageMediaReplyMarkup(value *InlineKeyboardMarkup) EditE
 // Note that it is not guaranteed that the user will receive the message edit event, especially if they are offline.
 // On success, True is returned.
 func (c *Client) EditEphemeralMessageMedia(ctx context.Context, params *EditEphemeralMessageMediaParams) (ret bool, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		{
 			v := params.ChatID.String()
@@ -4063,113 +3989,65 @@ func (c *Client) EditEphemeralMessageMedia(ctx context.Context, params *EditEphe
 		{
 			switch {
 			case params.Media.InputMediaAnimation != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Media.InputMediaAnimation.Media,
-					"media_animation_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Media.InputMediaAnimation.Media, "media_animation_media")
 				if err != nil {
 					return
 				}
 				if params.Media.InputMediaAnimation.Thumbnail != nil {
-					err = createFormFileFromInputFile(
-						writer,
-						params.Media.InputMediaAnimation.Thumbnail,
-						"media_animation_thumbnail",
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, params.Media.InputMediaAnimation.Thumbnail, "media_animation_thumbnail")
 					if err != nil {
 						return
 					}
 				}
 			case params.Media.InputMediaAudio != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Media.InputMediaAudio.Media,
-					"media_audio_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Media.InputMediaAudio.Media, "media_audio_media")
 				if err != nil {
 					return
 				}
 				if params.Media.InputMediaAudio.Thumbnail != nil {
-					err = createFormFileFromInputFile(
-						writer,
-						params.Media.InputMediaAudio.Thumbnail,
-						"media_audio_thumbnail",
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, params.Media.InputMediaAudio.Thumbnail, "media_audio_thumbnail")
 					if err != nil {
 						return
 					}
 				}
 			case params.Media.InputMediaDocument != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Media.InputMediaDocument.Media,
-					"media_document_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Media.InputMediaDocument.Media, "media_document_media")
 				if err != nil {
 					return
 				}
 				if params.Media.InputMediaDocument.Thumbnail != nil {
-					err = createFormFileFromInputFile(
-						writer,
-						params.Media.InputMediaDocument.Thumbnail,
-						"media_document_thumbnail",
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, params.Media.InputMediaDocument.Thumbnail, "media_document_thumbnail")
 					if err != nil {
 						return
 					}
 				}
 			case params.Media.InputMediaLivePhoto != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Media.InputMediaLivePhoto.Media,
-					"media_live_photo_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Media.InputMediaLivePhoto.Media, "media_live_photo_media")
 				if err != nil {
 					return
 				}
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Media.InputMediaLivePhoto.Photo,
-					"media_live_photo_photo",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Media.InputMediaLivePhoto.Photo, "media_live_photo_photo")
 				if err != nil {
 					return
 				}
 			case params.Media.InputMediaPhoto != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Media.InputMediaPhoto.Media,
-					"media_photo_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Media.InputMediaPhoto.Media, "media_photo_media")
 				if err != nil {
 					return
 				}
 			case params.Media.InputMediaVideo != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Media.InputMediaVideo.Media,
-					"media_video_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Media.InputMediaVideo.Media, "media_video_media")
 				if err != nil {
 					return
 				}
 				if params.Media.InputMediaVideo.Thumbnail != nil {
-					err = createFormFileFromInputFile(
-						writer,
-						params.Media.InputMediaVideo.Thumbnail,
-						"media_video_thumbnail",
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, params.Media.InputMediaVideo.Thumbnail, "media_video_thumbnail")
 					if err != nil {
 						return
 					}
 				}
 				if params.Media.InputMediaVideo.Cover != nil {
-					err = createFormFileFromInputFile(
-						writer,
-						params.Media.InputMediaVideo.Cover,
-						"media_video_cover",
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, params.Media.InputMediaVideo.Cover, "media_video_cover")
 					if err != nil {
 						return
 					}
@@ -4199,16 +4077,16 @@ func (c *Client) EditEphemeralMessageMedia(ctx context.Context, params *EditEphe
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[bool](ctx, c, "editEphemeralMessageMedia", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -5198,29 +5076,7 @@ func WithEditMessageMediaReplyMarkup(value *InlineKeyboardMarkup) EditMessageMed
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) EditMessageMedia(ctx context.Context, params *EditMessageMediaParams) (ret *Message, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
@@ -5257,113 +5113,65 @@ func (c *Client) EditMessageMedia(ctx context.Context, params *EditMessageMediaP
 		{
 			switch {
 			case params.Media.InputMediaAnimation != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Media.InputMediaAnimation.Media,
-					"media_animation_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Media.InputMediaAnimation.Media, "media_animation_media")
 				if err != nil {
 					return
 				}
 				if params.Media.InputMediaAnimation.Thumbnail != nil {
-					err = createFormFileFromInputFile(
-						writer,
-						params.Media.InputMediaAnimation.Thumbnail,
-						"media_animation_thumbnail",
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, params.Media.InputMediaAnimation.Thumbnail, "media_animation_thumbnail")
 					if err != nil {
 						return
 					}
 				}
 			case params.Media.InputMediaAudio != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Media.InputMediaAudio.Media,
-					"media_audio_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Media.InputMediaAudio.Media, "media_audio_media")
 				if err != nil {
 					return
 				}
 				if params.Media.InputMediaAudio.Thumbnail != nil {
-					err = createFormFileFromInputFile(
-						writer,
-						params.Media.InputMediaAudio.Thumbnail,
-						"media_audio_thumbnail",
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, params.Media.InputMediaAudio.Thumbnail, "media_audio_thumbnail")
 					if err != nil {
 						return
 					}
 				}
 			case params.Media.InputMediaDocument != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Media.InputMediaDocument.Media,
-					"media_document_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Media.InputMediaDocument.Media, "media_document_media")
 				if err != nil {
 					return
 				}
 				if params.Media.InputMediaDocument.Thumbnail != nil {
-					err = createFormFileFromInputFile(
-						writer,
-						params.Media.InputMediaDocument.Thumbnail,
-						"media_document_thumbnail",
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, params.Media.InputMediaDocument.Thumbnail, "media_document_thumbnail")
 					if err != nil {
 						return
 					}
 				}
 			case params.Media.InputMediaLivePhoto != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Media.InputMediaLivePhoto.Media,
-					"media_live_photo_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Media.InputMediaLivePhoto.Media, "media_live_photo_media")
 				if err != nil {
 					return
 				}
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Media.InputMediaLivePhoto.Photo,
-					"media_live_photo_photo",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Media.InputMediaLivePhoto.Photo, "media_live_photo_photo")
 				if err != nil {
 					return
 				}
 			case params.Media.InputMediaPhoto != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Media.InputMediaPhoto.Media,
-					"media_photo_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Media.InputMediaPhoto.Media, "media_photo_media")
 				if err != nil {
 					return
 				}
 			case params.Media.InputMediaVideo != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Media.InputMediaVideo.Media,
-					"media_video_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Media.InputMediaVideo.Media, "media_video_media")
 				if err != nil {
 					return
 				}
 				if params.Media.InputMediaVideo.Thumbnail != nil {
-					err = createFormFileFromInputFile(
-						writer,
-						params.Media.InputMediaVideo.Thumbnail,
-						"media_video_thumbnail",
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, params.Media.InputMediaVideo.Thumbnail, "media_video_thumbnail")
 					if err != nil {
 						return
 					}
 				}
 				if params.Media.InputMediaVideo.Cover != nil {
-					err = createFormFileFromInputFile(
-						writer,
-						params.Media.InputMediaVideo.Cover,
-						"media_video_cover",
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, params.Media.InputMediaVideo.Cover, "media_video_cover")
 					if err != nil {
 						return
 					}
@@ -5393,16 +5201,16 @@ func (c *Client) EditMessageMedia(ctx context.Context, params *EditMessageMediaP
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[*Message](ctx, c, "editMessageMedia", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -5809,29 +5617,7 @@ func WithEditStoryAreas(value []StoryArea) EditStoryOption {
 //
 // [Story]: https://core.telegram.org/bots/api#story
 func (c *Client) EditStory(ctx context.Context, params *EditStoryParams) (ret *Story, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		{
 			v := params.BusinessConnectionID
@@ -5852,20 +5638,12 @@ func (c *Client) EditStory(ctx context.Context, params *EditStoryParams) (ret *S
 		{
 			switch {
 			case params.Content.InputStoryContentPhoto != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Content.InputStoryContentPhoto.Photo,
-					"content_photo_photo",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Content.InputStoryContentPhoto.Photo, "content_photo_photo")
 				if err != nil {
 					return
 				}
 			case params.Content.InputStoryContentVideo != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Content.InputStoryContentVideo.Video,
-					"content_video_video",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Content.InputStoryContentVideo.Video, "content_video_video")
 				if err != nil {
 					return
 				}
@@ -5922,16 +5700,16 @@ func (c *Client) EditStory(ctx context.Context, params *EditStoryParams) (ret *S
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[*Story](ctx, c, "editStory", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -8969,29 +8747,7 @@ func WithPostStoryProtectContent(value bool) PostStoryOption {
 //
 // [Story]: https://core.telegram.org/bots/api#story
 func (c *Client) PostStory(ctx context.Context, params *PostStoryParams) (ret *Story, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		{
 			v := params.BusinessConnectionID
@@ -9004,20 +8760,12 @@ func (c *Client) PostStory(ctx context.Context, params *PostStoryParams) (ret *S
 		{
 			switch {
 			case params.Content.InputStoryContentPhoto != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Content.InputStoryContentPhoto.Photo,
-					"content_photo_photo",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Content.InputStoryContentPhoto.Photo, "content_photo_photo")
 				if err != nil {
 					return
 				}
 			case params.Content.InputStoryContentVideo != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Content.InputStoryContentVideo.Video,
-					"content_video_video",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Content.InputStoryContentVideo.Video, "content_video_video")
 				if err != nil {
 					return
 				}
@@ -9098,16 +8846,16 @@ func (c *Client) PostStory(ctx context.Context, params *PostStoryParams) (ret *S
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[*Story](ctx, c, "postStory", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -9959,29 +9707,7 @@ func WithReplaceStickerInSetSticker(value InputSticker) ReplaceStickerInSetOptio
 // [addStickerToSet]: https://core.telegram.org/bots/api#addstickertoset
 // [setStickerPositionInSet]: https://core.telegram.org/bots/api#setstickerpositioninset
 func (c *Client) ReplaceStickerInSet(ctx context.Context, params *ReplaceStickerInSetParams) (ret bool, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		{
 			v := strconv.FormatInt(params.UserID, 10)
@@ -10008,11 +9734,7 @@ func (c *Client) ReplaceStickerInSet(ctx context.Context, params *ReplaceSticker
 		}
 
 		{
-			err = createFormFileFromInputFile(
-				writer,
-				&params.Sticker.Sticker,
-				"sticker__sticker",
-			)
+			err = createFormFileFromInputFile(ctx, writer, body, &params.Sticker.Sticker, "sticker__sticker")
 			if err != nil {
 				return
 			}
@@ -10028,16 +9750,16 @@ func (c *Client) ReplaceStickerInSet(ctx context.Context, params *ReplaceSticker
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[bool](ctx, c, "replaceStickerInSet", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -10829,29 +10551,7 @@ func WithSendAnimationReplyMarkup(value *ReplyMarkup) SendAnimationOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams) (ret *Message, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
@@ -10898,11 +10598,7 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 		}
 
 		{
-			err = createFormFileFromInputFile(
-				writer,
-				&params.Animation,
-				"animation",
-			)
+			err = createFormFileFromInputFile(ctx, writer, body, &params.Animation, "animation")
 			if err != nil {
 				return
 			}
@@ -10935,11 +10631,7 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 
 		{
 			if params.Thumbnail != nil {
-				err = createFormFileFromInputFile(
-					writer,
-					params.Thumbnail,
-					"thumbnail",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, params.Thumbnail, "thumbnail")
 				if err != nil {
 					return
 				}
@@ -11059,16 +10751,16 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[*Message](ctx, c, "sendAnimation", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -11392,29 +11084,7 @@ func WithSendAudioReplyMarkup(value *ReplyMarkup) SendAudioOption {
 // [Message]: https://core.telegram.org/bots/api#message
 // [sendVoice]: https://core.telegram.org/bots/api#sendvoice
 func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *Message, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
@@ -11461,11 +11131,7 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 		}
 
 		{
-			err = createFormFileFromInputFile(
-				writer,
-				&params.Audio,
-				"audio",
-			)
+			err = createFormFileFromInputFile(ctx, writer, body, &params.Audio, "audio")
 			if err != nil {
 				return
 			}
@@ -11526,11 +11192,7 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 
 		{
 			if params.Thumbnail != nil {
-				err = createFormFileFromInputFile(
-					writer,
-					params.Thumbnail,
-					"thumbnail",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, params.Thumbnail, "thumbnail")
 				if err != nil {
 					return
 				}
@@ -11606,16 +11268,16 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[*Message](ctx, c, "sendAudio", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -12698,29 +12360,7 @@ func WithSendDocumentReplyMarkup(value *ReplyMarkup) SendDocumentOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (ret *Message, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
@@ -12767,11 +12407,7 @@ func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (
 		}
 
 		{
-			err = createFormFileFromInputFile(
-				writer,
-				&params.Document,
-				"document",
-			)
+			err = createFormFileFromInputFile(ctx, writer, body, &params.Document, "document")
 			if err != nil {
 				return
 			}
@@ -12780,11 +12416,7 @@ func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (
 
 		{
 			if params.Thumbnail != nil {
-				err = createFormFileFromInputFile(
-					writer,
-					params.Thumbnail,
-					"thumbnail",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, params.Thumbnail, "thumbnail")
 				if err != nil {
 					return
 				}
@@ -12896,16 +12528,16 @@ func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[*Message](ctx, c, "sendDocument", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -14070,29 +13702,7 @@ func WithSendLivePhotoReplyMarkup(value *ReplyMarkup) SendLivePhotoOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendLivePhoto(ctx context.Context, params *SendLivePhotoParams) (ret *Message, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
@@ -14139,11 +13749,7 @@ func (c *Client) SendLivePhoto(ctx context.Context, params *SendLivePhotoParams)
 		}
 
 		{
-			err = createFormFileFromInputFile(
-				writer,
-				&params.LivePhoto,
-				"live_photo",
-			)
+			err = createFormFileFromInputFile(ctx, writer, body, &params.LivePhoto, "live_photo")
 			if err != nil {
 				return
 			}
@@ -14151,11 +13757,7 @@ func (c *Client) SendLivePhoto(ctx context.Context, params *SendLivePhotoParams)
 		}
 
 		{
-			err = createFormFileFromInputFile(
-				writer,
-				&params.Photo,
-				"photo",
-			)
+			err = createFormFileFromInputFile(ctx, writer, body, &params.Photo, "photo")
 			if err != nil {
 				return
 			}
@@ -14274,16 +13876,16 @@ func (c *Client) SendLivePhoto(ctx context.Context, params *SendLivePhotoParams)
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[*Message](ctx, c, "sendLivePhoto", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -14734,29 +14336,7 @@ func WithSendMediaGroupReplyParameters(value *ReplyParameters) SendMediaGroupOpt
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendMediaGroup(ctx context.Context, params *SendMediaGroupParams) (ret []Message, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
@@ -14794,113 +14374,65 @@ func (c *Client) SendMediaGroup(ctx context.Context, params *SendMediaGroupParam
 			for i := range params.Media {
 				switch {
 				case params.Media[i].InputMediaAnimation != nil:
-					err = createFormFileFromInputFile(
-						writer,
-						&params.Media[i].InputMediaAnimation.Media,
-						"media_animation_media"+strconv.Itoa(i),
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, &params.Media[i].InputMediaAnimation.Media, "media_animation_media"+strconv.Itoa(i))
 					if err != nil {
 						return
 					}
 					if params.Media[i].InputMediaAnimation.Thumbnail != nil {
-						err = createFormFileFromInputFile(
-							writer,
-							params.Media[i].InputMediaAnimation.Thumbnail,
-							"media_animation_thumbnail"+strconv.Itoa(i),
-						)
+						err = createFormFileFromInputFile(ctx, writer, body, params.Media[i].InputMediaAnimation.Thumbnail, "media_animation_thumbnail"+strconv.Itoa(i))
 						if err != nil {
 							return
 						}
 					}
 				case params.Media[i].InputMediaAudio != nil:
-					err = createFormFileFromInputFile(
-						writer,
-						&params.Media[i].InputMediaAudio.Media,
-						"media_audio_media"+strconv.Itoa(i),
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, &params.Media[i].InputMediaAudio.Media, "media_audio_media"+strconv.Itoa(i))
 					if err != nil {
 						return
 					}
 					if params.Media[i].InputMediaAudio.Thumbnail != nil {
-						err = createFormFileFromInputFile(
-							writer,
-							params.Media[i].InputMediaAudio.Thumbnail,
-							"media_audio_thumbnail"+strconv.Itoa(i),
-						)
+						err = createFormFileFromInputFile(ctx, writer, body, params.Media[i].InputMediaAudio.Thumbnail, "media_audio_thumbnail"+strconv.Itoa(i))
 						if err != nil {
 							return
 						}
 					}
 				case params.Media[i].InputMediaDocument != nil:
-					err = createFormFileFromInputFile(
-						writer,
-						&params.Media[i].InputMediaDocument.Media,
-						"media_document_media"+strconv.Itoa(i),
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, &params.Media[i].InputMediaDocument.Media, "media_document_media"+strconv.Itoa(i))
 					if err != nil {
 						return
 					}
 					if params.Media[i].InputMediaDocument.Thumbnail != nil {
-						err = createFormFileFromInputFile(
-							writer,
-							params.Media[i].InputMediaDocument.Thumbnail,
-							"media_document_thumbnail"+strconv.Itoa(i),
-						)
+						err = createFormFileFromInputFile(ctx, writer, body, params.Media[i].InputMediaDocument.Thumbnail, "media_document_thumbnail"+strconv.Itoa(i))
 						if err != nil {
 							return
 						}
 					}
 				case params.Media[i].InputMediaLivePhoto != nil:
-					err = createFormFileFromInputFile(
-						writer,
-						&params.Media[i].InputMediaLivePhoto.Media,
-						"media_live_photo_media"+strconv.Itoa(i),
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, &params.Media[i].InputMediaLivePhoto.Media, "media_live_photo_media"+strconv.Itoa(i))
 					if err != nil {
 						return
 					}
-					err = createFormFileFromInputFile(
-						writer,
-						&params.Media[i].InputMediaLivePhoto.Photo,
-						"media_live_photo_photo"+strconv.Itoa(i),
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, &params.Media[i].InputMediaLivePhoto.Photo, "media_live_photo_photo"+strconv.Itoa(i))
 					if err != nil {
 						return
 					}
 				case params.Media[i].InputMediaPhoto != nil:
-					err = createFormFileFromInputFile(
-						writer,
-						&params.Media[i].InputMediaPhoto.Media,
-						"media_photo_media"+strconv.Itoa(i),
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, &params.Media[i].InputMediaPhoto.Media, "media_photo_media"+strconv.Itoa(i))
 					if err != nil {
 						return
 					}
 				case params.Media[i].InputMediaVideo != nil:
-					err = createFormFileFromInputFile(
-						writer,
-						&params.Media[i].InputMediaVideo.Media,
-						"media_video_media"+strconv.Itoa(i),
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, &params.Media[i].InputMediaVideo.Media, "media_video_media"+strconv.Itoa(i))
 					if err != nil {
 						return
 					}
 					if params.Media[i].InputMediaVideo.Thumbnail != nil {
-						err = createFormFileFromInputFile(
-							writer,
-							params.Media[i].InputMediaVideo.Thumbnail,
-							"media_video_thumbnail"+strconv.Itoa(i),
-						)
+						err = createFormFileFromInputFile(ctx, writer, body, params.Media[i].InputMediaVideo.Thumbnail, "media_video_thumbnail"+strconv.Itoa(i))
 						if err != nil {
 							return
 						}
 					}
 					if params.Media[i].InputMediaVideo.Cover != nil {
-						err = createFormFileFromInputFile(
-							writer,
-							params.Media[i].InputMediaVideo.Cover,
-							"media_video_cover"+strconv.Itoa(i),
-						)
+						err = createFormFileFromInputFile(ctx, writer, body, params.Media[i].InputMediaVideo.Cover, "media_video_cover"+strconv.Itoa(i))
 						if err != nil {
 							return
 						}
@@ -14963,16 +14495,16 @@ func (c *Client) SendMediaGroup(ctx context.Context, params *SendMediaGroupParam
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[[]Message](ctx, c, "sendMediaGroup", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -15659,29 +15191,7 @@ func WithSendPaidMediaReplyMarkup(value *ReplyMarkup) SendPaidMediaOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendPaidMedia(ctx context.Context, params *SendPaidMediaParams) (ret *Message, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
@@ -15727,56 +15237,32 @@ func (c *Client) SendPaidMedia(ctx context.Context, params *SendPaidMediaParams)
 			for i := range params.Media {
 				switch {
 				case params.Media[i].InputPaidMediaLivePhoto != nil:
-					err = createFormFileFromInputFile(
-						writer,
-						&params.Media[i].InputPaidMediaLivePhoto.Media,
-						"media_live_photo_media"+strconv.Itoa(i),
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, &params.Media[i].InputPaidMediaLivePhoto.Media, "media_live_photo_media"+strconv.Itoa(i))
 					if err != nil {
 						return
 					}
-					err = createFormFileFromInputFile(
-						writer,
-						&params.Media[i].InputPaidMediaLivePhoto.Photo,
-						"media_live_photo_photo"+strconv.Itoa(i),
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, &params.Media[i].InputPaidMediaLivePhoto.Photo, "media_live_photo_photo"+strconv.Itoa(i))
 					if err != nil {
 						return
 					}
 				case params.Media[i].InputPaidMediaPhoto != nil:
-					err = createFormFileFromInputFile(
-						writer,
-						&params.Media[i].InputPaidMediaPhoto.Media,
-						"media_photo_media"+strconv.Itoa(i),
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, &params.Media[i].InputPaidMediaPhoto.Media, "media_photo_media"+strconv.Itoa(i))
 					if err != nil {
 						return
 					}
 				case params.Media[i].InputPaidMediaVideo != nil:
-					err = createFormFileFromInputFile(
-						writer,
-						&params.Media[i].InputPaidMediaVideo.Media,
-						"media_video_media"+strconv.Itoa(i),
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, &params.Media[i].InputPaidMediaVideo.Media, "media_video_media"+strconv.Itoa(i))
 					if err != nil {
 						return
 					}
 					if params.Media[i].InputPaidMediaVideo.Thumbnail != nil {
-						err = createFormFileFromInputFile(
-							writer,
-							params.Media[i].InputPaidMediaVideo.Thumbnail,
-							"media_video_thumbnail"+strconv.Itoa(i),
-						)
+						err = createFormFileFromInputFile(ctx, writer, body, params.Media[i].InputPaidMediaVideo.Thumbnail, "media_video_thumbnail"+strconv.Itoa(i))
 						if err != nil {
 							return
 						}
 					}
 					if params.Media[i].InputPaidMediaVideo.Cover != nil {
-						err = createFormFileFromInputFile(
-							writer,
-							params.Media[i].InputPaidMediaVideo.Cover,
-							"media_video_cover"+strconv.Itoa(i),
-						)
+						err = createFormFileFromInputFile(ctx, writer, body, params.Media[i].InputPaidMediaVideo.Cover, "media_video_cover"+strconv.Itoa(i))
 						if err != nil {
 							return
 						}
@@ -15899,16 +15385,16 @@ func (c *Client) SendPaidMedia(ctx context.Context, params *SendPaidMediaParams)
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[*Message](ctx, c, "sendPaidMedia", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -16196,29 +15682,7 @@ func WithSendPhotoReplyMarkup(value *ReplyMarkup) SendPhotoOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendPhoto(ctx context.Context, params *SendPhotoParams) (ret *Message, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
@@ -16265,11 +15729,7 @@ func (c *Client) SendPhoto(ctx context.Context, params *SendPhotoParams) (ret *M
 		}
 
 		{
-			err = createFormFileFromInputFile(
-				writer,
-				&params.Photo,
-				"photo",
-			)
+			err = createFormFileFromInputFile(ctx, writer, body, &params.Photo, "photo")
 			if err != nil {
 				return
 			}
@@ -16388,16 +15848,16 @@ func (c *Client) SendPhoto(ctx context.Context, params *SendPhotoParams) (ret *M
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[*Message](ctx, c, "sendPhoto", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -16897,29 +16357,7 @@ func WithSendPollReplyMarkup(value *ReplyMarkup) SendPollOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Message, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
@@ -17104,115 +16542,67 @@ func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Mes
 		{
 			switch {
 			case params.ExplanationMedia.InputMediaAnimation != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.ExplanationMedia.InputMediaAnimation.Media,
-					"explanation_media_animation_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.ExplanationMedia.InputMediaAnimation.Media, "explanation_media_animation_media")
 				if err != nil {
 					return
 				}
 				if params.ExplanationMedia.InputMediaAnimation.Thumbnail != nil {
-					err = createFormFileFromInputFile(
-						writer,
-						params.ExplanationMedia.InputMediaAnimation.Thumbnail,
-						"explanation_media_animation_thumbnail",
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, params.ExplanationMedia.InputMediaAnimation.Thumbnail, "explanation_media_animation_thumbnail")
 					if err != nil {
 						return
 					}
 				}
 			case params.ExplanationMedia.InputMediaAudio != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.ExplanationMedia.InputMediaAudio.Media,
-					"explanation_media_audio_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.ExplanationMedia.InputMediaAudio.Media, "explanation_media_audio_media")
 				if err != nil {
 					return
 				}
 				if params.ExplanationMedia.InputMediaAudio.Thumbnail != nil {
-					err = createFormFileFromInputFile(
-						writer,
-						params.ExplanationMedia.InputMediaAudio.Thumbnail,
-						"explanation_media_audio_thumbnail",
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, params.ExplanationMedia.InputMediaAudio.Thumbnail, "explanation_media_audio_thumbnail")
 					if err != nil {
 						return
 					}
 				}
 			case params.ExplanationMedia.InputMediaDocument != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.ExplanationMedia.InputMediaDocument.Media,
-					"explanation_media_document_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.ExplanationMedia.InputMediaDocument.Media, "explanation_media_document_media")
 				if err != nil {
 					return
 				}
 				if params.ExplanationMedia.InputMediaDocument.Thumbnail != nil {
-					err = createFormFileFromInputFile(
-						writer,
-						params.ExplanationMedia.InputMediaDocument.Thumbnail,
-						"explanation_media_document_thumbnail",
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, params.ExplanationMedia.InputMediaDocument.Thumbnail, "explanation_media_document_thumbnail")
 					if err != nil {
 						return
 					}
 				}
 			case params.ExplanationMedia.InputMediaLivePhoto != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.ExplanationMedia.InputMediaLivePhoto.Media,
-					"explanation_media_live_photo_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.ExplanationMedia.InputMediaLivePhoto.Media, "explanation_media_live_photo_media")
 				if err != nil {
 					return
 				}
-				err = createFormFileFromInputFile(
-					writer,
-					&params.ExplanationMedia.InputMediaLivePhoto.Photo,
-					"explanation_media_live_photo_photo",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.ExplanationMedia.InputMediaLivePhoto.Photo, "explanation_media_live_photo_photo")
 				if err != nil {
 					return
 				}
 			case params.ExplanationMedia.InputMediaLocation != nil:
 			case params.ExplanationMedia.InputMediaPhoto != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.ExplanationMedia.InputMediaPhoto.Media,
-					"explanation_media_photo_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.ExplanationMedia.InputMediaPhoto.Media, "explanation_media_photo_media")
 				if err != nil {
 					return
 				}
 			case params.ExplanationMedia.InputMediaVenue != nil:
 			case params.ExplanationMedia.InputMediaVideo != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.ExplanationMedia.InputMediaVideo.Media,
-					"explanation_media_video_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.ExplanationMedia.InputMediaVideo.Media, "explanation_media_video_media")
 				if err != nil {
 					return
 				}
 				if params.ExplanationMedia.InputMediaVideo.Thumbnail != nil {
-					err = createFormFileFromInputFile(
-						writer,
-						params.ExplanationMedia.InputMediaVideo.Thumbnail,
-						"explanation_media_video_thumbnail",
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, params.ExplanationMedia.InputMediaVideo.Thumbnail, "explanation_media_video_thumbnail")
 					if err != nil {
 						return
 					}
 				}
 				if params.ExplanationMedia.InputMediaVideo.Cover != nil {
-					err = createFormFileFromInputFile(
-						writer,
-						params.ExplanationMedia.InputMediaVideo.Cover,
-						"explanation_media_video_cover",
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, params.ExplanationMedia.InputMediaVideo.Cover, "explanation_media_video_cover")
 					if err != nil {
 						return
 					}
@@ -17285,115 +16675,67 @@ func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Mes
 		{
 			switch {
 			case params.Media.InputMediaAnimation != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Media.InputMediaAnimation.Media,
-					"media_animation_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Media.InputMediaAnimation.Media, "media_animation_media")
 				if err != nil {
 					return
 				}
 				if params.Media.InputMediaAnimation.Thumbnail != nil {
-					err = createFormFileFromInputFile(
-						writer,
-						params.Media.InputMediaAnimation.Thumbnail,
-						"media_animation_thumbnail",
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, params.Media.InputMediaAnimation.Thumbnail, "media_animation_thumbnail")
 					if err != nil {
 						return
 					}
 				}
 			case params.Media.InputMediaAudio != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Media.InputMediaAudio.Media,
-					"media_audio_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Media.InputMediaAudio.Media, "media_audio_media")
 				if err != nil {
 					return
 				}
 				if params.Media.InputMediaAudio.Thumbnail != nil {
-					err = createFormFileFromInputFile(
-						writer,
-						params.Media.InputMediaAudio.Thumbnail,
-						"media_audio_thumbnail",
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, params.Media.InputMediaAudio.Thumbnail, "media_audio_thumbnail")
 					if err != nil {
 						return
 					}
 				}
 			case params.Media.InputMediaDocument != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Media.InputMediaDocument.Media,
-					"media_document_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Media.InputMediaDocument.Media, "media_document_media")
 				if err != nil {
 					return
 				}
 				if params.Media.InputMediaDocument.Thumbnail != nil {
-					err = createFormFileFromInputFile(
-						writer,
-						params.Media.InputMediaDocument.Thumbnail,
-						"media_document_thumbnail",
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, params.Media.InputMediaDocument.Thumbnail, "media_document_thumbnail")
 					if err != nil {
 						return
 					}
 				}
 			case params.Media.InputMediaLivePhoto != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Media.InputMediaLivePhoto.Media,
-					"media_live_photo_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Media.InputMediaLivePhoto.Media, "media_live_photo_media")
 				if err != nil {
 					return
 				}
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Media.InputMediaLivePhoto.Photo,
-					"media_live_photo_photo",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Media.InputMediaLivePhoto.Photo, "media_live_photo_photo")
 				if err != nil {
 					return
 				}
 			case params.Media.InputMediaLocation != nil:
 			case params.Media.InputMediaPhoto != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Media.InputMediaPhoto.Media,
-					"media_photo_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Media.InputMediaPhoto.Media, "media_photo_media")
 				if err != nil {
 					return
 				}
 			case params.Media.InputMediaVenue != nil:
 			case params.Media.InputMediaVideo != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Media.InputMediaVideo.Media,
-					"media_video_media",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Media.InputMediaVideo.Media, "media_video_media")
 				if err != nil {
 					return
 				}
 				if params.Media.InputMediaVideo.Thumbnail != nil {
-					err = createFormFileFromInputFile(
-						writer,
-						params.Media.InputMediaVideo.Thumbnail,
-						"media_video_thumbnail",
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, params.Media.InputMediaVideo.Thumbnail, "media_video_thumbnail")
 					if err != nil {
 						return
 					}
 				}
 				if params.Media.InputMediaVideo.Cover != nil {
-					err = createFormFileFromInputFile(
-						writer,
-						params.Media.InputMediaVideo.Cover,
-						"media_video_cover",
-					)
+					err = createFormFileFromInputFile(ctx, writer, body, params.Media.InputMediaVideo.Cover, "media_video_cover")
 					if err != nil {
 						return
 					}
@@ -17467,16 +16809,16 @@ func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Mes
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[*Message](ctx, c, "sendPoll", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -18058,29 +17400,7 @@ func WithSendStickerReplyMarkup(value *ReplyMarkup) SendStickerOption {
 // [video]: https://telegram.org/blog/video-stickers-better-reactions
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendSticker(ctx context.Context, params *SendStickerParams) (ret *Message, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
@@ -18127,11 +17447,7 @@ func (c *Client) SendSticker(ctx context.Context, params *SendStickerParams) (re
 		}
 
 		{
-			err = createFormFileFromInputFile(
-				writer,
-				&params.Sticker,
-				"sticker",
-			)
+			err = createFormFileFromInputFile(ctx, writer, body, &params.Sticker, "sticker")
 			if err != nil {
 				return
 			}
@@ -18214,16 +17530,16 @@ func (c *Client) SendSticker(ctx context.Context, params *SendStickerParams) (re
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[*Message](ctx, c, "sendSticker", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -18923,29 +18239,7 @@ func WithSendVideoReplyMarkup(value *ReplyMarkup) SendVideoOption {
 // [Document]: https://core.telegram.org/bots/api#document
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *Message, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
@@ -18992,11 +18286,7 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 		}
 
 		{
-			err = createFormFileFromInputFile(
-				writer,
-				&params.Video,
-				"video",
-			)
+			err = createFormFileFromInputFile(ctx, writer, body, &params.Video, "video")
 			if err != nil {
 				return
 			}
@@ -19029,11 +18319,7 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 
 		{
 			if params.Thumbnail != nil {
-				err = createFormFileFromInputFile(
-					writer,
-					params.Thumbnail,
-					"thumbnail",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, params.Thumbnail, "thumbnail")
 				if err != nil {
 					return
 				}
@@ -19043,11 +18329,7 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 
 		{
 			if params.Cover != nil {
-				err = createFormFileFromInputFile(
-					writer,
-					params.Cover,
-					"cover",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, params.Cover, "cover")
 				if err != nil {
 					return
 				}
@@ -19183,16 +18465,16 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[*Message](ctx, c, "sendVideo", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -19462,29 +18744,7 @@ func WithSendVideoNoteReplyMarkup(value *ReplyMarkup) SendVideoNoteOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams) (ret *Message, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
@@ -19531,11 +18791,7 @@ func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams)
 		}
 
 		{
-			err = createFormFileFromInputFile(
-				writer,
-				&params.VideoNote,
-				"video_note",
-			)
+			err = createFormFileFromInputFile(ctx, writer, body, &params.VideoNote, "video_note")
 			if err != nil {
 				return
 			}
@@ -19560,11 +18816,7 @@ func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams)
 
 		{
 			if params.Thumbnail != nil {
-				err = createFormFileFromInputFile(
-					writer,
-					params.Thumbnail,
-					"thumbnail",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, params.Thumbnail, "thumbnail")
 				if err != nil {
 					return
 				}
@@ -19640,16 +18892,16 @@ func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams)
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[*Message](ctx, c, "sendVideoNote", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -19923,29 +19175,7 @@ func WithSendVoiceReplyMarkup(value *ReplyMarkup) SendVoiceOption {
 // [Document]: https://core.telegram.org/bots/api#document
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendVoice(ctx context.Context, params *SendVoiceParams) (ret *Message, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		if params.BusinessConnectionID != "" {
 			v := params.BusinessConnectionID
@@ -19992,11 +19222,7 @@ func (c *Client) SendVoice(ctx context.Context, params *SendVoiceParams) (ret *M
 		}
 
 		{
-			err = createFormFileFromInputFile(
-				writer,
-				&params.Voice,
-				"voice",
-			)
+			err = createFormFileFromInputFile(ctx, writer, body, &params.Voice, "voice")
 			if err != nil {
 				return
 			}
@@ -20107,16 +19333,16 @@ func (c *Client) SendVoice(ctx context.Context, params *SendVoiceParams) (ret *M
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[*Message](ctx, c, "sendVoice", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -20376,29 +19602,7 @@ func WithSetBusinessAccountProfilePhotoIsPublic(value bool) SetBusinessAccountPr
 // Requires the can_edit_profile_photo business bot right.
 // Returns True on success.
 func (c *Client) SetBusinessAccountProfilePhoto(ctx context.Context, params *SetBusinessAccountProfilePhotoParams) (ret bool, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		{
 			v := params.BusinessConnectionID
@@ -20411,20 +19615,12 @@ func (c *Client) SetBusinessAccountProfilePhoto(ctx context.Context, params *Set
 		{
 			switch {
 			case params.Photo.InputProfilePhotoStatic != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Photo.InputProfilePhotoStatic.Photo,
-					"photo_static_photo",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Photo.InputProfilePhotoStatic.Photo, "photo_static_photo")
 				if err != nil {
 					return
 				}
 			case params.Photo.InputProfilePhotoAnimated != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Photo.InputProfilePhotoAnimated.Animation,
-					"photo_animated_animation",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Photo.InputProfilePhotoAnimated.Animation, "photo_animated_animation")
 				if err != nil {
 					return
 				}
@@ -20449,16 +19645,16 @@ func (c *Client) SetBusinessAccountProfilePhoto(ctx context.Context, params *Set
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[bool](ctx, c, "setBusinessAccountProfilePhoto", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -20929,29 +20125,7 @@ func WithSetChatPhotoPhoto(value InputFile) SetChatPhotoOption {
 // The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
 // Returns True on success.
 func (c *Client) SetChatPhoto(ctx context.Context, params *SetChatPhotoParams) (ret bool, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		{
 			v := params.ChatID.String()
@@ -20962,27 +20136,23 @@ func (c *Client) SetChatPhoto(ctx context.Context, params *SetChatPhotoParams) (
 		}
 
 		{
-			err = createFormFileFromInputFile(
-				writer,
-				&params.Photo,
-				"photo",
-			)
+			err = createFormFileFromInputFile(ctx, writer, body, &params.Photo, "photo")
 			if err != nil {
 				return
 			}
 
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[bool](ctx, c, "setChatPhoto", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -21773,47 +20943,17 @@ func WithSetMyProfilePhotoPhoto(value InputProfilePhoto) SetMyProfilePhotoOption
 // Changes the profile photo of the bot.
 // Returns True on success.
 func (c *Client) SetMyProfilePhoto(ctx context.Context, params *SetMyProfilePhotoParams) (ret bool, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		{
 			switch {
 			case params.Photo.InputProfilePhotoStatic != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Photo.InputProfilePhotoStatic.Photo,
-					"photo_static_photo",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Photo.InputProfilePhotoStatic.Photo, "photo_static_photo")
 				if err != nil {
 					return
 				}
 			case params.Photo.InputProfilePhotoAnimated != nil:
-				err = createFormFileFromInputFile(
-					writer,
-					&params.Photo.InputProfilePhotoAnimated.Animation,
-					"photo_animated_animation",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, &params.Photo.InputProfilePhotoAnimated.Animation, "photo_animated_animation")
 				if err != nil {
 					return
 				}
@@ -21830,16 +20970,16 @@ func (c *Client) SetMyProfilePhoto(ctx context.Context, params *SetMyProfilePhot
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[bool](ctx, c, "setMyProfilePhoto", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -22284,29 +21424,7 @@ func WithSetStickerSetThumbnailFormat(value string) SetStickerSetThumbnailOption
 // The format of the thumbnail file must match the format of the stickers in the set.
 // Returns True on success.
 func (c *Client) SetStickerSetThumbnail(ctx context.Context, params *SetStickerSetThumbnailParams) (ret bool, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		{
 			v := params.Name
@@ -22326,11 +21444,7 @@ func (c *Client) SetStickerSetThumbnail(ctx context.Context, params *SetStickerS
 
 		{
 			if params.Thumbnail != nil {
-				err = createFormFileFromInputFile(
-					writer,
-					params.Thumbnail,
-					"thumbnail",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, params.Thumbnail, "thumbnail")
 				if err != nil {
 					return
 				}
@@ -22346,16 +21460,16 @@ func (c *Client) SetStickerSetThumbnail(ctx context.Context, params *SetStickerS
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[bool](ctx, c, "setStickerSetThumbnail", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -22629,29 +21743,7 @@ func WithSetWebhookSecretToken(value string) SetWebhookOption {
 // [Update]: https://core.telegram.org/bots/api#update
 // [HTTP status code]: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
 func (c *Client) SetWebhook(ctx context.Context, params *SetWebhookParams) (ret bool, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		{
 			v := params.URL
@@ -22663,11 +21755,7 @@ func (c *Client) SetWebhook(ctx context.Context, params *SetWebhookParams) (ret 
 
 		{
 			if params.Certificate != nil {
-				err = createFormFileFromInputFile(
-					writer,
-					params.Certificate,
-					"certificate",
-				)
+				err = createFormFileFromInputFile(ctx, writer, body, params.Certificate, "certificate")
 				if err != nil {
 					return
 				}
@@ -22719,16 +21807,16 @@ func (c *Client) SetWebhook(ctx context.Context, params *SetWebhookParams) (ret 
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[bool](ctx, c, "setWebhook", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -23673,29 +22761,7 @@ func WithUploadStickerFileStickerFormat(value string) UploadStickerFileOption {
 // [replaceStickerInSet]: https://core.telegram.org/bots/api#replacestickerinset
 // [File]: https://core.telegram.org/bots/api#file
 func (c *Client) UploadStickerFile(ctx context.Context, params *UploadStickerFileParams) (ret *File, err error) {
-	reader, pw := io.Pipe()
-	writer := multipart.NewWriter(pw)
-	contentType := writer.FormDataContentType()
-	writeErr := make(chan error, 1)
-
-	go func() {
-		var err error
-		defer func() {
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			err = writer.Close()
-			if err != nil {
-				_ = pw.CloseWithError(err)
-				writeErr <- err
-				return
-			}
-
-			writeErr <- pw.Close()
-		}()
+	body := newMultipartBody(ctx, func(ctx context.Context, writer *multipart.Writer, body *multipartBody) (err error) {
 
 		{
 			v := strconv.FormatInt(params.UserID, 10)
@@ -23706,11 +22772,7 @@ func (c *Client) UploadStickerFile(ctx context.Context, params *UploadStickerFil
 		}
 
 		{
-			err = createFormFileFromInputFile(
-				writer,
-				&params.Sticker,
-				"sticker",
-			)
+			err = createFormFileFromInputFile(ctx, writer, body, &params.Sticker, "sticker")
 			if err != nil {
 				return
 			}
@@ -23725,16 +22787,16 @@ func (c *Client) UploadStickerFile(ctx context.Context, params *UploadStickerFil
 			}
 		}
 
-	}()
+		return nil
+	})
+	defer body.Close() //nolint:errcheck
+
+	reader, contentType := body, body.ContentType()
 
 	ret, err = call[*File](ctx, c, "uploadStickerFile", params, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		_ = reader.CloseWithError(err)
-		<-writeErr
-		return
+	if writeErr := body.Err(); writeErr != nil {
+		err = writeErr // the root cause behind a broken-body transport error
 	}
-
-	err = <-writeErr
 
 	return ret, err
 }
@@ -23866,23 +22928,4 @@ func (c *Client) VerifyUser(ctx context.Context, params *VerifyUserParams) (ret 
 	ret, err = call[bool](ctx, c, "verifyUser", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
-}
-
-// createFormFileFromInputFile streams f.File into the multipart body.
-// The caller owns f.File and closes it after the API call returns.
-func createFormFileFromInputFile(writer *multipart.Writer, f *InputFile, name string) error {
-	if f.File == nil {
-		return nil
-	}
-
-	f.fieldName = name
-
-	w, err := writer.CreateFormFile(f.fieldName, f.FileName)
-	if err != nil {
-		return err
-	}
-
-	_, err = io.Copy(w, f.File)
-
-	return err
 }

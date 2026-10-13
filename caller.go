@@ -176,20 +176,24 @@ func (h httpCaller) roundTrip(ctx context.Context, req Request, result any) erro
 	return nil
 }
 
+// rewinder is a body that can start over for a retry, see multipartBody.
+type rewinder interface {
+	Rewind() error
+}
+
 // rewind resets body to its start for a retry.
 func rewind(body io.Reader) error {
-	if body == nil {
+	switch b := body.(type) {
+	case nil:
 		return nil
-	}
-
-	seeker, ok := body.(io.Seeker)
-	if !ok {
+	case rewinder:
+		return b.Rewind()
+	case io.Seeker:
+		_, err := b.Seek(0, io.SeekStart)
+		return err
+	default:
 		return ErrBodyNotRewindable
 	}
-
-	_, err := seeker.Seek(0, io.SeekStart)
-
-	return err
 }
 
 // sleep waits d or until ctx is done.
