@@ -156,10 +156,47 @@ func parseDescription(nodes ...*html.Node) string {
 
 	if len(links) != 0 {
 		desc = append(desc, "\n// "...)
-		desc = append(desc, links...)
+		desc = append(desc, dedupeLinks(string(links))...)
 	}
 
-	return string(desc)
+	return collapseEmptyCommentLines(string(desc))
+}
+
+// dedupeLinks drops repeated "// [name]: url" definitions: gofmt treats a
+// duplicate as plain text and breaks the link list into paragraphs.
+func dedupeLinks(links string) string {
+	seen := make(map[string]bool)
+	lines := strings.Split(links, "\n")
+	out := lines[:0]
+
+	for _, line := range lines {
+		if seen[line] {
+			continue
+		}
+
+		seen[line] = true
+		out = append(out, line)
+	}
+
+	return strings.Join(out, "\n")
+}
+
+// collapseEmptyCommentLines trims trailing spaces of comment lines and folds
+// runs of empty "//" lines into one, as gofmt would.
+func collapseEmptyCommentLines(desc string) string {
+	lines := strings.Split(desc, "\n")
+	out := lines[:0]
+
+	for _, line := range lines {
+		line = strings.TrimRight(line, " \t")
+		if line == "//" && len(out) != 0 && out[len(out)-1] == "//" {
+			continue
+		}
+
+		out = append(out, line)
+	}
+
+	return strings.Join(out, "\n")
 }
 
 func parseSubtypes(lists []*html.Node) []string {

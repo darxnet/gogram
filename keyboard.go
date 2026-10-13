@@ -1,77 +1,73 @@
 package gogram
 
-// // InlineKeyboardBuilder is a helper for building InlineKeyboardMarkup.
-// type InlineKeyboardBuilder struct {
-// 	keyboard   [][]InlineKeyboardButton
-// 	currentRow []InlineKeyboardButton
-// }
+// InlineKeyboardBuilder builds an [InlineKeyboardMarkup] row by row:
+//
+//	markup := gogram.NewInlineKeyboard().
+//		Text("Yes", "confirm 1").Text("No", "confirm 0").Row().
+//		URL("Docs", "https://example.com").
+//		Markup()
+//
+// Buttons are appended to the current row; Row starts the next one.
+// The zero value is ready to use.
+type InlineKeyboardBuilder struct {
+	rows [][]InlineKeyboardButton
+	row  []InlineKeyboardButton
+}
 
-// // NewInlineKeyboard creates a new InlineKeyboardBuilder.
-// func NewInlineKeyboard() *InlineKeyboardBuilder {
-// 	return &InlineKeyboardBuilder{
-// 		keyboard:   make([][]InlineKeyboardButton, 0),
-// 		currentRow: make([]InlineKeyboardButton, 0),
-// 	}
-// }
+// NewInlineKeyboard returns an empty builder.
+func NewInlineKeyboard() *InlineKeyboardBuilder {
+	return &InlineKeyboardBuilder{}
+}
 
-// // AddButton adds a button with callback data to the current row.
-// func (b *InlineKeyboardBuilder) AddButton(text, data string) *InlineKeyboardBuilder {
-// 	b.currentRow = append(b.currentRow, InlineKeyboardButton{
-// 		Text:         text,
-// 		CallbackData: data,
-// 	})
-// 	return b
-// }
+// Add appends buttons to the current row.
+func (b *InlineKeyboardBuilder) Add(buttons ...InlineKeyboardButton) *InlineKeyboardBuilder {
+	b.row = append(b.row, buttons...)
+	return b
+}
 
-// // AddURL adds a button with a URL to the current row.
-// func (b *InlineKeyboardBuilder) AddURL(text, url string) *InlineKeyboardBuilder {
-// 	b.currentRow = append(b.currentRow, InlineKeyboardButton{
-// 		Text: text,
-// 		URL:  url,
-// 	})
-// 	return b
-// }
+// Text appends a callback button; see [Callback] for typed callback data.
+func (b *InlineKeyboardBuilder) Text(text, callbackData string) *InlineKeyboardBuilder {
+	return b.Add(InlineKeyboardButton{Text: text, CallbackData: callbackData})
+}
 
-// // Row completes the current row and starts a new one.
-// func (b *InlineKeyboardBuilder) Row() *InlineKeyboardBuilder {
-// 	if len(b.currentRow) > 0 {
-// 		b.keyboard = append(b.keyboard, b.currentRow)
-// 		b.currentRow = make([]InlineKeyboardButton, 0)
-// 	}
-// 	return b
-// }
+// URL appends a button that opens url.
+func (b *InlineKeyboardBuilder) URL(text, url string) *InlineKeyboardBuilder {
+	return b.Add(InlineKeyboardButton{Text: text, URL: url})
+}
 
-// // Build constructs the InlineKeyboardMarkup.
-// func (b *InlineKeyboardBuilder) Build() InlineKeyboardMarkup {
-// 	// If there are buttons in the last row, add them
-// 	if len(b.currentRow) > 0 {
-// 		b.keyboard = append(b.keyboard, b.currentRow)
-// 	}
-// 	return InlineKeyboardMarkup{
-// 		InlineKeyboard: b.keyboard,
-// 	}
-// }
+// WebApp appends a button that opens a Web App.
+func (b *InlineKeyboardBuilder) WebApp(text, url string) *InlineKeyboardBuilder {
+	return b.Add(InlineKeyboardButton{Text: text, WebApp: &WebAppInfo{URL: url}})
+}
 
-// ///
+// SwitchInline appends a button that inserts the bot's username and query
+// into the current chat's input field.
+func (b *InlineKeyboardBuilder) SwitchInline(text, query string) *InlineKeyboardBuilder {
+	return b.Add(InlineKeyboardButton{Text: text, SwitchInlineQueryCurrentChat: query})
+}
 
-// // PaginationItem represents an item in a paginated list.
-// type PaginationItem struct {
-// 	Text         string
-// 	CallbackData string
-// }
+// Row finishes the current row. An empty row is skipped.
+func (b *InlineKeyboardBuilder) Row() *InlineKeyboardBuilder {
+	if len(b.row) != 0 {
+		b.rows = append(b.rows, b.row)
+		b.row = nil
+	}
 
-// // Paginate creates a pagination keyboard.
-// // Note: This method is currently not implemented.
-// func (b *InlineKeyboardBuilder) Paginate(
-// 	items []PaginationItem,
-// 	page int,
-// 	limit int,
-// 	navPrefix string,
-// ) *InlineKeyboardBuilder {
-// 	total := len(items)
-// 	if total == 0 {
-// 		return b // If list is empty, do nothing
-// 	}
+	return b
+}
 
-// 	return nil
-// }
+// Rows returns the keyboard as rows of buttons, finishing the current row.
+func (b *InlineKeyboardBuilder) Rows() [][]InlineKeyboardButton {
+	b.Row()
+	return b.rows
+}
+
+// Markup returns the keyboard as [InlineKeyboardMarkup].
+func (b *InlineKeyboardBuilder) Markup() *InlineKeyboardMarkup {
+	return &InlineKeyboardMarkup{InlineKeyboard: b.Rows()}
+}
+
+// ReplyMarkup returns the keyboard as [ReplyMarkup] for send methods.
+func (b *InlineKeyboardBuilder) ReplyMarkup() *ReplyMarkup {
+	return &ReplyMarkup{InlineKeyboardMarkup: b.Markup()}
+}

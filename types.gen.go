@@ -134,13 +134,11 @@ type Audio struct {
 // This object describes the way a background is filled based on the selected colors.
 // Currently, it can be one of
 //
-//
 // [BackgroundFillSolid]
 //
 // [BackgroundFillGradient]
 //
 // [BackgroundFillFreeformGradient]
-//
 //
 // [BackgroundFillSolid]: https://core.telegram.org/bots/api#backgroundfillsolid
 // [BackgroundFillGradient]: https://core.telegram.org/bots/api#backgroundfillgradient
@@ -252,7 +250,6 @@ type BackgroundFillSolid struct {
 // This object describes the type of a background.
 // Currently, it can be one of
 //
-//
 // [BackgroundTypeFill]
 //
 // [BackgroundTypeWallpaper]
@@ -260,7 +257,6 @@ type BackgroundFillSolid struct {
 // [BackgroundTypePattern]
 //
 // [BackgroundTypeChatTheme]
-//
 //
 // [BackgroundTypeFill]: https://core.telegram.org/bots/api#backgroundtypefill
 // [BackgroundTypeWallpaper]: https://core.telegram.org/bots/api#backgroundtypewallpaper
@@ -462,7 +458,6 @@ type BotCommand struct {
 // This object represents the scope to which bot commands are applied.
 // Currently, the following 7 scopes are supported:
 //
-//
 // [BotCommandScopeDefault]
 //
 // [BotCommandScopeAllPrivateChats]
@@ -476,7 +471,6 @@ type BotCommand struct {
 // [BotCommandScopeChatAdministrators]
 //
 // [BotCommandScopeChatMember]
-//
 //
 // [BotCommandScopeDefault]: https://core.telegram.org/bots/api#botcommandscopedefault
 // [BotCommandScopeAllPrivateChats]: https://core.telegram.org/bots/api#botcommandscopeallprivatechats
@@ -1078,13 +1072,11 @@ type ChatBoostRemoved struct {
 // This object describes the source of a chat boost.
 // It can be one of
 //
-//
 // [ChatBoostSourcePremium]
 //
 // [ChatBoostSourceGiftCode]
 //
 // [ChatBoostSourceGiveaway]
-//
 //
 // [ChatBoostSourcePremium]: https://core.telegram.org/bots/api#chatboostsourcepremium
 // [ChatBoostSourceGiftCode]: https://core.telegram.org/bots/api#chatboostsourcegiftcode
@@ -1545,7 +1537,6 @@ type ChatLocation struct {
 // This object contains information about one member of a chat.
 // Currently, the following 6 types of chat members are supported:
 //
-//
 // [ChatMemberOwner]
 //
 // [ChatMemberAdministrator]
@@ -1557,7 +1548,6 @@ type ChatLocation struct {
 // [ChatMemberLeft]
 //
 // [ChatMemberBanned]
-//
 //
 // [ChatMemberOwner]: https://core.telegram.org/bots/api#chatmemberowner
 // [ChatMemberAdministrator]: https://core.telegram.org/bots/api#chatmemberadministrator
@@ -2410,7 +2400,6 @@ type EncryptedPassportElement struct {
 }
 
 // EphemeralMessageParameters
-//
 type EphemeralMessageParameters struct {
 	// Identifier of the user who will receive the message.
 	// It is not guaranteed that the user will receive the message, especially if they are offline.
@@ -3130,7 +3119,6 @@ type InlineQuery struct {
 //
 // This object represents one result of an inline query.
 // Telegram clients currently support results of the following 20 types:
-//
 //
 // [InlineQueryResultCachedAudio]
 //
@@ -4638,7 +4626,6 @@ type InputLocationMessageContent struct {
 // This object represents the content of a media message to be sent.
 // It should be one of
 //
-//
 // [InputMediaAnimation]
 //
 // [InputMediaAudio]
@@ -4650,7 +4637,6 @@ type InputLocationMessageContent struct {
 // [InputMediaPhoto]
 //
 // [InputMediaVideo]
-//
 //
 // [InputMediaAnimation]: https://core.telegram.org/bots/api#inputmediaanimation
 // [InputMediaAudio]: https://core.telegram.org/bots/api#inputmediaaudio
@@ -5200,7 +5186,6 @@ type InputMediaVoiceNote struct {
 // This object represents the content of a message to be sent as a result of an inline query.
 // Telegram clients currently support the following types:
 //
-//
 // [InputTextMessageContent]
 //
 // [InputRichMessageContent]
@@ -5212,7 +5197,6 @@ type InputMediaVoiceNote struct {
 // [InputContactMessageContent]
 //
 // [InputInvoiceMessageContent]
-//
 //
 // [InputTextMessageContent]: https://core.telegram.org/bots/api#inputtextmessagecontent
 // [InputRichMessageContent]: https://core.telegram.org/bots/api#inputrichmessagecontent
@@ -5263,13 +5247,11 @@ func (r *InputMessageContent) MarshalJSON() ([]byte, error) {
 // This object describes the paid media to be sent.
 // Currently, it can be one of
 //
-//
 // [InputPaidMediaLivePhoto]
 //
 // [InputPaidMediaPhoto]
 //
 // [InputPaidMediaVideo]
-//
 //
 // [InputPaidMediaLivePhoto]: https://core.telegram.org/bots/api#inputpaidmedialivephoto
 // [InputPaidMediaPhoto]: https://core.telegram.org/bots/api#inputpaidmediaphoto
@@ -5435,7 +5417,6 @@ type InputPaidMediaVideo struct {
 // This object represents the content of a poll description or a quiz explanation to be sent.
 // It should be one of
 //
-//
 // [InputMediaAnimation]
 //
 // [InputMediaAudio]
@@ -5451,7 +5432,6 @@ type InputPaidMediaVideo struct {
 // [InputMediaVenue]
 //
 // [InputMediaVideo]
-//
 //
 // [InputMediaAnimation]: https://core.telegram.org/bots/api#inputmediaanimation
 // [InputMediaAudio]: https://core.telegram.org/bots/api#inputmediaaudio
@@ -5604,7 +5584,6 @@ type InputPollOption struct {
 // This object represents the content of a poll option to be sent.
 // It should be one of
 //
-//
 // [InputMediaAnimation]
 //
 // [InputMediaLink]
@@ -5620,7 +5599,6 @@ type InputPollOption struct {
 // [InputMediaVenue]
 //
 // [InputMediaVideo]
-//
 //
 // [InputMediaAnimation]: https://core.telegram.org/bots/api#inputmediaanimation
 // [InputMediaLink]: https://core.telegram.org/bots/api#inputmedialink
@@ -5748,11 +5726,9 @@ func (r *InputPollOptionMedia) UnmarshalJSON(data []byte) error {
 // This object describes a profile photo to set.
 // Currently, it can be one of
 //
-//
 // [InputProfilePhotoStatic]
 //
 // [InputProfilePhotoAnimated]
-//
 //
 // [InputProfilePhotoStatic]: https://core.telegram.org/bots/api#inputprofilephotostatic
 // [InputProfilePhotoAnimated]: https://core.telegram.org/bots/api#inputprofilephotoanimated
@@ -5849,7 +5825,6 @@ type InputProfilePhotoStatic struct {
 // This object represents a block in a rich formatted message to be sent.
 // Currently, it can be any of the following types:
 //
-//
 // [InputRichBlockParagraph]
 //
 // [InputRichBlockSectionHeading]
@@ -5897,7 +5872,6 @@ type InputProfilePhotoStatic struct {
 // [InputRichBlockVoiceNote]
 //
 // [InputRichBlockThinking]
-//
 //
 // [InputRichBlockParagraph]: https://core.telegram.org/bots/api#inputrichblockparagraph
 // [InputRichBlockSectionHeading]: https://core.telegram.org/bots/api#inputrichblocksectionheading
@@ -6688,11 +6662,9 @@ type InputSticker struct {
 // This object describes the content of a story to post.
 // Currently, it can be one of
 //
-//
 // [InputStoryContentPhoto]
 //
 // [InputStoryContentVideo]
-//
 //
 // [InputStoryContentPhoto]: https://core.telegram.org/bots/api#inputstorycontentphoto
 // [InputStoryContentVideo]: https://core.telegram.org/bots/api#inputstorycontentvideo
@@ -7313,11 +7285,9 @@ type MaskPosition struct {
 // This object describes a message that can be inaccessible to the bot.
 // It can be one of
 //
-//
 // [Message]
 //
 // [InaccessibleMessage]
-//
 //
 // [Message]: https://core.telegram.org/bots/api#message
 // [InaccessibleMessage]: https://core.telegram.org/bots/api#inaccessiblemessage
@@ -7344,7 +7314,6 @@ func (r *MaybeInaccessibleMessage) MarshalJSON() ([]byte, error) {
 // This object describes the bot's menu button in a private chat.
 // It should be one of
 //
-//
 // [MenuButtonCommands]
 //
 // [MenuButtonWebApp]
@@ -7357,7 +7326,6 @@ func (r *MaybeInaccessibleMessage) MarshalJSON() ([]byte, error) {
 //
 // [MenuButtonCommands]: https://core.telegram.org/bots/api#menubuttoncommands
 // [MenuButtonWebApp]: https://core.telegram.org/bots/api#menubuttonwebapp
-// [MenuButtonDefault]: https://core.telegram.org/bots/api#menubuttondefault
 // [MenuButtonDefault]: https://core.telegram.org/bots/api#menubuttondefault
 type MenuButton struct {
 	*MenuButtonCommands
@@ -8094,7 +8062,6 @@ type MessageId struct {
 // This object describes the origin of a message.
 // It can be one of
 //
-//
 // [MessageOriginUser]
 //
 // [MessageOriginHiddenUser]
@@ -8102,7 +8069,6 @@ type MessageId struct {
 // [MessageOriginChat]
 //
 // [MessageOriginChannel]
-//
 //
 // [MessageOriginUser]: https://core.telegram.org/bots/api#messageoriginuser
 // [MessageOriginHiddenUser]: https://core.telegram.org/bots/api#messageoriginhiddenuser
@@ -8319,11 +8285,9 @@ type OrderInfo struct {
 // This object describes a gift received and owned by a user or a chat.
 // Currently, it can be one of
 //
-//
 // [OwnedGiftRegular]
 //
 // [OwnedGiftUnique]
-//
 //
 // [OwnedGiftRegular]: https://core.telegram.org/bots/api#ownedgiftregular
 // [OwnedGiftUnique]: https://core.telegram.org/bots/api#ownedgiftunique
@@ -8505,7 +8469,6 @@ type OwnedGifts struct {
 // This object describes paid media.
 // Currently, it can be one of
 //
-//
 // [PaidMediaLivePhoto]
 //
 // [PaidMediaPhoto]
@@ -8513,7 +8476,6 @@ type OwnedGifts struct {
 // [PaidMediaPreview]
 //
 // [PaidMediaVideo]
-//
 //
 // [PaidMediaLivePhoto]: https://core.telegram.org/bots/api#paidmedialivephoto
 // [PaidMediaPhoto]: https://core.telegram.org/bots/api#paidmediaphoto
@@ -8693,7 +8655,6 @@ type PassportData struct {
 // This object represents an error in the Telegram Passport element which was submitted that should be resolved by the user.
 // It should be one of:
 //
-//
 // [PassportElementErrorDataField]
 //
 // [PassportElementErrorFrontSide]
@@ -8711,7 +8672,6 @@ type PassportData struct {
 // [PassportElementErrorTranslationFiles]
 //
 // [PassportElementErrorUnspecified]
-//
 //
 // [PassportElementErrorDataField]: https://core.telegram.org/bots/api#passportelementerrordatafield
 // [PassportElementErrorFrontSide]: https://core.telegram.org/bots/api#passportelementerrorfrontside
@@ -9378,13 +9338,11 @@ type ReactionCount struct {
 // This object describes the type of a reaction.
 // Currently, it can be one of
 //
-//
 // [ReactionTypeEmoji]
 //
 // [ReactionTypeCustomEmoji]
 //
 // [ReactionTypePaid]
-//
 //
 // [ReactionTypeEmoji]: https://core.telegram.org/bots/api#reactiontypeemoji
 // [ReactionTypeCustomEmoji]: https://core.telegram.org/bots/api#reactiontypecustomemoji
@@ -9663,13 +9621,11 @@ type ResponseParameters struct {
 // This object describes the state of a revenue withdrawal operation.
 // Currently, it can be one of
 //
-//
 // [RevenueWithdrawalStatePending]
 //
 // [RevenueWithdrawalStateSucceeded]
 //
 // [RevenueWithdrawalStateFailed]
-//
 //
 // [RevenueWithdrawalStatePending]: https://core.telegram.org/bots/api#revenuewithdrawalstatepending
 // [RevenueWithdrawalStateSucceeded]: https://core.telegram.org/bots/api#revenuewithdrawalstatesucceeded
@@ -9772,7 +9728,6 @@ type RevenueWithdrawalStateSucceeded struct {
 // This object represents a block in a rich formatted message.
 // Currently, it can be any of the following types:
 //
-//
 // [RichBlockParagraph]
 //
 // [RichBlockSectionHeading]
@@ -9820,7 +9775,6 @@ type RevenueWithdrawalStateSucceeded struct {
 // [RichBlockVoiceNote]
 //
 // [RichBlockThinking]
-//
 //
 // [RichBlockParagraph]: https://core.telegram.org/bots/api#richblockparagraph
 // [RichBlockSectionHeading]: https://core.telegram.org/bots/api#richblocksectionheading
@@ -10654,7 +10608,6 @@ type RichMessageButton struct {
 // This object represents a rich formatted text.
 // Currently, it can be either a String for plain text, an Array of [RichText], or any of the following types:
 //
-//
 // [RichTextBold]
 //
 // [RichTextItalic]
@@ -10706,7 +10659,6 @@ type RichMessageButton struct {
 // [RichTextReference]
 //
 // [RichTextReferenceLink]
-//
 //
 // [RichText]: https://core.telegram.org/bots/api#richtext
 // [RichTextBold]: https://core.telegram.org/bots/api#richtextbold
@@ -11677,7 +11629,6 @@ type StoryAreaPosition struct {
 // Describes the type of a clickable area on a story.
 // Currently, it can be one of
 //
-//
 // [StoryAreaTypeLocation]
 //
 // [StoryAreaTypeSuggestedReaction]
@@ -11687,7 +11638,6 @@ type StoryAreaPosition struct {
 // [StoryAreaTypeWeather]
 //
 // [StoryAreaTypeUniqueGift]
-//
 //
 // [StoryAreaTypeLocation]: https://core.telegram.org/bots/api#storyareatypelocation
 // [StoryAreaTypeSuggestedReaction]: https://core.telegram.org/bots/api#storyareatypesuggestedreaction
@@ -12099,7 +12049,6 @@ type TextQuote struct {
 // This object describes the source of a transaction, or its recipient for outgoing transactions.
 // Currently, it can be one of
 //
-//
 // [TransactionPartnerUser]
 //
 // [TransactionPartnerChat]
@@ -12113,7 +12062,6 @@ type TextQuote struct {
 // [TransactionPartnerTelegramApi]
 //
 // [TransactionPartnerOther]
-//
 //
 // [TransactionPartnerUser]: https://core.telegram.org/bots/api#transactionpartneruser
 // [TransactionPartnerChat]: https://core.telegram.org/bots/api#transactionpartnerchat

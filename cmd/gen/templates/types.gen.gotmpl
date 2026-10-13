@@ -10,7 +10,9 @@ import (
 
 {{ range .Types }}
     // {{ .Name }}
+    {{- if .Desc }}
     // {{ .Desc }}
+    {{- end }}
     type {{ .Name }} struct {
         {{- if .CanBeString }}
             // Plain holds the value when {{ .Name }} is represented as a plain string.
