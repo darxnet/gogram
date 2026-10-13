@@ -152,6 +152,7 @@ type Client struct {
 	addrs atomic.Pointer[connAddrs]
 
 	caller Caller // transformer chain ending in cfg.caller or httpCaller
+	info   botInfo
 
 	run atomic.Pointer[runState]
 }

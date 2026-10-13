@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"slices"
+	"sync/atomic"
 	"testing"
 
 	"github.com/darxnet/gogram"
@@ -125,5 +126,41 @@ func TestEnvelope_NullResult(t *testing.T) {
 	msg, err := client.GetMe(t.Context(), nil)
 	if err != nil || msg != nil {
 		t.Fatalf("GetMe = %+v, %v; want nil, nil", msg, err)
+	}
+}
+
+func TestClient_Me_Cached(t *testing.T) {
+	t.Parallel()
+
+	var calls atomic.Int32
+
+	caller := gogram.CallerFunc(func(_ context.Context, _ gogram.Request, result any) error {
+		calls.Add(1)
+
+		if calls.Load() == 1 {
+			return errDenied // first fetch fails and must not be cached
+		}
+
+		return json.Unmarshal([]byte(`{"id":123,"is_bot":true,"first_name":"bot","username":"test_bot"}`), result)
+	})
+
+	client, err := gogram.NewClient(testToken, gogram.WithCaller(caller))
+	if err != nil {
+		t.Fatalf("NewClient: %v", err)
+	}
+
+	if _, err = client.Me(t.Context()); !errors.Is(err, errDenied) {
+		t.Fatalf("first Me = %v, want errDenied", err)
+	}
+
+	for range 3 {
+		me, err := client.Me(t.Context())
+		if err != nil || me.Username != "test_bot" {
+			t.Fatalf("Me = %+v, %v", me, err)
+		}
+	}
+
+	if n := calls.Load(); n != 2 {
+		t.Fatalf("getMe calls = %d, want 2 (one failed, one cached)", n)
 	}
 }

@@ -4,19 +4,31 @@
 нижче, — поза кореневим функціоналом (клієнт + роутер + FSM) і може жити в
 окремих підпакетах, щоб `gogram` лишався без зайвих залежностей.
 
-## Inline keyboard builder (`keyboard.go` — ескіз)
+## Зроблено (жовтень 2026)
 
-Поточний `keyboard.go` — закоментований ескіз `InlineKeyboardBuilder`.
-Цільовий дизайн:
+- Один прохід JSON на виклик, пул буферів, плоскі `With*`-опції без алокацій.
+- `Caller`/`Transformer` pipeline: `Throttle` (per-chat flood control),
+  `Logging` (slog), `WithCaller` для тестів/альтернативних транспортів.
+- Typed callback data `Callback[T]`, `InlineKeyboardBuilder`.
+- `New<Method>Params` builders, `Detached()`, typed context keys `Key[T]`.
+- FSM на `goshard` з мемоізацією стану на апдейт; `sqlstore` підпакет.
+- `tgtest`: `Recorder` + конструктори апдейтів + assert-хелпери.
+- `client.Me()` (кешований `GetMe`).
+- Толерантність до невідомих підтипів у `getUpdates`.
 
-- `InlineKeyboardBuilder` без прихованих алокацій: один `[][]InlineKeyboardButton`,
-  що росте `append`-ом; `Row()` не створює новий слайс, а фіксує зріз.
-- `Button(text, data)`, `URL(text, url)`, `WebApp(text, url)`, `Switch(...)`,
-  `Row()`, `Build() *InlineKeyboardMarkup`.
-- `CallbackData` з аргументами через вже наявні `InlineKeyboardButton.WithArgs`/`WithPayload`
-  (формат `data arg1 arg2`, який уже розуміє fast-path роутера).
-- Розташування: підпакет `keyboard` або кореневий файл — вирішити після
-  того, як з'явиться пагінація (вона й визначить API).
+## Наступне
+
+1. **Pagination + Calendar** — вирішити розташування (`pkg/`-підпакети
+   `paginator` і `calendar` поверх `Callback[T]` + `InlineKeyboardBuilder`;
+   без залежностей, крім `gogram`).
+2. **Композиція фільтрів** методами (`f.And(g)`, `f.Or(g)`, `f.Not()`) і
+   відсутні фільтри: `FilterPrivate/Group/Channel`, `FilterMessagePhoto/Media`,
+   `FilterUsers(ids...)`.
+3. **`WithStorer`** на рівні клієнта → `ctx.FSM()` і `FilterState("name")`
+   без аргументу storer; Conversation DSL.
+4. Deep links (`BotLink`) поверх `client.Me()`.
+5. `sqlstore`: TTL/очищення, тест на SQLite в CI.
+6. `WithLocalAddrs` (multi-IP egress), low priority.
 
 ## Pagination
 
@@ -48,10 +60,9 @@ Inline-календар для вибору дати (поширений зап�
 
 ## Deep links (колишній `link.go`)
 
-`BotLink(user, opt)` з `start=` / `startgroup=` — потрібно, але після `client.Me()`
-(кешований `GetMe`), щоб username не передавати руками:
-`ctx.Client().Link(gogram.Start("ref123"))`. Валідація параметра: 1–64 символи
-`[A-Za-z0-9_-]` (константа `StartParamMaxLen`).
+`client.Me()` уже є; лишилося `client.Link(ctx, gogram.Start("ref123"))` /
+`StartGroup(...)` з валідацією параметра (1–64 символи `[A-Za-z0-9_-]`,
+константа `StartParamMaxLen`).
 
 ## Multi-IP egress (`WithLocalAddrs`)
 
@@ -62,16 +73,11 @@ dial-помилку; TLS/проксі беруться з клонованого
 
 ## Решта
 
-- `context_reply.go`: `Reply` виділяє новий слайс опцій на кожен виклик
-  (`append([]SendMessageOption{reply}, opts...)`). Варіант без алокації —
-  генерувати в `SendMessage` параметр `ReplyParameters` з контексту через
-  `AutoFillCode`, а `Reply` зробити тонкою обгорткою з прапором.
-- `state_machine_sql.go`: TTL для SQL-сховища (`updated_at` вже є) і батчеве
-  очищення; тест на SQLite в CI.
 - Webhook: варіант з обробкою апдейтів через той самий worker-pool, що й
   polling, щоб довгі хендлери не тригерили ретраї Telegram.
-- Тести: порівняльні бенчмарки у `client_bench_test.go` розширити
-  multipart-завантаженням і роутером (fast path vs slow path).
+- Бенчмарки: multipart-завантаження.
+- Хелпери тексту: `EscapeMarkdownV2/EscapeHTML`, `Message.EntityText(e)`
+  з UTF-16 offset-ами.
 
 ## Конкуренти (стан на 2026-10-12)
 
