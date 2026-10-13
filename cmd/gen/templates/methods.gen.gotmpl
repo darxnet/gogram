@@ -33,6 +33,20 @@ import (
         }
     }
 
+    {{- range .Params }}
+        {{- if eq .Name "chat_id" }}
+            {{- $goType := toType .Type .IsRequired }}
+    // ChatTarget implements [ChatTargeter].
+    func (r *{{ $params }}) ChatTarget() string {
+            {{- if eq $goType "int64" }}
+        return strconv.FormatInt(r.ChatID, 10)
+            {{- else }}
+        return r.ChatID
+            {{- end }}
+    }
+        {{- end }}
+    {{- end }}
+
     {{ range .Params }}
         {{ $param := toTitle .Name }}
         // With{{ $method }}{{ $param }} sets the {{ $param }} field.

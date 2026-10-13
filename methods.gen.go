@@ -746,6 +746,11 @@ func (r *ApproveChatJoinRequestParams) Option(opts ...ApproveChatJoinRequestOpti
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *ApproveChatJoinRequestParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithApproveChatJoinRequestChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
@@ -806,6 +811,11 @@ func (r *ApproveSuggestedPostParams) Option(opts ...ApproveSuggestedPostOption) 
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *ApproveSuggestedPostParams) ChatTarget() string {
+	return strconv.FormatInt(r.ChatID, 10)
 }
 
 // WithApproveSuggestedPostChatID sets the ChatID field.
@@ -884,6 +894,11 @@ func (r *BanChatMemberParams) Option(opts ...BanChatMemberOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *BanChatMemberParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithBanChatMemberChatID sets the ChatID field.
@@ -967,6 +982,11 @@ func (r *BanChatSenderChatParams) Option(opts ...BanChatSenderChatOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *BanChatSenderChatParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithBanChatSenderChatChatID sets the ChatID field.
@@ -1067,6 +1087,11 @@ func (r *CloseForumTopicParams) Option(opts ...CloseForumTopicOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *CloseForumTopicParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithCloseForumTopicChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
@@ -1120,6 +1145,11 @@ func (r *CloseGeneralForumTopicParams) Option(opts ...CloseGeneralForumTopicOpti
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *CloseGeneralForumTopicParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithCloseGeneralForumTopicChatID sets the ChatID field.
@@ -1288,6 +1318,11 @@ func (r *CopyMessageParams) Option(opts ...CopyMessageOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *CopyMessageParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithCopyMessageChatID sets the ChatID field.
@@ -1527,6 +1562,11 @@ func (r *CopyMessagesParams) Option(opts ...CopyMessagesOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *CopyMessagesParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithCopyMessagesChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
@@ -1661,6 +1701,11 @@ func (r *CreateChatInviteLinkParams) Option(opts ...CreateChatInviteLinkOption) 
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *CreateChatInviteLinkParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithCreateChatInviteLinkChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
@@ -1758,6 +1803,11 @@ func (r *CreateChatSubscriptionInviteLinkParams) Option(opts ...CreateChatSubscr
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *CreateChatSubscriptionInviteLinkParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithCreateChatSubscriptionInviteLinkChatID sets the ChatID field.
 //
 // Unique identifier for the target channel chat or username of the target channel in the format @username
@@ -1849,6 +1899,11 @@ func (r *CreateForumTopicParams) Option(opts ...CreateForumTopicOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *CreateForumTopicParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithCreateForumTopicChatID sets the ChatID field.
@@ -2536,6 +2591,11 @@ func (r *DeclineChatJoinRequestParams) Option(opts ...DeclineChatJoinRequestOpti
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *DeclineChatJoinRequestParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithDeclineChatJoinRequestChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
@@ -2595,6 +2655,11 @@ func (r *DeclineSuggestedPostParams) Option(opts ...DeclineSuggestedPostOption) 
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *DeclineSuggestedPostParams) ChatTarget() string {
+	return strconv.FormatInt(r.ChatID, 10)
 }
 
 // WithDeclineSuggestedPostChatID sets the ChatID field.
@@ -2665,6 +2730,11 @@ func (r *DeleteAllMessageReactionsParams) Option(opts ...DeleteAllMessageReactio
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *DeleteAllMessageReactionsParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithDeleteAllMessageReactionsChatID sets the ChatID field.
@@ -2797,6 +2867,11 @@ func (r *DeleteChatPhotoParams) Option(opts ...DeleteChatPhotoOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *DeleteChatPhotoParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithDeleteChatPhotoChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
@@ -2842,6 +2917,11 @@ func (r *DeleteChatStickerSetParams) Option(opts ...DeleteChatStickerSetOption) 
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *DeleteChatStickerSetParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithDeleteChatStickerSetChatID sets the ChatID field.
@@ -2897,6 +2977,11 @@ func (r *DeleteEphemeralMessageParams) Option(opts ...DeleteEphemeralMessageOpti
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *DeleteEphemeralMessageParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithDeleteEphemeralMessageChatID sets the ChatID field.
@@ -2966,6 +3051,11 @@ func (r *DeleteForumTopicParams) Option(opts ...DeleteForumTopicOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *DeleteForumTopicParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithDeleteForumTopicChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
@@ -3022,6 +3112,11 @@ func (r *DeleteMessageParams) Option(opts ...DeleteMessageOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *DeleteMessageParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithDeleteMessageChatID sets the ChatID field.
@@ -3094,6 +3189,11 @@ func (r *DeleteMessageReactionParams) Option(opts ...DeleteMessageReactionOption
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *DeleteMessageReactionParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithDeleteMessageReactionChatID sets the ChatID field.
@@ -3173,6 +3273,11 @@ func (r *DeleteMessagesParams) Option(opts ...DeleteMessagesOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *DeleteMessagesParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithDeleteMessagesChatID sets the ChatID field.
@@ -3512,6 +3617,11 @@ func (r *EditChatInviteLinkParams) Option(opts ...EditChatInviteLinkOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *EditChatInviteLinkParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithEditChatInviteLinkChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
@@ -3612,6 +3722,11 @@ func (r *EditChatSubscriptionInviteLinkParams) Option(opts ...EditChatSubscripti
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *EditChatSubscriptionInviteLinkParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithEditChatSubscriptionInviteLinkChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
@@ -3703,6 +3818,11 @@ func (r *EditEphemeralMessageCaptionParams) Option(opts ...EditEphemeralMessageC
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *EditEphemeralMessageCaptionParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithEditEphemeralMessageCaptionChatID sets the ChatID field.
@@ -3832,6 +3952,11 @@ func (r *EditEphemeralMessageMediaParams) Option(opts ...EditEphemeralMessageMed
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *EditEphemeralMessageMediaParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithEditEphemeralMessageMediaChatID sets the ChatID field.
@@ -4115,6 +4240,11 @@ func (r *EditEphemeralMessageReplyMarkupParams) Option(opts ...EditEphemeralMess
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *EditEphemeralMessageReplyMarkupParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithEditEphemeralMessageReplyMarkupChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
@@ -4217,6 +4347,11 @@ func (r *EditEphemeralMessageTextParams) Option(opts ...EditEphemeralMessageText
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *EditEphemeralMessageTextParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithEditEphemeralMessageTextChatID sets the ChatID field.
@@ -4357,6 +4492,11 @@ func (r *EditForumTopicParams) Option(opts ...EditForumTopicOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *EditForumTopicParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithEditForumTopicChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
@@ -4437,6 +4577,11 @@ func (r *EditGeneralForumTopicParams) Option(opts ...EditGeneralForumTopicOption
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *EditGeneralForumTopicParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithEditGeneralForumTopicChatID sets the ChatID field.
@@ -4525,6 +4670,11 @@ func (r *EditMessageCaptionParams) Option(opts ...EditMessageCaptionOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *EditMessageCaptionParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithEditMessageCaptionBusinessConnectionID sets the BusinessConnectionID field.
@@ -4670,6 +4820,11 @@ func (r *EditMessageChecklistParams) Option(opts ...EditMessageChecklistOption) 
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *EditMessageChecklistParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithEditMessageChecklistBusinessConnectionID sets the BusinessConnectionID field.
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
@@ -4793,6 +4948,11 @@ func (r *EditMessageLiveLocationParams) Option(opts ...EditMessageLiveLocationOp
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *EditMessageLiveLocationParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithEditMessageLiveLocationBusinessConnectionID sets the BusinessConnectionID field.
@@ -4962,6 +5122,11 @@ func (r *EditMessageMediaParams) Option(opts ...EditMessageMediaOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *EditMessageMediaParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithEditMessageMediaBusinessConnectionID sets the BusinessConnectionID field.
@@ -5275,6 +5440,11 @@ func (r *EditMessageReplyMarkupParams) Option(opts ...EditMessageReplyMarkupOpti
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *EditMessageReplyMarkupParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithEditMessageReplyMarkupBusinessConnectionID sets the BusinessConnectionID field.
 //
 // Unique identifier of the business connection on behalf of which the message to be edited was sent
@@ -5398,6 +5568,11 @@ func (r *EditMessageTextParams) Option(opts ...EditMessageTextOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *EditMessageTextParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithEditMessageTextBusinessConnectionID sets the BusinessConnectionID field.
@@ -5848,6 +6023,11 @@ func (r *ExportChatInviteLinkParams) Option(opts ...ExportChatInviteLinkOption) 
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *ExportChatInviteLinkParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithExportChatInviteLinkChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
@@ -5922,6 +6102,11 @@ func (r *ForwardMessageParams) Option(opts ...ForwardMessageOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *ForwardMessageParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithForwardMessageChatID sets the ChatID field.
@@ -6076,6 +6261,11 @@ func (r *ForwardMessagesParams) Option(opts ...ForwardMessagesOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *ForwardMessagesParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithForwardMessagesChatID sets the ChatID field.
@@ -6490,6 +6680,11 @@ func (r *GetChatParams) Option(opts ...GetChatOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *GetChatParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithGetChatChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup or channel in the format @username
@@ -6539,6 +6734,11 @@ func (r *GetChatAdministratorsParams) Option(opts ...GetChatAdministratorsOption
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *GetChatAdministratorsParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithGetChatAdministratorsChatID sets the ChatID field.
@@ -6630,6 +6830,11 @@ func (r *GetChatGiftsParams) Option(opts ...GetChatGiftsOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *GetChatGiftsParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithGetChatGiftsChatID sets the ChatID field.
@@ -6776,6 +6981,11 @@ func (r *GetChatMemberParams) Option(opts ...GetChatMemberOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *GetChatMemberParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithGetChatMemberChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup or channel in the format @username
@@ -6833,6 +7043,11 @@ func (r *GetChatMemberCountParams) Option(opts ...GetChatMemberCountOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *GetChatMemberCountParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithGetChatMemberCountChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup or channel in the format @username
@@ -6877,6 +7092,11 @@ func (r *GetChatMenuButtonParams) Option(opts ...GetChatMenuButtonOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *GetChatMenuButtonParams) ChatTarget() string {
+	return strconv.FormatInt(r.ChatID, 10)
 }
 
 // WithGetChatMenuButtonChatID sets the ChatID field.
@@ -7077,6 +7297,11 @@ func (r *GetGameHighScoresParams) Option(opts ...GetGameHighScoresOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *GetGameHighScoresParams) ChatTarget() string {
+	return strconv.FormatInt(r.ChatID, 10)
 }
 
 // WithGetGameHighScoresUserID sets the UserID field.
@@ -7816,6 +8041,11 @@ func (r *GetUserChatBoostsParams) Option(opts ...GetUserChatBoostsOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *GetUserChatBoostsParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithGetUserChatBoostsChatID sets the ChatID field.
 //
 // Unique identifier for the chat or username of the channel in the format @username
@@ -8389,6 +8619,11 @@ func (r *HideGeneralForumTopicParams) Option(opts ...HideGeneralForumTopicOption
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *HideGeneralForumTopicParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithHideGeneralForumTopicChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
@@ -8435,6 +8670,11 @@ func (r *LeaveChatParams) Option(opts ...LeaveChatOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *LeaveChatParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithLeaveChatChatID sets the ChatID field.
@@ -8528,6 +8768,11 @@ func (r *PinChatMessageParams) Option(opts ...PinChatMessageOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *PinChatMessageParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithPinChatMessageBusinessConnectionID sets the BusinessConnectionID field.
@@ -8942,6 +9187,11 @@ func (r *PromoteChatMemberParams) Option(opts ...PromoteChatMemberOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *PromoteChatMemberParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithPromoteChatMemberChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
@@ -9169,6 +9419,11 @@ func (r *ReadBusinessMessageParams) Option(opts ...ReadBusinessMessageOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *ReadBusinessMessageParams) ChatTarget() string {
+	return strconv.FormatInt(r.ChatID, 10)
+}
+
 // WithReadBusinessMessageBusinessConnectionID sets the BusinessConnectionID field.
 //
 // Unique identifier of the business connection on behalf of which to read the message
@@ -9353,6 +9608,11 @@ func (r *RemoveChatVerificationParams) Option(opts ...RemoveChatVerificationOpti
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *RemoveChatVerificationParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithRemoveChatVerificationChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot or channel in the format @username
@@ -9485,6 +9745,11 @@ func (r *ReopenForumTopicParams) Option(opts ...ReopenForumTopicOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *ReopenForumTopicParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithReopenForumTopicChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
@@ -9538,6 +9803,11 @@ func (r *ReopenGeneralForumTopicParams) Option(opts ...ReopenGeneralForumTopicOp
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *ReopenGeneralForumTopicParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithReopenGeneralForumTopicChatID sets the ChatID field.
@@ -9911,6 +10181,11 @@ func (r *RestrictChatMemberParams) Option(opts ...RestrictChatMemberOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *RestrictChatMemberParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithRestrictChatMemberChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
@@ -9997,6 +10272,11 @@ func (r *RevokeChatInviteLinkParams) Option(opts ...RevokeChatInviteLinkOption) 
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *RevokeChatInviteLinkParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithRevokeChatInviteLinkChatID sets the ChatID field.
@@ -10311,6 +10591,11 @@ func (r *SendAnimationParams) Option(opts ...SendAnimationOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *SendAnimationParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithSendAnimationBusinessConnectionID sets the BusinessConnectionID field.
@@ -10886,6 +11171,11 @@ func (r *SendAudioParams) Option(opts ...SendAudioOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *SendAudioParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithSendAudioBusinessConnectionID sets the BusinessConnectionID field.
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
@@ -11366,6 +11656,11 @@ func (r *SendChatActionParams) Option(opts ...SendChatActionOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *SendChatActionParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithSendChatActionBusinessConnectionID sets the BusinessConnectionID field.
 //
 // Unique identifier of the business connection on behalf of which the action will be sent
@@ -11539,6 +11834,11 @@ func (r *SendChecklistParams) Option(opts ...SendChecklistOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *SendChecklistParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithSendChecklistBusinessConnectionID sets the BusinessConnectionID field.
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
@@ -11708,6 +12008,11 @@ func (r *SendContactParams) Option(opts ...SendContactOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *SendContactParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithSendContactBusinessConnectionID sets the BusinessConnectionID field.
@@ -11952,6 +12257,11 @@ func (r *SendDiceParams) Option(opts ...SendDiceOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *SendDiceParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithSendDiceBusinessConnectionID sets the BusinessConnectionID field.
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
@@ -12186,6 +12496,11 @@ func (r *SendDocumentParams) Option(opts ...SendDocumentOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *SendDocumentParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithSendDocumentBusinessConnectionID sets the BusinessConnectionID field.
@@ -12652,6 +12967,11 @@ func (r *SendGameParams) Option(opts ...SendGameOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *SendGameParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithSendGameBusinessConnectionID sets the BusinessConnectionID field.
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
@@ -12818,6 +13138,11 @@ func (r *SendGiftParams) Option(opts ...SendGiftOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *SendGiftParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithSendGiftUserID sets the UserID field.
@@ -13075,6 +13400,11 @@ func (r *SendInvoiceParams) Option(opts ...SendInvoiceOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *SendInvoiceParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithSendInvoiceChatID sets the ChatID field.
@@ -13530,6 +13860,11 @@ func (r *SendLivePhotoParams) Option(opts ...SendLivePhotoOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *SendLivePhotoParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithSendLivePhotoBusinessConnectionID sets the BusinessConnectionID field.
@@ -14036,6 +14371,11 @@ func (r *SendLocationParams) Option(opts ...SendLocationOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *SendLocationParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithSendLocationBusinessConnectionID sets the BusinessConnectionID field.
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
@@ -14283,6 +14623,11 @@ func (r *SendMediaGroupParams) Option(opts ...SendMediaGroupOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *SendMediaGroupParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithSendMediaGroupBusinessConnectionID sets the BusinessConnectionID field.
@@ -14707,6 +15052,11 @@ func (r *SendMessageParams) Option(opts ...SendMessageOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *SendMessageParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithSendMessageBusinessConnectionID sets the BusinessConnectionID field.
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
@@ -14935,6 +15285,11 @@ func (r *SendMessageDraftParams) Option(opts ...SendMessageDraftOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *SendMessageDraftParams) ChatTarget() string {
+	return strconv.FormatInt(r.ChatID, 10)
+}
+
 // WithSendMessageDraftChatID sets the ChatID field.
 //
 // Unique identifier for the target private chat
@@ -15120,6 +15475,11 @@ func (r *SendPaidMediaParams) Option(opts ...SendPaidMediaOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *SendPaidMediaParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithSendPaidMediaBusinessConnectionID sets the BusinessConnectionID field.
@@ -15639,6 +15999,11 @@ func (r *SendPhotoParams) Option(opts ...SendPhotoOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *SendPhotoParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithSendPhotoBusinessConnectionID sets the BusinessConnectionID field.
@@ -16181,6 +16546,11 @@ func (r *SendPollParams) Option(opts ...SendPollOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *SendPollParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithSendPollBusinessConnectionID sets the BusinessConnectionID field.
@@ -17175,6 +17545,11 @@ func (r *SendRichMessageParams) Option(opts ...SendRichMessageOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *SendRichMessageParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithSendRichMessageBusinessConnectionID sets the BusinessConnectionID field.
 //
 // Unique identifier of the business connection on behalf of which the message will be sent.
@@ -17366,6 +17741,11 @@ func (r *SendRichMessageDraftParams) Option(opts ...SendRichMessageDraftOption) 
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *SendRichMessageDraftParams) ChatTarget() string {
+	return strconv.FormatInt(r.ChatID, 10)
+}
+
 // WithSendRichMessageDraftChatID sets the ChatID field.
 //
 // Unique identifier for the target private chat
@@ -17520,6 +17900,11 @@ func (r *SendStickerParams) Option(opts ...SendStickerOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *SendStickerParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithSendStickerBusinessConnectionID sets the BusinessConnectionID field.
@@ -17931,6 +18316,11 @@ func (r *SendVenueParams) Option(opts ...SendVenueOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *SendVenueParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithSendVenueBusinessConnectionID sets the BusinessConnectionID field.
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
@@ -18263,6 +18653,11 @@ func (r *SendVideoParams) Option(opts ...SendVideoOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *SendVideoParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithSendVideoBusinessConnectionID sets the BusinessConnectionID field.
@@ -18887,6 +19282,11 @@ func (r *SendVideoNoteParams) Option(opts ...SendVideoNoteOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *SendVideoNoteParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithSendVideoNoteBusinessConnectionID sets the BusinessConnectionID field.
 //
 // Unique identifier of the business connection on behalf of which the message will be sent
@@ -19334,6 +19734,11 @@ func (r *SendVoiceParams) Option(opts ...SendVoiceOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *SendVoiceParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithSendVoiceBusinessConnectionID sets the BusinessConnectionID field.
@@ -20138,6 +20543,11 @@ func (r *SetChatAdministratorCustomTitleParams) Option(opts ...SetChatAdministra
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *SetChatAdministratorCustomTitleParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithSetChatAdministratorCustomTitleChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
@@ -20204,6 +20614,11 @@ func (r *SetChatDescriptionParams) Option(opts ...SetChatDescriptionOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *SetChatDescriptionParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithSetChatDescriptionChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
@@ -20263,6 +20678,11 @@ func (r *SetChatMemberTagParams) Option(opts ...SetChatMemberTagOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *SetChatMemberTagParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithSetChatMemberTagChatID sets the ChatID field.
@@ -20336,6 +20756,11 @@ func (r *SetChatMenuButtonParams) Option(opts ...SetChatMenuButtonOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *SetChatMenuButtonParams) ChatTarget() string {
+	return strconv.FormatInt(r.ChatID, 10)
+}
+
 // WithSetChatMenuButtonChatID sets the ChatID field.
 //
 // Unique identifier for the target private chat.
@@ -20399,6 +20824,11 @@ func (r *SetChatPermissionsParams) Option(opts ...SetChatPermissionsOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *SetChatPermissionsParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithSetChatPermissionsChatID sets the ChatID field.
@@ -20467,6 +20897,11 @@ func (r *SetChatPhotoParams) Option(opts ...SetChatPhotoOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *SetChatPhotoParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithSetChatPhotoChatID sets the ChatID field.
@@ -20571,6 +21006,11 @@ func (r *SetChatStickerSetParams) Option(opts ...SetChatStickerSetOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *SetChatStickerSetParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithSetChatStickerSetChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
@@ -20630,6 +21070,11 @@ func (r *SetChatTitleParams) Option(opts ...SetChatTitleOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *SetChatTitleParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithSetChatTitleChatID sets the ChatID field.
@@ -20765,6 +21210,11 @@ func (r *SetGameScoreParams) Option(opts ...SetGameScoreOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *SetGameScoreParams) ChatTarget() string {
+	return strconv.FormatInt(r.ChatID, 10)
 }
 
 // WithSetGameScoreUserID sets the UserID field.
@@ -20957,6 +21407,11 @@ func (r *SetMessageReactionParams) Option(opts ...SetMessageReactionOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *SetMessageReactionParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithSetMessageReactionChatID sets the ChatID field.
@@ -22311,6 +22766,11 @@ func (r *StopMessageLiveLocationParams) Option(opts ...StopMessageLiveLocationOp
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *StopMessageLiveLocationParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithStopMessageLiveLocationBusinessConnectionID sets the BusinessConnectionID field.
 //
 // Unique identifier of the business connection on behalf of which the message to be edited was sent
@@ -22408,6 +22868,11 @@ func (r *StopPollParams) Option(opts ...StopPollOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *StopPollParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithStopPollBusinessConnectionID sets the BusinessConnectionID field.
@@ -22637,6 +23102,11 @@ func (r *UnbanChatMemberParams) Option(opts ...UnbanChatMemberOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *UnbanChatMemberParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithUnbanChatMemberChatID sets the ChatID field.
 //
 // Unique identifier for the target group or username of the target supergroup or channel in the format @username
@@ -22708,6 +23178,11 @@ func (r *UnbanChatSenderChatParams) Option(opts ...UnbanChatSenderChatOption) {
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *UnbanChatSenderChatParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithUnbanChatSenderChatChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
@@ -22763,6 +23238,11 @@ func (r *UnhideGeneralForumTopicParams) Option(opts ...UnhideGeneralForumTopicOp
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *UnhideGeneralForumTopicParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithUnhideGeneralForumTopicChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
@@ -22807,6 +23287,11 @@ func (r *UnpinAllChatMessagesParams) Option(opts ...UnpinAllChatMessagesOption) 
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *UnpinAllChatMessagesParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithUnpinAllChatMessagesChatID sets the ChatID field.
@@ -22857,6 +23342,11 @@ func (r *UnpinAllForumTopicMessagesParams) Option(opts ...UnpinAllForumTopicMess
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *UnpinAllForumTopicMessagesParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithUnpinAllForumTopicMessagesChatID sets the ChatID field.
@@ -22914,6 +23404,11 @@ func (r *UnpinAllGeneralForumTopicMessagesParams) Option(opts ...UnpinAllGeneral
 	}
 }
 
+// ChatTarget implements [ChatTargeter].
+func (r *UnpinAllGeneralForumTopicMessagesParams) ChatTarget() string {
+	return r.ChatID
+}
+
 // WithUnpinAllGeneralForumTopicMessagesChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
@@ -22966,6 +23461,11 @@ func (r *UnpinChatMessageParams) Option(opts ...UnpinChatMessageOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *UnpinChatMessageParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithUnpinChatMessageBusinessConnectionID sets the BusinessConnectionID field.
@@ -23258,6 +23758,11 @@ func (r *VerifyChatParams) Option(opts ...VerifyChatOption) {
 	for _, opt := range opts {
 		opt(r)
 	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *VerifyChatParams) ChatTarget() string {
+	return r.ChatID
 }
 
 // WithVerifyChatChatID sets the ChatID field.
