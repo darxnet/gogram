@@ -31,6 +31,9 @@ jobs:
       - name: Run tests with race detector and coverage
         run: go test -race -coverprofile=coverage.out -covermode=atomic ./...
 
+      - name: Run sqlstore tests against SQLite
+        run: cd sqlstore/sqlitetest && go test -race ./...
+
       - name: Check coverage threshold
         run: |
           COVERAGE=$(go tool cover -func=coverage.out | grep '^total:' | awk '{print $3}' | tr -d '%')
