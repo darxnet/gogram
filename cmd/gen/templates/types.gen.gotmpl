@@ -58,6 +58,10 @@ import (
             return nil, nil
         }
 
+        {{- /* InlineQueryResult is input-only and its subtypes share discriminator
+               values (photo: InlineQueryResultPhoto and InlineQueryResultCachedPhoto),
+               so no UnmarshalJSON is generated for it. MaybeInaccessibleMessage has no
+               discriminator at all (date == 0 means inaccessible): hand-written. */}}
         {{ if and $hasDiscriminator (ne .Name "InlineQueryResult") }}
             // UnmarshalJSON unmarshals JSON into the matching {{ .Name }} subtype.
             {{- if or .CanBeString .CanBeArray }}

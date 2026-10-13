@@ -9,7 +9,7 @@ everywhere.
 go get github.com/darxnet/gogram
 ```
 
-Requires Go 1.26.
+Requires Go 1.24.
 
 ## Quick start
 
@@ -64,10 +64,14 @@ update and applies the client's default parse mode:
 
 ```go
 ctx.SendChatAction(gogram.ChatActionTyping)
-ctx.EditMessageText("done", gogram.WithEditMessageTextReplyMarkup(kb.Markup()))
+ctx.EditMessageText(gogram.WithEditMessageTextText("done"), gogram.WithEditMessageTextReplyMarkup(kb.Markup()))
 ctx.AnswerCallbackQuery(gogram.WithAnswerCallbackQueryText("saved"))
 ctx.DeleteMessage()
 ```
+
+Chat ids are `gogram.ChatID{ID: 7}` or `gogram.Username("channel")`; methods
+without a generated wrapper go through `client.Call(ctx, "method", params, &result)`
+or `gogram.Call[*gogram.Message](ctx, client, "method", params)`.
 
 Context methods return only `error`, which keeps handlers one-liners. When
 the result is needed, build the same params and call the client:
@@ -124,7 +128,10 @@ kb := gogram.NewInlineKeyboardBuilder().
 	URL("Docs", "https://example.com")
 
 pageCB.Handle(router.RouterGroup, func(ctx *gogram.Context, cq *gogram.CallbackQuery, p Page) error {
-	return ctx.EditMessageText(render(p.List, p.N), gogram.WithEditMessageTextReplyMarkup(kb.Markup()))
+	return ctx.EditMessageText(
+		gogram.WithEditMessageTextText(render(p.List, p.N)),
+		gogram.WithEditMessageTextReplyMarkup(kb.Markup()),
+	)
 })
 ```
 
@@ -136,14 +143,23 @@ the button is built; data from an older build fails with
 
 ```go
 router.HandleCommand("/register", func(ctx *gogram.Context, _ *gogram.Message) error {
-	fsm, _ := ctx.FSM()
-	return errors.Join(fsm.Set(ctx, "name"), ctx.SendMessage("Your name?"))
+	return errors.Join(ctx.SetState("name"), ctx.SendMessage("Your name?"))
+}, "Register")
+
+conv := router.Conversation()
+
+conv.On("name", func(ctx *gogram.Context, m *gogram.Message) error {
+	nameKey.Set(ctx, m.Text)
+	return errors.Join(ctx.SetState("age"), ctx.SendMessage("Your age?"))
 })
 
-router.HandleOnMessage(func(ctx *gogram.Context, m *gogram.Message) error {
-	fsm, _ := ctx.FSM()
-	return errors.Join(fsm.Finish(ctx), ctx.SendMessage("Hi, "+m.Text))
-}, gogram.FilterState("name"))
+conv.On("age", func(ctx *gogram.Context, m *gogram.Message) error {
+	return errors.Join(ctx.FinishState(), ctx.SendMessage("Done"))
+}, gogram.FilterRegexp(`^\d+$`))
+
+conv.Fallback(func(ctx *gogram.Context, _ *gogram.Message) error {
+	return ctx.SendMessage("Please answer the question")
+})
 
 client, err := gogram.NewClient(token,
 	gogram.WithRouter(router),
@@ -152,8 +168,26 @@ client, err := gogram.NewClient(token,
 )
 ```
 
-Without `WithStateStore` an in-memory storer is used. The state is loaded once
-per update however many `FilterState` routes there are.
+Without `WithStateStore` an in-memory store is used. Commands keep priority
+over states, so `/cancel` works anywhere; the state is loaded once per
+update however many state routes there are. `ctx.State()`, `FilterState`
+and `FilterStateIn` are available outside conversations too.
+
+## Pagination and calendar
+
+`paginator` renders a list as pages of buttons with a navigation row,
+`calendar` an inline date picker; both are stateless (the page or month
+travels in the callback data) and depend only on `gogram`:
+
+```go
+users := paginator.New("users", loadUsers, userButton, paginator.PerPage(8), paginator.Text(title))
+users.Handle(router.RouterGroup)
+
+cal := calendar.New("cal", calendar.Min(time.Now()))
+cal.Handle(router.RouterGroup, func(ctx *gogram.Context, _ *gogram.CallbackQuery, date time.Time) error {
+	return ctx.EditMessageText(gogram.WithEditMessageTextText("Booked " + date.Format("2006-01-02")))
+})
+```
 
 ## Flood control, logging, custom transports
 
