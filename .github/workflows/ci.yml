@@ -47,6 +47,7 @@ jobs:
         run: go test -race -failfast -count=1 ./...
 
       - name: Test sqlstore against SQLite
+        if: matrix.go == '1.26' # the test-only module needs the SQLite driver's Go version
         run: go test -C sqlstore/sqlitetest -race -failfast -count=1 ./...
 
       - name: Benchmarks compile and run once
@@ -61,7 +62,7 @@ jobs:
 
       - uses: actions/setup-go@v7
         with:
-          go-version-file: go.mod
+          go-version: stable
           cache: true
 
       - name: Lint
