@@ -14,3 +14,15 @@ func (ctx *Context) Reply(text string, opts ...SendMessageOption) error {
 
 	return err
 }
+
+// Command returns the bot command of the current message ("/start" for
+// "/start@bot payload"), or "" when the message is not a command.
+func (ctx *Context) Command() string {
+	return retrieveCommand(ctx.Text())
+}
+
+// Args returns the space-separated arguments after the command or first
+// word of the current message, or nil.
+func (ctx *Context) Args() []string {
+	return extractArgs(ctx.Text())
+}

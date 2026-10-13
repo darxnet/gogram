@@ -323,13 +323,15 @@ func (c *Client) do(req *http.Request) (*http.Response, error) {
 }
 
 // Call invokes a Bot API method with params encoded as JSON and decodes
-// the result into result, a pointer to the method's return type. It is the
-// escape hatch for methods without a generated wrapper:
+// the result into result, a pointer to the method's return type. params is
+// any JSON-encodable value: a generated *<Method>Params, a map, or a struct
+// of your own for a method without a generated wrapper:
 //
 //	var msg gogram.Message
 //	err := client.Call(ctx, "sendMessage", map[string]any{"chat_id": 7, "text": "hi"}, &msg)
 //
-// Transient errors are retried like for generated methods.
+// See [Call] for the typed form. Transient errors are retried as for
+// generated methods.
 func (c *Client) Call(ctx context.Context, method string, params, result any) error {
 	buffer := acquireBuffer()
 	defer releaseBuffer(buffer)
@@ -345,6 +347,19 @@ func (c *Client) Call(ctx context.Context, method string, params, result any) er
 		ContentType: contentTypeJSON,
 		Timeout:     c.cfg.timeout,
 	}, result)
+}
+
+// Call is the typed form of [Client.Call]: the result type is the type
+// parameter, so no destination variable is needed:
+//
+//	msg, err := gogram.Call[*gogram.Message](ctx, client, "sendMessage", params)
+//	ok, err := gogram.Call[bool](ctx, client, "deleteMessage", params)
+func Call[T any](ctx context.Context, c *Client, method string, params any) (T, error) {
+	var ret T
+
+	err := c.Call(ctx, method, params, &ret)
+
+	return ret, err
 }
 
 // call is the generated methods' entry point: it routes the request through
