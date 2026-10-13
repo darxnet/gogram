@@ -36,7 +36,7 @@ func (c *Client) ReceiveFileReader(ctx context.Context, file *File) (io.ReadClos
 		return nil, fmt.Errorf("gogram: failed to create request: %w", err)
 	}
 
-	resp, err := c.Do(req)
+	resp, err := c.do(req)
 	if err != nil {
 		return nil, fmt.Errorf("gogram: failed to download file: %w", err)
 	}

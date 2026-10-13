@@ -294,19 +294,19 @@ func (rg *RouterGroup) HandleKeyboardButton(
 	rg.HandleOnMessage(handler, FilterText(b.Text))
 }
 
-// HandleInlineKeyboardButton registers a handler triggered when an inline
-// keyboard button is pressed. It matches callbacks whose data equals
-// b.CallbackData exactly or whose data starts with b.CallbackData followed by
-// a space (i.e. "data payload" pattern).
-func (rg *RouterGroup) HandleInlineKeyboardButton(
-	b *InlineKeyboardButton,
-	handler func(ctx *Context, cq *CallbackQuery) error,
-) {
+// HandleCallback registers a handler for callback queries whose data equals
+// prefix or starts with prefix followed by a space ("prefix payload"),
+// using an O(1) map lookup. See [Callback] for typed callback data.
+func (rg *RouterGroup) HandleCallback(prefix string, handler func(ctx *Context, cq *CallbackQuery) error) {
+	if prefix == "" || strings.Contains(prefix, " ") {
+		panic("gogram: callback prefix must be non-empty and contain no spaces")
+	}
+
 	fn := func(ctx *Context) error {
 		return handler(ctx, ctx.Update().CallbackQuery)
 	}
 
-	rg.router.handlersCallbacks[b.CallbackData] = append(rg.router.handlersCallbacks[b.CallbackData], route{
+	rg.router.handlersCallbacks[prefix] = append(rg.router.handlersCallbacks[prefix], route{
 		filter:  rg.filter,
 		handler: rg.applyMiddlewares(fn),
 	})

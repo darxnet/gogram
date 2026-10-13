@@ -58,7 +58,7 @@ type clientConfig struct {
 	numWorkers       int
 	caller           Caller
 	transformers     []Transformer
-	storer           Storer
+	store            StateStore
 }
 
 // WithHost sets the host for the Client.
@@ -84,8 +84,8 @@ func WithTimeout(timeout time.Duration) ClientOption {
 	}
 }
 
-// WithTest sets the test mode for the Client.
-func WithTest(test bool) ClientOption {
+// WithTestEnvironment routes calls to Telegram's test environment (/test/ path).
+func WithTestEnvironment(test bool) ClientOption {
 	return func(c *Client) {
 		c.cfg.test = test
 		c.setLinkPrefix()
@@ -131,17 +131,17 @@ func WithTransformers(transformers ...Transformer) ClientOption {
 	}
 }
 
-// WithStorer sets the state storer used by [Context.FSM] and [FilterState]
-// when none is passed explicitly. Default: [NewInMemoryStorer] without TTL.
-func WithStorer(storer Storer) ClientOption {
+// WithStateStore sets the state storer used by [Context.FSM] and [FilterState]
+// when none is passed explicitly. Default: [NewMemoryStateStore] without TTL.
+func WithStateStore(store StateStore) ClientOption {
 	return func(c *Client) {
-		c.cfg.storer = storer
+		c.cfg.store = store
 	}
 }
 
-// WithNumWorkers sets the number of concurrent update-processing goroutines.
+// WithWorkers sets the number of concurrent update-processing goroutines.
 // By default equals to the GetUpdates Limit value.
-func WithNumWorkers(n int) ClientOption {
+func WithWorkers(n int) ClientOption {
 	return func(c *Client) {
 		c.cfg.numWorkers = n
 	}
@@ -242,7 +242,7 @@ func NewClient(token string, opts ...ClientOption) (*Client, error) {
 			timeout:    defaultTimeout,
 			httpClient: http.DefaultClient,
 			router:     NewRouter(), // one per client, never shared
-			storer:     NewInMemoryStorer(),
+			store:      NewMemoryStateStore(),
 		},
 	}
 
@@ -285,13 +285,6 @@ func (c *Client) ID() int64 {
 	return c.id
 }
 
-// Token returns the bot's token. Be aware, it is credentials.
-//
-// Deprecated: use [Client.SameToken] to check a token without exposing it.
-func (c *Client) Token() string {
-	return c.token
-}
-
 // SameToken reports whether token equals the client's token, in constant time.
 // Use it to detect a rotated token without exposing the current one.
 func (c *Client) SameToken(token string) bool {
@@ -320,8 +313,8 @@ func (c *Client) RemoteAddr() net.Addr {
 	return nil
 }
 
-// Do sends an HTTP request and returns an HTTP response.
-func (c *Client) Do(req *http.Request) (*http.Response, error) {
+// do sends an HTTP request through the rate limiter.
+func (c *Client) do(req *http.Request) (*http.Response, error) {
 	if err := c.cfg.rateLimiter.Wait(req.Context()); err != nil {
 		return nil, err
 	}
@@ -374,25 +367,6 @@ func call[T any](
 	}, &ret)
 
 	return ret, err
-}
-
-// Raw sends a raw request to the Telegram Bot API and returns the result
-// appended to dst.
-//
-// Deprecated: use [Client.Call].
-func (c *Client) Raw(
-	ctx context.Context,
-	method string,
-	reader io.Reader,
-	contentType string,
-	dst []byte,
-) (json.RawMessage, error) {
-	result, err := call[json.RawMessage](ctx, c, method, nil, reader, contentType, c.cfg.timeout)
-	if err != nil {
-		return nil, err
-	}
-
-	return append(dst, result...), nil
 }
 
 // getUpdates is the polling-loop variant of GetUpdates: the HTTP deadline

@@ -133,7 +133,7 @@ func (h httpCaller) roundTrip(ctx context.Context, req Request, result any) erro
 		httpReq.Header.Set("Content-Type", req.ContentType)
 	}
 
-	resp, err := c.Do(httpReq)
+	resp, err := c.do(httpReq)
 	if err != nil {
 		return err
 	}

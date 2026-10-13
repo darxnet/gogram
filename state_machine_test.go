@@ -12,7 +12,7 @@ import (
 func TestInMemoryStorer_SetGetFinish(t *testing.T) {
 	t.Parallel()
 
-	s := gogram.NewInMemoryStorer()
+	s := gogram.NewMemoryStateStore()
 	defer s.Close() //nolint:errcheck
 
 	ctx := t.Context()
@@ -40,7 +40,7 @@ func TestInMemoryStorer_TTLExpires(t *testing.T) {
 
 	const ttl = 20 * time.Millisecond
 
-	s := gogram.NewInMemoryStorer(gogram.WithTTL(ttl))
+	s := gogram.NewMemoryStateStore(gogram.WithTTL(ttl))
 	defer s.Close() //nolint:errcheck
 
 	ctx := t.Context()
@@ -85,10 +85,10 @@ func TestFilterState_MemoizesPerUpdate(t *testing.T) {
 		r.HandleOnMessage(func(*gogram.Context, *gogram.Message) error {
 			handled = state
 			return nil
-		}, gogram.FilterState(state, storer))
+		}, gogram.FilterState(state))
 	}
 
-	client, err := gogram.NewClient(testToken)
+	client, err := gogram.NewClient(testToken, gogram.WithStateStore(storer))
 	if err != nil {
 		t.Fatalf("NewClient: %v", err)
 	}
@@ -110,7 +110,7 @@ func TestContext_FSM_SetInvalidatesMemo(t *testing.T) {
 
 	storer := &countingStorer{state: "a"}
 
-	client, err := gogram.NewClient(testToken)
+	client, err := gogram.NewClient(testToken, gogram.WithStateStore(storer))
 	if err != nil {
 		t.Fatalf("NewClient: %v", err)
 	}
@@ -118,7 +118,7 @@ func TestContext_FSM_SetInvalidatesMemo(t *testing.T) {
 	update := &gogram.Update{Message: &gogram.Message{From: &gogram.User{ID: 7}, Chat: gogram.Chat{ID: 7}}}
 	ctx := gogram.NewTestContext(t.Context(), client, update)
 
-	filter := gogram.FilterState("a", storer)
+	filter := gogram.FilterState("a")
 
 	filter(ctx)
 	filter(ctx)
@@ -127,7 +127,7 @@ func TestContext_FSM_SetInvalidatesMemo(t *testing.T) {
 		t.Fatalf("GetState calls = %d, want 1", gets)
 	}
 
-	fsm, ok := ctx.FSM(storer)
+	fsm, ok := ctx.FSM()
 	if !ok {
 		t.Fatal("FSM: expected ok")
 	}
@@ -148,7 +148,7 @@ func TestWithStorer_Default(t *testing.T) {
 
 	storer := &countingStorer{state: "x"}
 
-	client, err := gogram.NewClient(testToken, gogram.WithStorer(storer))
+	client, err := gogram.NewClient(testToken, gogram.WithStateStore(storer))
 	if err != nil {
 		t.Fatalf("NewClient: %v", err)
 	}
@@ -165,7 +165,7 @@ func TestWithStorer_Default(t *testing.T) {
 		t.Fatal("FSM() must use the client's storer")
 	}
 
-	// Without WithStorer an in-memory storer is the default.
+	// Without WithStateStore an in-memory storer is the default.
 	plain, err := gogram.NewClient(testToken)
 	if err != nil {
 		t.Fatalf("NewClient: %v", err)

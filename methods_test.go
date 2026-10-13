@@ -94,7 +94,7 @@ func TestSendRichMessage_JSONBody(t *testing.T) {
 		capturedBody = b
 
 		msg := gogram.Message{Text: "rich"}
-		resp := gogram.Response{OK: true, Result: json.RawMessage(mustMarshal(t, &msg))}
+		resp := testResponse{OK: true, Result: json.RawMessage(mustMarshal(t, &msg))}
 		return jsonHTTPResponse(t, &resp), nil
 	})
 
@@ -182,7 +182,7 @@ func TestSetMyProfilePhoto_Upload(t *testing.T) {
 		}
 		capturedFields, sawFile = multipartFields(t, req)
 
-		resp := gogram.Response{OK: true, Result: json.RawMessage(`true`)}
+		resp := testResponse{OK: true, Result: json.RawMessage(`true`)}
 		return jsonHTTPResponse(t, &resp), nil
 	})
 
@@ -246,7 +246,7 @@ func TestSetMyProfilePhoto_FileID(t *testing.T) {
 		}
 		capturedFields, sawFile = multipartFields(t, req)
 
-		resp := gogram.Response{OK: true, Result: json.RawMessage(`true`)}
+		resp := testResponse{OK: true, Result: json.RawMessage(`true`)}
 		return jsonHTTPResponse(t, &resp), nil
 	})
 
@@ -307,7 +307,7 @@ func TestSetBusinessAccountProfilePhoto_Upload(t *testing.T) {
 		}
 		capturedFields, sawFile = multipartFields(t, req)
 
-		resp := gogram.Response{OK: true, Result: json.RawMessage(`true`)}
+		resp := testResponse{OK: true, Result: json.RawMessage(`true`)}
 		return jsonHTTPResponse(t, &resp), nil
 	})
 
@@ -374,7 +374,7 @@ func TestPostStory_Upload(t *testing.T) {
 		capturedFields, sawFile = multipartFields(t, req)
 
 		story := &gogram.Story{ID: 1}
-		resp := gogram.Response{OK: true, Result: json.RawMessage(mustMarshal(t, story))}
+		resp := testResponse{OK: true, Result: json.RawMessage(mustMarshal(t, story))}
 		return jsonHTTPResponse(t, &resp), nil
 	})
 
@@ -442,7 +442,7 @@ func TestEditStory_Upload(t *testing.T) {
 		capturedFields, sawFile = multipartFields(t, req)
 
 		story := &gogram.Story{ID: 42}
-		resp := gogram.Response{OK: true, Result: json.RawMessage(mustMarshal(t, story))}
+		resp := testResponse{OK: true, Result: json.RawMessage(mustMarshal(t, story))}
 		return jsonHTTPResponse(t, &resp), nil
 	})
 

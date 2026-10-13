@@ -43,7 +43,7 @@ type Context struct {
 
 	// Per-update memos: computed on first use, dropped on release.
 	detachedCtx context.Context // context without cancellation for API calls
-	chatIdent   string          // Chat().Identifier()
+	chatTargetMemo   string          // Chat().Target()
 	fsm         fsmMemo
 }
 
@@ -60,16 +60,16 @@ func (ctx *Context) Detached() context.Context {
 	return ctx.detachedCtx
 }
 
-// chatIdentifier returns Chat().Identifier() memoized per update: the
+// chatTarget returns Chat().Target() memoized per update: the
 // strconv result is one allocation shared by every API call of the handler.
-func (ctx *Context) chatIdentifier() string {
-	if ctx.chatIdent == "" {
+func (ctx *Context) chatTarget() string {
+	if ctx.chatTargetMemo == "" {
 		if c := ctx.Chat(); c != nil {
-			ctx.chatIdent = c.Identifier()
+			ctx.chatTargetMemo = c.Target()
 		}
 	}
 
-	return ctx.chatIdent
+	return ctx.chatTargetMemo
 }
 
 // chatID returns Chat().ID or 0.

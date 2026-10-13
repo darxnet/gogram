@@ -107,7 +107,7 @@ func (ctx *Context) Text() string {
 
 // Payload returns the substring of Text() after the first space.
 func (ctx *Context) Payload() string {
-    return ExtractPayload(ctx.Text())
+    return extractPayload(ctx.Text())
 }
 
 {{ range .Methods }}

@@ -113,7 +113,7 @@ type Page struct {
 
 var pageCB = gogram.NewCallback[Page]("pg") // callback_data: "pg users 2"
 
-kb := gogram.NewInlineKeyboard().
+kb := gogram.NewInlineKeyboardBuilder().
 	Add(pageCB.Button("‹", Page{"users", 1}), pageCB.Button("›", Page{"users", 3})).Row().
 	URL("Docs", "https://example.com")
 
@@ -141,11 +141,11 @@ router.HandleOnMessage(func(ctx *gogram.Context, m *gogram.Message) error {
 
 client, err := gogram.NewClient(token,
 	gogram.WithRouter(router),
-	gogram.WithStorer(gogram.NewInMemoryStorer(gogram.WithTTL(time.Hour))), // or sqlstore.New(ctx, sqlstore.PostgreSQL, db)
+	gogram.WithStateStore(gogram.NewMemoryStateStore(gogram.WithTTL(time.Hour))), // or sqlstore.New(ctx, sqlstore.PostgreSQL, db)
 )
 ```
 
-Without `WithStorer` an in-memory storer is used. The state is loaded once
+Without `WithStateStore` an in-memory storer is used. The state is loaded once
 per update however many `FilterState` routes there are.
 
 ## Flood control, logging, custom transports

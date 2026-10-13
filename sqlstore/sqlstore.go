@@ -1,4 +1,4 @@
-// Package sqlstore provides a [gogram.Storer] backed by database/sql
+// Package sqlstore provides a [gogram.StateStore] backed by database/sql
 // (PostgreSQL, MySQL, SQLite).
 package sqlstore
 
@@ -24,8 +24,8 @@ const (
 	SQLite     Dialect = "sqlite3"
 )
 
-// Storer is a persistent, SQL-backed [gogram.Storer].
-type Storer struct {
+// Store is a persistent, SQL-backed [gogram.StateStore].
+type Store struct {
 	db      *sql.DB
 	dialect Dialect
 	// Prepared statements for performance and security.
@@ -34,16 +34,16 @@ type Storer struct {
 	deleteStmt *sql.Stmt
 }
 
-var _ gogram.Storer = (*Storer)(nil)
+var _ gogram.StateStore = (*Store)(nil)
 
 // New creates a SQL-backed state storer.
 // It creates the table if needed and prepares the statements.
 // The context is used for the initial setup queries.
-func New(ctx context.Context, dialect Dialect, db *sql.DB) (*Storer, error) {
+func New(ctx context.Context, dialect Dialect, db *sql.DB) (*Store, error) {
 	if db == nil {
 		return nil, errNilDatabase
 	}
-	s := &Storer{
+	s := &Store{
 		db:      db,
 		dialect: dialect,
 	}
@@ -59,7 +59,7 @@ func New(ctx context.Context, dialect Dialect, db *sql.DB) (*Storer, error) {
 	return s, nil
 }
 
-func (s *Storer) initSchema(ctx context.Context) error {
+func (s *Store) initSchema(ctx context.Context) error {
 	var query string
 	switch s.dialect {
 	case PostgreSQL:
@@ -97,7 +97,7 @@ func (s *Storer) initSchema(ctx context.Context) error {
 	return err
 }
 
-func (s *Storer) prepareStatements(ctx context.Context) (err error) {
+func (s *Store) prepareStatements(ctx context.Context) (err error) {
 	var upsertQuery string
 	switch s.dialect {
 	case PostgreSQL:
@@ -148,7 +148,7 @@ func (s *Storer) prepareStatements(ctx context.Context) (err error) {
 
 // SetState saves or updates the state for a user-chat pair.
 // The context is forwarded to the underlying SQL driver for cancellation support.
-func (s *Storer) SetState(ctx context.Context, userID, chatID int64, state gogram.State) error {
+func (s *Store) SetState(ctx context.Context, userID, chatID int64, state gogram.State) error {
 	_, err := s.upsertStmt.ExecContext(ctx, userID, chatID, string(state))
 	return err
 }
@@ -156,7 +156,7 @@ func (s *Storer) SetState(ctx context.Context, userID, chatID int64, state gogra
 // GetState retrieves the state for a user-chat pair.
 // Returns ("", nil) when no state is found.
 // The context is forwarded to the underlying SQL driver for cancellation support.
-func (s *Storer) GetState(ctx context.Context, userID, chatID int64) (gogram.State, error) {
+func (s *Store) GetState(ctx context.Context, userID, chatID int64) (gogram.State, error) {
 	var stateStr string
 
 	err := s.selectStmt.QueryRowContext(ctx, userID, chatID).Scan(&stateStr)
@@ -172,14 +172,14 @@ func (s *Storer) GetState(ctx context.Context, userID, chatID int64) (gogram.Sta
 
 // Finish removes the state for a user-chat pair.
 // The context is forwarded to the underlying SQL driver for cancellation support.
-func (s *Storer) Finish(ctx context.Context, userID, chatID int64) error {
+func (s *Store) Finish(ctx context.Context, userID, chatID int64) error {
 	_, err := s.deleteStmt.ExecContext(ctx, userID, chatID)
 	return err
 }
 
 // Close closes the prepared statements.
 // It does not close the underlying *sql.DB – that remains the caller's responsibility.
-func (s *Storer) Close() error {
+func (s *Store) Close() error {
 	if s == nil {
 		return nil
 	}

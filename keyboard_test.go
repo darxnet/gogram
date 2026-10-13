@@ -9,7 +9,7 @@ import (
 func TestInlineKeyboardBuilder(t *testing.T) {
 	t.Parallel()
 
-	rows := gogram.NewInlineKeyboard().
+	rows := gogram.NewInlineKeyboardBuilder().
 		Text("Yes", "c 1").Text("No", "c 0").Row().
 		Row(). // empty row is skipped
 		URL("Docs", "https://example.com").

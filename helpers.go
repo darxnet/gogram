@@ -2,8 +2,8 @@ package gogram
 
 import "strings"
 
-// ExtractArgs splits the text by spaces and returns the arguments (excluding the command).
-func ExtractArgs(text string) []string {
+// extractArgs splits the text by spaces and returns the arguments (excluding the command).
+func extractArgs(text string) []string {
 	fields := strings.Fields(text)
 	if len(fields) == 0 {
 		return nil
@@ -12,8 +12,8 @@ func ExtractArgs(text string) []string {
 	return fields[1:]
 }
 
-// ExtractPayload returns the substring after the first space.
-func ExtractPayload(text string) string {
+// extractPayload returns the substring after the first space.
+func extractPayload(text string) string {
 	_, after, _ := strings.Cut(text, " ")
 	return after
 }
@@ -34,13 +34,4 @@ func LargestPhoto(list []PhotoSize) *PhotoSize {
 	}
 
 	return v
-}
-
-// PhotoBiggest returns the largest photo from a list of PhotoSize.
-//
-// Deprecated: use [LargestPhoto].
-//
-//go:fix inline
-func PhotoBiggest(list []PhotoSize) *PhotoSize {
-	return LargestPhoto(list)
 }

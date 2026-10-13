@@ -69,9 +69,7 @@ func TestRouter_HandleCallback_FilterRunsOnceWithoutPayload(t *testing.T) {
 		filterCalls++
 		return false
 	})
-	group.HandleInlineKeyboardButton(
-		&gogram.InlineKeyboardButton{CallbackData: "action"},
-		func(*gogram.Context, *gogram.CallbackQuery) error { return nil },
+	group.HandleCallback("action", func(*gogram.Context, *gogram.CallbackQuery) error { return nil },
 	)
 
 	client, err := gogram.NewClient(testToken)
@@ -91,9 +89,7 @@ func TestRouter_HandleCallback_PrefixWithPayload(t *testing.T) {
 
 	r := gogram.NewRouter()
 	handled := false
-	r.HandleInlineKeyboardButton(
-		&gogram.InlineKeyboardButton{CallbackData: "action"},
-		func(_ *gogram.Context, callback *gogram.CallbackQuery) error {
+	r.HandleCallback("action", func(_ *gogram.Context, callback *gogram.CallbackQuery) error {
 			handled = callback.Data == "action payload"
 			return nil
 		},

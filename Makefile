@@ -1,5 +1,3 @@
-GOLANGCI_LINT_VERSION ?= v2.14.0
-
 .PHONY: all generate lint test bench update deps
 
 all: generate lint test
@@ -25,6 +23,6 @@ bench:
 update:
 	go get -u ./... && go mod tidy
 
-## deps: install the pinned golangci-lint (the script verifies the archive checksum)
+## deps: install golangci-lint (the script verifies the archive checksum)
 deps:
-	curl -sSfL https://golangci-lint.run/install.sh | sh -s -- -b $$(go env GOPATH)/bin $(GOLANGCI_LINT_VERSION)
+	curl -sSfL https://golangci-lint.run/install.sh | sh -s -- -b $$(go env GOPATH)/bin

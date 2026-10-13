@@ -2,7 +2,7 @@ package gogram
 
 // InlineKeyboardBuilder builds an [InlineKeyboardMarkup] row by row:
 //
-//	markup := gogram.NewInlineKeyboard().
+//	markup := gogram.NewInlineKeyboardBuilder().
 //		Text("Yes", "confirm 1").Text("No", "confirm 0").Row().
 //		URL("Docs", "https://example.com").
 //		Markup()
@@ -14,8 +14,8 @@ type InlineKeyboardBuilder struct {
 	row  []InlineKeyboardButton
 }
 
-// NewInlineKeyboard returns an empty builder.
-func NewInlineKeyboard() *InlineKeyboardBuilder {
+// NewInlineKeyboardBuilder returns an empty builder.
+func NewInlineKeyboardBuilder() *InlineKeyboardBuilder {
 	return &InlineKeyboardBuilder{}
 }
 

@@ -10,8 +10,7 @@ func newBenchRouter() *gogram.Router {
 	r := gogram.NewRouter()
 	r.Use(func(next gogram.HandlerFunc) gogram.HandlerFunc { return next })
 	r.HandleCommand("/start", func(*gogram.Context, *gogram.Message) error { return nil })
-	r.HandleInlineKeyboardButton(&gogram.InlineKeyboardButton{CallbackData: "page"},
-		func(*gogram.Context, *gogram.CallbackQuery) error { return nil })
+	r.HandleCallback("page", func(*gogram.Context, *gogram.CallbackQuery) error { return nil })
 	r.HandleOnMessage(func(*gogram.Context, *gogram.Message) error { return nil },
 		gogram.FilterPrefix("hello"), gogram.FilterChat(7))
 	r.SetHandlerDefault(func(*gogram.Context) error { return nil })

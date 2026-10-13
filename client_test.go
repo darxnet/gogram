@@ -20,6 +20,15 @@ import (
 
 const testToken = "123456:ABC-DEF1234567890"
 
+// testResponse is the Bot API response envelope as test servers produce it.
+type testResponse struct {
+	Parameters  *gogram.ResponseParameters `json:"parameters,omitempty"`
+	Description string                     `json:"description,omitempty"`
+	Result      json.RawMessage            `json:"result,omitempty"`
+	ErrorCode   int                        `json:"error_code,omitempty"`
+	OK          bool                       `json:"ok"`
+}
+
 // TestNewClient_Success validates successful client creation.
 func TestNewClient_Success(t *testing.T) {
 	t.Parallel()
@@ -33,8 +42,8 @@ func TestNewClient_Success(t *testing.T) {
 	if client.ID() != int64(123456) {
 		t.Errorf("expected ID 123456, got %d", client.ID())
 	}
-	if client.Token() != testToken {
-		t.Errorf("expected token %q, got %q", testToken, client.Token())
+	if !client.SameToken(testToken) || client.SameToken("other") {
+		t.Error("SameToken must match only the client's token")
 	}
 }
 
@@ -82,7 +91,7 @@ func TestClient_StartPolling_Success(t *testing.T) {
 			time.Sleep(10 * time.Millisecond) // Prevent busy loop for subsequent requests
 		}
 
-		resp := gogram.Response{
+		resp := testResponse{
 			OK:     true,
 			Result: json.RawMessage(mustMarshal(t, updates)),
 		}
@@ -143,7 +152,7 @@ func TestClient_StartPolling_Resilience(t *testing.T) {
 		if count <= 2 {
 			// Return 429 with a 1-second retry-after so the rate limiter only
 			// pauses for 1 s – safely within the 2-second test budget.
-			resp := gogram.Response{
+			resp := testResponse{
 				OK:          false,
 				ErrorCode:   http.StatusTooManyRequests,
 				Description: "Too Many Requests: retry after 1",
@@ -155,7 +164,7 @@ func TestClient_StartPolling_Resilience(t *testing.T) {
 			return
 		}
 		// Succeed from the third request onward.
-		resp := gogram.Response{OK: true, Result: json.RawMessage(`[]`)}
+		resp := testResponse{OK: true, Result: json.RawMessage(`[]`)}
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write(mustMarshal(t, &resp))
 	}))
@@ -240,7 +249,7 @@ func TestContextMethod_PropagatesHandlerContext(t *testing.T) {
 			}
 			sawValue.Store(true)
 
-			resp := gogram.Response{
+			resp := testResponse{
 				OK:     true,
 				Result: json.RawMessage(`{}`),
 			}
@@ -294,7 +303,7 @@ func TestContextMethod_WithoutCancel_PreservesValuesAfterParentCancel(t *testing
 
 			sawValue.Store(true)
 
-			resp := gogram.Response{
+			resp := testResponse{
 				OK:     true,
 				Result: json.RawMessage(`{}`),
 			}
@@ -395,7 +404,7 @@ func TestClient_Stop_DrainsWorkerQueues(t *testing.T) {
 			}
 		}
 
-		resp := gogram.Response{
+		resp := testResponse{
 			OK:     true,
 			Result: json.RawMessage(mustMarshal(t, updates)),
 		}
@@ -425,7 +434,7 @@ func TestClient_Stop_DrainsWorkerQueues(t *testing.T) {
 		gogram.WithHost(strings.TrimPrefix(server.URL, "https://")),
 		gogram.WithHTTPClient(server.Client()),
 		gogram.WithRouter(router),
-		gogram.WithNumWorkers(1),
+		gogram.WithWorkers(1),
 	)
 	if err != nil {
 		t.Fatalf("NewClient: %v", err)
@@ -507,7 +516,7 @@ func TestClient_StartPolling_FatalError(t *testing.T) {
 	t.Parallel()
 
 	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-		resp := gogram.Response{
+		resp := testResponse{
 			OK:          false,
 			ErrorCode:   http.StatusUnauthorized,
 			Description: "Unauthorized",
@@ -548,7 +557,7 @@ func TestClient_StartPolling_LongPollDeadline(t *testing.T) {
 
 	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		time.Sleep(pollTimeout*time.Second + 200*time.Millisecond)
-		resp := gogram.Response{OK: true, Result: json.RawMessage(`[]`)}
+		resp := testResponse{OK: true, Result: json.RawMessage(`[]`)}
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write(mustMarshal(t, &resp))
 	}))

@@ -32,12 +32,12 @@ jobs:
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v9
         with:
-          version: v2.14.0
+          version: latest
           args: --timeout=5m
 
       - name: Run golangci-lint (generator module)
         uses: golangci/golangci-lint-action@v9
         with:
-          version: v2.14.0
+          version: latest
           working-directory: cmd/gen
           args: --timeout=5m
