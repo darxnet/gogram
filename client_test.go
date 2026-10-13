@@ -500,3 +500,177 @@ func jsonHTTPResponse(t *testing.T, payload any) *http.Response {
 		Body:       io.NopCloser(bytes.NewReader(mustMarshal(t, payload))),
 	}
 }
+
+// TestClient_StartPolling_FatalError validates that Start returns the API
+// error when the bot is unauthorized instead of swallowing it.
+func TestClient_StartPolling_FatalError(t *testing.T) {
+	t.Parallel()
+
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		resp := gogram.Response{
+			OK:          false,
+			ErrorCode:   http.StatusUnauthorized,
+			Description: "Unauthorized",
+		}
+		w.WriteHeader(http.StatusUnauthorized)
+		_, _ = w.Write(mustMarshal(t, &resp))
+	}))
+	defer server.Close()
+
+	host := strings.TrimPrefix(server.URL, "https://")
+
+	client, err := gogram.NewClient(testToken,
+		gogram.WithHost(host),
+		gogram.WithHTTPClient(server.Client()),
+	)
+	if err != nil {
+		t.Fatalf("NewClient: %v", err)
+	}
+
+	ctx, cancel := context.WithTimeout(t.Context(), 2*time.Second)
+	defer cancel()
+
+	err = client.Start(ctx, nil)
+	if !errors.Is(err, gogram.ErrUnauthorized) {
+		t.Fatalf("expected ErrUnauthorized, got %v", err)
+	}
+}
+
+// TestClient_StartPolling_LongPollDeadline validates that the HTTP deadline of
+// getUpdates exceeds the long-poll timeout: a server that answers exactly at
+// the timeout boundary must not trip "context deadline exceeded".
+func TestClient_StartPolling_LongPollDeadline(t *testing.T) {
+	t.Parallel()
+
+	const pollTimeout = 1 // seconds
+
+	var errCount atomic.Int32
+
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		time.Sleep(pollTimeout*time.Second + 200*time.Millisecond)
+		resp := gogram.Response{OK: true, Result: json.RawMessage(`[]`)}
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(mustMarshal(t, &resp))
+	}))
+	defer server.Close()
+
+	router := gogram.NewRouter()
+	router.SetHandlerErr(func(_ *gogram.Context, _ error) { errCount.Add(1) })
+
+	host := strings.TrimPrefix(server.URL, "https://")
+
+	client, err := gogram.NewClient(testToken,
+		gogram.WithHost(host),
+		gogram.WithHTTPClient(server.Client()),
+		gogram.WithRouter(router),
+		// Shorter than the poll timeout: must not apply to getUpdates.
+		gogram.WithTimeout(500*time.Millisecond),
+	)
+	if err != nil {
+		t.Fatalf("NewClient: %v", err)
+	}
+
+	ctx, cancel := context.WithTimeout(t.Context(), 3*time.Second)
+	defer cancel()
+
+	_ = client.Start(ctx, &gogram.GetUpdatesParams{Timeout: pollTimeout})
+
+	if n := errCount.Load(); n != 0 {
+		t.Fatalf("expected no polling errors, got %d", n)
+	}
+}
+
+// TestNewClient_DefaultRouterNotShared validates that clients created without
+// WithRouter do not share one Router instance.
+func TestNewClient_DefaultRouterNotShared(t *testing.T) {
+	t.Parallel()
+
+	a, err := gogram.NewClient(testToken)
+	if err != nil {
+		t.Fatalf("NewClient: %v", err)
+	}
+
+	b, err := gogram.NewClient(testToken)
+	if err != nil {
+		t.Fatalf("NewClient: %v", err)
+	}
+
+	var handledByA, handledByB atomic.Bool
+
+	ctxA := gogram.NewTestContext(t.Context(), a, &gogram.Update{Message: &gogram.Message{Text: "/x"}})
+	ctxB := gogram.NewTestContext(t.Context(), b, &gogram.Update{Message: &gogram.Message{Text: "/x"}})
+
+	routerA, ok := a.Router().(*gogram.Router)
+	if !ok {
+		t.Fatalf("Router() = %T, want *gogram.Router", a.Router())
+	}
+
+	routerA.HandleCommand("/x", func(*gogram.Context, *gogram.Message) error {
+		handledByA.Store(true)
+		return nil
+	})
+
+	a.Router().Process(ctxA)
+	b.Router().Process(ctxB)
+
+	if !handledByA.Load() || handledByB.Load() {
+		t.Fatalf("handledByA=%v handledByB=%v; want true,false", handledByA.Load(), handledByB.Load())
+	}
+}
+
+// TestClient_Call_RetriesNonJSONBody validates that an empty body and an HTML
+// 5xx page from a proxy are classified as transient: the client sleeps before
+// retrying instead of failing on the JSON error.
+func TestClient_Call_RetriesNonJSONBody(t *testing.T) {
+	t.Parallel()
+
+	cases := []struct {
+		name   string
+		status int
+		body   string
+	}{
+		{name: "empty body", status: http.StatusOK, body: ""},
+		{name: "bare EOF", status: http.StatusOK, body: "EOF"},
+		{name: "json EOF", status: http.StatusBadRequest, body: `{"ok":false,"error_code":400,"description":"EOF"}`},
+		{name: "html 502", status: http.StatusBadGateway, body: "<html>502 Bad Gateway</html>"},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			var requestCount atomic.Int32
+
+			client, err := gogram.NewClient(testToken, gogram.WithHTTPClient(&http.Client{
+				Transport: roundTripperFunc(func(req *http.Request) (*http.Response, error) {
+					requestCount.Add(1)
+
+					return &http.Response{
+						StatusCode: tc.status,
+						Status:     http.StatusText(tc.status),
+						Body:       io.NopCloser(strings.NewReader(tc.body)),
+						Header:     http.Header{},
+						Request:    req,
+					}, nil
+				}),
+			}))
+			if err != nil {
+				t.Fatalf("NewClient: %v", err)
+			}
+
+			// The retry sleeps defaultTimeoutOnError; a short deadline cuts it
+			// and proves the error was retryable rather than returned at once.
+			ctx, cancel := context.WithTimeout(t.Context(), 100*time.Millisecond)
+			defer cancel()
+
+			_, err = client.GetMe(ctx, nil)
+			if !errors.Is(err, context.DeadlineExceeded) {
+				t.Fatalf("expected the retry sleep to hit the deadline, got %v", err)
+			}
+
+			if n := requestCount.Load(); n != 1 {
+				t.Fatalf("requests = %d, want 1", n)
+			}
+		})
+	}
+}

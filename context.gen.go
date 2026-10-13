@@ -2,10 +2,6 @@
 
 package gogram
 
-import (
-	"context"
-)
-
 func (ctx *Context) findHandlerOn() handleOn {
 	if ctx.update == nil {
 		return 0
@@ -227,22 +223,14 @@ func (ctx *Context) AddStickerToSet(
 	opts ...AddStickerToSetOption,
 ) error {
 	params := &AddStickerToSetParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		UserID:  ctx.userID(),
 		Name:    name,
 		Sticker: sticker,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.AddStickerToSet(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.AddStickerToSet(ctx.detached(), params)
 
 	return err
 }
@@ -273,8 +261,7 @@ func (ctx *Context) AnswerCallbackQuery(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.AnswerCallbackQuery(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.AnswerCallbackQuery(ctx.detached(), params)
 
 	return err
 }
@@ -295,8 +282,7 @@ func (ctx *Context) AnswerChatJoinRequestQuery(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.AnswerChatJoinRequestQuery(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.AnswerChatJoinRequestQuery(ctx.detached(), params)
 
 	return err
 }
@@ -325,8 +311,7 @@ func (ctx *Context) AnswerGuestQuery(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.AnswerGuestQuery(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.AnswerGuestQuery(ctx.detached(), params)
 
 	return err
 }
@@ -357,8 +342,7 @@ func (ctx *Context) AnswerInlineQuery(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.AnswerInlineQuery(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.AnswerInlineQuery(ctx.detached(), params)
 
 	return err
 }
@@ -392,8 +376,7 @@ func (ctx *Context) AnswerPreCheckoutQuery(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.AnswerPreCheckoutQuery(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.AnswerPreCheckoutQuery(ctx.detached(), params)
 
 	return err
 }
@@ -426,8 +409,7 @@ func (ctx *Context) AnswerShippingQuery(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.AnswerShippingQuery(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.AnswerShippingQuery(ctx.detached(), params)
 
 	return err
 }
@@ -451,8 +433,7 @@ func (ctx *Context) AnswerWebAppQuery(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.AnswerWebAppQuery(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.AnswerWebAppQuery(ctx.detached(), params)
 
 	return err
 }
@@ -466,28 +447,13 @@ func (ctx *Context) ApproveChatJoinRequest(
 	opts ...ApproveChatJoinRequestOption,
 ) error {
 	params := &ApproveChatJoinRequestParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.ApproveChatJoinRequest(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.ApproveChatJoinRequest(ctx.detached(), params)
 
 	return err
 }
@@ -501,14 +467,7 @@ func (ctx *Context) ApproveSuggestedPost(
 	opts ...ApproveSuggestedPostOption,
 ) error {
 	params := &ApproveSuggestedPostParams{
-		ChatID: func(ctx *Context) int64 {
-			c := ctx.Chat()
-			if c == nil {
-				return 0
-			}
-
-			return c.ID
-		}(ctx),
+		ChatID: ctx.chatID(),
 		MessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -521,8 +480,7 @@ func (ctx *Context) ApproveSuggestedPost(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.ApproveSuggestedPost(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.ApproveSuggestedPost(ctx.detached(), params)
 
 	return err
 }
@@ -539,28 +497,13 @@ func (ctx *Context) BanChatMember(
 	opts ...BanChatMemberOption,
 ) error {
 	params := &BanChatMemberParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.BanChatMember(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.BanChatMember(ctx.detached(), params)
 
 	return err
 }
@@ -578,21 +521,13 @@ func (ctx *Context) BanChatSenderChat(
 	opts ...BanChatSenderChatOption,
 ) error {
 	params := &BanChatSenderChatParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID:       ctx.chatIdentifier(),
 		SenderChatID: senderChatID,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.BanChatSenderChat(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.BanChatSenderChat(ctx.detached(), params)
 
 	return err
 }
@@ -611,8 +546,7 @@ func (ctx *Context) Close(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.Close(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.Close(ctx.detached(), params)
 
 	return err
 }
@@ -626,14 +560,7 @@ func (ctx *Context) CloseForumTopic(
 	opts ...CloseForumTopicOption,
 ) error {
 	params := &CloseForumTopicParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -646,8 +573,7 @@ func (ctx *Context) CloseForumTopic(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.CloseForumTopic(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.CloseForumTopic(ctx.detached(), params)
 
 	return err
 }
@@ -661,20 +587,12 @@ func (ctx *Context) CloseGeneralForumTopic(
 	opts ...CloseGeneralForumTopicOption,
 ) error {
 	params := &CloseGeneralForumTopicParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.CloseGeneralForumTopic(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.CloseGeneralForumTopic(ctx.detached(), params)
 
 	return err
 }
@@ -702,8 +620,7 @@ func (ctx *Context) ConvertGiftToStars(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.ConvertGiftToStars(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.ConvertGiftToStars(ctx.detached(), params)
 
 	return err
 }
@@ -724,14 +641,7 @@ func (ctx *Context) CopyMessage(
 	opts ...CopyMessageOption,
 ) error {
 	params := &CopyMessageParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -773,8 +683,7 @@ func (ctx *Context) CopyMessage(
 		}
 	}
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.CopyMessage(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.CopyMessage(ctx.detached(), params)
 
 	return err
 }
@@ -798,14 +707,7 @@ func (ctx *Context) CopyMessages(
 	opts ...CopyMessagesOption,
 ) error {
 	params := &CopyMessagesParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -832,8 +734,7 @@ func (ctx *Context) CopyMessages(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.CopyMessages(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.CopyMessages(ctx.detached(), params)
 
 	return err
 }
@@ -851,20 +752,12 @@ func (ctx *Context) CreateChatInviteLink(
 	opts ...CreateChatInviteLinkOption,
 ) error {
 	params := &CreateChatInviteLinkParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.CreateChatInviteLink(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.CreateChatInviteLink(ctx.detached(), params)
 
 	return err
 }
@@ -886,22 +779,14 @@ func (ctx *Context) CreateChatSubscriptionInviteLink(
 	opts ...CreateChatSubscriptionInviteLinkOption,
 ) error {
 	params := &CreateChatSubscriptionInviteLinkParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID:             ctx.chatIdentifier(),
 		SubscriptionPeriod: subscriptionPeriod,
 		SubscriptionPrice:  subscriptionPrice,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.CreateChatSubscriptionInviteLink(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.CreateChatSubscriptionInviteLink(ctx.detached(), params)
 
 	return err
 }
@@ -918,21 +803,13 @@ func (ctx *Context) CreateForumTopic(
 	opts ...CreateForumTopicOption,
 ) error {
 	params := &CreateForumTopicParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
-		Name: name,
+		ChatID: ctx.chatIdentifier(),
+		Name:   name,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.CreateForumTopic(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.CreateForumTopic(ctx.detached(), params)
 
 	return err
 }
@@ -967,8 +844,7 @@ func (ctx *Context) CreateInvoiceLink(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.CreateInvoiceLink(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.CreateInvoiceLink(ctx.detached(), params)
 
 	return err
 }
@@ -985,14 +861,7 @@ func (ctx *Context) CreateNewStickerSet(
 	opts ...CreateNewStickerSetOption,
 ) error {
 	params := &CreateNewStickerSetParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		UserID:   ctx.userID(),
 		Name:     name,
 		Title:    title,
 		Stickers: stickers,
@@ -1000,8 +869,7 @@ func (ctx *Context) CreateNewStickerSet(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.CreateNewStickerSet(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.CreateNewStickerSet(ctx.detached(), params)
 
 	return err
 }
@@ -1015,28 +883,13 @@ func (ctx *Context) DeclineChatJoinRequest(
 	opts ...DeclineChatJoinRequestOption,
 ) error {
 	params := &DeclineChatJoinRequestParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.DeclineChatJoinRequest(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.DeclineChatJoinRequest(ctx.detached(), params)
 
 	return err
 }
@@ -1050,14 +903,7 @@ func (ctx *Context) DeclineSuggestedPost(
 	opts ...DeclineSuggestedPostOption,
 ) error {
 	params := &DeclineSuggestedPostParams{
-		ChatID: func(ctx *Context) int64 {
-			c := ctx.Chat()
-			if c == nil {
-				return 0
-			}
-
-			return c.ID
-		}(ctx),
+		ChatID: ctx.chatID(),
 		MessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -1070,8 +916,7 @@ func (ctx *Context) DeclineSuggestedPost(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.DeclineSuggestedPost(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.DeclineSuggestedPost(ctx.detached(), params)
 
 	return err
 }
@@ -1085,28 +930,13 @@ func (ctx *Context) DeleteAllMessageReactions(
 	opts ...DeleteAllMessageReactionsOption,
 ) error {
 	params := &DeleteAllMessageReactionsParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.DeleteAllMessageReactions(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.DeleteAllMessageReactions(ctx.detached(), params)
 
 	return err
 }
@@ -1134,8 +964,7 @@ func (ctx *Context) DeleteBusinessMessages(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.DeleteBusinessMessages(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.DeleteBusinessMessages(ctx.detached(), params)
 
 	return err
 }
@@ -1150,20 +979,12 @@ func (ctx *Context) DeleteChatPhoto(
 	opts ...DeleteChatPhotoOption,
 ) error {
 	params := &DeleteChatPhotoParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.DeleteChatPhoto(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.DeleteChatPhoto(ctx.detached(), params)
 
 	return err
 }
@@ -1180,20 +1001,12 @@ func (ctx *Context) DeleteChatStickerSet(
 	opts ...DeleteChatStickerSetOption,
 ) error {
 	params := &DeleteChatStickerSetParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.DeleteChatStickerSet(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.DeleteChatStickerSet(ctx.detached(), params)
 
 	return err
 }
@@ -1208,14 +1021,7 @@ func (ctx *Context) DeleteEphemeralMessage(
 	opts ...DeleteEphemeralMessageOption,
 ) error {
 	params := &DeleteEphemeralMessageParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID:         ctx.chatIdentifier(),
 		ReceiverUserID: receiverUserID,
 		EphemeralMessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
@@ -1229,8 +1035,7 @@ func (ctx *Context) DeleteEphemeralMessage(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.DeleteEphemeralMessage(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.DeleteEphemeralMessage(ctx.detached(), params)
 
 	return err
 }
@@ -1244,14 +1049,7 @@ func (ctx *Context) DeleteForumTopic(
 	opts ...DeleteForumTopicOption,
 ) error {
 	params := &DeleteForumTopicParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -1264,8 +1062,7 @@ func (ctx *Context) DeleteForumTopic(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.DeleteForumTopic(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.DeleteForumTopic(ctx.detached(), params)
 
 	return err
 }
@@ -1287,14 +1084,7 @@ func (ctx *Context) DeleteMessage(
 	opts ...DeleteMessageOption,
 ) error {
 	params := &DeleteMessageParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -1307,8 +1097,7 @@ func (ctx *Context) DeleteMessage(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.DeleteMessage(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.DeleteMessage(ctx.detached(), params)
 
 	return err
 }
@@ -1322,14 +1111,7 @@ func (ctx *Context) DeleteMessageReaction(
 	opts ...DeleteMessageReactionOption,
 ) error {
 	params := &DeleteMessageReactionParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -1338,20 +1120,12 @@ func (ctx *Context) DeleteMessageReaction(
 
 			return m.MessageID
 		}(ctx),
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.DeleteMessageReaction(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.DeleteMessageReaction(ctx.detached(), params)
 
 	return err
 }
@@ -1366,21 +1140,13 @@ func (ctx *Context) DeleteMessages(
 	opts ...DeleteMessagesOption,
 ) error {
 	params := &DeleteMessagesParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID:     ctx.chatIdentifier(),
 		MessageIDs: messageIDs,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.DeleteMessages(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.DeleteMessages(ctx.detached(), params)
 
 	return err
 }
@@ -1399,8 +1165,7 @@ func (ctx *Context) DeleteMyCommands(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.DeleteMyCommands(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.DeleteMyCommands(ctx.detached(), params)
 
 	return err
 }
@@ -1419,8 +1184,7 @@ func (ctx *Context) DeleteStickerFromSet(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.DeleteStickerFromSet(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.DeleteStickerFromSet(ctx.detached(), params)
 
 	return err
 }
@@ -1439,8 +1203,7 @@ func (ctx *Context) DeleteStickerSet(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.DeleteStickerSet(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.DeleteStickerSet(ctx.detached(), params)
 
 	return err
 }
@@ -1468,8 +1231,7 @@ func (ctx *Context) DeleteStory(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.DeleteStory(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.DeleteStory(ctx.detached(), params)
 
 	return err
 }
@@ -1487,8 +1249,7 @@ func (ctx *Context) DeleteWebhook(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.DeleteWebhook(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.DeleteWebhook(ctx.detached(), params)
 
 	return err
 }
@@ -1505,21 +1266,13 @@ func (ctx *Context) EditChatInviteLink(
 	opts ...EditChatInviteLinkOption,
 ) error {
 	params := &EditChatInviteLinkParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID:     ctx.chatIdentifier(),
 		InviteLink: inviteLink,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.EditChatInviteLink(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.EditChatInviteLink(ctx.detached(), params)
 
 	return err
 }
@@ -1536,21 +1289,13 @@ func (ctx *Context) EditChatSubscriptionInviteLink(
 	opts ...EditChatSubscriptionInviteLinkOption,
 ) error {
 	params := &EditChatSubscriptionInviteLinkParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID:     ctx.chatIdentifier(),
 		InviteLink: inviteLink,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.EditChatSubscriptionInviteLink(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.EditChatSubscriptionInviteLink(ctx.detached(), params)
 
 	return err
 }
@@ -1565,14 +1310,7 @@ func (ctx *Context) EditEphemeralMessageCaption(
 	opts ...EditEphemeralMessageCaptionOption,
 ) error {
 	params := &EditEphemeralMessageCaptionParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID:         ctx.chatIdentifier(),
 		ReceiverUserID: receiverUserID,
 		EphemeralMessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
@@ -1594,8 +1332,7 @@ func (ctx *Context) EditEphemeralMessageCaption(
 		}
 	}
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.EditEphemeralMessageCaption(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.EditEphemeralMessageCaption(ctx.detached(), params)
 
 	return err
 }
@@ -1611,14 +1348,7 @@ func (ctx *Context) EditEphemeralMessageMedia(
 	opts ...EditEphemeralMessageMediaOption,
 ) error {
 	params := &EditEphemeralMessageMediaParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID:         ctx.chatIdentifier(),
 		ReceiverUserID: receiverUserID,
 		EphemeralMessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
@@ -1639,8 +1369,7 @@ func (ctx *Context) EditEphemeralMessageMedia(
 		defaultParseModeToInputMedia(&params.Media, defaultParseMode)
 	}
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.EditEphemeralMessageMedia(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.EditEphemeralMessageMedia(ctx.detached(), params)
 
 	return err
 }
@@ -1655,14 +1384,7 @@ func (ctx *Context) EditEphemeralMessageReplyMarkup(
 	opts ...EditEphemeralMessageReplyMarkupOption,
 ) error {
 	params := &EditEphemeralMessageReplyMarkupParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID:         ctx.chatIdentifier(),
 		ReceiverUserID: receiverUserID,
 		EphemeralMessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
@@ -1676,8 +1398,7 @@ func (ctx *Context) EditEphemeralMessageReplyMarkup(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.EditEphemeralMessageReplyMarkup(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.EditEphemeralMessageReplyMarkup(ctx.detached(), params)
 
 	return err
 }
@@ -1692,14 +1413,7 @@ func (ctx *Context) EditEphemeralMessageText(
 	opts ...EditEphemeralMessageTextOption,
 ) error {
 	params := &EditEphemeralMessageTextParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID:         ctx.chatIdentifier(),
 		ReceiverUserID: receiverUserID,
 		EphemeralMessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
@@ -1721,8 +1435,7 @@ func (ctx *Context) EditEphemeralMessageText(
 		}
 	}
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.EditEphemeralMessageText(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.EditEphemeralMessageText(ctx.detached(), params)
 
 	return err
 }
@@ -1736,14 +1449,7 @@ func (ctx *Context) EditForumTopic(
 	opts ...EditForumTopicOption,
 ) error {
 	params := &EditForumTopicParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -1756,8 +1462,7 @@ func (ctx *Context) EditForumTopic(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.EditForumTopic(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.EditForumTopic(ctx.detached(), params)
 
 	return err
 }
@@ -1772,21 +1477,13 @@ func (ctx *Context) EditGeneralForumTopic(
 	opts ...EditGeneralForumTopicOption,
 ) error {
 	params := &EditGeneralForumTopicParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
-		Name: name,
+		ChatID: ctx.chatIdentifier(),
+		Name:   name,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.EditGeneralForumTopic(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.EditGeneralForumTopic(ctx.detached(), params)
 
 	return err
 }
@@ -1810,14 +1507,7 @@ func (ctx *Context) EditMessageCaption(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -1845,8 +1535,7 @@ func (ctx *Context) EditMessageCaption(
 		}
 	}
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.EditMessageCaption(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.EditMessageCaption(ctx.detached(), params)
 
 	return err
 }
@@ -1870,14 +1559,7 @@ func (ctx *Context) EditMessageChecklist(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -1891,8 +1573,7 @@ func (ctx *Context) EditMessageChecklist(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.EditMessageChecklist(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.EditMessageChecklist(ctx.detached(), params)
 
 	return err
 }
@@ -1919,14 +1600,7 @@ func (ctx *Context) EditMessageLiveLocation(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -1948,8 +1622,7 @@ func (ctx *Context) EditMessageLiveLocation(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.EditMessageLiveLocation(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.EditMessageLiveLocation(ctx.detached(), params)
 
 	return err
 }
@@ -1976,14 +1649,7 @@ func (ctx *Context) EditMessageMedia(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -2010,8 +1676,7 @@ func (ctx *Context) EditMessageMedia(
 		defaultParseModeToInputMedia(&params.Media, defaultParseMode)
 	}
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.EditMessageMedia(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.EditMessageMedia(ctx.detached(), params)
 
 	return err
 }
@@ -2035,14 +1700,7 @@ func (ctx *Context) EditMessageReplyMarkup(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -2062,8 +1720,7 @@ func (ctx *Context) EditMessageReplyMarkup(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.EditMessageReplyMarkup(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.EditMessageReplyMarkup(ctx.detached(), params)
 
 	return err
 }
@@ -2088,14 +1745,7 @@ func (ctx *Context) EditMessageText(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -2123,8 +1773,7 @@ func (ctx *Context) EditMessageText(
 		}
 	}
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.EditMessageText(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.EditMessageText(ctx.detached(), params)
 
 	return err
 }
@@ -2164,8 +1813,7 @@ func (ctx *Context) EditStory(
 		}
 	}
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.EditStory(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.EditStory(ctx.detached(), params)
 
 	return err
 }
@@ -2180,22 +1828,14 @@ func (ctx *Context) EditUserStarSubscription(
 	opts ...EditUserStarSubscriptionOption,
 ) error {
 	params := &EditUserStarSubscriptionParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		UserID:                  ctx.userID(),
 		TelegramPaymentChargeID: telegramPaymentChargeID,
 		IsCanceled:              isCanceled,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.EditUserStarSubscription(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.EditUserStarSubscription(ctx.detached(), params)
 
 	return err
 }
@@ -2209,20 +1849,12 @@ func (ctx *Context) ExportChatInviteLink(
 	opts ...ExportChatInviteLinkOption,
 ) error {
 	params := &ExportChatInviteLinkParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.ExportChatInviteLink(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.ExportChatInviteLink(ctx.detached(), params)
 
 	return err
 }
@@ -2239,14 +1871,7 @@ func (ctx *Context) ForwardMessage(
 	opts ...ForwardMessageOption,
 ) error {
 	params := &ForwardMessageParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -2280,8 +1905,7 @@ func (ctx *Context) ForwardMessage(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.ForwardMessage(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.ForwardMessage(ctx.detached(), params)
 
 	return err
 }
@@ -2301,14 +1925,7 @@ func (ctx *Context) ForwardMessages(
 	opts ...ForwardMessagesOption,
 ) error {
 	params := &ForwardMessagesParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -2335,8 +1952,7 @@ func (ctx *Context) ForwardMessages(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.ForwardMessages(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.ForwardMessages(ctx.detached(), params)
 
 	return err
 }
@@ -2355,8 +1971,7 @@ func (ctx *Context) GetAvailableGifts(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetAvailableGifts(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetAvailableGifts(ctx.detached(), params)
 
 	return err
 }
@@ -2384,8 +1999,7 @@ func (ctx *Context) GetBusinessAccountGifts(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetBusinessAccountGifts(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetBusinessAccountGifts(ctx.detached(), params)
 
 	return err
 }
@@ -2413,8 +2027,7 @@ func (ctx *Context) GetBusinessAccountStarBalance(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetBusinessAccountStarBalance(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetBusinessAccountStarBalance(ctx.detached(), params)
 
 	return err
 }
@@ -2441,8 +2054,7 @@ func (ctx *Context) GetBusinessConnection(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetBusinessConnection(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetBusinessConnection(ctx.detached(), params)
 
 	return err
 }
@@ -2457,20 +2069,12 @@ func (ctx *Context) GetChat(
 	opts ...GetChatOption,
 ) error {
 	params := &GetChatParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetChat(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetChat(ctx.detached(), params)
 
 	return err
 }
@@ -2485,20 +2089,12 @@ func (ctx *Context) GetChatAdministrators(
 	opts ...GetChatAdministratorsOption,
 ) error {
 	params := &GetChatAdministratorsParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetChatAdministrators(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetChatAdministrators(ctx.detached(), params)
 
 	return err
 }
@@ -2513,20 +2109,12 @@ func (ctx *Context) GetChatGifts(
 	opts ...GetChatGiftsOption,
 ) error {
 	params := &GetChatGiftsParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetChatGifts(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetChatGifts(ctx.detached(), params)
 
 	return err
 }
@@ -2542,28 +2130,13 @@ func (ctx *Context) GetChatMember(
 	opts ...GetChatMemberOption,
 ) error {
 	params := &GetChatMemberParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetChatMember(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetChatMember(ctx.detached(), params)
 
 	return err
 }
@@ -2576,20 +2149,12 @@ func (ctx *Context) GetChatMemberCount(
 	opts ...GetChatMemberCountOption,
 ) error {
 	params := &GetChatMemberCountParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetChatMemberCount(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetChatMemberCount(ctx.detached(), params)
 
 	return err
 }
@@ -2604,20 +2169,12 @@ func (ctx *Context) GetChatMenuButton(
 	opts ...GetChatMenuButtonOption,
 ) error {
 	params := &GetChatMenuButtonParams{
-		ChatID: func(ctx *Context) int64 {
-			c := ctx.Chat()
-			if c == nil {
-				return 0
-			}
-
-			return c.ID
-		}(ctx),
+		ChatID: ctx.chatID(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetChatMenuButton(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetChatMenuButton(ctx.detached(), params)
 
 	return err
 }
@@ -2638,8 +2195,7 @@ func (ctx *Context) GetCustomEmojiStickers(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetCustomEmojiStickers(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetCustomEmojiStickers(ctx.detached(), params)
 
 	return err
 }
@@ -2667,8 +2223,7 @@ func (ctx *Context) GetFile(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetFile(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetFile(ctx.detached(), params)
 
 	return err
 }
@@ -2687,8 +2242,7 @@ func (ctx *Context) GetForumTopicIconStickers(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetForumTopicIconStickers(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetForumTopicIconStickers(ctx.detached(), params)
 
 	return err
 }
@@ -2704,22 +2258,8 @@ func (ctx *Context) GetGameHighScores(
 	opts ...GetGameHighScoresOption,
 ) error {
 	params := &GetGameHighScoresParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
-		ChatID: func(ctx *Context) int64 {
-			c := ctx.Chat()
-			if c == nil {
-				return 0
-			}
-
-			return c.ID
-		}(ctx),
+		UserID: ctx.userID(),
+		ChatID: ctx.chatID(),
 		MessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -2739,8 +2279,7 @@ func (ctx *Context) GetGameHighScores(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetGameHighScores(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetGameHighScores(ctx.detached(), params)
 
 	return err
 }
@@ -2755,20 +2294,12 @@ func (ctx *Context) GetManagedBotAccessSettings(
 	opts ...GetManagedBotAccessSettingsOption,
 ) error {
 	params := &GetManagedBotAccessSettingsParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetManagedBotAccessSettings(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetManagedBotAccessSettings(ctx.detached(), params)
 
 	return err
 }
@@ -2781,20 +2312,12 @@ func (ctx *Context) GetManagedBotToken(
 	opts ...GetManagedBotTokenOption,
 ) error {
 	params := &GetManagedBotTokenParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetManagedBotToken(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetManagedBotToken(ctx.detached(), params)
 
 	return err
 }
@@ -2813,8 +2336,7 @@ func (ctx *Context) GetMe(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetMe(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetMe(ctx.detached(), params)
 
 	return err
 }
@@ -2833,8 +2355,7 @@ func (ctx *Context) GetMyCommands(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetMyCommands(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetMyCommands(ctx.detached(), params)
 
 	return err
 }
@@ -2852,8 +2373,7 @@ func (ctx *Context) GetMyDefaultAdministratorRights(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetMyDefaultAdministratorRights(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetMyDefaultAdministratorRights(ctx.detached(), params)
 
 	return err
 }
@@ -2871,8 +2391,7 @@ func (ctx *Context) GetMyDescription(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetMyDescription(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetMyDescription(ctx.detached(), params)
 
 	return err
 }
@@ -2890,8 +2409,7 @@ func (ctx *Context) GetMyName(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetMyName(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetMyName(ctx.detached(), params)
 
 	return err
 }
@@ -2909,8 +2427,7 @@ func (ctx *Context) GetMyShortDescription(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetMyShortDescription(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetMyShortDescription(ctx.detached(), params)
 
 	return err
 }
@@ -2929,8 +2446,7 @@ func (ctx *Context) GetMyStarBalance(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetMyStarBalance(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetMyStarBalance(ctx.detached(), params)
 
 	return err
 }
@@ -2948,8 +2464,7 @@ func (ctx *Context) GetStarTransactions(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetStarTransactions(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetStarTransactions(ctx.detached(), params)
 
 	return err
 }
@@ -2970,8 +2485,7 @@ func (ctx *Context) GetStickerSet(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetStickerSet(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetStickerSet(ctx.detached(), params)
 
 	return err
 }
@@ -2990,8 +2504,7 @@ func (ctx *Context) GetUpdates(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetUpdates(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetUpdates(ctx.detached(), params)
 
 	return err
 }
@@ -3007,28 +2520,13 @@ func (ctx *Context) GetUserChatBoosts(
 	opts ...GetUserChatBoostsOption,
 ) error {
 	params := &GetUserChatBoostsParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetUserChatBoosts(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetUserChatBoosts(ctx.detached(), params)
 
 	return err
 }
@@ -3043,20 +2541,12 @@ func (ctx *Context) GetUserGifts(
 	opts ...GetUserGiftsOption,
 ) error {
 	params := &GetUserGiftsParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetUserGifts(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetUserGifts(ctx.detached(), params)
 
 	return err
 }
@@ -3072,21 +2562,13 @@ func (ctx *Context) GetUserPersonalChatMessages(
 	opts ...GetUserPersonalChatMessagesOption,
 ) error {
 	params := &GetUserPersonalChatMessagesParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
-		Limit: limit,
+		UserID: ctx.userID(),
+		Limit:  limit,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetUserPersonalChatMessages(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetUserPersonalChatMessages(ctx.detached(), params)
 
 	return err
 }
@@ -3101,20 +2583,12 @@ func (ctx *Context) GetUserProfileAudios(
 	opts ...GetUserProfileAudiosOption,
 ) error {
 	params := &GetUserProfileAudiosParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetUserProfileAudios(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetUserProfileAudios(ctx.detached(), params)
 
 	return err
 }
@@ -3129,20 +2603,12 @@ func (ctx *Context) GetUserProfilePhotos(
 	opts ...GetUserProfilePhotosOption,
 ) error {
 	params := &GetUserProfilePhotosParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetUserProfilePhotos(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetUserProfilePhotos(ctx.detached(), params)
 
 	return err
 }
@@ -3163,8 +2629,7 @@ func (ctx *Context) GetWebhookInfo(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GetWebhookInfo(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GetWebhookInfo(ctx.detached(), params)
 
 	return err
 }
@@ -3179,14 +2644,7 @@ func (ctx *Context) GiftPremiumSubscription(
 	opts ...GiftPremiumSubscriptionOption,
 ) error {
 	params := &GiftPremiumSubscriptionParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		UserID:     ctx.userID(),
 		MonthCount: monthCount,
 		StarCount:  starCount,
 	}
@@ -3198,8 +2656,7 @@ func (ctx *Context) GiftPremiumSubscription(
 	if defaultParseMode != "" {
 	}
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.GiftPremiumSubscription(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.GiftPremiumSubscription(ctx.detached(), params)
 
 	return err
 }
@@ -3214,20 +2671,12 @@ func (ctx *Context) HideGeneralForumTopic(
 	opts ...HideGeneralForumTopicOption,
 ) error {
 	params := &HideGeneralForumTopicParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.HideGeneralForumTopic(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.HideGeneralForumTopic(ctx.detached(), params)
 
 	return err
 }
@@ -3240,20 +2689,12 @@ func (ctx *Context) LeaveChat(
 	opts ...LeaveChatOption,
 ) error {
 	params := &LeaveChatParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.LeaveChat(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.LeaveChat(ctx.detached(), params)
 
 	return err
 }
@@ -3272,8 +2713,7 @@ func (ctx *Context) LogOut(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.LogOut(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.LogOut(ctx.detached(), params)
 
 	return err
 }
@@ -3296,14 +2736,7 @@ func (ctx *Context) PinChatMessage(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -3316,8 +2749,7 @@ func (ctx *Context) PinChatMessage(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.PinChatMessage(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.PinChatMessage(ctx.detached(), params)
 
 	return err
 }
@@ -3357,8 +2789,7 @@ func (ctx *Context) PostStory(
 		}
 	}
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.PostStory(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.PostStory(ctx.detached(), params)
 
 	return err
 }
@@ -3373,28 +2804,13 @@ func (ctx *Context) PromoteChatMember(
 	opts ...PromoteChatMemberOption,
 ) error {
 	params := &PromoteChatMemberParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.PromoteChatMember(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.PromoteChatMember(ctx.detached(), params)
 
 	return err
 }
@@ -3416,14 +2832,7 @@ func (ctx *Context) ReadBusinessMessage(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) int64 {
-			c := ctx.Chat()
-			if c == nil {
-				return 0
-			}
-
-			return c.ID
-		}(ctx),
+		ChatID: ctx.chatID(),
 		MessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -3436,8 +2845,7 @@ func (ctx *Context) ReadBusinessMessage(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.ReadBusinessMessage(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.ReadBusinessMessage(ctx.detached(), params)
 
 	return err
 }
@@ -3453,21 +2861,13 @@ func (ctx *Context) RefundStarPayment(
 	opts ...RefundStarPaymentOption,
 ) error {
 	params := &RefundStarPaymentParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		UserID:                  ctx.userID(),
 		TelegramPaymentChargeID: telegramPaymentChargeID,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.RefundStarPayment(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.RefundStarPayment(ctx.detached(), params)
 
 	return err
 }
@@ -3493,8 +2893,7 @@ func (ctx *Context) RemoveBusinessAccountProfilePhoto(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.RemoveBusinessAccountProfilePhoto(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.RemoveBusinessAccountProfilePhoto(ctx.detached(), params)
 
 	return err
 }
@@ -3509,20 +2908,12 @@ func (ctx *Context) RemoveChatVerification(
 	opts ...RemoveChatVerificationOption,
 ) error {
 	params := &RemoveChatVerificationParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.RemoveChatVerification(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.RemoveChatVerification(ctx.detached(), params)
 
 	return err
 }
@@ -3539,8 +2930,7 @@ func (ctx *Context) RemoveMyProfilePhoto(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.RemoveMyProfilePhoto(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.RemoveMyProfilePhoto(ctx.detached(), params)
 
 	return err
 }
@@ -3555,20 +2945,12 @@ func (ctx *Context) RemoveUserVerification(
 	opts ...RemoveUserVerificationOption,
 ) error {
 	params := &RemoveUserVerificationParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.RemoveUserVerification(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.RemoveUserVerification(ctx.detached(), params)
 
 	return err
 }
@@ -3582,14 +2964,7 @@ func (ctx *Context) ReopenForumTopic(
 	opts ...ReopenForumTopicOption,
 ) error {
 	params := &ReopenForumTopicParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -3602,8 +2977,7 @@ func (ctx *Context) ReopenForumTopic(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.ReopenForumTopic(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.ReopenForumTopic(ctx.detached(), params)
 
 	return err
 }
@@ -3618,20 +2992,12 @@ func (ctx *Context) ReopenGeneralForumTopic(
 	opts ...ReopenGeneralForumTopicOption,
 ) error {
 	params := &ReopenGeneralForumTopicParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.ReopenGeneralForumTopic(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.ReopenGeneralForumTopic(ctx.detached(), params)
 
 	return err
 }
@@ -3644,20 +3010,12 @@ func (ctx *Context) ReplaceManagedBotToken(
 	opts ...ReplaceManagedBotTokenOption,
 ) error {
 	params := &ReplaceManagedBotTokenParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.ReplaceManagedBotToken(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.ReplaceManagedBotToken(ctx.detached(), params)
 
 	return err
 }
@@ -3678,14 +3036,7 @@ func (ctx *Context) ReplaceStickerInSet(
 	opts ...ReplaceStickerInSetOption,
 ) error {
 	params := &ReplaceStickerInSetParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		UserID:     ctx.userID(),
 		Name:       name,
 		OldSticker: oldSticker,
 		Sticker:    sticker,
@@ -3693,8 +3044,7 @@ func (ctx *Context) ReplaceStickerInSet(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.ReplaceStickerInSet(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.ReplaceStickerInSet(ctx.detached(), params)
 
 	return err
 }
@@ -3729,8 +3079,7 @@ func (ctx *Context) RepostStory(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.RepostStory(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.RepostStory(ctx.detached(), params)
 
 	return err
 }
@@ -3746,29 +3095,14 @@ func (ctx *Context) RestrictChatMember(
 	opts ...RestrictChatMemberOption,
 ) error {
 	params := &RestrictChatMemberParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		ChatID:      ctx.chatIdentifier(),
+		UserID:      ctx.userID(),
 		Permissions: permissions,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.RestrictChatMember(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.RestrictChatMember(ctx.detached(), params)
 
 	return err
 }
@@ -3786,21 +3120,13 @@ func (ctx *Context) RevokeChatInviteLink(
 	opts ...RevokeChatInviteLinkOption,
 ) error {
 	params := &RevokeChatInviteLinkParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID:     ctx.chatIdentifier(),
 		InviteLink: inviteLink,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.RevokeChatInviteLink(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.RevokeChatInviteLink(ctx.detached(), params)
 
 	return err
 }
@@ -3816,21 +3142,13 @@ func (ctx *Context) SavePreparedInlineMessage(
 	opts ...SavePreparedInlineMessageOption,
 ) error {
 	params := &SavePreparedInlineMessageParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		UserID: ctx.userID(),
 		Result: result,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SavePreparedInlineMessage(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SavePreparedInlineMessage(ctx.detached(), params)
 
 	return err
 }
@@ -3846,21 +3164,13 @@ func (ctx *Context) SavePreparedKeyboardButton(
 	opts ...SavePreparedKeyboardButtonOption,
 ) error {
 	params := &SavePreparedKeyboardButtonParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		UserID: ctx.userID(),
 		Button: button,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SavePreparedKeyboardButton(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SavePreparedKeyboardButton(ctx.detached(), params)
 
 	return err
 }
@@ -3885,14 +3195,7 @@ func (ctx *Context) SendAnimation(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -3926,8 +3229,7 @@ func (ctx *Context) SendAnimation(
 		}
 	}
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendAnimation(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendAnimation(ctx.detached(), params)
 
 	return err
 }
@@ -3955,14 +3257,7 @@ func (ctx *Context) SendAudio(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -3996,8 +3291,7 @@ func (ctx *Context) SendAudio(
 		}
 	}
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendAudio(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendAudio(ctx.detached(), params)
 
 	return err
 }
@@ -4021,14 +3315,7 @@ func (ctx *Context) SendChatAction(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -4042,8 +3329,7 @@ func (ctx *Context) SendChatAction(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendChatAction(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendChatAction(ctx.detached(), params)
 
 	return err
 }
@@ -4067,8 +3353,7 @@ func (ctx *Context) SendChatJoinRequestWebApp(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendChatJoinRequestWebApp(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendChatJoinRequestWebApp(ctx.detached(), params)
 
 	return err
 }
@@ -4092,21 +3377,13 @@ func (ctx *Context) SendChecklist(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID:    ctx.chatIdentifier(),
 		Checklist: checklist,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendChecklist(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendChecklist(ctx.detached(), params)
 
 	return err
 }
@@ -4131,14 +3408,7 @@ func (ctx *Context) SendContact(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -4165,8 +3435,7 @@ func (ctx *Context) SendContact(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendContact(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendContact(ctx.detached(), params)
 
 	return err
 }
@@ -4189,14 +3458,7 @@ func (ctx *Context) SendDice(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -4221,8 +3483,7 @@ func (ctx *Context) SendDice(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendDice(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendDice(ctx.detached(), params)
 
 	return err
 }
@@ -4247,14 +3508,7 @@ func (ctx *Context) SendDocument(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -4288,8 +3542,7 @@ func (ctx *Context) SendDocument(
 		}
 	}
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendDocument(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendDocument(ctx.detached(), params)
 
 	return err
 }
@@ -4313,14 +3566,7 @@ func (ctx *Context) SendGame(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -4334,8 +3580,7 @@ func (ctx *Context) SendGame(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendGame(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendGame(ctx.detached(), params)
 
 	return err
 }
@@ -4350,22 +3595,8 @@ func (ctx *Context) SendGift(
 	opts ...SendGiftOption,
 ) error {
 	params := &SendGiftParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		UserID: ctx.userID(),
+		ChatID: ctx.chatIdentifier(),
 		GiftID: giftID,
 	}
 
@@ -4376,8 +3607,7 @@ func (ctx *Context) SendGift(
 	if defaultParseMode != "" {
 	}
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendGift(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendGift(ctx.detached(), params)
 
 	return err
 }
@@ -4397,14 +3627,7 @@ func (ctx *Context) SendInvoice(
 	opts ...SendInvoiceOption,
 ) error {
 	params := &SendInvoiceParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -4434,8 +3657,7 @@ func (ctx *Context) SendInvoice(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendInvoice(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendInvoice(ctx.detached(), params)
 
 	return err
 }
@@ -4460,14 +3682,7 @@ func (ctx *Context) SendLivePhoto(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -4502,8 +3717,7 @@ func (ctx *Context) SendLivePhoto(
 		}
 	}
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendLivePhoto(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendLivePhoto(ctx.detached(), params)
 
 	return err
 }
@@ -4528,14 +3742,7 @@ func (ctx *Context) SendLocation(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -4562,8 +3769,7 @@ func (ctx *Context) SendLocation(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendLocation(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendLocation(ctx.detached(), params)
 
 	return err
 }
@@ -4588,14 +3794,7 @@ func (ctx *Context) SendMediaGroup(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -4629,8 +3828,7 @@ func (ctx *Context) SendMediaGroup(
 		}
 	}
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendMediaGroup(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendMediaGroup(ctx.detached(), params)
 
 	return err
 }
@@ -4654,14 +3852,7 @@ func (ctx *Context) SendMessage(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -4695,8 +3886,7 @@ func (ctx *Context) SendMessage(
 		}
 	}
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendMessage(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendMessage(ctx.detached(), params)
 
 	return err
 }
@@ -4713,14 +3903,7 @@ func (ctx *Context) SendMessageDraft(
 	opts ...SendMessageDraftOption,
 ) error {
 	params := &SendMessageDraftParams{
-		ChatID: func(ctx *Context) int64 {
-			c := ctx.Chat()
-			if c == nil {
-				return 0
-			}
-
-			return c.ID
-		}(ctx),
+		ChatID: ctx.chatID(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -4742,8 +3925,7 @@ func (ctx *Context) SendMessageDraft(
 		}
 	}
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendMessageDraft(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendMessageDraft(ctx.detached(), params)
 
 	return err
 }
@@ -4768,14 +3950,7 @@ func (ctx *Context) SendPaidMedia(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -4810,8 +3985,7 @@ func (ctx *Context) SendPaidMedia(
 		}
 	}
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendPaidMedia(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendPaidMedia(ctx.detached(), params)
 
 	return err
 }
@@ -4835,14 +4009,7 @@ func (ctx *Context) SendPhoto(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -4876,8 +4043,7 @@ func (ctx *Context) SendPhoto(
 		}
 	}
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendPhoto(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendPhoto(ctx.detached(), params)
 
 	return err
 }
@@ -4902,14 +4068,7 @@ func (ctx *Context) SendPoll(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -4929,8 +4088,7 @@ func (ctx *Context) SendPoll(
 	if defaultParseMode != "" {
 	}
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendPoll(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendPoll(ctx.detached(), params)
 
 	return err
 }
@@ -4955,14 +4113,7 @@ func (ctx *Context) SendRichMessage(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -4988,8 +4139,7 @@ func (ctx *Context) SendRichMessage(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendRichMessage(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendRichMessage(ctx.detached(), params)
 
 	return err
 }
@@ -5007,14 +4157,7 @@ func (ctx *Context) SendRichMessageDraft(
 	opts ...SendRichMessageDraftOption,
 ) error {
 	params := &SendRichMessageDraftParams{
-		ChatID: func(ctx *Context) int64 {
-			c := ctx.Chat()
-			if c == nil {
-				return 0
-			}
-
-			return c.ID
-		}(ctx),
+		ChatID: ctx.chatID(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -5029,8 +4172,7 @@ func (ctx *Context) SendRichMessageDraft(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendRichMessageDraft(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendRichMessageDraft(ctx.detached(), params)
 
 	return err
 }
@@ -5056,14 +4198,7 @@ func (ctx *Context) SendSticker(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -5089,8 +4224,7 @@ func (ctx *Context) SendSticker(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendSticker(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendSticker(ctx.detached(), params)
 
 	return err
 }
@@ -5117,14 +4251,7 @@ func (ctx *Context) SendVenue(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -5153,8 +4280,7 @@ func (ctx *Context) SendVenue(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendVenue(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendVenue(ctx.detached(), params)
 
 	return err
 }
@@ -5180,14 +4306,7 @@ func (ctx *Context) SendVideo(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -5221,8 +4340,7 @@ func (ctx *Context) SendVideo(
 		}
 	}
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendVideo(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendVideo(ctx.detached(), params)
 
 	return err
 }
@@ -5246,14 +4364,7 @@ func (ctx *Context) SendVideoNote(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -5279,8 +4390,7 @@ func (ctx *Context) SendVideoNote(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendVideoNote(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendVideoNote(ctx.detached(), params)
 
 	return err
 }
@@ -5308,14 +4418,7 @@ func (ctx *Context) SendVoice(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -5349,8 +4452,7 @@ func (ctx *Context) SendVoice(
 		}
 	}
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SendVoice(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SendVoice(ctx.detached(), params)
 
 	return err
 }
@@ -5376,8 +4478,7 @@ func (ctx *Context) SetBusinessAccountBio(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetBusinessAccountBio(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetBusinessAccountBio(ctx.detached(), params)
 
 	return err
 }
@@ -5407,8 +4508,7 @@ func (ctx *Context) SetBusinessAccountGiftSettings(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetBusinessAccountGiftSettings(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetBusinessAccountGiftSettings(ctx.detached(), params)
 
 	return err
 }
@@ -5436,8 +4536,7 @@ func (ctx *Context) SetBusinessAccountName(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetBusinessAccountName(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetBusinessAccountName(ctx.detached(), params)
 
 	return err
 }
@@ -5465,8 +4564,7 @@ func (ctx *Context) SetBusinessAccountProfilePhoto(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetBusinessAccountProfilePhoto(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetBusinessAccountProfilePhoto(ctx.detached(), params)
 
 	return err
 }
@@ -5492,8 +4590,7 @@ func (ctx *Context) SetBusinessAccountUsername(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetBusinessAccountUsername(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetBusinessAccountUsername(ctx.detached(), params)
 
 	return err
 }
@@ -5507,29 +4604,14 @@ func (ctx *Context) SetChatAdministratorCustomTitle(
 	opts ...SetChatAdministratorCustomTitleOption,
 ) error {
 	params := &SetChatAdministratorCustomTitleParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		ChatID:      ctx.chatIdentifier(),
+		UserID:      ctx.userID(),
 		CustomTitle: customTitle,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetChatAdministratorCustomTitle(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetChatAdministratorCustomTitle(ctx.detached(), params)
 
 	return err
 }
@@ -5543,20 +4625,12 @@ func (ctx *Context) SetChatDescription(
 	opts ...SetChatDescriptionOption,
 ) error {
 	params := &SetChatDescriptionParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetChatDescription(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetChatDescription(ctx.detached(), params)
 
 	return err
 }
@@ -5570,28 +4644,13 @@ func (ctx *Context) SetChatMemberTag(
 	opts ...SetChatMemberTagOption,
 ) error {
 	params := &SetChatMemberTagParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetChatMemberTag(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetChatMemberTag(ctx.detached(), params)
 
 	return err
 }
@@ -5604,20 +4663,12 @@ func (ctx *Context) SetChatMenuButton(
 	opts ...SetChatMenuButtonOption,
 ) error {
 	params := &SetChatMenuButtonParams{
-		ChatID: func(ctx *Context) int64 {
-			c := ctx.Chat()
-			if c == nil {
-				return 0
-			}
-
-			return c.ID
-		}(ctx),
+		ChatID: ctx.chatID(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetChatMenuButton(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetChatMenuButton(ctx.detached(), params)
 
 	return err
 }
@@ -5632,21 +4683,13 @@ func (ctx *Context) SetChatPermissions(
 	opts ...SetChatPermissionsOption,
 ) error {
 	params := &SetChatPermissionsParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID:      ctx.chatIdentifier(),
 		Permissions: permissions,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetChatPermissions(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetChatPermissions(ctx.detached(), params)
 
 	return err
 }
@@ -5662,21 +4705,13 @@ func (ctx *Context) SetChatPhoto(
 	opts ...SetChatPhotoOption,
 ) error {
 	params := &SetChatPhotoParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
-		Photo: photo,
+		ChatID: ctx.chatIdentifier(),
+		Photo:  photo,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetChatPhoto(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetChatPhoto(ctx.detached(), params)
 
 	return err
 }
@@ -5694,21 +4729,13 @@ func (ctx *Context) SetChatStickerSet(
 	opts ...SetChatStickerSetOption,
 ) error {
 	params := &SetChatStickerSetParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID:         ctx.chatIdentifier(),
 		StickerSetName: stickerSetName,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetChatStickerSet(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetChatStickerSet(ctx.detached(), params)
 
 	return err
 }
@@ -5724,21 +4751,13 @@ func (ctx *Context) SetChatTitle(
 	opts ...SetChatTitleOption,
 ) error {
 	params := &SetChatTitleParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
-		Title: title,
+		ChatID: ctx.chatIdentifier(),
+		Title:  title,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetChatTitle(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetChatTitle(ctx.detached(), params)
 
 	return err
 }
@@ -5757,8 +4776,7 @@ func (ctx *Context) SetCustomEmojiStickerSetThumbnail(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetCustomEmojiStickerSetThumbnail(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetCustomEmojiStickerSetThumbnail(ctx.detached(), params)
 
 	return err
 }
@@ -5775,23 +4793,9 @@ func (ctx *Context) SetGameScore(
 	opts ...SetGameScoreOption,
 ) error {
 	params := &SetGameScoreParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
-		Score: score,
-		ChatID: func(ctx *Context) int64 {
-			c := ctx.Chat()
-			if c == nil {
-				return 0
-			}
-
-			return c.ID
-		}(ctx),
+		UserID: ctx.userID(),
+		Score:  score,
+		ChatID: ctx.chatID(),
 		MessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -5811,8 +4815,7 @@ func (ctx *Context) SetGameScore(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetGameScore(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetGameScore(ctx.detached(), params)
 
 	return err
 }
@@ -5826,21 +4829,13 @@ func (ctx *Context) SetManagedBotAccessSettings(
 	opts ...SetManagedBotAccessSettingsOption,
 ) error {
 	params := &SetManagedBotAccessSettingsParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		UserID:             ctx.userID(),
 		IsAccessRestricted: isAccessRestricted,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetManagedBotAccessSettings(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetManagedBotAccessSettings(ctx.detached(), params)
 
 	return err
 }
@@ -5856,14 +4851,7 @@ func (ctx *Context) SetMessageReaction(
 	opts ...SetMessageReactionOption,
 ) error {
 	params := &SetMessageReactionParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -5876,8 +4864,7 @@ func (ctx *Context) SetMessageReaction(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetMessageReaction(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetMessageReaction(ctx.detached(), params)
 
 	return err
 }
@@ -5899,8 +4886,7 @@ func (ctx *Context) SetMyCommands(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetMyCommands(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetMyCommands(ctx.detached(), params)
 
 	return err
 }
@@ -5917,8 +4903,7 @@ func (ctx *Context) SetMyDefaultAdministratorRights(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetMyDefaultAdministratorRights(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetMyDefaultAdministratorRights(ctx.detached(), params)
 
 	return err
 }
@@ -5934,8 +4919,7 @@ func (ctx *Context) SetMyDescription(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetMyDescription(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetMyDescription(ctx.detached(), params)
 
 	return err
 }
@@ -5951,8 +4935,7 @@ func (ctx *Context) SetMyName(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetMyName(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetMyName(ctx.detached(), params)
 
 	return err
 }
@@ -5971,8 +4954,7 @@ func (ctx *Context) SetMyProfilePhoto(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetMyProfilePhoto(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetMyProfilePhoto(ctx.detached(), params)
 
 	return err
 }
@@ -5988,8 +4970,7 @@ func (ctx *Context) SetMyShortDescription(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetMyShortDescription(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetMyShortDescription(ctx.detached(), params)
 
 	return err
 }
@@ -6007,21 +4988,13 @@ func (ctx *Context) SetPassportDataErrors(
 	opts ...SetPassportDataErrorsOption,
 ) error {
 	params := &SetPassportDataErrorsParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		UserID: ctx.userID(),
 		Errors: errors,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetPassportDataErrors(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetPassportDataErrors(ctx.detached(), params)
 
 	return err
 }
@@ -6043,8 +5016,7 @@ func (ctx *Context) SetStickerEmojiList(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetStickerEmojiList(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetStickerEmojiList(ctx.detached(), params)
 
 	return err
 }
@@ -6064,8 +5036,7 @@ func (ctx *Context) SetStickerKeywords(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetStickerKeywords(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetStickerKeywords(ctx.detached(), params)
 
 	return err
 }
@@ -6087,8 +5058,7 @@ func (ctx *Context) SetStickerMaskPosition(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetStickerMaskPosition(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetStickerMaskPosition(ctx.detached(), params)
 
 	return err
 }
@@ -6109,8 +5079,7 @@ func (ctx *Context) SetStickerPositionInSet(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetStickerPositionInSet(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetStickerPositionInSet(ctx.detached(), params)
 
 	return err
 }
@@ -6126,22 +5095,14 @@ func (ctx *Context) SetStickerSetThumbnail(
 	opts ...SetStickerSetThumbnailOption,
 ) error {
 	params := &SetStickerSetThumbnailParams{
-		Name: name,
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		Name:   name,
+		UserID: ctx.userID(),
 		Format: format,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetStickerSetThumbnail(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetStickerSetThumbnail(ctx.detached(), params)
 
 	return err
 }
@@ -6162,8 +5123,7 @@ func (ctx *Context) SetStickerSetTitle(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetStickerSetTitle(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetStickerSetTitle(ctx.detached(), params)
 
 	return err
 }
@@ -6178,20 +5138,12 @@ func (ctx *Context) SetUserEmojiStatus(
 	opts ...SetUserEmojiStatusOption,
 ) error {
 	params := &SetUserEmojiStatusParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetUserEmojiStatus(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetUserEmojiStatus(ctx.detached(), params)
 
 	return err
 }
@@ -6217,8 +5169,7 @@ func (ctx *Context) SetWebhook(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.SetWebhook(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.SetWebhook(ctx.detached(), params)
 
 	return err
 }
@@ -6241,14 +5192,7 @@ func (ctx *Context) StopMessageLiveLocation(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -6268,8 +5212,7 @@ func (ctx *Context) StopMessageLiveLocation(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.StopMessageLiveLocation(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.StopMessageLiveLocation(ctx.detached(), params)
 
 	return err
 }
@@ -6292,14 +5235,7 @@ func (ctx *Context) StopPoll(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -6312,8 +5248,7 @@ func (ctx *Context) StopPoll(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.StopPoll(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.StopPoll(ctx.detached(), params)
 
 	return err
 }
@@ -6341,8 +5276,7 @@ func (ctx *Context) TransferBusinessAccountStars(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.TransferBusinessAccountStars(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.TransferBusinessAccountStars(ctx.detached(), params)
 
 	return err
 }
@@ -6373,8 +5307,7 @@ func (ctx *Context) TransferGift(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.TransferGift(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.TransferGift(ctx.detached(), params)
 
 	return err
 }
@@ -6392,28 +5325,13 @@ func (ctx *Context) UnbanChatMember(
 	opts ...UnbanChatMemberOption,
 ) error {
 	params := &UnbanChatMemberParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.UnbanChatMember(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.UnbanChatMember(ctx.detached(), params)
 
 	return err
 }
@@ -6428,21 +5346,13 @@ func (ctx *Context) UnbanChatSenderChat(
 	opts ...UnbanChatSenderChatOption,
 ) error {
 	params := &UnbanChatSenderChatParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID:       ctx.chatIdentifier(),
 		SenderChatID: senderChatID,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.UnbanChatSenderChat(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.UnbanChatSenderChat(ctx.detached(), params)
 
 	return err
 }
@@ -6456,20 +5366,12 @@ func (ctx *Context) UnhideGeneralForumTopic(
 	opts ...UnhideGeneralForumTopicOption,
 ) error {
 	params := &UnhideGeneralForumTopicParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.UnhideGeneralForumTopic(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.UnhideGeneralForumTopic(ctx.detached(), params)
 
 	return err
 }
@@ -6484,20 +5386,12 @@ func (ctx *Context) UnpinAllChatMessages(
 	opts ...UnpinAllChatMessagesOption,
 ) error {
 	params := &UnpinAllChatMessagesParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.UnpinAllChatMessages(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.UnpinAllChatMessages(ctx.detached(), params)
 
 	return err
 }
@@ -6511,14 +5405,7 @@ func (ctx *Context) UnpinAllForumTopicMessages(
 	opts ...UnpinAllForumTopicMessagesOption,
 ) error {
 	params := &UnpinAllForumTopicMessagesParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageThreadID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -6531,8 +5418,7 @@ func (ctx *Context) UnpinAllForumTopicMessages(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.UnpinAllForumTopicMessages(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.UnpinAllForumTopicMessages(ctx.detached(), params)
 
 	return err
 }
@@ -6546,20 +5432,12 @@ func (ctx *Context) UnpinAllGeneralForumTopicMessages(
 	opts ...UnpinAllGeneralForumTopicMessagesOption,
 ) error {
 	params := &UnpinAllGeneralForumTopicMessagesParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.UnpinAllGeneralForumTopicMessages(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.UnpinAllGeneralForumTopicMessages(ctx.detached(), params)
 
 	return err
 }
@@ -6582,14 +5460,7 @@ func (ctx *Context) UnpinChatMessage(
 
 			return m.BusinessConnectionID
 		}(ctx),
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 		MessageID: func(ctx *Context) int64 {
 			m := ctx.Message()
 			if m == nil {
@@ -6602,8 +5473,7 @@ func (ctx *Context) UnpinChatMessage(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.UnpinChatMessage(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.UnpinChatMessage(ctx.detached(), params)
 
 	return err
 }
@@ -6632,8 +5502,7 @@ func (ctx *Context) UpgradeGift(
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.UpgradeGift(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.UpgradeGift(ctx.detached(), params)
 
 	return err
 }
@@ -6653,22 +5522,14 @@ func (ctx *Context) UploadStickerFile(
 	opts ...UploadStickerFileOption,
 ) error {
 	params := &UploadStickerFileParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		UserID:        ctx.userID(),
 		Sticker:       sticker,
 		StickerFormat: stickerFormat,
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.UploadStickerFile(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.UploadStickerFile(ctx.detached(), params)
 
 	return err
 }
@@ -6683,20 +5544,12 @@ func (ctx *Context) VerifyChat(
 	opts ...VerifyChatOption,
 ) error {
 	params := &VerifyChatParams{
-		ChatID: func(ctx *Context) string {
-			c := ctx.Chat()
-			if c == nil {
-				return ""
-			}
-
-			return c.Identifier()
-		}(ctx),
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.VerifyChat(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.VerifyChat(ctx.detached(), params)
 
 	return err
 }
@@ -6711,20 +5564,12 @@ func (ctx *Context) VerifyUser(
 	opts ...VerifyUserOption,
 ) error {
 	params := &VerifyUserParams{
-		UserID: func(ctx *Context) int64 {
-			u := ctx.User()
-			if u == nil {
-				return 0
-			}
-
-			return u.ID
-		}(ctx),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	// Detach cancellation while preserving context values for worker-side requests.
-	_, err := ctx.client.VerifyUser(context.WithoutCancel(ctx.context), params)
+	_, err := ctx.client.VerifyUser(ctx.detached(), params)
 
 	return err
 }

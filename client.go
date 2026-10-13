@@ -1,7 +1,9 @@
 package gogram
 
 import (
+	"bytes"
 	"context"
+	"crypto/subtle"
 	"encoding/json"
 	"errors"
 	"io"
@@ -10,7 +12,6 @@ import (
 	"net/http/httptrace"
 	"strconv"
 	"strings"
-	"sync"
 	"sync/atomic"
 	"time"
 
@@ -24,7 +25,22 @@ const (
 	defaultRPS     = 30
 	defaultTimeout = 25 * time.Second
 	defaultUpdates = 100
+
+	// pollGrace is added to the long-poll timeout for the HTTP deadline of
+	// getUpdates: Telegram answers at the timeout boundary and the answer
+	// (up to 100 updates) still has to travel back. Too small means spurious
+	// deadline errors plus a backoff; too large only delays detecting a hung
+	// connection by the same amount.
+	pollGrace = 5 * time.Second
+
+	retryLimit = 5
+
+	contentTypeJSON = "application/json"
 )
+
+// headerJSON is the shared Content-Type value for JSON requests: assigning it
+// to req.Header skips the per-request []string allocation of Header.Set.
+var headerJSON = []string{contentTypeJSON}
 
 // ClientOption is a function that configures a Client.
 type ClientOption func(client *Client)
@@ -60,7 +76,7 @@ func WithRPS(rps int) ClientOption {
 	}
 }
 
-// WithTimeout sets the HTTP client timeout for the Client.
+// WithTimeout sets the per-request HTTP timeout for the Client.
 func WithTimeout(timeout time.Duration) ClientOption {
 	return func(c *Client) {
 		c.cfg.timeout = timeout
@@ -104,14 +120,6 @@ func WithNumWorkers(n int) ClientOption {
 	}
 }
 
-var defaultOpts = []ClientOption{
-	WithHost(defaultHost),
-	WithRPS(defaultRPS),
-	WithTimeout(defaultTimeout),
-	WithRouter(NewRouter()),
-	WithHTTPClient(http.DefaultClient),
-}
-
 // Client is a Telegram Bot API client.
 //
 // References:
@@ -123,16 +131,22 @@ type Client struct {
 
 	cfg clientConfig
 
-	httpTrace             *httptrace.ClientTrace
-	localAddr, remoteAddr atomic.Value
+	trace *httptrace.ClientTrace
+	addrs atomic.Pointer[connAddrs]
 
-	runMu sync.Mutex
-	run   *runState
+	run atomic.Pointer[runState]
 }
 
+// connAddrs is the address pair of the connection the last request went
+// through. Stored as one pointer so both addresses change atomically.
+type connAddrs struct {
+	conn          net.Conn
+	local, remote net.Addr
+}
+
+// runState is one Start/StartWebhook run.
 type runState struct {
-	stop     chan struct{}
-	stopOnce sync.Once
+	cancel context.CancelFunc
 }
 
 func (c *Client) setLinkPrefix() {
@@ -149,14 +163,10 @@ func (c *Client) setLinkPrefix() {
 }
 
 func (c *Client) setRateLimiter() {
-	var limit rate.Limit
-
-	burst := c.cfg.rps
+	limit, burst := rate.Inf, 0
 	if c.cfg.rps > 0 {
 		limit = rate.Every(time.Second / time.Duration(c.cfg.rps))
-	} else {
-		limit = rate.Inf
-		burst = 0
+		burst = c.cfg.rps
 	}
 
 	c.cfg.rateLimiter = rate.NewLimiter(limit, burst)
@@ -176,6 +186,9 @@ var (
 	ErrInvalidToken = errors.New("gogram: invalid token provided")
 	// ErrAlreadyStarted indicates that Start was called for an already running client.
 	ErrAlreadyStarted = errors.New("gogram: already started")
+	// ErrBodyNotRewindable indicates a retryable API error on a request whose
+	// body cannot be replayed (streamed multipart upload).
+	ErrBodyNotRewindable = errors.New("gogram: request body cannot be rewound for retry")
 )
 
 // NewClient creates a new Client with the provided token and options.
@@ -190,20 +203,34 @@ func NewClient(token string, opts ...ClientOption) (*Client, error) {
 		return nil, ErrInvalidToken
 	}
 
-	c := new(Client)
-
-	c.id = botID
-	c.token = token
-
-	c.httpTrace = &httptrace.ClientTrace{
-		GotConn: func(info httptrace.GotConnInfo) {
-			c.localAddr.Store(info.Conn.LocalAddr())
-			c.remoteAddr.Store(info.Conn.RemoteAddr())
+	c := &Client{
+		id:    botID,
+		token: token,
+		cfg: clientConfig{
+			host:       defaultHost,
+			rps:        defaultRPS,
+			timeout:    defaultTimeout,
+			httpClient: http.DefaultClient,
+			router:     NewRouter(), // one per client, never shared
 		},
 	}
 
-	for _, opt := range defaultOpts {
-		opt(c)
+	c.setLinkPrefix()
+	c.setRateLimiter()
+
+	c.trace = &httptrace.ClientTrace{
+		GotConn: func(info httptrace.GotConnInfo) {
+			// A reused connection stores nothing: no allocation per request.
+			if cur := c.addrs.Load(); cur != nil && cur.conn == info.Conn {
+				return
+			}
+
+			c.addrs.Store(&connAddrs{
+				conn:   info.Conn,
+				local:  info.Conn.LocalAddr(),
+				remote: info.Conn.RemoteAddr(),
+			})
+		},
 	}
 
 	for _, opt := range opts {
@@ -219,20 +246,38 @@ func (c *Client) ID() int64 {
 }
 
 // Token returns the bot's token. Be aware, it is credentials.
+//
+// Deprecated: use [Client.SameToken] to check a token without exposing it.
 func (c *Client) Token() string {
 	return c.token
 }
 
-// LocalAddr returns the local network address used by the client.
-func (c *Client) LocalAddr() net.Addr {
-	v, _ := c.localAddr.Load().(net.Addr)
-	return v
+// SameToken reports whether token equals the client's token, in constant time.
+// Use it to detect a rotated token without exposing the current one.
+func (c *Client) SameToken(token string) bool {
+	return subtle.ConstantTimeCompare([]byte(c.token), []byte(token)) == 1
 }
 
-// RemoteAddr returns the remote network address used by the client.
+// LocalAddr returns the local network address of the last connection the
+// client used. On a multi-homed host the kernel may route each connection
+// through a different interface; this reports which one actually carried
+// the traffic.
+func (c *Client) LocalAddr() net.Addr {
+	if a := c.addrs.Load(); a != nil {
+		return a.local
+	}
+
+	return nil
+}
+
+// RemoteAddr returns the remote network address of the last connection the
+// client used, see [Client.LocalAddr].
 func (c *Client) RemoteAddr() net.Addr {
-	v, _ := c.remoteAddr.Load().(net.Addr)
-	return v
+	if a := c.addrs.Load(); a != nil {
+		return a.remote
+	}
+
+	return nil
 }
 
 // Do sends an HTTP request and returns an HTTP response.
@@ -244,13 +289,162 @@ func (c *Client) Do(req *http.Request) (*http.Response, error) {
 	return c.cfg.httpClient.Do(req) //nolint:gosec // G107: client can send request to user-defined hosts
 }
 
-type contextKey struct {
-	name string
+// envelope is the API response with Result decoded straight into T:
+// one JSON pass, no intermediate RawMessage copy.
+type envelope[T any] struct {
+	Result      T                   `json:"result"`
+	Parameters  *ResponseParameters `json:"parameters"`
+	Description string              `json:"description"`
+	ErrorCode   int                 `json:"error_code"`
+	OK          bool                `json:"ok"`
 }
 
-var retryCountContextKey = &contextKey{name: "retry-count"}
+// call posts body to method and returns the decoded result. Retryable API
+// errors are retried up to retryLimit times when body can be rewound.
+// timeout bounds a single attempt; zero means no per-attempt deadline.
+func call[T any](
+	ctx context.Context,
+	c *Client,
+	method string,
+	body io.Reader,
+	contentType string,
+	timeout time.Duration,
+) (T, error) {
+	var zero T
 
-// Raw sends a raw request to the Telegram Bot API.
+	for attempt := 0; ; attempt++ {
+		var env envelope[T]
+
+		status, err := c.roundTrip(ctx, method, body, contentType, timeout, &env)
+		if err == nil {
+			if env.OK {
+				return env.Result, nil
+			}
+
+			err = genError(env.ErrorCode, status, env.Description, env.Parameters)
+		}
+
+		// Both transport-level errors (empty body, HTML 5xx) and API errors
+		// go through the same retry classification.
+		retryErr, ok := errors.AsType[*RetryError](err)
+		if !ok || attempt >= retryLimit {
+			return zero, err
+		}
+
+		if rewindErr := rewind(body); rewindErr != nil {
+			return zero, errors.Join(retryErr, rewindErr)
+		}
+
+		if sleepErr := sleep(ctx, retryErr.RetryAfter); sleepErr != nil {
+			return zero, sleepErr
+		}
+	}
+}
+
+// roundTrip performs one HTTP attempt and decodes the body into dst.
+func (c *Client) roundTrip(
+	ctx context.Context,
+	method string,
+	body io.Reader,
+	contentType string,
+	timeout time.Duration,
+	dst any,
+) (status string, err error) {
+	ctx = httptrace.WithClientTrace(ctx, c.trace)
+
+	if timeout > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, timeout)
+		defer cancel()
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.cfg.linkPrefix+method, body)
+	if err != nil {
+		return "", err
+	}
+
+	if contentType == contentTypeJSON {
+		req.Header["Content-Type"] = headerJSON
+	} else {
+		req.Header.Set("Content-Type", contentType)
+	}
+
+	resp, err := c.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close() //nolint:errcheck
+
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
+	if _, err = buffer.ReadFrom(resp.Body); err != nil {
+		return resp.Status, err
+	}
+
+	// Telegram occasionally answers with an empty body or the bare text
+	// "EOF", and proxies in front of it with an HTML error page: none of
+	// these is JSON, all are transient.
+	if body := bytes.TrimSpace(buffer.B); len(body) == 0 || string(body) == errTextEOF {
+		return resp.Status, &RetryError{Err: ErrEOF, RetryAfter: defaultTimeoutOnError}
+	}
+
+	if err = json.Unmarshal(buffer.B, dst); err != nil {
+		if resp.StatusCode >= http.StatusInternalServerError {
+			return resp.Status, genError(resp.StatusCode, resp.Status, "", nil)
+		}
+
+		return resp.Status, err
+	}
+
+	return resp.Status, nil
+}
+
+// rewind resets body to its start for a retry.
+func rewind(body io.Reader) error {
+	if body == nil {
+		return nil
+	}
+
+	seeker, ok := body.(io.Seeker)
+	if !ok {
+		return ErrBodyNotRewindable
+	}
+
+	_, err := seeker.Seek(0, io.SeekStart)
+
+	return err
+}
+
+// sleep waits d or until ctx is done.
+func sleep(ctx context.Context, d time.Duration) error {
+	timer := time.NewTimer(d)
+	defer timer.Stop()
+
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-timer.C:
+		return nil
+	}
+}
+
+// Call posts body to a Bot API method and decodes the result into T.
+// It is the typed escape hatch for methods without a generated wrapper:
+//
+//	msg, err := gogram.Call[*gogram.Message](ctx, c, "sendMessage", body, "application/json")
+//
+// Retryable API errors are retried when body implements io.Seeker.
+func Call[T any](ctx context.Context, c *Client, method string, body io.Reader, contentType string) (T, error) {
+	return call[T](ctx, c, method, body, contentType, c.cfg.timeout)
+}
+
+// Raw sends a raw request to the Telegram Bot API and returns the result
+// appended to dst.
+//
+// Deprecated: use [Call] with json.RawMessage.
+//
+//go:fix inline
 func (c *Client) Raw(
 	ctx context.Context,
 	method string,
@@ -258,124 +452,52 @@ func (c *Client) Raw(
 	contentType string,
 	dst []byte,
 ) (json.RawMessage, error) {
-	innerCtx := httptrace.WithClientTrace(ctx, c.httpTrace)
-
-	timeout := c.cfg.timeout
-	link := c.cfg.linkPrefix + method
-
-	if timeout > 0 {
-		var cancel context.CancelFunc
-		innerCtx, cancel = context.WithTimeout(innerCtx, timeout)
-		defer cancel()
-	}
-
-	req, err := http.NewRequestWithContext(innerCtx, http.MethodPost, link, reader)
+	result, err := Call[json.RawMessage](ctx, c, method, reader, contentType)
 	if err != nil {
 		return nil, err
 	}
 
-	req.Header.Set("Content-Type", contentType)
+	return append(dst, result...), nil
+}
 
-	resp, err := c.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close() //nolint:errcheck
-
+// getUpdates is the polling-loop variant of GetUpdates: the HTTP deadline
+// is derived from the long-poll timeout instead of cfg.timeout, see pollGrace.
+func (c *Client) getUpdates(ctx context.Context, params *GetUpdatesParams) ([]Update, error) {
 	buffer := acquireBuffer()
 	defer releaseBuffer(buffer)
 
-	_, err = io.Copy(buffer, resp.Body)
-	if err != nil {
+	if err := json.NewEncoder(buffer).Encode(params); err != nil {
 		return nil, err
 	}
 
-	var v Response
+	timeout := time.Duration(params.Timeout)*time.Second + pollGrace
 
-	err = json.Unmarshal(buffer.Bytes(), &v)
-	if err != nil {
-		return nil, err
-	}
-
-	if !v.OK {
-		err = genError(v.ErrorCode, resp.Status, v.Description, v.Parameters)
-		return c.handleRetryErr(ctx, method, reader, contentType, err, dst)
-	}
-
-	return append(dst, v.Result...), nil
+	return call[[]Update](ctx, c, "getUpdates", bytes.NewReader(buffer.B), contentTypeJSON, timeout)
 }
 
-func (c *Client) handleRetryErr(
-	ctx context.Context,
-	method string,
-	reader io.Reader,
-	contentType string,
-	err error,
-	dst []byte,
-) (json.RawMessage, error) {
-	const retryLimit = 5
-
-	if retryErr, ok := errors.AsType[*RetryError](err); ok {
-		retryCount := 0
-		if v := ctx.Value(retryCountContextKey); v != nil {
-			retryCount = v.(int)
-		}
-
-		if retryCount < retryLimit {
-			retryCount++
-			ctx = context.WithValue(ctx, retryCountContextKey, retryCount)
-
-			select {
-			case <-ctx.Done():
-				return nil, ctx.Err()
-			case <-time.After(retryErr.RetryAfter):
-			}
-
-			if reader != nil {
-				if seeker, ok := reader.(io.Seeker); ok {
-					if _, err = seeker.Seek(0, io.SeekStart); err != nil {
-						return nil, err
-					}
-				} else {
-					// Cannot rewind reader, retry would send empty body.
-					return nil, err
-				}
-			}
-
-			return c.Raw(ctx, method, reader, contentType, dst)
-		}
-	}
-
-	return nil, err
-}
-
-func (c *Client) startPolling(ctx context.Context, params *GetUpdatesParams, workers []chan *Context) {
+// poll runs the long-polling loop and returns ctx.Err() when ctx is done or
+// the API error when the bot is unauthorized or banned.
+func (c *Client) poll(ctx context.Context, params *GetUpdatesParams, workers []chan *Context) error {
 	numWorkers := int64(len(workers))
 	router := c.cfg.router
 
 	for {
-		select {
-		case <-ctx.Done():
-			return
-
-		default:
-		}
-
-		batch, err := c.GetUpdates(ctx, params)
+		batch, err := c.getUpdates(ctx, params)
 		if err != nil {
+			if ctxErr := ctx.Err(); ctxErr != nil {
+				return ctxErr
+			}
+
 			gogramCtx := c.acquireContext(ctx, nil)
 			router.HandleErr(gogramCtx, err)
 			c.releaseContext(gogramCtx)
 
 			if errors.Is(err, ErrUnauthorized) || errors.Is(err, ErrNotFoundBanned) {
-				return
+				return err
 			}
 
-			select {
-			case <-ctx.Done():
-				return
-
-			case <-time.After(defaultTimeoutOnError):
+			if sleepErr := sleep(ctx, defaultTimeoutOnError); sleepErr != nil {
+				return sleepErr
 			}
 
 			continue
@@ -385,16 +507,13 @@ func (c *Client) startPolling(ctx context.Context, params *GetUpdatesParams, wor
 			params.Offset = batch[i].UpdateID + 1
 			gogramCtx := c.acquireContext(ctx, &batch[i])
 
-			// send update to same worker
-			var chatID int64
-
+			// Updates of one chat always go to the same worker: ordering per chat.
+			key := batch[i].UpdateID
 			if chat := gogramCtx.Chat(); chat != nil {
-				chatID = chat.ID
-			} else {
-				chatID = batch[i].UpdateID
+				key = chat.ID
 			}
 
-			idx := chatID % numWorkers
+			idx := key % numWorkers
 			if idx < 0 {
 				idx = -idx
 			}
@@ -403,45 +522,27 @@ func (c *Client) startPolling(ctx context.Context, params *GetUpdatesParams, wor
 			case workers[idx] <- gogramCtx:
 			case <-ctx.Done():
 				c.releaseContext(gogramCtx)
-				return
+				return ctx.Err()
 			}
 		}
 	}
 }
 
 func (c *Client) beginRun(ctx context.Context) (context.Context, *runState, error) {
-	state := &runState{
-		stop: make(chan struct{}),
-	}
+	innerCtx, cancel := context.WithCancel(ctx)
+	state := &runState{cancel: cancel}
 
-	c.runMu.Lock()
-	if c.run != nil {
-		c.runMu.Unlock()
+	if !c.run.CompareAndSwap(nil, state) {
+		cancel()
 		return nil, nil, ErrAlreadyStarted
 	}
-	c.run = state
-	c.runMu.Unlock()
-
-	innerCtx, cancel := context.WithCancel(ctx)
-	go func() {
-		select {
-		case <-ctx.Done():
-		case <-state.stop:
-		}
-		cancel()
-	}()
 
 	return innerCtx, state, nil
 }
 
 func (c *Client) finishRun(state *runState) {
-	state.stopOnce.Do(func() { close(state.stop) })
-
-	c.runMu.Lock()
-	if c.run == state {
-		c.run = nil
-	}
-	c.runMu.Unlock()
+	state.cancel()
+	c.run.CompareAndSwap(state, nil)
 }
 
 // Stop requests the active polling or webhook run to stop.
@@ -449,11 +550,7 @@ func (c *Client) finishRun(state *runState) {
 // Stop never waits for handlers to finish, so it is safe to call from a
 // handler. Start or StartWebhook returns after the run has fully drained.
 func (c *Client) Stop() {
-	c.runMu.Lock()
-	state := c.run
-	c.runMu.Unlock()
-
-	if state != nil {
-		state.stopOnce.Do(func() { close(state.stop) })
+	if state := c.run.Load(); state != nil {
+		state.cancel()
 	}
 }

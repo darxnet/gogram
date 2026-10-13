@@ -2,10 +2,6 @@
 
 package gogram
 
-import (
-    "context"
-)
-
 {{ $root := . }}
 
 func (ctx *Context) findHandlerOn() handleOn {
@@ -184,8 +180,7 @@ func (ctx *Context) {{ $method }}(
         }
     {{ end }}
 
-    // Detach cancellation while preserving context values for worker-side requests.
-    _, err := ctx.client.{{ $method }}(context.WithoutCancel(ctx.context), params)
+    _, err := ctx.client.{{ $method }}(ctx.detached(), params)
 
     return err
 }

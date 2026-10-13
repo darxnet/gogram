@@ -1,21 +1,26 @@
 package gogram
 
-// Standard bot commands.
+// Global commands Telegram requires every bot to support.
+//
+// Reference: https://core.telegram.org/bots/features#global-commands
 const (
-	// CommandStart is the default start command.
+	// CommandStart begins the interaction with the user.
 	CommandStart = "/start"
-	// CommandHelp is the default help command.
+	// CommandHelp returns a help message.
 	CommandHelp = "/help"
-	// CommandSettings is the default settings command.
+	// CommandSettings shows the bot's settings for this user, if applicable.
 	CommandSettings = "/settings"
 )
 
-// RequiredCommands lists the commands that are typically required for a bot.
+// RequiredCommands lists the global commands every bot must support.
 var RequiredCommands = [...]string{
 	CommandStart,
 	CommandHelp,
 	CommandSettings,
 }
 
-// BusinessStartPayloadPrefix is the payload prefix used for business chat start links.
-const BusinessStartPayloadPrefix = "bizChat" // bizChat<user_chat_id>
+// BusinessStartPayloadPrefix is the /start payload prefix a bot receives when
+// a business account owner taps "Manage Bot": "/start bizChat<user_chat_id>".
+//
+// Reference: https://core.telegram.org/bots/features#business-mode
+const BusinessStartPayloadPrefix = "bizChat"

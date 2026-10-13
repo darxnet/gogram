@@ -26,12 +26,11 @@ import (
     // {{ $option }} configures {{ $params }}.
     type {{ $option }} = Option[{{ $params }}]
 
-    // Option applies one or more {{ $option }} values and returns the last rollback option.
-    func (r *{{ $params }}) Option(opts ...{{ $option }}) (previous {{ $option }}) {
+    // Option applies opts to r in order.
+    func (r *{{ $params }}) Option(opts ...{{ $option }}) {
         for _, opt := range opts {
-            previous = opt(r)
+            opt(r)
         }
-        return previous
     }
 
     {{ range .Params }}
@@ -122,23 +121,17 @@ import (
                         {{- $uploadCode }}
                     {{- end }}
                     {{- if ne $goType "InputFile" }}
-                        {{- /* Use pointer to trigger pointer-receiver MarshalJSON on union types. */}}
-                        var bs []byte
-                        bs, err = json.Marshal(&params.{{ $goTitle }})
+                        var p io.Writer
+                        p, err = writer.CreateFormField("{{ .Name }}")
                         if err != nil {
                             return
                         }
 
-                        var p io.Writer
-                        p, err = writer.CreateFormField("{{ .Name }}")
-                       	if err != nil {
-                      		return
-                       	}
-
-                        _, err = p.Write(bs)
-                       	if err != nil {
-                      		return
-                       	}
+                        {{- /* Pointer: triggers pointer-receiver MarshalJSON on union types. */}}
+                        err = json.NewEncoder(p).Encode(&params.{{ $goTitle }})
+                        if err != nil {
+                            return
+                        }
                     {{- end }}
                     }
                 {{- end }}
@@ -146,69 +139,47 @@ import (
 
             }()
         {{- else }}
-            buffer := new(bytes.Buffer)
-           	if err = json.NewEncoder(buffer).Encode(params); err != nil {
-          		return
-           	}
+            buffer := acquireBuffer()
+            defer releaseBuffer(buffer)
 
-           	reader := bytes.NewReader(buffer.Bytes())
-
-            contentType := "application/json"
-        {{ end }}
-
-        var result json.RawMessage
-
-        result, err = c.Raw(ctx, "{{ .Name }}", reader, contentType, nil)
-        if err != nil {
-            {{- if $multipart }}
-                _ = reader.CloseWithError(err)
-                <-writeErr
-            {{- end }}
-            return
-        }
-        {{- if $multipart }}
-            if err = <-writeErr; err != nil {
+            if err = json.NewEncoder(buffer).Encode(params); err != nil {
                 return
             }
+
+            reader := bytes.NewReader(buffer.B)
+            contentType := contentTypeJSON
+        {{ end }}
+
+        ret, err = call[{{ toType .Result false }}](ctx, c, "{{ .Name }}", reader, contentType, c.cfg.timeout)
+        {{- if $multipart }}
+            if err != nil {
+                _ = reader.CloseWithError(err)
+                <-writeErr
+                return
+            }
+
+            err = <-writeErr
         {{- end }}
 
-        {{ toMake .Result "ret" "ref" }}
-
-       	err = json.Unmarshal(result, ref)
-        if err != nil {
-            return
-        }
-
-       	return ret, err
+        return ret, err
     }
 {{ end }}
 
+// createFormFileFromInputFile streams f.File into the multipart body.
+// The caller owns f.File and closes it after the API call returns.
 func createFormFileFromInputFile(writer *multipart.Writer, f *InputFile, name string) error {
 	if f.File == nil {
 		return nil
 	}
 
-	var w io.Writer
-	var err error
-
 	f.fieldName = name
 
-	w, err = writer.CreateFormFile(f.fieldName, f.FileName)
+	w, err := writer.CreateFormFile(f.fieldName, f.FileName)
 	if err != nil {
 		return err
 	}
 
 	_, err = io.Copy(w, f.File)
-	if err != nil {
-		return err
-	}
 
-	if closer, ok := f.File.(io.Closer); ok {
-		err = closer.Close()
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return err
 }

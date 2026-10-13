@@ -7,6 +7,8 @@ import (
 )
 
 // Start starts the client and listens for updates using long polling.
+// It returns nil when ctx is cancelled or Stop is called, the context error
+// on deadline, and the API error when the bot is unauthorized or banned.
 func (c *Client) Start(ctx context.Context, params *GetUpdatesParams) error {
 	innerCtx, state, err := c.beginRun(ctx)
 	if err != nil {
@@ -14,55 +16,51 @@ func (c *Client) Start(ctx context.Context, params *GetUpdatesParams) error {
 	}
 	defer c.finishRun(state)
 
-	var localParams GetUpdatesParams
-
+	var local GetUpdatesParams
 	if params != nil {
-		localParams = *params
+		local = *params
 	}
 
-	if localParams.Limit == 0 {
-		localParams.Limit = defaultUpdates
+	if local.Limit <= 0 || local.Limit > defaultUpdates {
+		local.Limit = defaultUpdates
 	}
 
-	if localParams.Timeout == 0 {
-		localParams.Timeout = int64(defaultTimeout.Seconds())
+	if local.Timeout <= 0 {
+		local.Timeout = int64(defaultTimeout.Seconds())
 	}
 
-	numWorkers := localParams.Limit
+	numWorkers := local.Limit
 	if c.cfg.numWorkers > 0 {
 		numWorkers = int64(c.cfg.numWorkers)
 	}
 
-	workerChans := make([]chan *Context, numWorkers)
-	for i := range numWorkers {
-		workerChans[i] = make(chan *Context, max(localParams.Limit/numWorkers, 1))
+	workers := make([]chan *Context, numWorkers)
+	for i := range workers {
+		workers[i] = make(chan *Context, max(local.Limit/numWorkers, 1))
 	}
 
 	var wg sync.WaitGroup
-
-	wg.Go(func() {
-		defer func() {
-			for _, ch := range workerChans {
-				close(ch)
-			}
-		}()
-		c.startPolling(innerCtx, &localParams, workerChans)
-	})
-
-	for i := range numWorkers {
-		ch := workerChans[i]
+	for _, ch := range workers {
 		wg.Go(func() {
-			for ctx := range ch {
-				c.processUpdate(ctx)
+			for gogramCtx := range ch {
+				c.processUpdate(gogramCtx)
 			}
 		})
 	}
 
+	// The caller's goroutine polls; no extra goroutine, no close-on-defer dance.
+	err = c.poll(innerCtx, &local, workers)
+
+	for _, ch := range workers {
+		close(ch)
+	}
 	wg.Wait()
 
-	if err = ctx.Err(); !errors.Is(err, context.Canceled) {
-		return err
+	// Stop and a cancelled ctx are a normal shutdown; a deadline and
+	// fatal API errors are reported.
+	if errors.Is(err, context.Canceled) {
+		return nil
 	}
 
-	return nil
+	return err
 }

@@ -4,7 +4,6 @@ package gogram
 
 import (
     "encoding/json"
-    "errors"
 )
 
 {{ $root := . }}
@@ -109,7 +108,10 @@ import (
                     {{ end }}
                 {{ end }}
                 default:
-                    return errors.New("unknown subtype value: " + v.Discriminator)
+                    // A subtype this build does not know yet: leave every
+                    // field nil instead of failing the whole update, so a
+                    // Bot API release never stalls getUpdates.
+                    return nil
                 }
             }
         {{ end }}

@@ -2,6 +2,7 @@ package gogram
 
 import (
 	"context"
+	"crypto/subtle"
 	"encoding/json"
 	"errors"
 	"io"
@@ -69,6 +70,7 @@ func (c *Client) StartWebhook(ctx context.Context, addr string, params *SetWebho
 		Addr:              addr,
 		Handler:           mux,
 		ReadHeaderTimeout: readHeaderTimeout,
+		ReadTimeout:       max(c.cfg.timeout, readHeaderTimeout), // the body is bounded too
 	}
 
 	errCh := make(chan error, 1)
@@ -79,7 +81,12 @@ func (c *Client) StartWebhook(ctx context.Context, addr string, params *SetWebho
 	select {
 	case err = <-errCh:
 	case <-innerCtx.Done():
-		shutdownCtx, shutdownCancel := context.WithTimeout(context.WithoutCancel(ctx), c.cfg.timeout)
+		shutdownTimeout := c.cfg.timeout
+		if shutdownTimeout <= 0 {
+			shutdownTimeout = defaultTimeout
+		}
+
+		shutdownCtx, shutdownCancel := context.WithTimeout(context.WithoutCancel(ctx), shutdownTimeout)
 		defer shutdownCancel()
 		shutdownErr := srv.Shutdown(shutdownCtx)
 		if shutdownErr != nil {
@@ -102,9 +109,7 @@ func (c *Client) StartWebhook(ctx context.Context, addr string, params *SetWebho
 
 func (c *Client) webhookHandler(secretToken string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		defer func() { _ = r.Body.Close() }()
-
-		if secretToken != "" && r.Header.Get("X-Telegram-Bot-Api-Secret-Token") != secretToken {
+		if secretToken != "" && !validSecretToken(r.Header.Get("X-Telegram-Bot-Api-Secret-Token"), secretToken) {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
 			return
 		}
@@ -130,4 +135,9 @@ func (c *Client) webhookHandler(secretToken string) http.HandlerFunc {
 		c.processUpdate(c.acquireContext(r.Context(), &update))
 		w.WriteHeader(http.StatusOK)
 	}
+}
+
+// validSecretToken compares the webhook secret in constant time.
+func validSecretToken(got, want string) bool {
+	return subtle.ConstantTimeCompare([]byte(got), []byte(want)) == 1
 }

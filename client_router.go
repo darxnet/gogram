@@ -7,6 +7,12 @@ type Processor interface {
 	HandlePanic(ctx *Context, v any)
 }
 
+// Router returns the update processor of the client: the one passed with
+// WithRouter, or the client's own default [Router].
+func (c *Client) Router() Processor {
+	return c.cfg.router
+}
+
 func (c *Client) processUpdate(gogramCtx *Context) {
 	defer c.releaseContext(gogramCtx)
 	c.cfg.router.Process(gogramCtx)

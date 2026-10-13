@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"embed"
-	"fmt"
 	"go/format"
 	"io/fs"
 	"log"
@@ -24,7 +23,6 @@ func parseTemplates() *template.Template {
 	funcMap := template.FuncMap{
 		"toTitle":      toTitle,
 		"toType":       toType,
-		"toMake":       toMake,
 		"toLowerFirst": toLowerFirst,
 	}
 
@@ -74,24 +72,25 @@ func toTitle(s string) string {
 	}, s)
 }
 
+// typeMapping maps Telegram doc type names onto Go types.
+var typeMapping = map[string]string{
+	// types
+
+	"Integer":           "int64",
+	"String":            "string",
+	"Integer or String": "string",
+	"Boolean":           "bool",
+	"True":              "bool",
+	"Float":             "float64",
+
+	// methods
+
+	"InlineKeyboardMarkup or ReplyKeyboardMarkup or ReplyKeyboardRemove or ForceReply": "ReplyMarkup",
+	"InputFile or String": "InputFile",
+	"Int":                 "int64",
+}
+
 func toType(s string, required bool) string {
-	var typeMapping = map[string]string{
-		// types
-
-		"Integer":           "int64",
-		"String":            "string",
-		"Integer or String": "string",
-		"Boolean":           "bool",
-		"True":              "bool",
-		"Float":             "float64",
-
-		// methods
-
-		"InlineKeyboardMarkup or ReplyKeyboardMarkup or ReplyKeyboardRemove or ForceReply": "ReplyMarkup",
-		"InputFile or String": "InputFile",
-		"Int":                 "int64",
-	}
-
 	arrayDepth := 0
 
 	for strings.HasPrefix(s, prefixArrayOf) {
@@ -115,24 +114,6 @@ func toType(s string, required bool) string {
 	}
 
 	return strings.Repeat("[]", arrayDepth) + s
-}
-
-func toMake(s, ret, ref string) string {
-	typ := toType(s, true)
-
-	if typ == "" {
-		return "!!!" + s
-	}
-
-	if typ[0] == '[' {
-		return fmt.Sprintf("%[1]s = make(%[3]s, 0, 100)\n%[2]s := &%[1]s", ret, ref, typ)
-	}
-
-	if !isTitle(typ[0]) {
-		return fmt.Sprintf("%s := &%s", ref, ret)
-	}
-
-	return fmt.Sprintf("%[1]s = new(%[3]s)\n%[2]s := %[1]s", ret, ref, typ)
 }
 
 func toLowerFirst(s string) string {

@@ -285,7 +285,7 @@ func parseResult(paragraphs []*html.Node) string {
 				}
 
 				s := findText(node.NextSibling)
-				if !isTitle(s[0]) {
+				if s == "" || !isTitle(s[0]) {
 					continue
 				}
 

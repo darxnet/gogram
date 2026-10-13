@@ -80,7 +80,7 @@ func (r *Router) HandlePanic(ctx *Context, v any) {
 //	"/start"           → "/start"
 //	"/start payload"   → "/start"
 //	"/start@bot"       → "/start"
-func (r *Router) retrieveCommand(text string) string {
+func retrieveCommand(text string) string {
 	if text == "" || text[0] != '/' {
 		return ""
 	}
@@ -104,7 +104,7 @@ func (r *Router) Process(ctx *Context) {
 
 	// fast path: command map lookup.
 	if len(r.handlersCommands) != 0 && (1<<on)&commandHandlersMask != 0 {
-		if command := r.retrieveCommand(ctx.Text()); command != "" {
+		if command := retrieveCommand(ctx.Text()); command != "" {
 			if routes, ok := r.handlersCommands[command]; ok {
 				for i := range routes {
 					if routes[i].filter(ctx) {
@@ -286,7 +286,7 @@ func (rg *RouterGroup) HandleKeyboardButton(
 	b *KeyboardButton,
 	handler func(ctx *Context, m *Message) error,
 ) {
-	if command := rg.router.retrieveCommand(b.Text); command != "" {
+	if command := retrieveCommand(b.Text); command != "" {
 		rg.HandleCommand(command, handler)
 		return
 	}

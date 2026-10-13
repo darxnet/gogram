@@ -27,12 +27,11 @@ type AddStickerToSetParams struct {
 // AddStickerToSetOption configures AddStickerToSetParams.
 type AddStickerToSetOption = Option[AddStickerToSetParams]
 
-// Option applies one or more AddStickerToSetOption values and returns the last rollback option.
-func (r *AddStickerToSetParams) Option(opts ...AddStickerToSetOption) (previous AddStickerToSetOption) {
+// Option applies opts to r in order.
+func (r *AddStickerToSetParams) Option(opts ...AddStickerToSetOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithAddStickerToSetUserID sets the UserID field.
@@ -120,19 +119,12 @@ func (c *Client) AddStickerToSet(ctx context.Context, params *AddStickerToSetPar
 				return
 			}
 
-			var bs []byte
-			bs, err = json.Marshal(&params.Sticker)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("sticker")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.Sticker)
 			if err != nil {
 				return
 			}
@@ -140,24 +132,14 @@ func (c *Client) AddStickerToSet(ctx context.Context, params *AddStickerToSetPar
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "addStickerToSet", reader, contentType, nil)
+	ret, err = call[bool](ctx, c, "addStickerToSet", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -193,12 +175,11 @@ type AnswerCallbackQueryParams struct {
 // AnswerCallbackQueryOption configures AnswerCallbackQueryParams.
 type AnswerCallbackQueryOption = Option[AnswerCallbackQueryParams]
 
-// Option applies one or more AnswerCallbackQueryOption values and returns the last rollback option.
-func (r *AnswerCallbackQueryParams) Option(opts ...AnswerCallbackQueryOption) (previous AnswerCallbackQueryOption) {
+// Option applies opts to r in order.
+func (r *AnswerCallbackQueryParams) Option(opts ...AnswerCallbackQueryOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithAnswerCallbackQueryCallbackQueryID sets the CallbackQueryID field.
@@ -264,28 +245,17 @@ func WithAnswerCallbackQueryCacheTime(value int64) AnswerCallbackQueryOption {
 //
 // [inline keyboards]: https://core.telegram.org/bots/features#inline-keyboards
 func (c *Client) AnswerCallbackQuery(ctx context.Context, params *AnswerCallbackQueryParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "answerCallbackQuery", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "answerCallbackQuery", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -303,12 +273,11 @@ type AnswerChatJoinRequestQueryParams struct {
 // AnswerChatJoinRequestQueryOption configures AnswerChatJoinRequestQueryParams.
 type AnswerChatJoinRequestQueryOption = Option[AnswerChatJoinRequestQueryParams]
 
-// Option applies one or more AnswerChatJoinRequestQueryOption values and returns the last rollback option.
-func (r *AnswerChatJoinRequestQueryParams) Option(opts ...AnswerChatJoinRequestQueryOption) (previous AnswerChatJoinRequestQueryOption) {
+// Option applies opts to r in order.
+func (r *AnswerChatJoinRequestQueryParams) Option(opts ...AnswerChatJoinRequestQueryOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithAnswerChatJoinRequestQueryChatJoinRequestQueryID sets the ChatJoinRequestQueryID field.
@@ -335,28 +304,17 @@ func WithAnswerChatJoinRequestQueryResult(value string) AnswerChatJoinRequestQue
 // Use this method to process a received chat join request query.
 // Returns True on success.
 func (c *Client) AnswerChatJoinRequestQuery(ctx context.Context, params *AnswerChatJoinRequestQueryParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "answerChatJoinRequestQuery", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "answerChatJoinRequestQuery", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -373,12 +331,11 @@ type AnswerGuestQueryParams struct {
 // AnswerGuestQueryOption configures AnswerGuestQueryParams.
 type AnswerGuestQueryOption = Option[AnswerGuestQueryParams]
 
-// Option applies one or more AnswerGuestQueryOption values and returns the last rollback option.
-func (r *AnswerGuestQueryParams) Option(opts ...AnswerGuestQueryOption) (previous AnswerGuestQueryOption) {
+// Option applies opts to r in order.
+func (r *AnswerGuestQueryParams) Option(opts ...AnswerGuestQueryOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithAnswerGuestQueryGuestQueryID sets the GuestQueryID field.
@@ -406,29 +363,17 @@ func WithAnswerGuestQueryResult(value InlineQueryResult) AnswerGuestQueryOption 
 //
 // [SentGuestMessage]: https://core.telegram.org/bots/api#sentguestmessage
 func (c *Client) AnswerGuestQuery(ctx context.Context, params *AnswerGuestQueryParams) (ret *SentGuestMessage, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "answerGuestQuery", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(SentGuestMessage)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*SentGuestMessage](ctx, c, "answerGuestQuery", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -461,12 +406,11 @@ type AnswerInlineQueryParams struct {
 // AnswerInlineQueryOption configures AnswerInlineQueryParams.
 type AnswerInlineQueryOption = Option[AnswerInlineQueryParams]
 
-// Option applies one or more AnswerInlineQueryOption values and returns the last rollback option.
-func (r *AnswerInlineQueryParams) Option(opts ...AnswerInlineQueryOption) (previous AnswerInlineQueryOption) {
+// Option applies opts to r in order.
+func (r *AnswerInlineQueryParams) Option(opts ...AnswerInlineQueryOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithAnswerInlineQueryInlineQueryID sets the InlineQueryID field.
@@ -533,28 +477,17 @@ func WithAnswerInlineQueryButton(value *InlineQueryResultsButton) AnswerInlineQu
 // On success, True is returned.
 // No more than 50 results per query are allowed.
 func (c *Client) AnswerInlineQuery(ctx context.Context, params *AnswerInlineQueryParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "answerInlineQuery", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "answerInlineQuery", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -579,12 +512,11 @@ type AnswerPreCheckoutQueryParams struct {
 // AnswerPreCheckoutQueryOption configures AnswerPreCheckoutQueryParams.
 type AnswerPreCheckoutQueryOption = Option[AnswerPreCheckoutQueryParams]
 
-// Option applies one or more AnswerPreCheckoutQueryOption values and returns the last rollback option.
-func (r *AnswerPreCheckoutQueryParams) Option(opts ...AnswerPreCheckoutQueryOption) (previous AnswerPreCheckoutQueryOption) {
+// Option applies opts to r in order.
+func (r *AnswerPreCheckoutQueryParams) Option(opts ...AnswerPreCheckoutQueryOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithAnswerPreCheckoutQueryPreCheckoutQueryID sets the PreCheckoutQueryID field.
@@ -628,28 +560,17 @@ func WithAnswerPreCheckoutQueryErrorMessage(value string) AnswerPreCheckoutQuery
 //
 // [Update]: https://core.telegram.org/bots/api#update
 func (c *Client) AnswerPreCheckoutQuery(ctx context.Context, params *AnswerPreCheckoutQueryParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "answerPreCheckoutQuery", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "answerPreCheckoutQuery", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -676,12 +597,11 @@ type AnswerShippingQueryParams struct {
 // AnswerShippingQueryOption configures AnswerShippingQueryParams.
 type AnswerShippingQueryOption = Option[AnswerShippingQueryParams]
 
-// Option applies one or more AnswerShippingQueryOption values and returns the last rollback option.
-func (r *AnswerShippingQueryParams) Option(opts ...AnswerShippingQueryOption) (previous AnswerShippingQueryOption) {
+// Option applies opts to r in order.
+func (r *AnswerShippingQueryParams) Option(opts ...AnswerShippingQueryOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithAnswerShippingQueryShippingQueryID sets the ShippingQueryID field.
@@ -732,28 +652,17 @@ func WithAnswerShippingQueryErrorMessage(value string) AnswerShippingQueryOption
 //
 // [Update]: https://core.telegram.org/bots/api#update
 func (c *Client) AnswerShippingQuery(ctx context.Context, params *AnswerShippingQueryParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "answerShippingQuery", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "answerShippingQuery", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -770,12 +679,11 @@ type AnswerWebAppQueryParams struct {
 // AnswerWebAppQueryOption configures AnswerWebAppQueryParams.
 type AnswerWebAppQueryOption = Option[AnswerWebAppQueryParams]
 
-// Option applies one or more AnswerWebAppQueryOption values and returns the last rollback option.
-func (r *AnswerWebAppQueryParams) Option(opts ...AnswerWebAppQueryOption) (previous AnswerWebAppQueryOption) {
+// Option applies opts to r in order.
+func (r *AnswerWebAppQueryParams) Option(opts ...AnswerWebAppQueryOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithAnswerWebAppQueryWebAppQueryID sets the WebAppQueryID field.
@@ -804,29 +712,17 @@ func WithAnswerWebAppQueryResult(value InlineQueryResult) AnswerWebAppQueryOptio
 // [Web App]: https://core.telegram.org/bots/webapps
 // [SentWebAppMessage]: https://core.telegram.org/bots/api#sentwebappmessage
 func (c *Client) AnswerWebAppQuery(ctx context.Context, params *AnswerWebAppQueryParams) (ret *SentWebAppMessage, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "answerWebAppQuery", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(SentWebAppMessage)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*SentWebAppMessage](ctx, c, "answerWebAppQuery", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -843,12 +739,11 @@ type ApproveChatJoinRequestParams struct {
 // ApproveChatJoinRequestOption configures ApproveChatJoinRequestParams.
 type ApproveChatJoinRequestOption = Option[ApproveChatJoinRequestParams]
 
-// Option applies one or more ApproveChatJoinRequestOption values and returns the last rollback option.
-func (r *ApproveChatJoinRequestParams) Option(opts ...ApproveChatJoinRequestOption) (previous ApproveChatJoinRequestOption) {
+// Option applies opts to r in order.
+func (r *ApproveChatJoinRequestParams) Option(opts ...ApproveChatJoinRequestOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithApproveChatJoinRequestChatID sets the ChatID field.
@@ -875,28 +770,17 @@ func WithApproveChatJoinRequestUserID(value int64) ApproveChatJoinRequestOption 
 // The bot must be an administrator in the chat for this to work and must have the can_invite_users administrator right.
 // Returns True on success.
 func (c *Client) ApproveChatJoinRequest(ctx context.Context, params *ApproveChatJoinRequestParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "approveChatJoinRequest", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "approveChatJoinRequest", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -917,12 +801,11 @@ type ApproveSuggestedPostParams struct {
 // ApproveSuggestedPostOption configures ApproveSuggestedPostParams.
 type ApproveSuggestedPostOption = Option[ApproveSuggestedPostParams]
 
-// Option applies one or more ApproveSuggestedPostOption values and returns the last rollback option.
-func (r *ApproveSuggestedPostParams) Option(opts ...ApproveSuggestedPostOption) (previous ApproveSuggestedPostOption) {
+// Option applies opts to r in order.
+func (r *ApproveSuggestedPostParams) Option(opts ...ApproveSuggestedPostOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithApproveSuggestedPostChatID sets the ChatID field.
@@ -959,28 +842,17 @@ func WithApproveSuggestedPostSendDate(value int64) ApproveSuggestedPostOption {
 // The bot must have the 'can_post_messages' administrator right in the corresponding channel chat.
 // Returns True on success.
 func (c *Client) ApproveSuggestedPost(ctx context.Context, params *ApproveSuggestedPostParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "approveSuggestedPost", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "approveSuggestedPost", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -1007,12 +879,11 @@ type BanChatMemberParams struct {
 // BanChatMemberOption configures BanChatMemberParams.
 type BanChatMemberOption = Option[BanChatMemberParams]
 
-// Option applies one or more BanChatMemberOption values and returns the last rollback option.
-func (r *BanChatMemberParams) Option(opts ...BanChatMemberOption) (previous BanChatMemberOption) {
+// Option applies opts to r in order.
+func (r *BanChatMemberParams) Option(opts ...BanChatMemberOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithBanChatMemberChatID sets the ChatID field.
@@ -1064,28 +935,17 @@ func WithBanChatMemberRevokeMessages(value bool) BanChatMemberOption {
 //
 // [unbanned]: https://core.telegram.org/bots/api#unbanchatmember
 func (c *Client) BanChatMember(ctx context.Context, params *BanChatMemberParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "banChatMember", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "banChatMember", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -1102,12 +962,11 @@ type BanChatSenderChatParams struct {
 // BanChatSenderChatOption configures BanChatSenderChatParams.
 type BanChatSenderChatOption = Option[BanChatSenderChatParams]
 
-// Option applies one or more BanChatSenderChatOption values and returns the last rollback option.
-func (r *BanChatSenderChatParams) Option(opts ...BanChatSenderChatOption) (previous BanChatSenderChatOption) {
+// Option applies opts to r in order.
+func (r *BanChatSenderChatParams) Option(opts ...BanChatSenderChatOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithBanChatSenderChatChatID sets the ChatID field.
@@ -1137,28 +996,17 @@ func WithBanChatSenderChatSenderChatID(value int64) BanChatSenderChatOption {
 //
 // [unbanned]: https://core.telegram.org/bots/api#unbanchatsenderchat
 func (c *Client) BanChatSenderChat(ctx context.Context, params *BanChatSenderChatParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "banChatSenderChat", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "banChatSenderChat", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -1170,12 +1018,11 @@ type CloseParams struct {
 // CloseOption configures CloseParams.
 type CloseOption = Option[CloseParams]
 
-// Option applies one or more CloseOption values and returns the last rollback option.
-func (r *CloseParams) Option(opts ...CloseOption) (previous CloseOption) {
+// Option applies opts to r in order.
+func (r *CloseParams) Option(opts ...CloseOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // Close calls the close Telegram Bot API method.
@@ -1186,28 +1033,17 @@ func (r *CloseParams) Option(opts ...CloseOption) (previous CloseOption) {
 // Returns True on success.
 // Requires no parameters.
 func (c *Client) Close(ctx context.Context, params *CloseParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "close", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "close", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -1224,12 +1060,11 @@ type CloseForumTopicParams struct {
 // CloseForumTopicOption configures CloseForumTopicParams.
 type CloseForumTopicOption = Option[CloseForumTopicParams]
 
-// Option applies one or more CloseForumTopicOption values and returns the last rollback option.
-func (r *CloseForumTopicParams) Option(opts ...CloseForumTopicOption) (previous CloseForumTopicOption) {
+// Option applies opts to r in order.
+func (r *CloseForumTopicParams) Option(opts ...CloseForumTopicOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithCloseForumTopicChatID sets the ChatID field.
@@ -1256,28 +1091,17 @@ func WithCloseForumTopicMessageThreadID(value int64) CloseForumTopicOption {
 // The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights, unless it is the creator of the topic.
 // Returns True on success.
 func (c *Client) CloseForumTopic(ctx context.Context, params *CloseForumTopicParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "closeForumTopic", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "closeForumTopic", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -1291,12 +1115,11 @@ type CloseGeneralForumTopicParams struct {
 // CloseGeneralForumTopicOption configures CloseGeneralForumTopicParams.
 type CloseGeneralForumTopicOption = Option[CloseGeneralForumTopicParams]
 
-// Option applies one or more CloseGeneralForumTopicOption values and returns the last rollback option.
-func (r *CloseGeneralForumTopicParams) Option(opts ...CloseGeneralForumTopicOption) (previous CloseGeneralForumTopicOption) {
+// Option applies opts to r in order.
+func (r *CloseGeneralForumTopicParams) Option(opts ...CloseGeneralForumTopicOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithCloseGeneralForumTopicChatID sets the ChatID field.
@@ -1314,28 +1137,17 @@ func WithCloseGeneralForumTopicChatID(value string) CloseGeneralForumTopicOption
 // The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights.
 // Returns True on success.
 func (c *Client) CloseGeneralForumTopic(ctx context.Context, params *CloseGeneralForumTopicParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "closeGeneralForumTopic", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "closeGeneralForumTopic", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -1352,12 +1164,11 @@ type ConvertGiftToStarsParams struct {
 // ConvertGiftToStarsOption configures ConvertGiftToStarsParams.
 type ConvertGiftToStarsOption = Option[ConvertGiftToStarsParams]
 
-// Option applies one or more ConvertGiftToStarsOption values and returns the last rollback option.
-func (r *ConvertGiftToStarsParams) Option(opts ...ConvertGiftToStarsOption) (previous ConvertGiftToStarsOption) {
+// Option applies opts to r in order.
+func (r *ConvertGiftToStarsParams) Option(opts ...ConvertGiftToStarsOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithConvertGiftToStarsBusinessConnectionID sets the BusinessConnectionID field.
@@ -1384,28 +1195,17 @@ func WithConvertGiftToStarsOwnedGiftID(value string) ConvertGiftToStarsOption {
 // Requires the can_convert_gifts_to_stars business bot right.
 // Returns True on success.
 func (c *Client) ConvertGiftToStars(ctx context.Context, params *ConvertGiftToStarsParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "convertGiftToStars", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "convertGiftToStars", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -1483,12 +1283,11 @@ type CopyMessageParams struct {
 // CopyMessageOption configures CopyMessageParams.
 type CopyMessageOption = Option[CopyMessageParams]
 
-// Option applies one or more CopyMessageOption values and returns the last rollback option.
-func (r *CopyMessageParams) Option(opts ...CopyMessageOption) (previous CopyMessageOption) {
+// Option applies opts to r in order.
+func (r *CopyMessageParams) Option(opts ...CopyMessageOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithCopyMessageChatID sets the ChatID field.
@@ -1672,29 +1471,17 @@ func WithCopyMessageReplyMarkup(value *ReplyMarkup) CopyMessageOption {
 // [forwardMessage]: https://core.telegram.org/bots/api#forwardmessage
 // [MessageId]: https://core.telegram.org/bots/api#messageid
 func (c *Client) CopyMessage(ctx context.Context, params *CopyMessageParams) (ret *MessageId, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "copyMessage", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(MessageId)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*MessageId](ctx, c, "copyMessage", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -1733,12 +1520,11 @@ type CopyMessagesParams struct {
 // CopyMessagesOption configures CopyMessagesParams.
 type CopyMessagesOption = Option[CopyMessagesParams]
 
-// Option applies one or more CopyMessagesOption values and returns the last rollback option.
-func (r *CopyMessagesParams) Option(opts ...CopyMessagesOption) (previous CopyMessagesOption) {
+// Option applies opts to r in order.
+func (r *CopyMessagesParams) Option(opts ...CopyMessagesOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithCopyMessagesChatID sets the ChatID field.
@@ -1831,29 +1617,17 @@ func WithCopyMessagesRemoveCaption(value bool) CopyMessagesOption {
 // [forwardMessages]: https://core.telegram.org/bots/api#forwardmessages
 // [MessageId]: https://core.telegram.org/bots/api#messageid
 func (c *Client) CopyMessages(ctx context.Context, params *CopyMessagesParams) (ret []MessageId, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "copyMessages", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = make([]MessageId, 0, 100)
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[[]MessageId](ctx, c, "copyMessages", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -1880,12 +1654,11 @@ type CreateChatInviteLinkParams struct {
 // CreateChatInviteLinkOption configures CreateChatInviteLinkParams.
 type CreateChatInviteLinkOption = Option[CreateChatInviteLinkParams]
 
-// Option applies one or more CreateChatInviteLinkOption values and returns the last rollback option.
-func (r *CreateChatInviteLinkParams) Option(opts ...CreateChatInviteLinkOption) (previous CreateChatInviteLinkOption) {
+// Option applies opts to r in order.
+func (r *CreateChatInviteLinkParams) Option(opts ...CreateChatInviteLinkOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithCreateChatInviteLinkChatID sets the ChatID field.
@@ -1944,29 +1717,17 @@ func WithCreateChatInviteLinkCreatesJoinRequest(value bool) CreateChatInviteLink
 // [revokeChatInviteLink]: https://core.telegram.org/bots/api#revokechatinvitelink
 // [ChatInviteLink]: https://core.telegram.org/bots/api#chatinvitelink
 func (c *Client) CreateChatInviteLink(ctx context.Context, params *CreateChatInviteLinkParams) (ret *ChatInviteLink, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "createChatInviteLink", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(ChatInviteLink)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*ChatInviteLink](ctx, c, "createChatInviteLink", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -1990,12 +1751,11 @@ type CreateChatSubscriptionInviteLinkParams struct {
 // CreateChatSubscriptionInviteLinkOption configures CreateChatSubscriptionInviteLinkParams.
 type CreateChatSubscriptionInviteLinkOption = Option[CreateChatSubscriptionInviteLinkParams]
 
-// Option applies one or more CreateChatSubscriptionInviteLinkOption values and returns the last rollback option.
-func (r *CreateChatSubscriptionInviteLinkParams) Option(opts ...CreateChatSubscriptionInviteLinkOption) (previous CreateChatSubscriptionInviteLinkOption) {
+// Option applies opts to r in order.
+func (r *CreateChatSubscriptionInviteLinkParams) Option(opts ...CreateChatSubscriptionInviteLinkOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithCreateChatSubscriptionInviteLinkChatID sets the ChatID field.
@@ -2047,29 +1807,17 @@ func WithCreateChatSubscriptionInviteLinkSubscriptionPrice(value int64) CreateCh
 // [revokeChatInviteLink]: https://core.telegram.org/bots/api#revokechatinvitelink
 // [ChatInviteLink]: https://core.telegram.org/bots/api#chatinvitelink
 func (c *Client) CreateChatSubscriptionInviteLink(ctx context.Context, params *CreateChatSubscriptionInviteLinkParams) (ret *ChatInviteLink, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "createChatSubscriptionInviteLink", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(ChatInviteLink)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*ChatInviteLink](ctx, c, "createChatSubscriptionInviteLink", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -2096,12 +1844,11 @@ type CreateForumTopicParams struct {
 // CreateForumTopicOption configures CreateForumTopicParams.
 type CreateForumTopicOption = Option[CreateForumTopicParams]
 
-// Option applies one or more CreateForumTopicOption values and returns the last rollback option.
-func (r *CreateForumTopicParams) Option(opts ...CreateForumTopicOption) (previous CreateForumTopicOption) {
+// Option applies opts to r in order.
+func (r *CreateForumTopicParams) Option(opts ...CreateForumTopicOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithCreateForumTopicChatID sets the ChatID field.
@@ -2152,29 +1899,17 @@ func WithCreateForumTopicIconCustomEmojiID(value string) CreateForumTopicOption 
 //
 // [ForumTopic]: https://core.telegram.org/bots/api#forumtopic
 func (c *Client) CreateForumTopic(ctx context.Context, params *CreateForumTopicParams) (ret *ForumTopic, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "createForumTopic", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(ForumTopic)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*ForumTopic](ctx, c, "createForumTopic", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -2303,12 +2038,11 @@ type CreateInvoiceLinkParams struct {
 // CreateInvoiceLinkOption configures CreateInvoiceLinkParams.
 type CreateInvoiceLinkOption = Option[CreateInvoiceLinkParams]
 
-// Option applies one or more CreateInvoiceLinkOption values and returns the last rollback option.
-func (r *CreateInvoiceLinkParams) Option(opts ...CreateInvoiceLinkOption) (previous CreateInvoiceLinkOption) {
+// Option applies opts to r in order.
+func (r *CreateInvoiceLinkParams) Option(opts ...CreateInvoiceLinkOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithCreateInvoiceLinkBusinessConnectionID sets the BusinessConnectionID field.
@@ -2566,28 +2300,17 @@ func WithCreateInvoiceLinkIsFlexible(value bool) CreateInvoiceLinkOption {
 // Use this method to create a link for an invoice.
 // Returns the created invoice link as String on success.
 func (c *Client) CreateInvoiceLink(ctx context.Context, params *CreateInvoiceLinkParams) (ret string, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "createInvoiceLink", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[string](ctx, c, "createInvoiceLink", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -2621,12 +2344,11 @@ type CreateNewStickerSetParams struct {
 // CreateNewStickerSetOption configures CreateNewStickerSetParams.
 type CreateNewStickerSetOption = Option[CreateNewStickerSetParams]
 
-// Option applies one or more CreateNewStickerSetOption values and returns the last rollback option.
-func (r *CreateNewStickerSetParams) Option(opts ...CreateNewStickerSetOption) (previous CreateNewStickerSetOption) {
+// Option applies opts to r in order.
+func (r *CreateNewStickerSetParams) Option(opts ...CreateNewStickerSetOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithCreateNewStickerSetUserID sets the UserID field.
@@ -2754,19 +2476,12 @@ func (c *Client) CreateNewStickerSet(ctx context.Context, params *CreateNewStick
 				}
 			}
 
-			var bs []byte
-			bs, err = json.Marshal(&params.Stickers)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("stickers")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.Stickers)
 			if err != nil {
 				return
 			}
@@ -2790,24 +2505,14 @@ func (c *Client) CreateNewStickerSet(ctx context.Context, params *CreateNewStick
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "createNewStickerSet", reader, contentType, nil)
+	ret, err = call[bool](ctx, c, "createNewStickerSet", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -2824,12 +2529,11 @@ type DeclineChatJoinRequestParams struct {
 // DeclineChatJoinRequestOption configures DeclineChatJoinRequestParams.
 type DeclineChatJoinRequestOption = Option[DeclineChatJoinRequestParams]
 
-// Option applies one or more DeclineChatJoinRequestOption values and returns the last rollback option.
-func (r *DeclineChatJoinRequestParams) Option(opts ...DeclineChatJoinRequestOption) (previous DeclineChatJoinRequestOption) {
+// Option applies opts to r in order.
+func (r *DeclineChatJoinRequestParams) Option(opts ...DeclineChatJoinRequestOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithDeclineChatJoinRequestChatID sets the ChatID field.
@@ -2856,28 +2560,17 @@ func WithDeclineChatJoinRequestUserID(value int64) DeclineChatJoinRequestOption 
 // The bot must be an administrator in the chat for this to work and must have the can_invite_users administrator right.
 // Returns True on success.
 func (c *Client) DeclineChatJoinRequest(ctx context.Context, params *DeclineChatJoinRequestParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "declineChatJoinRequest", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "declineChatJoinRequest", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -2897,12 +2590,11 @@ type DeclineSuggestedPostParams struct {
 // DeclineSuggestedPostOption configures DeclineSuggestedPostParams.
 type DeclineSuggestedPostOption = Option[DeclineSuggestedPostParams]
 
-// Option applies one or more DeclineSuggestedPostOption values and returns the last rollback option.
-func (r *DeclineSuggestedPostParams) Option(opts ...DeclineSuggestedPostOption) (previous DeclineSuggestedPostOption) {
+// Option applies opts to r in order.
+func (r *DeclineSuggestedPostParams) Option(opts ...DeclineSuggestedPostOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithDeclineSuggestedPostChatID sets the ChatID field.
@@ -2938,28 +2630,17 @@ func WithDeclineSuggestedPostComment(value string) DeclineSuggestedPostOption {
 // The bot must have the 'can_manage_direct_messages' administrator right in the corresponding channel chat.
 // Returns True on success.
 func (c *Client) DeclineSuggestedPost(ctx context.Context, params *DeclineSuggestedPostParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "declineSuggestedPost", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "declineSuggestedPost", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -2979,12 +2660,11 @@ type DeleteAllMessageReactionsParams struct {
 // DeleteAllMessageReactionsOption configures DeleteAllMessageReactionsParams.
 type DeleteAllMessageReactionsOption = Option[DeleteAllMessageReactionsParams]
 
-// Option applies one or more DeleteAllMessageReactionsOption values and returns the last rollback option.
-func (r *DeleteAllMessageReactionsParams) Option(opts ...DeleteAllMessageReactionsOption) (previous DeleteAllMessageReactionsOption) {
+// Option applies opts to r in order.
+func (r *DeleteAllMessageReactionsParams) Option(opts ...DeleteAllMessageReactionsOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithDeleteAllMessageReactionsChatID sets the ChatID field.
@@ -3020,28 +2700,17 @@ func WithDeleteAllMessageReactionsActorChatID(value int64) DeleteAllMessageReact
 // The bot must have the 'can_delete_messages' administrator right in the chat.
 // Returns True on success.
 func (c *Client) DeleteAllMessageReactions(ctx context.Context, params *DeleteAllMessageReactionsParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "deleteAllMessageReactions", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "deleteAllMessageReactions", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3062,12 +2731,11 @@ type DeleteBusinessMessagesParams struct {
 // DeleteBusinessMessagesOption configures DeleteBusinessMessagesParams.
 type DeleteBusinessMessagesOption = Option[DeleteBusinessMessagesParams]
 
-// Option applies one or more DeleteBusinessMessagesOption values and returns the last rollback option.
-func (r *DeleteBusinessMessagesParams) Option(opts ...DeleteBusinessMessagesOption) (previous DeleteBusinessMessagesOption) {
+// Option applies opts to r in order.
+func (r *DeleteBusinessMessagesParams) Option(opts ...DeleteBusinessMessagesOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithDeleteBusinessMessagesBusinessConnectionID sets the BusinessConnectionID field.
@@ -3098,28 +2766,17 @@ func WithDeleteBusinessMessagesMessageIDs(value []int64) DeleteBusinessMessagesO
 // Requires the can_delete_sent_messages business bot right to delete messages sent by the bot itself, or the can_delete_all_messages business bot right to delete any message.
 // Returns True on success.
 func (c *Client) DeleteBusinessMessages(ctx context.Context, params *DeleteBusinessMessagesParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "deleteBusinessMessages", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "deleteBusinessMessages", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3133,12 +2790,11 @@ type DeleteChatPhotoParams struct {
 // DeleteChatPhotoOption configures DeleteChatPhotoParams.
 type DeleteChatPhotoOption = Option[DeleteChatPhotoParams]
 
-// Option applies one or more DeleteChatPhotoOption values and returns the last rollback option.
-func (r *DeleteChatPhotoParams) Option(opts ...DeleteChatPhotoOption) (previous DeleteChatPhotoOption) {
+// Option applies opts to r in order.
+func (r *DeleteChatPhotoParams) Option(opts ...DeleteChatPhotoOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithDeleteChatPhotoChatID sets the ChatID field.
@@ -3157,28 +2813,17 @@ func WithDeleteChatPhotoChatID(value string) DeleteChatPhotoOption {
 // The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
 // Returns True on success.
 func (c *Client) DeleteChatPhoto(ctx context.Context, params *DeleteChatPhotoParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "deleteChatPhoto", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "deleteChatPhoto", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3192,12 +2837,11 @@ type DeleteChatStickerSetParams struct {
 // DeleteChatStickerSetOption configures DeleteChatStickerSetParams.
 type DeleteChatStickerSetOption = Option[DeleteChatStickerSetParams]
 
-// Option applies one or more DeleteChatStickerSetOption values and returns the last rollback option.
-func (r *DeleteChatStickerSetParams) Option(opts ...DeleteChatStickerSetOption) (previous DeleteChatStickerSetOption) {
+// Option applies opts to r in order.
+func (r *DeleteChatStickerSetParams) Option(opts ...DeleteChatStickerSetOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithDeleteChatStickerSetChatID sets the ChatID field.
@@ -3218,28 +2862,17 @@ func WithDeleteChatStickerSetChatID(value string) DeleteChatStickerSetOption {
 //
 // [getChat]: https://core.telegram.org/bots/api#getchat
 func (c *Client) DeleteChatStickerSet(ctx context.Context, params *DeleteChatStickerSetParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "deleteChatStickerSet", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "deleteChatStickerSet", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3259,12 +2892,11 @@ type DeleteEphemeralMessageParams struct {
 // DeleteEphemeralMessageOption configures DeleteEphemeralMessageParams.
 type DeleteEphemeralMessageOption = Option[DeleteEphemeralMessageParams]
 
-// Option applies one or more DeleteEphemeralMessageOption values and returns the last rollback option.
-func (r *DeleteEphemeralMessageParams) Option(opts ...DeleteEphemeralMessageOption) (previous DeleteEphemeralMessageOption) {
+// Option applies opts to r in order.
+func (r *DeleteEphemeralMessageParams) Option(opts ...DeleteEphemeralMessageOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithDeleteEphemeralMessageChatID sets the ChatID field.
@@ -3300,28 +2932,17 @@ func WithDeleteEphemeralMessageEphemeralMessageID(value int64) DeleteEphemeralMe
 // Note that it is not guaranteed that the user will receive the message deletion event, especially if they are offline.
 // Returns True on success.
 func (c *Client) DeleteEphemeralMessage(ctx context.Context, params *DeleteEphemeralMessageParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "deleteEphemeralMessage", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "deleteEphemeralMessage", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3338,12 +2959,11 @@ type DeleteForumTopicParams struct {
 // DeleteForumTopicOption configures DeleteForumTopicParams.
 type DeleteForumTopicOption = Option[DeleteForumTopicParams]
 
-// Option applies one or more DeleteForumTopicOption values and returns the last rollback option.
-func (r *DeleteForumTopicParams) Option(opts ...DeleteForumTopicOption) (previous DeleteForumTopicOption) {
+// Option applies opts to r in order.
+func (r *DeleteForumTopicParams) Option(opts ...DeleteForumTopicOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithDeleteForumTopicChatID sets the ChatID field.
@@ -3370,28 +2990,17 @@ func WithDeleteForumTopicMessageThreadID(value int64) DeleteForumTopicOption {
 // In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_delete_messages administrator rights.
 // Returns True on success.
 func (c *Client) DeleteForumTopic(ctx context.Context, params *DeleteForumTopicParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "deleteForumTopic", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "deleteForumTopic", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3408,12 +3017,11 @@ type DeleteMessageParams struct {
 // DeleteMessageOption configures DeleteMessageParams.
 type DeleteMessageOption = Option[DeleteMessageParams]
 
-// Option applies one or more DeleteMessageOption values and returns the last rollback option.
-func (r *DeleteMessageParams) Option(opts ...DeleteMessageOption) (previous DeleteMessageOption) {
+// Option applies opts to r in order.
+func (r *DeleteMessageParams) Option(opts ...DeleteMessageOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithDeleteMessageChatID sets the ChatID field.
@@ -3448,28 +3056,17 @@ func WithDeleteMessageMessageID(value int64) DeleteMessageOption {
 // - If the bot has can_manage_direct_messages administrator right in a channel, it can delete any message in the corresponding direct messages chat.
 // Returns True on success.
 func (c *Client) DeleteMessage(ctx context.Context, params *DeleteMessageParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "deleteMessage", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "deleteMessage", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3492,12 +3089,11 @@ type DeleteMessageReactionParams struct {
 // DeleteMessageReactionOption configures DeleteMessageReactionParams.
 type DeleteMessageReactionOption = Option[DeleteMessageReactionParams]
 
-// Option applies one or more DeleteMessageReactionOption values and returns the last rollback option.
-func (r *DeleteMessageReactionParams) Option(opts ...DeleteMessageReactionOption) (previous DeleteMessageReactionOption) {
+// Option applies opts to r in order.
+func (r *DeleteMessageReactionParams) Option(opts ...DeleteMessageReactionOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithDeleteMessageReactionChatID sets the ChatID field.
@@ -3542,28 +3138,17 @@ func WithDeleteMessageReactionActorChatID(value int64) DeleteMessageReactionOpti
 // The bot must have the 'can_delete_messages' administrator right in the chat.
 // Returns True on success.
 func (c *Client) DeleteMessageReaction(ctx context.Context, params *DeleteMessageReactionParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "deleteMessageReaction", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "deleteMessageReaction", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3583,12 +3168,11 @@ type DeleteMessagesParams struct {
 // DeleteMessagesOption configures DeleteMessagesParams.
 type DeleteMessagesOption = Option[DeleteMessagesParams]
 
-// Option applies one or more DeleteMessagesOption values and returns the last rollback option.
-func (r *DeleteMessagesParams) Option(opts ...DeleteMessagesOption) (previous DeleteMessagesOption) {
+// Option applies opts to r in order.
+func (r *DeleteMessagesParams) Option(opts ...DeleteMessagesOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithDeleteMessagesChatID sets the ChatID field.
@@ -3618,28 +3202,17 @@ func WithDeleteMessagesMessageIDs(value []int64) DeleteMessagesOption {
 // If some of the specified messages can't be found, they are skipped.
 // Returns True on success.
 func (c *Client) DeleteMessages(ctx context.Context, params *DeleteMessagesParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "deleteMessages", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "deleteMessages", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3660,12 +3233,11 @@ type DeleteMyCommandsParams struct {
 // DeleteMyCommandsOption configures DeleteMyCommandsParams.
 type DeleteMyCommandsOption = Option[DeleteMyCommandsParams]
 
-// Option applies one or more DeleteMyCommandsOption values and returns the last rollback option.
-func (r *DeleteMyCommandsParams) Option(opts ...DeleteMyCommandsOption) (previous DeleteMyCommandsOption) {
+// Option applies opts to r in order.
+func (r *DeleteMyCommandsParams) Option(opts ...DeleteMyCommandsOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithDeleteMyCommandsScope sets the Scope field.
@@ -3698,28 +3270,17 @@ func WithDeleteMyCommandsLanguageCode(value string) DeleteMyCommandsOption {
 //
 // [higher level commands]: https://core.telegram.org/bots/api#determining-list-of-commands
 func (c *Client) DeleteMyCommands(ctx context.Context, params *DeleteMyCommandsParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "deleteMyCommands", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "deleteMyCommands", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3733,12 +3294,11 @@ type DeleteStickerFromSetParams struct {
 // DeleteStickerFromSetOption configures DeleteStickerFromSetParams.
 type DeleteStickerFromSetOption = Option[DeleteStickerFromSetParams]
 
-// Option applies one or more DeleteStickerFromSetOption values and returns the last rollback option.
-func (r *DeleteStickerFromSetParams) Option(opts ...DeleteStickerFromSetOption) (previous DeleteStickerFromSetOption) {
+// Option applies opts to r in order.
+func (r *DeleteStickerFromSetParams) Option(opts ...DeleteStickerFromSetOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithDeleteStickerFromSetSticker sets the Sticker field.
@@ -3755,28 +3315,17 @@ func WithDeleteStickerFromSetSticker(value string) DeleteStickerFromSetOption {
 // Use this method to delete a sticker from a set created by the bot.
 // Returns True on success.
 func (c *Client) DeleteStickerFromSet(ctx context.Context, params *DeleteStickerFromSetParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "deleteStickerFromSet", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "deleteStickerFromSet", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3790,12 +3339,11 @@ type DeleteStickerSetParams struct {
 // DeleteStickerSetOption configures DeleteStickerSetParams.
 type DeleteStickerSetOption = Option[DeleteStickerSetParams]
 
-// Option applies one or more DeleteStickerSetOption values and returns the last rollback option.
-func (r *DeleteStickerSetParams) Option(opts ...DeleteStickerSetOption) (previous DeleteStickerSetOption) {
+// Option applies opts to r in order.
+func (r *DeleteStickerSetParams) Option(opts ...DeleteStickerSetOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithDeleteStickerSetName sets the Name field.
@@ -3812,28 +3360,17 @@ func WithDeleteStickerSetName(value string) DeleteStickerSetOption {
 // Use this method to delete a sticker set that was created by the bot.
 // Returns True on success.
 func (c *Client) DeleteStickerSet(ctx context.Context, params *DeleteStickerSetParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "deleteStickerSet", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "deleteStickerSet", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3850,12 +3387,11 @@ type DeleteStoryParams struct {
 // DeleteStoryOption configures DeleteStoryParams.
 type DeleteStoryOption = Option[DeleteStoryParams]
 
-// Option applies one or more DeleteStoryOption values and returns the last rollback option.
-func (r *DeleteStoryParams) Option(opts ...DeleteStoryOption) (previous DeleteStoryOption) {
+// Option applies opts to r in order.
+func (r *DeleteStoryParams) Option(opts ...DeleteStoryOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithDeleteStoryBusinessConnectionID sets the BusinessConnectionID field.
@@ -3882,28 +3418,17 @@ func WithDeleteStoryStoryID(value int64) DeleteStoryOption {
 // Requires the can_manage_stories business bot right.
 // Returns True on success.
 func (c *Client) DeleteStory(ctx context.Context, params *DeleteStoryParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "deleteStory", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "deleteStory", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3917,12 +3442,11 @@ type DeleteWebhookParams struct {
 // DeleteWebhookOption configures DeleteWebhookParams.
 type DeleteWebhookOption = Option[DeleteWebhookParams]
 
-// Option applies one or more DeleteWebhookOption values and returns the last rollback option.
-func (r *DeleteWebhookParams) Option(opts ...DeleteWebhookOption) (previous DeleteWebhookOption) {
+// Option applies opts to r in order.
+func (r *DeleteWebhookParams) Option(opts ...DeleteWebhookOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithDeleteWebhookDropPendingUpdates sets the DropPendingUpdates field.
@@ -3941,28 +3465,17 @@ func WithDeleteWebhookDropPendingUpdates(value bool) DeleteWebhookOption {
 //
 // [getUpdates]: https://core.telegram.org/bots/api#getupdates
 func (c *Client) DeleteWebhook(ctx context.Context, params *DeleteWebhookParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "deleteWebhook", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "deleteWebhook", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3992,12 +3505,11 @@ type EditChatInviteLinkParams struct {
 // EditChatInviteLinkOption configures EditChatInviteLinkParams.
 type EditChatInviteLinkOption = Option[EditChatInviteLinkParams]
 
-// Option applies one or more EditChatInviteLinkOption values and returns the last rollback option.
-func (r *EditChatInviteLinkParams) Option(opts ...EditChatInviteLinkOption) (previous EditChatInviteLinkOption) {
+// Option applies opts to r in order.
+func (r *EditChatInviteLinkParams) Option(opts ...EditChatInviteLinkOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithEditChatInviteLinkChatID sets the ChatID field.
@@ -4063,29 +3575,17 @@ func WithEditChatInviteLinkCreatesJoinRequest(value bool) EditChatInviteLinkOpti
 //
 // [ChatInviteLink]: https://core.telegram.org/bots/api#chatinvitelink
 func (c *Client) EditChatInviteLink(ctx context.Context, params *EditChatInviteLinkParams) (ret *ChatInviteLink, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "editChatInviteLink", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(ChatInviteLink)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*ChatInviteLink](ctx, c, "editChatInviteLink", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -4105,12 +3605,11 @@ type EditChatSubscriptionInviteLinkParams struct {
 // EditChatSubscriptionInviteLinkOption configures EditChatSubscriptionInviteLinkParams.
 type EditChatSubscriptionInviteLinkOption = Option[EditChatSubscriptionInviteLinkParams]
 
-// Option applies one or more EditChatSubscriptionInviteLinkOption values and returns the last rollback option.
-func (r *EditChatSubscriptionInviteLinkParams) Option(opts ...EditChatSubscriptionInviteLinkOption) (previous EditChatSubscriptionInviteLinkOption) {
+// Option applies opts to r in order.
+func (r *EditChatSubscriptionInviteLinkParams) Option(opts ...EditChatSubscriptionInviteLinkOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithEditChatSubscriptionInviteLinkChatID sets the ChatID field.
@@ -4148,29 +3647,17 @@ func WithEditChatSubscriptionInviteLinkName(value string) EditChatSubscriptionIn
 //
 // [ChatInviteLink]: https://core.telegram.org/bots/api#chatinvitelink
 func (c *Client) EditChatSubscriptionInviteLink(ctx context.Context, params *EditChatSubscriptionInviteLinkParams) (ret *ChatInviteLink, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "editChatSubscriptionInviteLink", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(ChatInviteLink)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*ChatInviteLink](ctx, c, "editChatSubscriptionInviteLink", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -4211,12 +3698,11 @@ type EditEphemeralMessageCaptionParams struct {
 // EditEphemeralMessageCaptionOption configures EditEphemeralMessageCaptionParams.
 type EditEphemeralMessageCaptionOption = Option[EditEphemeralMessageCaptionParams]
 
-// Option applies one or more EditEphemeralMessageCaptionOption values and returns the last rollback option.
-func (r *EditEphemeralMessageCaptionParams) Option(opts ...EditEphemeralMessageCaptionOption) (previous EditEphemeralMessageCaptionOption) {
+// Option applies opts to r in order.
+func (r *EditEphemeralMessageCaptionParams) Option(opts ...EditEphemeralMessageCaptionOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithEditEphemeralMessageCaptionChatID sets the ChatID field.
@@ -4303,28 +3789,17 @@ func WithEditEphemeralMessageCaptionReplyMarkup(value *InlineKeyboardMarkup) Edi
 // Note that it is not guaranteed that the user will receive the message edit event, especially if they are offline.
 // On success, True is returned.
 func (c *Client) EditEphemeralMessageCaption(ctx context.Context, params *EditEphemeralMessageCaptionParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "editEphemeralMessageCaption", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "editEphemeralMessageCaption", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -4352,12 +3827,11 @@ type EditEphemeralMessageMediaParams struct {
 // EditEphemeralMessageMediaOption configures EditEphemeralMessageMediaParams.
 type EditEphemeralMessageMediaOption = Option[EditEphemeralMessageMediaParams]
 
-// Option applies one or more EditEphemeralMessageMediaOption values and returns the last rollback option.
-func (r *EditEphemeralMessageMediaParams) Option(opts ...EditEphemeralMessageMediaOption) (previous EditEphemeralMessageMediaOption) {
+// Option applies opts to r in order.
+func (r *EditEphemeralMessageMediaParams) Option(opts ...EditEphemeralMessageMediaOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithEditEphemeralMessageMediaChatID sets the ChatID field.
@@ -4577,38 +4051,24 @@ func (c *Client) EditEphemeralMessageMedia(ctx context.Context, params *EditEphe
 				}
 			}
 
-			var bs []byte
-			bs, err = json.Marshal(&params.Media)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("media")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.Media)
 			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyMarkup)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyMarkup)
 			if err != nil {
 				return
 			}
@@ -4616,24 +4076,14 @@ func (c *Client) EditEphemeralMessageMedia(ctx context.Context, params *EditEphe
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "editEphemeralMessageMedia", reader, contentType, nil)
+	ret, err = call[bool](ctx, c, "editEphemeralMessageMedia", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -4658,12 +4108,11 @@ type EditEphemeralMessageReplyMarkupParams struct {
 // EditEphemeralMessageReplyMarkupOption configures EditEphemeralMessageReplyMarkupParams.
 type EditEphemeralMessageReplyMarkupOption = Option[EditEphemeralMessageReplyMarkupParams]
 
-// Option applies one or more EditEphemeralMessageReplyMarkupOption values and returns the last rollback option.
-func (r *EditEphemeralMessageReplyMarkupParams) Option(opts ...EditEphemeralMessageReplyMarkupOption) (previous EditEphemeralMessageReplyMarkupOption) {
+// Option applies opts to r in order.
+func (r *EditEphemeralMessageReplyMarkupParams) Option(opts ...EditEphemeralMessageReplyMarkupOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithEditEphemeralMessageReplyMarkupChatID sets the ChatID field.
@@ -4710,28 +4159,17 @@ func WithEditEphemeralMessageReplyMarkupReplyMarkup(value *InlineKeyboardMarkup)
 // Note that it is not guaranteed that the user will receive the message edit event, especially if they are offline.
 // On success, True is returned.
 func (c *Client) EditEphemeralMessageReplyMarkup(ctx context.Context, params *EditEphemeralMessageReplyMarkupParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "editEphemeralMessageReplyMarkup", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "editEphemeralMessageReplyMarkup", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -4774,12 +4212,11 @@ type EditEphemeralMessageTextParams struct {
 // EditEphemeralMessageTextOption configures EditEphemeralMessageTextParams.
 type EditEphemeralMessageTextOption = Option[EditEphemeralMessageTextParams]
 
-// Option applies one or more EditEphemeralMessageTextOption values and returns the last rollback option.
-func (r *EditEphemeralMessageTextParams) Option(opts ...EditEphemeralMessageTextOption) (previous EditEphemeralMessageTextOption) {
+// Option applies opts to r in order.
+func (r *EditEphemeralMessageTextParams) Option(opts ...EditEphemeralMessageTextOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithEditEphemeralMessageTextChatID sets the ChatID field.
@@ -4874,28 +4311,17 @@ func WithEditEphemeralMessageTextReplyMarkup(value *InlineKeyboardMarkup) EditEp
 // Note that it is not guaranteed that the user will receive the message edit event, especially if they are offline.
 // On success, True is returned.
 func (c *Client) EditEphemeralMessageText(ctx context.Context, params *EditEphemeralMessageTextParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "editEphemeralMessageText", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "editEphemeralMessageText", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -4924,12 +4350,11 @@ type EditForumTopicParams struct {
 // EditForumTopicOption configures EditForumTopicParams.
 type EditForumTopicOption = Option[EditForumTopicParams]
 
-// Option applies one or more EditForumTopicOption values and returns the last rollback option.
-func (r *EditForumTopicParams) Option(opts ...EditForumTopicOption) (previous EditForumTopicOption) {
+// Option applies opts to r in order.
+func (r *EditForumTopicParams) Option(opts ...EditForumTopicOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithEditForumTopicChatID sets the ChatID field.
@@ -4980,28 +4405,17 @@ func WithEditForumTopicIconCustomEmojiID(value string) EditForumTopicOption {
 // In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights, unless it is the creator of the topic.
 // Returns True on success.
 func (c *Client) EditForumTopic(ctx context.Context, params *EditForumTopicParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "editForumTopic", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "editForumTopic", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -5018,12 +4432,11 @@ type EditGeneralForumTopicParams struct {
 // EditGeneralForumTopicOption configures EditGeneralForumTopicParams.
 type EditGeneralForumTopicOption = Option[EditGeneralForumTopicParams]
 
-// Option applies one or more EditGeneralForumTopicOption values and returns the last rollback option.
-func (r *EditGeneralForumTopicParams) Option(opts ...EditGeneralForumTopicOption) (previous EditGeneralForumTopicOption) {
+// Option applies opts to r in order.
+func (r *EditGeneralForumTopicParams) Option(opts ...EditGeneralForumTopicOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithEditGeneralForumTopicChatID sets the ChatID field.
@@ -5050,28 +4463,17 @@ func WithEditGeneralForumTopicName(value string) EditGeneralForumTopicOption {
 // The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights.
 // Returns True on success.
 func (c *Client) EditGeneralForumTopic(ctx context.Context, params *EditGeneralForumTopicParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "editGeneralForumTopic", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "editGeneralForumTopic", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -5118,12 +4520,11 @@ type EditMessageCaptionParams struct {
 // EditMessageCaptionOption configures EditMessageCaptionParams.
 type EditMessageCaptionOption = Option[EditMessageCaptionParams]
 
-// Option applies one or more EditMessageCaptionOption values and returns the last rollback option.
-func (r *EditMessageCaptionParams) Option(opts ...EditMessageCaptionOption) (previous EditMessageCaptionOption) {
+// Option applies opts to r in order.
+func (r *EditMessageCaptionParams) Option(opts ...EditMessageCaptionOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithEditMessageCaptionBusinessConnectionID sets the BusinessConnectionID field.
@@ -5224,29 +4625,17 @@ func WithEditMessageCaptionReplyMarkup(value *InlineKeyboardMarkup) EditMessageC
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) EditMessageCaption(ctx context.Context, params *EditMessageCaptionParams) (ret *Message, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "editMessageCaption", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*Message](ctx, c, "editMessageCaption", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -5274,12 +4663,11 @@ type EditMessageChecklistParams struct {
 // EditMessageChecklistOption configures EditMessageChecklistParams.
 type EditMessageChecklistOption = Option[EditMessageChecklistParams]
 
-// Option applies one or more EditMessageChecklistOption values and returns the last rollback option.
-func (r *EditMessageChecklistParams) Option(opts ...EditMessageChecklistOption) (previous EditMessageChecklistOption) {
+// Option applies opts to r in order.
+func (r *EditMessageChecklistParams) Option(opts ...EditMessageChecklistOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithEditMessageChecklistBusinessConnectionID sets the BusinessConnectionID field.
@@ -5336,29 +4724,17 @@ func WithEditMessageChecklistReplyMarkup(value *InlineKeyboardMarkup) EditMessag
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) EditMessageChecklist(ctx context.Context, params *EditMessageChecklistParams) (ret *Message, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "editMessageChecklist", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*Message](ctx, c, "editMessageChecklist", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -5412,12 +4788,11 @@ type EditMessageLiveLocationParams struct {
 // EditMessageLiveLocationOption configures EditMessageLiveLocationParams.
 type EditMessageLiveLocationOption = Option[EditMessageLiveLocationParams]
 
-// Option applies one or more EditMessageLiveLocationOption values and returns the last rollback option.
-func (r *EditMessageLiveLocationParams) Option(opts ...EditMessageLiveLocationOption) (previous EditMessageLiveLocationOption) {
+// Option applies opts to r in order.
+func (r *EditMessageLiveLocationParams) Option(opts ...EditMessageLiveLocationOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithEditMessageLiveLocationBusinessConnectionID sets the BusinessConnectionID field.
@@ -5538,29 +4913,17 @@ func WithEditMessageLiveLocationReplyMarkup(value *InlineKeyboardMarkup) EditMes
 // [stopMessageLiveLocation]: https://core.telegram.org/bots/api#stopmessagelivelocation
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) EditMessageLiveLocation(ctx context.Context, params *EditMessageLiveLocationParams) (ret *Message, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "editMessageLiveLocation", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*Message](ctx, c, "editMessageLiveLocation", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -5594,12 +4957,11 @@ type EditMessageMediaParams struct {
 // EditMessageMediaOption configures EditMessageMediaParams.
 type EditMessageMediaOption = Option[EditMessageMediaParams]
 
-// Option applies one or more EditMessageMediaOption values and returns the last rollback option.
-func (r *EditMessageMediaParams) Option(opts ...EditMessageMediaOption) (previous EditMessageMediaOption) {
+// Option applies opts to r in order.
+func (r *EditMessageMediaParams) Option(opts ...EditMessageMediaOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithEditMessageMediaBusinessConnectionID sets the BusinessConnectionID field.
@@ -5843,38 +5205,24 @@ func (c *Client) EditMessageMedia(ctx context.Context, params *EditMessageMediaP
 				}
 			}
 
-			var bs []byte
-			bs, err = json.Marshal(&params.Media)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("media")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.Media)
 			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyMarkup)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyMarkup)
 			if err != nil {
 				return
 			}
@@ -5882,25 +5230,14 @@ func (c *Client) EditMessageMedia(ctx context.Context, params *EditMessageMediaP
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "editMessageMedia", reader, contentType, nil)
+	ret, err = call[*Message](ctx, c, "editMessageMedia", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -5931,12 +5268,11 @@ type EditMessageReplyMarkupParams struct {
 // EditMessageReplyMarkupOption configures EditMessageReplyMarkupParams.
 type EditMessageReplyMarkupOption = Option[EditMessageReplyMarkupParams]
 
-// Option applies one or more EditMessageReplyMarkupOption values and returns the last rollback option.
-func (r *EditMessageReplyMarkupParams) Option(opts ...EditMessageReplyMarkupOption) (previous EditMessageReplyMarkupOption) {
+// Option applies opts to r in order.
+func (r *EditMessageReplyMarkupParams) Option(opts ...EditMessageReplyMarkupOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithEditMessageReplyMarkupBusinessConnectionID sets the BusinessConnectionID field.
@@ -5997,29 +5333,17 @@ func WithEditMessageReplyMarkupReplyMarkup(value *InlineKeyboardMarkup) EditMess
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) EditMessageReplyMarkup(ctx context.Context, params *EditMessageReplyMarkupParams) (ret *Message, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "editMessageReplyMarkup", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*Message](ctx, c, "editMessageReplyMarkup", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -6069,12 +5393,11 @@ type EditMessageTextParams struct {
 // EditMessageTextOption configures EditMessageTextParams.
 type EditMessageTextOption = Option[EditMessageTextParams]
 
-// Option applies one or more EditMessageTextOption values and returns the last rollback option.
-func (r *EditMessageTextParams) Option(opts ...EditMessageTextOption) (previous EditMessageTextOption) {
+// Option applies opts to r in order.
+func (r *EditMessageTextParams) Option(opts ...EditMessageTextOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithEditMessageTextBusinessConnectionID sets the BusinessConnectionID field.
@@ -6185,29 +5508,17 @@ func WithEditMessageTextReplyMarkup(value *InlineKeyboardMarkup) EditMessageText
 // [game]: https://core.telegram.org/bots/api#games
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) EditMessageText(ctx context.Context, params *EditMessageTextParams) (ret *Message, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "editMessageText", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*Message](ctx, c, "editMessageText", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -6242,12 +5553,11 @@ type EditStoryParams struct {
 // EditStoryOption configures EditStoryParams.
 type EditStoryOption = Option[EditStoryParams]
 
-// Option applies one or more EditStoryOption values and returns the last rollback option.
-func (r *EditStoryParams) Option(opts ...EditStoryOption) (previous EditStoryOption) {
+// Option applies opts to r in order.
+func (r *EditStoryParams) Option(opts ...EditStoryOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithEditStoryBusinessConnectionID sets the BusinessConnectionID field.
@@ -6386,19 +5696,12 @@ func (c *Client) EditStory(ctx context.Context, params *EditStoryParams) (ret *S
 				}
 			}
 
-			var bs []byte
-			bs, err = json.Marshal(&params.Content)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("content")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.Content)
 			if err != nil {
 				return
 			}
@@ -6421,38 +5724,24 @@ func (c *Client) EditStory(ctx context.Context, params *EditStoryParams) (ret *S
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			var bs []byte
-			bs, err = json.Marshal(&params.CaptionEntities)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("caption_entities")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.CaptionEntities)
 			if err != nil {
 				return
 			}
 		}
 
 		if len(params.Areas) != 0 {
-			var bs []byte
-			bs, err = json.Marshal(&params.Areas)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("areas")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.Areas)
 			if err != nil {
 				return
 			}
@@ -6460,25 +5749,14 @@ func (c *Client) EditStory(ctx context.Context, params *EditStoryParams) (ret *S
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "editStory", reader, contentType, nil)
+	ret, err = call[*Story](ctx, c, "editStory", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ret = new(Story)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -6499,12 +5777,11 @@ type EditUserStarSubscriptionParams struct {
 // EditUserStarSubscriptionOption configures EditUserStarSubscriptionParams.
 type EditUserStarSubscriptionOption = Option[EditUserStarSubscriptionParams]
 
-// Option applies one or more EditUserStarSubscriptionOption values and returns the last rollback option.
-func (r *EditUserStarSubscriptionParams) Option(opts ...EditUserStarSubscriptionOption) (previous EditUserStarSubscriptionOption) {
+// Option applies opts to r in order.
+func (r *EditUserStarSubscriptionParams) Option(opts ...EditUserStarSubscriptionOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithEditUserStarSubscriptionUserID sets the UserID field.
@@ -6540,28 +5817,17 @@ func WithEditUserStarSubscriptionIsCanceled(value bool) EditUserStarSubscription
 // Allows the bot to cancel or re-enable extension of a subscription paid in Telegram Stars.
 // Returns True on success.
 func (c *Client) EditUserStarSubscription(ctx context.Context, params *EditUserStarSubscriptionParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "editUserStarSubscription", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "editUserStarSubscription", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -6575,12 +5841,11 @@ type ExportChatInviteLinkParams struct {
 // ExportChatInviteLinkOption configures ExportChatInviteLinkParams.
 type ExportChatInviteLinkOption = Option[ExportChatInviteLinkParams]
 
-// Option applies one or more ExportChatInviteLinkOption values and returns the last rollback option.
-func (r *ExportChatInviteLinkParams) Option(opts ...ExportChatInviteLinkOption) (previous ExportChatInviteLinkOption) {
+// Option applies opts to r in order.
+func (r *ExportChatInviteLinkParams) Option(opts ...ExportChatInviteLinkOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithExportChatInviteLinkChatID sets the ChatID field.
@@ -6598,28 +5863,17 @@ func WithExportChatInviteLinkChatID(value string) ExportChatInviteLinkOption {
 // The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
 // Returns the new invite link as String on success.
 func (c *Client) ExportChatInviteLink(ctx context.Context, params *ExportChatInviteLinkParams) (ret string, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "exportChatInviteLink", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[string](ctx, c, "exportChatInviteLink", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -6663,12 +5917,11 @@ type ForwardMessageParams struct {
 // ForwardMessageOption configures ForwardMessageParams.
 type ForwardMessageOption = Option[ForwardMessageParams]
 
-// Option applies one or more ForwardMessageOption values and returns the last rollback option.
-func (r *ForwardMessageParams) Option(opts ...ForwardMessageOption) (previous ForwardMessageOption) {
+// Option applies opts to r in order.
+func (r *ForwardMessageParams) Option(opts ...ForwardMessageOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithForwardMessageChatID sets the ChatID field.
@@ -6772,29 +6025,17 @@ func WithForwardMessageMessageID(value int64) ForwardMessageOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) ForwardMessage(ctx context.Context, params *ForwardMessageParams) (ret *Message, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "forwardMessage", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*Message](ctx, c, "forwardMessage", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -6830,12 +6071,11 @@ type ForwardMessagesParams struct {
 // ForwardMessagesOption configures ForwardMessagesParams.
 type ForwardMessagesOption = Option[ForwardMessagesParams]
 
-// Option applies one or more ForwardMessagesOption values and returns the last rollback option.
-func (r *ForwardMessagesParams) Option(opts ...ForwardMessagesOption) (previous ForwardMessagesOption) {
+// Option applies opts to r in order.
+func (r *ForwardMessagesParams) Option(opts ...ForwardMessagesOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithForwardMessagesChatID sets the ChatID field.
@@ -6915,29 +6155,17 @@ func WithForwardMessagesProtectContent(value bool) ForwardMessagesOption {
 //
 // [MessageId]: https://core.telegram.org/bots/api#messageid
 func (c *Client) ForwardMessages(ctx context.Context, params *ForwardMessagesParams) (ret []MessageId, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "forwardMessages", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = make([]MessageId, 0, 100)
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[[]MessageId](ctx, c, "forwardMessages", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -6949,12 +6177,11 @@ type GetAvailableGiftsParams struct {
 // GetAvailableGiftsOption configures GetAvailableGiftsParams.
 type GetAvailableGiftsOption = Option[GetAvailableGiftsParams]
 
-// Option applies one or more GetAvailableGiftsOption values and returns the last rollback option.
-func (r *GetAvailableGiftsParams) Option(opts ...GetAvailableGiftsOption) (previous GetAvailableGiftsOption) {
+// Option applies opts to r in order.
+func (r *GetAvailableGiftsParams) Option(opts ...GetAvailableGiftsOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // GetAvailableGifts calls the getAvailableGifts Telegram Bot API method.
@@ -6965,29 +6192,17 @@ func (r *GetAvailableGiftsParams) Option(opts ...GetAvailableGiftsOption) (previ
 //
 // [Gifts]: https://core.telegram.org/bots/api#gifts
 func (c *Client) GetAvailableGifts(ctx context.Context, params *GetAvailableGiftsParams) (ret *Gifts, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getAvailableGifts", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(Gifts)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*Gifts](ctx, c, "getAvailableGifts", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7033,12 +6248,11 @@ type GetBusinessAccountGiftsParams struct {
 // GetBusinessAccountGiftsOption configures GetBusinessAccountGiftsParams.
 type GetBusinessAccountGiftsOption = Option[GetBusinessAccountGiftsParams]
 
-// Option applies one or more GetBusinessAccountGiftsOption values and returns the last rollback option.
-func (r *GetBusinessAccountGiftsParams) Option(opts ...GetBusinessAccountGiftsOption) (previous GetBusinessAccountGiftsOption) {
+// Option applies opts to r in order.
+func (r *GetBusinessAccountGiftsParams) Option(opts ...GetBusinessAccountGiftsOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetBusinessAccountGiftsBusinessConnectionID sets the BusinessConnectionID field.
@@ -7150,29 +6364,17 @@ func WithGetBusinessAccountGiftsLimit(value int64) GetBusinessAccountGiftsOption
 //
 // [OwnedGifts]: https://core.telegram.org/bots/api#ownedgifts
 func (c *Client) GetBusinessAccountGifts(ctx context.Context, params *GetBusinessAccountGiftsParams) (ret *OwnedGifts, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getBusinessAccountGifts", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(OwnedGifts)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*OwnedGifts](ctx, c, "getBusinessAccountGifts", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7186,12 +6388,11 @@ type GetBusinessAccountStarBalanceParams struct {
 // GetBusinessAccountStarBalanceOption configures GetBusinessAccountStarBalanceParams.
 type GetBusinessAccountStarBalanceOption = Option[GetBusinessAccountStarBalanceParams]
 
-// Option applies one or more GetBusinessAccountStarBalanceOption values and returns the last rollback option.
-func (r *GetBusinessAccountStarBalanceParams) Option(opts ...GetBusinessAccountStarBalanceOption) (previous GetBusinessAccountStarBalanceOption) {
+// Option applies opts to r in order.
+func (r *GetBusinessAccountStarBalanceParams) Option(opts ...GetBusinessAccountStarBalanceOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetBusinessAccountStarBalanceBusinessConnectionID sets the BusinessConnectionID field.
@@ -7211,29 +6412,17 @@ func WithGetBusinessAccountStarBalanceBusinessConnectionID(value string) GetBusi
 //
 // [StarAmount]: https://core.telegram.org/bots/api#staramount
 func (c *Client) GetBusinessAccountStarBalance(ctx context.Context, params *GetBusinessAccountStarBalanceParams) (ret *StarAmount, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getBusinessAccountStarBalance", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(StarAmount)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*StarAmount](ctx, c, "getBusinessAccountStarBalance", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7247,12 +6436,11 @@ type GetBusinessConnectionParams struct {
 // GetBusinessConnectionOption configures GetBusinessConnectionParams.
 type GetBusinessConnectionOption = Option[GetBusinessConnectionParams]
 
-// Option applies one or more GetBusinessConnectionOption values and returns the last rollback option.
-func (r *GetBusinessConnectionParams) Option(opts ...GetBusinessConnectionOption) (previous GetBusinessConnectionOption) {
+// Option applies opts to r in order.
+func (r *GetBusinessConnectionParams) Option(opts ...GetBusinessConnectionOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetBusinessConnectionBusinessConnectionID sets the BusinessConnectionID field.
@@ -7271,29 +6459,17 @@ func WithGetBusinessConnectionBusinessConnectionID(value string) GetBusinessConn
 //
 // [BusinessConnection]: https://core.telegram.org/bots/api#businessconnection
 func (c *Client) GetBusinessConnection(ctx context.Context, params *GetBusinessConnectionParams) (ret *BusinessConnection, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getBusinessConnection", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(BusinessConnection)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*BusinessConnection](ctx, c, "getBusinessConnection", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7307,12 +6483,11 @@ type GetChatParams struct {
 // GetChatOption configures GetChatParams.
 type GetChatOption = Option[GetChatParams]
 
-// Option applies one or more GetChatOption values and returns the last rollback option.
-func (r *GetChatParams) Option(opts ...GetChatOption) (previous GetChatOption) {
+// Option applies opts to r in order.
+func (r *GetChatParams) Option(opts ...GetChatOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetChatChatID sets the ChatID field.
@@ -7331,29 +6506,17 @@ func WithGetChatChatID(value string) GetChatOption {
 //
 // [ChatFullInfo]: https://core.telegram.org/bots/api#chatfullinfo
 func (c *Client) GetChat(ctx context.Context, params *GetChatParams) (ret *ChatFullInfo, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getChat", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(ChatFullInfo)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*ChatFullInfo](ctx, c, "getChat", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7371,12 +6534,11 @@ type GetChatAdministratorsParams struct {
 // GetChatAdministratorsOption configures GetChatAdministratorsParams.
 type GetChatAdministratorsOption = Option[GetChatAdministratorsParams]
 
-// Option applies one or more GetChatAdministratorsOption values and returns the last rollback option.
-func (r *GetChatAdministratorsParams) Option(opts ...GetChatAdministratorsOption) (previous GetChatAdministratorsOption) {
+// Option applies opts to r in order.
+func (r *GetChatAdministratorsParams) Option(opts ...GetChatAdministratorsOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetChatAdministratorsChatID sets the ChatID field.
@@ -7405,29 +6567,17 @@ func WithGetChatAdministratorsReturnBots(value bool) GetChatAdministratorsOption
 //
 // [ChatMember]: https://core.telegram.org/bots/api#chatmember
 func (c *Client) GetChatAdministrators(ctx context.Context, params *GetChatAdministratorsParams) (ret []ChatMember, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getChatAdministrators", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = make([]ChatMember, 0, 100)
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[[]ChatMember](ctx, c, "getChatAdministrators", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7475,12 +6625,11 @@ type GetChatGiftsParams struct {
 // GetChatGiftsOption configures GetChatGiftsParams.
 type GetChatGiftsOption = Option[GetChatGiftsParams]
 
-// Option applies one or more GetChatGiftsOption values and returns the last rollback option.
-func (r *GetChatGiftsParams) Option(opts ...GetChatGiftsOption) (previous GetChatGiftsOption) {
+// Option applies opts to r in order.
+func (r *GetChatGiftsParams) Option(opts ...GetChatGiftsOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetChatGiftsChatID sets the ChatID field.
@@ -7593,29 +6742,17 @@ func WithGetChatGiftsLimit(value int64) GetChatGiftsOption {
 //
 // [OwnedGifts]: https://core.telegram.org/bots/api#ownedgifts
 func (c *Client) GetChatGifts(ctx context.Context, params *GetChatGiftsParams) (ret *OwnedGifts, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getChatGifts", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(OwnedGifts)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*OwnedGifts](ctx, c, "getChatGifts", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7632,12 +6769,11 @@ type GetChatMemberParams struct {
 // GetChatMemberOption configures GetChatMemberParams.
 type GetChatMemberOption = Option[GetChatMemberParams]
 
-// Option applies one or more GetChatMemberOption values and returns the last rollback option.
-func (r *GetChatMemberParams) Option(opts ...GetChatMemberOption) (previous GetChatMemberOption) {
+// Option applies opts to r in order.
+func (r *GetChatMemberParams) Option(opts ...GetChatMemberOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetChatMemberChatID sets the ChatID field.
@@ -7666,29 +6802,17 @@ func WithGetChatMemberUserID(value int64) GetChatMemberOption {
 //
 // [ChatMember]: https://core.telegram.org/bots/api#chatmember
 func (c *Client) GetChatMember(ctx context.Context, params *GetChatMemberParams) (ret *ChatMember, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getChatMember", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(ChatMember)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*ChatMember](ctx, c, "getChatMember", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7702,12 +6826,11 @@ type GetChatMemberCountParams struct {
 // GetChatMemberCountOption configures GetChatMemberCountParams.
 type GetChatMemberCountOption = Option[GetChatMemberCountParams]
 
-// Option applies one or more GetChatMemberCountOption values and returns the last rollback option.
-func (r *GetChatMemberCountParams) Option(opts ...GetChatMemberCountOption) (previous GetChatMemberCountOption) {
+// Option applies opts to r in order.
+func (r *GetChatMemberCountParams) Option(opts ...GetChatMemberCountOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetChatMemberCountChatID sets the ChatID field.
@@ -7724,28 +6847,17 @@ func WithGetChatMemberCountChatID(value string) GetChatMemberCountOption {
 // Use this method to get the number of members in a chat.
 // Returns Integer on success.
 func (c *Client) GetChatMemberCount(ctx context.Context, params *GetChatMemberCountParams) (ret int64, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getChatMemberCount", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[int64](ctx, c, "getChatMemberCount", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7760,12 +6872,11 @@ type GetChatMenuButtonParams struct {
 // GetChatMenuButtonOption configures GetChatMenuButtonParams.
 type GetChatMenuButtonOption = Option[GetChatMenuButtonParams]
 
-// Option applies one or more GetChatMenuButtonOption values and returns the last rollback option.
-func (r *GetChatMenuButtonParams) Option(opts ...GetChatMenuButtonOption) (previous GetChatMenuButtonOption) {
+// Option applies opts to r in order.
+func (r *GetChatMenuButtonParams) Option(opts ...GetChatMenuButtonOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetChatMenuButtonChatID sets the ChatID field.
@@ -7785,29 +6896,17 @@ func WithGetChatMenuButtonChatID(value int64) GetChatMenuButtonOption {
 //
 // [MenuButton]: https://core.telegram.org/bots/api#menubutton
 func (c *Client) GetChatMenuButton(ctx context.Context, params *GetChatMenuButtonParams) (ret *MenuButton, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getChatMenuButton", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(MenuButton)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*MenuButton](ctx, c, "getChatMenuButton", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7822,12 +6921,11 @@ type GetCustomEmojiStickersParams struct {
 // GetCustomEmojiStickersOption configures GetCustomEmojiStickersParams.
 type GetCustomEmojiStickersOption = Option[GetCustomEmojiStickersParams]
 
-// Option applies one or more GetCustomEmojiStickersOption values and returns the last rollback option.
-func (r *GetCustomEmojiStickersParams) Option(opts ...GetCustomEmojiStickersOption) (previous GetCustomEmojiStickersOption) {
+// Option applies opts to r in order.
+func (r *GetCustomEmojiStickersParams) Option(opts ...GetCustomEmojiStickersOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetCustomEmojiStickersCustomEmojiIDs sets the CustomEmojiIDs field.
@@ -7847,29 +6945,17 @@ func WithGetCustomEmojiStickersCustomEmojiIDs(value []string) GetCustomEmojiStic
 //
 // [Sticker]: https://core.telegram.org/bots/api#sticker
 func (c *Client) GetCustomEmojiStickers(ctx context.Context, params *GetCustomEmojiStickersParams) (ret []Sticker, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getCustomEmojiStickers", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = make([]Sticker, 0, 100)
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[[]Sticker](ctx, c, "getCustomEmojiStickers", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7883,12 +6969,11 @@ type GetFileParams struct {
 // GetFileOption configures GetFileParams.
 type GetFileOption = Option[GetFileParams]
 
-// Option applies one or more GetFileOption values and returns the last rollback option.
-func (r *GetFileParams) Option(opts ...GetFileOption) (previous GetFileOption) {
+// Option applies opts to r in order.
+func (r *GetFileParams) Option(opts ...GetFileOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetFileFileID sets the FileID field.
@@ -7914,29 +6999,17 @@ func WithGetFileFileID(value string) GetFileOption {
 // [File]: https://core.telegram.org/bots/api#file
 // [getFile]: https://core.telegram.org/bots/api#getfile
 func (c *Client) GetFile(ctx context.Context, params *GetFileParams) (ret *File, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getFile", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(File)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*File](ctx, c, "getFile", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7948,12 +7021,11 @@ type GetForumTopicIconStickersParams struct {
 // GetForumTopicIconStickersOption configures GetForumTopicIconStickersParams.
 type GetForumTopicIconStickersOption = Option[GetForumTopicIconStickersParams]
 
-// Option applies one or more GetForumTopicIconStickersOption values and returns the last rollback option.
-func (r *GetForumTopicIconStickersParams) Option(opts ...GetForumTopicIconStickersOption) (previous GetForumTopicIconStickersOption) {
+// Option applies opts to r in order.
+func (r *GetForumTopicIconStickersParams) Option(opts ...GetForumTopicIconStickersOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // GetForumTopicIconStickers calls the getForumTopicIconStickers Telegram Bot API method.
@@ -7964,29 +7036,17 @@ func (r *GetForumTopicIconStickersParams) Option(opts ...GetForumTopicIconSticke
 //
 // [Sticker]: https://core.telegram.org/bots/api#sticker
 func (c *Client) GetForumTopicIconStickers(ctx context.Context, params *GetForumTopicIconStickersParams) (ret []Sticker, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getForumTopicIconStickers", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = make([]Sticker, 0, 100)
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[[]Sticker](ctx, c, "getForumTopicIconStickers", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8012,12 +7072,11 @@ type GetGameHighScoresParams struct {
 // GetGameHighScoresOption configures GetGameHighScoresParams.
 type GetGameHighScoresOption = Option[GetGameHighScoresParams]
 
-// Option applies one or more GetGameHighScoresOption values and returns the last rollback option.
-func (r *GetGameHighScoresParams) Option(opts ...GetGameHighScoresOption) (previous GetGameHighScoresOption) {
+// Option applies opts to r in order.
+func (r *GetGameHighScoresParams) Option(opts ...GetGameHighScoresOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetGameHighScoresUserID sets the UserID field.
@@ -8067,29 +7126,17 @@ func WithGetGameHighScoresInlineMessageID(value string) GetGameHighScoresOption 
 //
 // [GameHighScore]: https://core.telegram.org/bots/api#gamehighscore
 func (c *Client) GetGameHighScores(ctx context.Context, params *GetGameHighScoresParams) (ret []GameHighScore, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getGameHighScores", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = make([]GameHighScore, 0, 100)
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[[]GameHighScore](ctx, c, "getGameHighScores", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8103,12 +7150,11 @@ type GetManagedBotAccessSettingsParams struct {
 // GetManagedBotAccessSettingsOption configures GetManagedBotAccessSettingsParams.
 type GetManagedBotAccessSettingsOption = Option[GetManagedBotAccessSettingsParams]
 
-// Option applies one or more GetManagedBotAccessSettingsOption values and returns the last rollback option.
-func (r *GetManagedBotAccessSettingsParams) Option(opts ...GetManagedBotAccessSettingsOption) (previous GetManagedBotAccessSettingsOption) {
+// Option applies opts to r in order.
+func (r *GetManagedBotAccessSettingsParams) Option(opts ...GetManagedBotAccessSettingsOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetManagedBotAccessSettingsUserID sets the UserID field.
@@ -8127,29 +7173,17 @@ func WithGetManagedBotAccessSettingsUserID(value int64) GetManagedBotAccessSetti
 //
 // [BotAccessSettings]: https://core.telegram.org/bots/api#botaccesssettings
 func (c *Client) GetManagedBotAccessSettings(ctx context.Context, params *GetManagedBotAccessSettingsParams) (ret *BotAccessSettings, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getManagedBotAccessSettings", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(BotAccessSettings)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*BotAccessSettings](ctx, c, "getManagedBotAccessSettings", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8163,12 +7197,11 @@ type GetManagedBotTokenParams struct {
 // GetManagedBotTokenOption configures GetManagedBotTokenParams.
 type GetManagedBotTokenOption = Option[GetManagedBotTokenParams]
 
-// Option applies one or more GetManagedBotTokenOption values and returns the last rollback option.
-func (r *GetManagedBotTokenParams) Option(opts ...GetManagedBotTokenOption) (previous GetManagedBotTokenOption) {
+// Option applies opts to r in order.
+func (r *GetManagedBotTokenParams) Option(opts ...GetManagedBotTokenOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetManagedBotTokenUserID sets the UserID field.
@@ -8185,28 +7218,17 @@ func WithGetManagedBotTokenUserID(value int64) GetManagedBotTokenOption {
 // Use this method to get the token of a managed bot.
 // Returns the token as String on success.
 func (c *Client) GetManagedBotToken(ctx context.Context, params *GetManagedBotTokenParams) (ret string, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getManagedBotToken", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[string](ctx, c, "getManagedBotToken", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8218,12 +7240,11 @@ type GetMeParams struct {
 // GetMeOption configures GetMeParams.
 type GetMeOption = Option[GetMeParams]
 
-// Option applies one or more GetMeOption values and returns the last rollback option.
-func (r *GetMeParams) Option(opts ...GetMeOption) (previous GetMeOption) {
+// Option applies opts to r in order.
+func (r *GetMeParams) Option(opts ...GetMeOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // GetMe calls the getMe Telegram Bot API method.
@@ -8234,29 +7255,17 @@ func (r *GetMeParams) Option(opts ...GetMeOption) (previous GetMeOption) {
 //
 // [User]: https://core.telegram.org/bots/api#user
 func (c *Client) GetMe(ctx context.Context, params *GetMeParams) (ret *User, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getMe", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(User)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*User](ctx, c, "getMe", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8276,12 +7285,11 @@ type GetMyCommandsParams struct {
 // GetMyCommandsOption configures GetMyCommandsParams.
 type GetMyCommandsOption = Option[GetMyCommandsParams]
 
-// Option applies one or more GetMyCommandsOption values and returns the last rollback option.
-func (r *GetMyCommandsParams) Option(opts ...GetMyCommandsOption) (previous GetMyCommandsOption) {
+// Option applies opts to r in order.
+func (r *GetMyCommandsParams) Option(opts ...GetMyCommandsOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetMyCommandsScope sets the Scope field.
@@ -8313,29 +7321,17 @@ func WithGetMyCommandsLanguageCode(value string) GetMyCommandsOption {
 //
 // [BotCommand]: https://core.telegram.org/bots/api#botcommand
 func (c *Client) GetMyCommands(ctx context.Context, params *GetMyCommandsParams) (ret []BotCommand, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getMyCommands", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = make([]BotCommand, 0, 100)
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[[]BotCommand](ctx, c, "getMyCommands", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8350,12 +7346,11 @@ type GetMyDefaultAdministratorRightsParams struct {
 // GetMyDefaultAdministratorRightsOption configures GetMyDefaultAdministratorRightsParams.
 type GetMyDefaultAdministratorRightsOption = Option[GetMyDefaultAdministratorRightsParams]
 
-// Option applies one or more GetMyDefaultAdministratorRightsOption values and returns the last rollback option.
-func (r *GetMyDefaultAdministratorRightsParams) Option(opts ...GetMyDefaultAdministratorRightsOption) (previous GetMyDefaultAdministratorRightsOption) {
+// Option applies opts to r in order.
+func (r *GetMyDefaultAdministratorRightsParams) Option(opts ...GetMyDefaultAdministratorRightsOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetMyDefaultAdministratorRightsForChannels sets the ForChannels field.
@@ -8375,29 +7370,17 @@ func WithGetMyDefaultAdministratorRightsForChannels(value bool) GetMyDefaultAdmi
 //
 // [ChatAdministratorRights]: https://core.telegram.org/bots/api#chatadministratorrights
 func (c *Client) GetMyDefaultAdministratorRights(ctx context.Context, params *GetMyDefaultAdministratorRightsParams) (ret *ChatAdministratorRights, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getMyDefaultAdministratorRights", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(ChatAdministratorRights)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*ChatAdministratorRights](ctx, c, "getMyDefaultAdministratorRights", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8411,12 +7394,11 @@ type GetMyDescriptionParams struct {
 // GetMyDescriptionOption configures GetMyDescriptionParams.
 type GetMyDescriptionOption = Option[GetMyDescriptionParams]
 
-// Option applies one or more GetMyDescriptionOption values and returns the last rollback option.
-func (r *GetMyDescriptionParams) Option(opts ...GetMyDescriptionOption) (previous GetMyDescriptionOption) {
+// Option applies opts to r in order.
+func (r *GetMyDescriptionParams) Option(opts ...GetMyDescriptionOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetMyDescriptionLanguageCode sets the LanguageCode field.
@@ -8435,29 +7417,17 @@ func WithGetMyDescriptionLanguageCode(value string) GetMyDescriptionOption {
 //
 // [BotDescription]: https://core.telegram.org/bots/api#botdescription
 func (c *Client) GetMyDescription(ctx context.Context, params *GetMyDescriptionParams) (ret *BotDescription, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getMyDescription", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(BotDescription)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*BotDescription](ctx, c, "getMyDescription", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8471,12 +7441,11 @@ type GetMyNameParams struct {
 // GetMyNameOption configures GetMyNameParams.
 type GetMyNameOption = Option[GetMyNameParams]
 
-// Option applies one or more GetMyNameOption values and returns the last rollback option.
-func (r *GetMyNameParams) Option(opts ...GetMyNameOption) (previous GetMyNameOption) {
+// Option applies opts to r in order.
+func (r *GetMyNameParams) Option(opts ...GetMyNameOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetMyNameLanguageCode sets the LanguageCode field.
@@ -8495,29 +7464,17 @@ func WithGetMyNameLanguageCode(value string) GetMyNameOption {
 //
 // [BotName]: https://core.telegram.org/bots/api#botname
 func (c *Client) GetMyName(ctx context.Context, params *GetMyNameParams) (ret *BotName, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getMyName", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(BotName)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*BotName](ctx, c, "getMyName", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8531,12 +7488,11 @@ type GetMyShortDescriptionParams struct {
 // GetMyShortDescriptionOption configures GetMyShortDescriptionParams.
 type GetMyShortDescriptionOption = Option[GetMyShortDescriptionParams]
 
-// Option applies one or more GetMyShortDescriptionOption values and returns the last rollback option.
-func (r *GetMyShortDescriptionParams) Option(opts ...GetMyShortDescriptionOption) (previous GetMyShortDescriptionOption) {
+// Option applies opts to r in order.
+func (r *GetMyShortDescriptionParams) Option(opts ...GetMyShortDescriptionOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetMyShortDescriptionLanguageCode sets the LanguageCode field.
@@ -8555,29 +7511,17 @@ func WithGetMyShortDescriptionLanguageCode(value string) GetMyShortDescriptionOp
 //
 // [BotShortDescription]: https://core.telegram.org/bots/api#botshortdescription
 func (c *Client) GetMyShortDescription(ctx context.Context, params *GetMyShortDescriptionParams) (ret *BotShortDescription, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getMyShortDescription", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(BotShortDescription)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*BotShortDescription](ctx, c, "getMyShortDescription", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8589,12 +7533,11 @@ type GetMyStarBalanceParams struct {
 // GetMyStarBalanceOption configures GetMyStarBalanceParams.
 type GetMyStarBalanceOption = Option[GetMyStarBalanceParams]
 
-// Option applies one or more GetMyStarBalanceOption values and returns the last rollback option.
-func (r *GetMyStarBalanceParams) Option(opts ...GetMyStarBalanceOption) (previous GetMyStarBalanceOption) {
+// Option applies opts to r in order.
+func (r *GetMyStarBalanceParams) Option(opts ...GetMyStarBalanceOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // GetMyStarBalance calls the getMyStarBalance Telegram Bot API method.
@@ -8605,29 +7548,17 @@ func (r *GetMyStarBalanceParams) Option(opts ...GetMyStarBalanceOption) (previou
 //
 // [StarAmount]: https://core.telegram.org/bots/api#staramount
 func (c *Client) GetMyStarBalance(ctx context.Context, params *GetMyStarBalanceParams) (ret *StarAmount, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getMyStarBalance", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(StarAmount)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*StarAmount](ctx, c, "getMyStarBalance", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8646,12 +7577,11 @@ type GetStarTransactionsParams struct {
 // GetStarTransactionsOption configures GetStarTransactionsParams.
 type GetStarTransactionsOption = Option[GetStarTransactionsParams]
 
-// Option applies one or more GetStarTransactionsOption values and returns the last rollback option.
-func (r *GetStarTransactionsParams) Option(opts ...GetStarTransactionsOption) (previous GetStarTransactionsOption) {
+// Option applies opts to r in order.
+func (r *GetStarTransactionsParams) Option(opts ...GetStarTransactionsOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetStarTransactionsOffset sets the Offset field.
@@ -8681,29 +7611,17 @@ func WithGetStarTransactionsLimit(value int64) GetStarTransactionsOption {
 //
 // [StarTransactions]: https://core.telegram.org/bots/api#startransactions
 func (c *Client) GetStarTransactions(ctx context.Context, params *GetStarTransactionsParams) (ret *StarTransactions, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getStarTransactions", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(StarTransactions)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*StarTransactions](ctx, c, "getStarTransactions", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8717,12 +7635,11 @@ type GetStickerSetParams struct {
 // GetStickerSetOption configures GetStickerSetParams.
 type GetStickerSetOption = Option[GetStickerSetParams]
 
-// Option applies one or more GetStickerSetOption values and returns the last rollback option.
-func (r *GetStickerSetParams) Option(opts ...GetStickerSetOption) (previous GetStickerSetOption) {
+// Option applies opts to r in order.
+func (r *GetStickerSetParams) Option(opts ...GetStickerSetOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetStickerSetName sets the Name field.
@@ -8741,29 +7658,17 @@ func WithGetStickerSetName(value string) GetStickerSetOption {
 //
 // [StickerSet]: https://core.telegram.org/bots/api#stickerset
 func (c *Client) GetStickerSet(ctx context.Context, params *GetStickerSetParams) (ret *StickerSet, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getStickerSet", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(StickerSet)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*StickerSet](ctx, c, "getStickerSet", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8806,12 +7711,11 @@ type GetUpdatesParams struct {
 // GetUpdatesOption configures GetUpdatesParams.
 type GetUpdatesOption = Option[GetUpdatesParams]
 
-// Option applies one or more GetUpdatesOption values and returns the last rollback option.
-func (r *GetUpdatesParams) Option(opts ...GetUpdatesOption) (previous GetUpdatesOption) {
+// Option applies opts to r in order.
+func (r *GetUpdatesParams) Option(opts ...GetUpdatesOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetUpdatesOffset sets the Offset field.
@@ -8878,29 +7782,17 @@ func WithGetUpdatesAllowedUpdates(value []string) GetUpdatesOption {
 // [wiki]: https://en.wikipedia.org/wiki/Push_technology#Long_polling
 // [Update]: https://core.telegram.org/bots/api#update
 func (c *Client) GetUpdates(ctx context.Context, params *GetUpdatesParams) (ret []Update, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getUpdates", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = make([]Update, 0, 100)
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[[]Update](ctx, c, "getUpdates", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8917,12 +7809,11 @@ type GetUserChatBoostsParams struct {
 // GetUserChatBoostsOption configures GetUserChatBoostsParams.
 type GetUserChatBoostsOption = Option[GetUserChatBoostsParams]
 
-// Option applies one or more GetUserChatBoostsOption values and returns the last rollback option.
-func (r *GetUserChatBoostsParams) Option(opts ...GetUserChatBoostsOption) (previous GetUserChatBoostsOption) {
+// Option applies opts to r in order.
+func (r *GetUserChatBoostsParams) Option(opts ...GetUserChatBoostsOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetUserChatBoostsChatID sets the ChatID field.
@@ -8951,29 +7842,17 @@ func WithGetUserChatBoostsUserID(value int64) GetUserChatBoostsOption {
 //
 // [UserChatBoosts]: https://core.telegram.org/bots/api#userchatboosts
 func (c *Client) GetUserChatBoosts(ctx context.Context, params *GetUserChatBoostsParams) (ret *UserChatBoosts, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getUserChatBoosts", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(UserChatBoosts)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*UserChatBoosts](ctx, c, "getUserChatBoosts", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -9013,12 +7892,11 @@ type GetUserGiftsParams struct {
 // GetUserGiftsOption configures GetUserGiftsParams.
 type GetUserGiftsOption = Option[GetUserGiftsParams]
 
-// Option applies one or more GetUserGiftsOption values and returns the last rollback option.
-func (r *GetUserGiftsParams) Option(opts ...GetUserGiftsOption) (previous GetUserGiftsOption) {
+// Option applies opts to r in order.
+func (r *GetUserGiftsParams) Option(opts ...GetUserGiftsOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetUserGiftsUserID sets the UserID field.
@@ -9111,29 +7989,17 @@ func WithGetUserGiftsLimit(value int64) GetUserGiftsOption {
 //
 // [OwnedGifts]: https://core.telegram.org/bots/api#ownedgifts
 func (c *Client) GetUserGifts(ctx context.Context, params *GetUserGiftsParams) (ret *OwnedGifts, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getUserGifts", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(OwnedGifts)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*OwnedGifts](ctx, c, "getUserGifts", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -9150,12 +8016,11 @@ type GetUserPersonalChatMessagesParams struct {
 // GetUserPersonalChatMessagesOption configures GetUserPersonalChatMessagesParams.
 type GetUserPersonalChatMessagesOption = Option[GetUserPersonalChatMessagesParams]
 
-// Option applies one or more GetUserPersonalChatMessagesOption values and returns the last rollback option.
-func (r *GetUserPersonalChatMessagesParams) Option(opts ...GetUserPersonalChatMessagesOption) (previous GetUserPersonalChatMessagesOption) {
+// Option applies opts to r in order.
+func (r *GetUserPersonalChatMessagesParams) Option(opts ...GetUserPersonalChatMessagesOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetUserPersonalChatMessagesUserID sets the UserID field.
@@ -9183,29 +8048,17 @@ func WithGetUserPersonalChatMessagesLimit(value int64) GetUserPersonalChatMessag
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) GetUserPersonalChatMessages(ctx context.Context, params *GetUserPersonalChatMessagesParams) (ret []Message, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getUserPersonalChatMessages", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = make([]Message, 0, 100)
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[[]Message](ctx, c, "getUserPersonalChatMessages", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -9228,12 +8081,11 @@ type GetUserProfileAudiosParams struct {
 // GetUserProfileAudiosOption configures GetUserProfileAudiosParams.
 type GetUserProfileAudiosOption = Option[GetUserProfileAudiosParams]
 
-// Option applies one or more GetUserProfileAudiosOption values and returns the last rollback option.
-func (r *GetUserProfileAudiosParams) Option(opts ...GetUserProfileAudiosOption) (previous GetUserProfileAudiosOption) {
+// Option applies opts to r in order.
+func (r *GetUserProfileAudiosParams) Option(opts ...GetUserProfileAudiosOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetUserProfileAudiosUserID sets the UserID field.
@@ -9273,29 +8125,17 @@ func WithGetUserProfileAudiosLimit(value int64) GetUserProfileAudiosOption {
 //
 // [UserProfileAudios]: https://core.telegram.org/bots/api#userprofileaudios
 func (c *Client) GetUserProfileAudios(ctx context.Context, params *GetUserProfileAudiosParams) (ret *UserProfileAudios, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getUserProfileAudios", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(UserProfileAudios)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*UserProfileAudios](ctx, c, "getUserProfileAudios", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -9318,12 +8158,11 @@ type GetUserProfilePhotosParams struct {
 // GetUserProfilePhotosOption configures GetUserProfilePhotosParams.
 type GetUserProfilePhotosOption = Option[GetUserProfilePhotosParams]
 
-// Option applies one or more GetUserProfilePhotosOption values and returns the last rollback option.
-func (r *GetUserProfilePhotosParams) Option(opts ...GetUserProfilePhotosOption) (previous GetUserProfilePhotosOption) {
+// Option applies opts to r in order.
+func (r *GetUserProfilePhotosParams) Option(opts ...GetUserProfilePhotosOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGetUserProfilePhotosUserID sets the UserID field.
@@ -9363,29 +8202,17 @@ func WithGetUserProfilePhotosLimit(value int64) GetUserProfilePhotosOption {
 //
 // [UserProfilePhotos]: https://core.telegram.org/bots/api#userprofilephotos
 func (c *Client) GetUserProfilePhotos(ctx context.Context, params *GetUserProfilePhotosParams) (ret *UserProfilePhotos, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getUserProfilePhotos", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(UserProfilePhotos)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*UserProfilePhotos](ctx, c, "getUserProfilePhotos", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -9397,12 +8224,11 @@ type GetWebhookInfoParams struct {
 // GetWebhookInfoOption configures GetWebhookInfoParams.
 type GetWebhookInfoOption = Option[GetWebhookInfoParams]
 
-// Option applies one or more GetWebhookInfoOption values and returns the last rollback option.
-func (r *GetWebhookInfoParams) Option(opts ...GetWebhookInfoOption) (previous GetWebhookInfoOption) {
+// Option applies opts to r in order.
+func (r *GetWebhookInfoParams) Option(opts ...GetWebhookInfoOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // GetWebhookInfo calls the getWebhookInfo Telegram Bot API method.
@@ -9415,29 +8241,17 @@ func (r *GetWebhookInfoParams) Option(opts ...GetWebhookInfoOption) (previous Ge
 // [WebhookInfo]: https://core.telegram.org/bots/api#webhookinfo
 // [getUpdates]: https://core.telegram.org/bots/api#getupdates
 func (c *Client) GetWebhookInfo(ctx context.Context, params *GetWebhookInfoParams) (ret *WebhookInfo, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "getWebhookInfo", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(WebhookInfo)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*WebhookInfo](ctx, c, "getWebhookInfo", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -9472,12 +8286,11 @@ type GiftPremiumSubscriptionParams struct {
 // GiftPremiumSubscriptionOption configures GiftPremiumSubscriptionParams.
 type GiftPremiumSubscriptionOption = Option[GiftPremiumSubscriptionParams]
 
-// Option applies one or more GiftPremiumSubscriptionOption values and returns the last rollback option.
-func (r *GiftPremiumSubscriptionParams) Option(opts ...GiftPremiumSubscriptionOption) (previous GiftPremiumSubscriptionOption) {
+// Option applies opts to r in order.
+func (r *GiftPremiumSubscriptionParams) Option(opts ...GiftPremiumSubscriptionOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithGiftPremiumSubscriptionUserID sets the UserID field.
@@ -9545,28 +8358,17 @@ func WithGiftPremiumSubscriptionTextEntities(value []MessageEntity) GiftPremiumS
 // Gifts a Telegram Premium subscription to the given user.
 // Returns True on success.
 func (c *Client) GiftPremiumSubscription(ctx context.Context, params *GiftPremiumSubscriptionParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "giftPremiumSubscription", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "giftPremiumSubscription", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -9580,12 +8382,11 @@ type HideGeneralForumTopicParams struct {
 // HideGeneralForumTopicOption configures HideGeneralForumTopicParams.
 type HideGeneralForumTopicOption = Option[HideGeneralForumTopicParams]
 
-// Option applies one or more HideGeneralForumTopicOption values and returns the last rollback option.
-func (r *HideGeneralForumTopicParams) Option(opts ...HideGeneralForumTopicOption) (previous HideGeneralForumTopicOption) {
+// Option applies opts to r in order.
+func (r *HideGeneralForumTopicParams) Option(opts ...HideGeneralForumTopicOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithHideGeneralForumTopicChatID sets the ChatID field.
@@ -9604,28 +8405,17 @@ func WithHideGeneralForumTopicChatID(value string) HideGeneralForumTopicOption {
 // The topic will be automatically closed if it was open.
 // Returns True on success.
 func (c *Client) HideGeneralForumTopic(ctx context.Context, params *HideGeneralForumTopicParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "hideGeneralForumTopic", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "hideGeneralForumTopic", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -9640,12 +8430,11 @@ type LeaveChatParams struct {
 // LeaveChatOption configures LeaveChatParams.
 type LeaveChatOption = Option[LeaveChatParams]
 
-// Option applies one or more LeaveChatOption values and returns the last rollback option.
-func (r *LeaveChatParams) Option(opts ...LeaveChatOption) (previous LeaveChatOption) {
+// Option applies opts to r in order.
+func (r *LeaveChatParams) Option(opts ...LeaveChatOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithLeaveChatChatID sets the ChatID field.
@@ -9663,28 +8452,17 @@ func WithLeaveChatChatID(value string) LeaveChatOption {
 // Use this method for your bot to leave a group, supergroup or channel.
 // Returns True on success.
 func (c *Client) LeaveChat(ctx context.Context, params *LeaveChatParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "leaveChat", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "leaveChat", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -9696,12 +8474,11 @@ type LogOutParams struct {
 // LogOutOption configures LogOutParams.
 type LogOutOption = Option[LogOutParams]
 
-// Option applies one or more LogOutOption values and returns the last rollback option.
-func (r *LogOutParams) Option(opts ...LogOutOption) (previous LogOutOption) {
+// Option applies opts to r in order.
+func (r *LogOutParams) Option(opts ...LogOutOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // LogOut calls the logOut Telegram Bot API method.
@@ -9712,28 +8489,17 @@ func (r *LogOutParams) Option(opts ...LogOutOption) (previous LogOutOption) {
 // Returns True on success.
 // Requires no parameters.
 func (c *Client) LogOut(ctx context.Context, params *LogOutParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "logOut", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "logOut", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -9757,12 +8523,11 @@ type PinChatMessageParams struct {
 // PinChatMessageOption configures PinChatMessageParams.
 type PinChatMessageOption = Option[PinChatMessageParams]
 
-// Option applies one or more PinChatMessageOption values and returns the last rollback option.
-func (r *PinChatMessageParams) Option(opts ...PinChatMessageOption) (previous PinChatMessageOption) {
+// Option applies opts to r in order.
+func (r *PinChatMessageParams) Option(opts ...PinChatMessageOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithPinChatMessageBusinessConnectionID sets the BusinessConnectionID field.
@@ -9809,28 +8574,17 @@ func WithPinChatMessageDisableNotification(value bool) PinChatMessageOption {
 // Conversely, the bot must be an administrator with the 'can_pin_messages' right or the 'can_edit_messages' right to pin messages in groups and channels respectively.
 // Returns True on success.
 func (c *Client) PinChatMessage(ctx context.Context, params *PinChatMessageParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "pinChatMessage", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "pinChatMessage", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -9871,12 +8625,11 @@ type PostStoryParams struct {
 // PostStoryOption configures PostStoryParams.
 type PostStoryOption = Option[PostStoryParams]
 
-// Option applies one or more PostStoryOption values and returns the last rollback option.
-func (r *PostStoryParams) Option(opts ...PostStoryOption) (previous PostStoryOption) {
+// Option applies opts to r in order.
+func (r *PostStoryParams) Option(opts ...PostStoryOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithPostStoryBusinessConnectionID sets the BusinessConnectionID field.
@@ -10025,19 +8778,12 @@ func (c *Client) PostStory(ctx context.Context, params *PostStoryParams) (ret *S
 				}
 			}
 
-			var bs []byte
-			bs, err = json.Marshal(&params.Content)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("content")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.Content)
 			if err != nil {
 				return
 			}
@@ -10068,38 +8814,24 @@ func (c *Client) PostStory(ctx context.Context, params *PostStoryParams) (ret *S
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			var bs []byte
-			bs, err = json.Marshal(&params.CaptionEntities)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("caption_entities")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.CaptionEntities)
 			if err != nil {
 				return
 			}
 		}
 
 		if len(params.Areas) != 0 {
-			var bs []byte
-			bs, err = json.Marshal(&params.Areas)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("areas")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.Areas)
 			if err != nil {
 				return
 			}
@@ -10123,25 +8855,14 @@ func (c *Client) PostStory(ctx context.Context, params *PostStoryParams) (ret *S
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "postStory", reader, contentType, nil)
+	ret, err = call[*Story](ctx, c, "postStory", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ret = new(Story)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -10214,12 +8935,11 @@ type PromoteChatMemberParams struct {
 // PromoteChatMemberOption configures PromoteChatMemberParams.
 type PromoteChatMemberOption = Option[PromoteChatMemberParams]
 
-// Option applies one or more PromoteChatMemberOption values and returns the last rollback option.
-func (r *PromoteChatMemberParams) Option(opts ...PromoteChatMemberOption) (previous PromoteChatMemberOption) {
+// Option applies opts to r in order.
+func (r *PromoteChatMemberParams) Option(opts ...PromoteChatMemberOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithPromoteChatMemberChatID sets the ChatID field.
@@ -10411,28 +9131,17 @@ func WithPromoteChatMemberCanSendWelcomeMessages(value bool) PromoteChatMemberOp
 // Pass False for all boolean parameters to demote a user.
 // Returns True on success.
 func (c *Client) PromoteChatMember(ctx context.Context, params *PromoteChatMemberParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "promoteChatMember", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "promoteChatMember", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -10453,12 +9162,11 @@ type ReadBusinessMessageParams struct {
 // ReadBusinessMessageOption configures ReadBusinessMessageParams.
 type ReadBusinessMessageOption = Option[ReadBusinessMessageParams]
 
-// Option applies one or more ReadBusinessMessageOption values and returns the last rollback option.
-func (r *ReadBusinessMessageParams) Option(opts ...ReadBusinessMessageOption) (previous ReadBusinessMessageOption) {
+// Option applies opts to r in order.
+func (r *ReadBusinessMessageParams) Option(opts ...ReadBusinessMessageOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithReadBusinessMessageBusinessConnectionID sets the BusinessConnectionID field.
@@ -10495,28 +9203,17 @@ func WithReadBusinessMessageMessageID(value int64) ReadBusinessMessageOption {
 // Requires the can_read_messages business bot right.
 // Returns True on success.
 func (c *Client) ReadBusinessMessage(ctx context.Context, params *ReadBusinessMessageParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "readBusinessMessage", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "readBusinessMessage", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -10533,12 +9230,11 @@ type RefundStarPaymentParams struct {
 // RefundStarPaymentOption configures RefundStarPaymentParams.
 type RefundStarPaymentOption = Option[RefundStarPaymentParams]
 
-// Option applies one or more RefundStarPaymentOption values and returns the last rollback option.
-func (r *RefundStarPaymentParams) Option(opts ...RefundStarPaymentOption) (previous RefundStarPaymentOption) {
+// Option applies opts to r in order.
+func (r *RefundStarPaymentParams) Option(opts ...RefundStarPaymentOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithRefundStarPaymentUserID sets the UserID field.
@@ -10566,28 +9262,17 @@ func WithRefundStarPaymentTelegramPaymentChargeID(value string) RefundStarPaymen
 //
 // [Telegram Stars]: https://t.me/BotNews/90
 func (c *Client) RefundStarPayment(ctx context.Context, params *RefundStarPaymentParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "refundStarPayment", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "refundStarPayment", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -10605,12 +9290,11 @@ type RemoveBusinessAccountProfilePhotoParams struct {
 // RemoveBusinessAccountProfilePhotoOption configures RemoveBusinessAccountProfilePhotoParams.
 type RemoveBusinessAccountProfilePhotoOption = Option[RemoveBusinessAccountProfilePhotoParams]
 
-// Option applies one or more RemoveBusinessAccountProfilePhotoOption values and returns the last rollback option.
-func (r *RemoveBusinessAccountProfilePhotoParams) Option(opts ...RemoveBusinessAccountProfilePhotoOption) (previous RemoveBusinessAccountProfilePhotoOption) {
+// Option applies opts to r in order.
+func (r *RemoveBusinessAccountProfilePhotoParams) Option(opts ...RemoveBusinessAccountProfilePhotoOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithRemoveBusinessAccountProfilePhotoBusinessConnectionID sets the BusinessConnectionID field.
@@ -10638,28 +9322,17 @@ func WithRemoveBusinessAccountProfilePhotoIsPublic(value bool) RemoveBusinessAcc
 // Requires the can_edit_profile_photo business bot right.
 // Returns True on success.
 func (c *Client) RemoveBusinessAccountProfilePhoto(ctx context.Context, params *RemoveBusinessAccountProfilePhotoParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "removeBusinessAccountProfilePhoto", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "removeBusinessAccountProfilePhoto", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -10673,12 +9346,11 @@ type RemoveChatVerificationParams struct {
 // RemoveChatVerificationOption configures RemoveChatVerificationParams.
 type RemoveChatVerificationOption = Option[RemoveChatVerificationParams]
 
-// Option applies one or more RemoveChatVerificationOption values and returns the last rollback option.
-func (r *RemoveChatVerificationParams) Option(opts ...RemoveChatVerificationOption) (previous RemoveChatVerificationOption) {
+// Option applies opts to r in order.
+func (r *RemoveChatVerificationParams) Option(opts ...RemoveChatVerificationOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithRemoveChatVerificationChatID sets the ChatID field.
@@ -10697,28 +9369,17 @@ func WithRemoveChatVerificationChatID(value string) RemoveChatVerificationOption
 //
 // [on behalf of the organization]: https://telegram.org/verify#third-party-verification
 func (c *Client) RemoveChatVerification(ctx context.Context, params *RemoveChatVerificationParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "removeChatVerification", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "removeChatVerification", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -10730,12 +9391,11 @@ type RemoveMyProfilePhotoParams struct {
 // RemoveMyProfilePhotoOption configures RemoveMyProfilePhotoParams.
 type RemoveMyProfilePhotoOption = Option[RemoveMyProfilePhotoParams]
 
-// Option applies one or more RemoveMyProfilePhotoOption values and returns the last rollback option.
-func (r *RemoveMyProfilePhotoParams) Option(opts ...RemoveMyProfilePhotoOption) (previous RemoveMyProfilePhotoOption) {
+// Option applies opts to r in order.
+func (r *RemoveMyProfilePhotoParams) Option(opts ...RemoveMyProfilePhotoOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // RemoveMyProfilePhoto calls the removeMyProfilePhoto Telegram Bot API method.
@@ -10744,28 +9404,17 @@ func (r *RemoveMyProfilePhotoParams) Option(opts ...RemoveMyProfilePhotoOption) 
 // Requires no parameters.
 // Returns True on success.
 func (c *Client) RemoveMyProfilePhoto(ctx context.Context, params *RemoveMyProfilePhotoParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "removeMyProfilePhoto", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "removeMyProfilePhoto", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -10779,12 +9428,11 @@ type RemoveUserVerificationParams struct {
 // RemoveUserVerificationOption configures RemoveUserVerificationParams.
 type RemoveUserVerificationOption = Option[RemoveUserVerificationParams]
 
-// Option applies one or more RemoveUserVerificationOption values and returns the last rollback option.
-func (r *RemoveUserVerificationParams) Option(opts ...RemoveUserVerificationOption) (previous RemoveUserVerificationOption) {
+// Option applies opts to r in order.
+func (r *RemoveUserVerificationParams) Option(opts ...RemoveUserVerificationOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithRemoveUserVerificationUserID sets the UserID field.
@@ -10803,28 +9451,17 @@ func WithRemoveUserVerificationUserID(value int64) RemoveUserVerificationOption 
 //
 // [on behalf of the organization]: https://telegram.org/verify#third-party-verification
 func (c *Client) RemoveUserVerification(ctx context.Context, params *RemoveUserVerificationParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "removeUserVerification", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "removeUserVerification", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -10841,12 +9478,11 @@ type ReopenForumTopicParams struct {
 // ReopenForumTopicOption configures ReopenForumTopicParams.
 type ReopenForumTopicOption = Option[ReopenForumTopicParams]
 
-// Option applies one or more ReopenForumTopicOption values and returns the last rollback option.
-func (r *ReopenForumTopicParams) Option(opts ...ReopenForumTopicOption) (previous ReopenForumTopicOption) {
+// Option applies opts to r in order.
+func (r *ReopenForumTopicParams) Option(opts ...ReopenForumTopicOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithReopenForumTopicChatID sets the ChatID field.
@@ -10873,28 +9509,17 @@ func WithReopenForumTopicMessageThreadID(value int64) ReopenForumTopicOption {
 // The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights, unless it is the creator of the topic.
 // Returns True on success.
 func (c *Client) ReopenForumTopic(ctx context.Context, params *ReopenForumTopicParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "reopenForumTopic", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "reopenForumTopic", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -10908,12 +9533,11 @@ type ReopenGeneralForumTopicParams struct {
 // ReopenGeneralForumTopicOption configures ReopenGeneralForumTopicParams.
 type ReopenGeneralForumTopicOption = Option[ReopenGeneralForumTopicParams]
 
-// Option applies one or more ReopenGeneralForumTopicOption values and returns the last rollback option.
-func (r *ReopenGeneralForumTopicParams) Option(opts ...ReopenGeneralForumTopicOption) (previous ReopenGeneralForumTopicOption) {
+// Option applies opts to r in order.
+func (r *ReopenGeneralForumTopicParams) Option(opts ...ReopenGeneralForumTopicOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithReopenGeneralForumTopicChatID sets the ChatID field.
@@ -10932,28 +9556,17 @@ func WithReopenGeneralForumTopicChatID(value string) ReopenGeneralForumTopicOpti
 // The topic will be automatically unhidden if it was hidden.
 // Returns True on success.
 func (c *Client) ReopenGeneralForumTopic(ctx context.Context, params *ReopenGeneralForumTopicParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "reopenGeneralForumTopic", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "reopenGeneralForumTopic", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -10967,12 +9580,11 @@ type ReplaceManagedBotTokenParams struct {
 // ReplaceManagedBotTokenOption configures ReplaceManagedBotTokenParams.
 type ReplaceManagedBotTokenOption = Option[ReplaceManagedBotTokenParams]
 
-// Option applies one or more ReplaceManagedBotTokenOption values and returns the last rollback option.
-func (r *ReplaceManagedBotTokenParams) Option(opts ...ReplaceManagedBotTokenOption) (previous ReplaceManagedBotTokenOption) {
+// Option applies opts to r in order.
+func (r *ReplaceManagedBotTokenParams) Option(opts ...ReplaceManagedBotTokenOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithReplaceManagedBotTokenUserID sets the UserID field.
@@ -10989,28 +9601,17 @@ func WithReplaceManagedBotTokenUserID(value int64) ReplaceManagedBotTokenOption 
 // Use this method to revoke the current token of a managed bot and generate a new one.
 // Returns the new token as String on success.
 func (c *Client) ReplaceManagedBotToken(ctx context.Context, params *ReplaceManagedBotTokenParams) (ret string, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "replaceManagedBotToken", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[string](ctx, c, "replaceManagedBotToken", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -11034,12 +9635,11 @@ type ReplaceStickerInSetParams struct {
 // ReplaceStickerInSetOption configures ReplaceStickerInSetParams.
 type ReplaceStickerInSetOption = Option[ReplaceStickerInSetParams]
 
-// Option applies one or more ReplaceStickerInSetOption values and returns the last rollback option.
-func (r *ReplaceStickerInSetParams) Option(opts ...ReplaceStickerInSetOption) (previous ReplaceStickerInSetOption) {
+// Option applies opts to r in order.
+func (r *ReplaceStickerInSetParams) Option(opts ...ReplaceStickerInSetOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithReplaceStickerInSetUserID sets the UserID field.
@@ -11147,19 +9747,12 @@ func (c *Client) ReplaceStickerInSet(ctx context.Context, params *ReplaceSticker
 				return
 			}
 
-			var bs []byte
-			bs, err = json.Marshal(&params.Sticker)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("sticker")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.Sticker)
 			if err != nil {
 				return
 			}
@@ -11167,24 +9760,14 @@ func (c *Client) ReplaceStickerInSet(ctx context.Context, params *ReplaceSticker
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "replaceStickerInSet", reader, contentType, nil)
+	ret, err = call[bool](ctx, c, "replaceStickerInSet", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -11213,12 +9796,11 @@ type RepostStoryParams struct {
 // RepostStoryOption configures RepostStoryParams.
 type RepostStoryOption = Option[RepostStoryParams]
 
-// Option applies one or more RepostStoryOption values and returns the last rollback option.
-func (r *RepostStoryParams) Option(opts ...RepostStoryOption) (previous RepostStoryOption) {
+// Option applies opts to r in order.
+func (r *RepostStoryParams) Option(opts ...RepostStoryOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithRepostStoryBusinessConnectionID sets the BusinessConnectionID field.
@@ -11284,29 +9866,17 @@ func WithRepostStoryProtectContent(value bool) RepostStoryOption {
 //
 // [Story]: https://core.telegram.org/bots/api#story
 func (c *Client) RepostStory(ctx context.Context, params *RepostStoryParams) (ret *Story, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "repostStory", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(Story)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*Story](ctx, c, "repostStory", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -11334,12 +9904,11 @@ type RestrictChatMemberParams struct {
 // RestrictChatMemberOption configures RestrictChatMemberParams.
 type RestrictChatMemberOption = Option[RestrictChatMemberParams]
 
-// Option applies one or more RestrictChatMemberOption values and returns the last rollback option.
-func (r *RestrictChatMemberParams) Option(opts ...RestrictChatMemberOption) (previous RestrictChatMemberOption) {
+// Option applies opts to r in order.
+func (r *RestrictChatMemberParams) Option(opts ...RestrictChatMemberOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithRestrictChatMemberChatID sets the ChatID field.
@@ -11396,28 +9965,17 @@ func WithRestrictChatMemberUntilDate(value int64) RestrictChatMemberOption {
 // Pass True for all permissions to lift restrictions from a user.
 // Returns True on success.
 func (c *Client) RestrictChatMember(ctx context.Context, params *RestrictChatMemberParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "restrictChatMember", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "restrictChatMember", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -11434,12 +9992,11 @@ type RevokeChatInviteLinkParams struct {
 // RevokeChatInviteLinkOption configures RevokeChatInviteLinkParams.
 type RevokeChatInviteLinkOption = Option[RevokeChatInviteLinkParams]
 
-// Option applies one or more RevokeChatInviteLinkOption values and returns the last rollback option.
-func (r *RevokeChatInviteLinkParams) Option(opts ...RevokeChatInviteLinkOption) (previous RevokeChatInviteLinkOption) {
+// Option applies opts to r in order.
+func (r *RevokeChatInviteLinkParams) Option(opts ...RevokeChatInviteLinkOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithRevokeChatInviteLinkChatID sets the ChatID field.
@@ -11469,29 +10026,17 @@ func WithRevokeChatInviteLinkInviteLink(value string) RevokeChatInviteLinkOption
 //
 // [ChatInviteLink]: https://core.telegram.org/bots/api#chatinvitelink
 func (c *Client) RevokeChatInviteLink(ctx context.Context, params *RevokeChatInviteLinkParams) (ret *ChatInviteLink, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "revokeChatInviteLink", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(ChatInviteLink)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*ChatInviteLink](ctx, c, "revokeChatInviteLink", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -11520,12 +10065,11 @@ type SavePreparedInlineMessageParams struct {
 // SavePreparedInlineMessageOption configures SavePreparedInlineMessageParams.
 type SavePreparedInlineMessageOption = Option[SavePreparedInlineMessageParams]
 
-// Option applies one or more SavePreparedInlineMessageOption values and returns the last rollback option.
-func (r *SavePreparedInlineMessageParams) Option(opts ...SavePreparedInlineMessageOption) (previous SavePreparedInlineMessageOption) {
+// Option applies opts to r in order.
+func (r *SavePreparedInlineMessageParams) Option(opts ...SavePreparedInlineMessageOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSavePreparedInlineMessageUserID sets the UserID field.
@@ -11589,29 +10133,17 @@ func WithSavePreparedInlineMessageAllowChannelChats(value bool) SavePreparedInli
 //
 // [PreparedInlineMessage]: https://core.telegram.org/bots/api#preparedinlinemessage
 func (c *Client) SavePreparedInlineMessage(ctx context.Context, params *SavePreparedInlineMessageParams) (ret *PreparedInlineMessage, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "savePreparedInlineMessage", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(PreparedInlineMessage)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*PreparedInlineMessage](ctx, c, "savePreparedInlineMessage", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -11629,12 +10161,11 @@ type SavePreparedKeyboardButtonParams struct {
 // SavePreparedKeyboardButtonOption configures SavePreparedKeyboardButtonParams.
 type SavePreparedKeyboardButtonOption = Option[SavePreparedKeyboardButtonParams]
 
-// Option applies one or more SavePreparedKeyboardButtonOption values and returns the last rollback option.
-func (r *SavePreparedKeyboardButtonParams) Option(opts ...SavePreparedKeyboardButtonOption) (previous SavePreparedKeyboardButtonOption) {
+// Option applies opts to r in order.
+func (r *SavePreparedKeyboardButtonParams) Option(opts ...SavePreparedKeyboardButtonOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSavePreparedKeyboardButtonUserID sets the UserID field.
@@ -11663,29 +10194,17 @@ func WithSavePreparedKeyboardButtonButton(value KeyboardButton) SavePreparedKeyb
 //
 // [PreparedKeyboardButton]: https://core.telegram.org/bots/api#preparedkeyboardbutton
 func (c *Client) SavePreparedKeyboardButton(ctx context.Context, params *SavePreparedKeyboardButtonParams) (ret *PreparedKeyboardButton, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "savePreparedKeyboardButton", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(PreparedKeyboardButton)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*PreparedKeyboardButton](ctx, c, "savePreparedKeyboardButton", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -11787,12 +10306,11 @@ type SendAnimationParams struct {
 // SendAnimationOption configures SendAnimationParams.
 type SendAnimationOption = Option[SendAnimationParams]
 
-// Option applies one or more SendAnimationOption values and returns the last rollback option.
-func (r *SendAnimationParams) Option(opts ...SendAnimationOption) (previous SendAnimationOption) {
+// Option applies opts to r in order.
+func (r *SendAnimationParams) Option(opts ...SendAnimationOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendAnimationBusinessConnectionID sets the BusinessConnectionID field.
@@ -12083,19 +10601,12 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 		}
 
 		if params.EphemeralMessageParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.EphemeralMessageParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("ephemeral_message_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.EphemeralMessageParameters)
 			if err != nil {
 				return
 			}
@@ -12168,19 +10679,12 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			var bs []byte
-			bs, err = json.Marshal(&params.CaptionEntities)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("caption_entities")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.CaptionEntities)
 			if err != nil {
 				return
 			}
@@ -12235,57 +10739,36 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 		}
 
 		if params.SuggestedPostParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.SuggestedPostParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.SuggestedPostParameters)
 			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyParameters)
 			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyMarkup)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyMarkup)
 			if err != nil {
 				return
 			}
@@ -12293,25 +10776,14 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendAnimation", reader, contentType, nil)
+	ret, err = call[*Message](ctx, c, "sendAnimation", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -12407,12 +10879,11 @@ type SendAudioParams struct {
 // SendAudioOption configures SendAudioParams.
 type SendAudioOption = Option[SendAudioParams]
 
-// Option applies one or more SendAudioOption values and returns the last rollback option.
-func (r *SendAudioParams) Option(opts ...SendAudioOption) (previous SendAudioOption) {
+// Option applies opts to r in order.
+func (r *SendAudioParams) Option(opts ...SendAudioOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendAudioBusinessConnectionID sets the BusinessConnectionID field.
@@ -12688,19 +11159,12 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 		}
 
 		if params.EphemeralMessageParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.EphemeralMessageParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("ephemeral_message_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.EphemeralMessageParameters)
 			if err != nil {
 				return
 			}
@@ -12735,19 +11199,12 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			var bs []byte
-			bs, err = json.Marshal(&params.CaptionEntities)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("caption_entities")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.CaptionEntities)
 			if err != nil {
 				return
 			}
@@ -12824,57 +11281,36 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 		}
 
 		if params.SuggestedPostParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.SuggestedPostParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.SuggestedPostParameters)
 			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyParameters)
 			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyMarkup)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyMarkup)
 			if err != nil {
 				return
 			}
@@ -12882,25 +11318,14 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendAudio", reader, contentType, nil)
+	ret, err = call[*Message](ctx, c, "sendAudio", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -12934,12 +11359,11 @@ type SendChatActionParams struct {
 // SendChatActionOption configures SendChatActionParams.
 type SendChatActionOption = Option[SendChatActionParams]
 
-// Option applies one or more SendChatActionOption values and returns the last rollback option.
-func (r *SendChatActionParams) Option(opts ...SendChatActionOption) (previous SendChatActionOption) {
+// Option applies opts to r in order.
+func (r *SendChatActionParams) Option(opts ...SendChatActionOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendChatActionBusinessConnectionID sets the BusinessConnectionID field.
@@ -12996,28 +11420,17 @@ func WithSendChatActionAction(value string) SendChatActionOption {
 // Returns True on success.
 // We only recommend using this method when a response from the bot will take a noticeable amount of time to arrive.
 func (c *Client) SendChatAction(ctx context.Context, params *SendChatActionParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendChatAction", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "sendChatAction", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -13036,12 +11449,11 @@ type SendChatJoinRequestWebAppParams struct {
 // SendChatJoinRequestWebAppOption configures SendChatJoinRequestWebAppParams.
 type SendChatJoinRequestWebAppOption = Option[SendChatJoinRequestWebAppParams]
 
-// Option applies one or more SendChatJoinRequestWebAppOption values and returns the last rollback option.
-func (r *SendChatJoinRequestWebAppParams) Option(opts ...SendChatJoinRequestWebAppOption) (previous SendChatJoinRequestWebAppOption) {
+// Option applies opts to r in order.
+func (r *SendChatJoinRequestWebAppParams) Option(opts ...SendChatJoinRequestWebAppOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendChatJoinRequestWebAppChatJoinRequestQueryID sets the ChatJoinRequestQueryID field.
@@ -13072,28 +11484,17 @@ func WithSendChatJoinRequestWebAppWebAppUrl(value string) SendChatJoinRequestWeb
 //
 // [answerChatJoinRequestQuery]: https://core.telegram.org/bots/api#answerchatjoinrequestquery
 func (c *Client) SendChatJoinRequestWebApp(ctx context.Context, params *SendChatJoinRequestWebAppParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendChatJoinRequestWebApp", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "sendChatJoinRequestWebApp", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -13131,12 +11532,11 @@ type SendChecklistParams struct {
 // SendChecklistOption configures SendChecklistParams.
 type SendChecklistOption = Option[SendChecklistParams]
 
-// Option applies one or more SendChecklistOption values and returns the last rollback option.
-func (r *SendChecklistParams) Option(opts ...SendChecklistOption) (previous SendChecklistOption) {
+// Option applies opts to r in order.
+func (r *SendChecklistParams) Option(opts ...SendChecklistOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendChecklistBusinessConnectionID sets the BusinessConnectionID field.
@@ -13221,29 +11621,17 @@ func WithSendChecklistReplyMarkup(value *InlineKeyboardMarkup) SendChecklistOpti
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendChecklist(ctx context.Context, params *SendChecklistParams) (ret *Message, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendChecklist", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*Message](ctx, c, "sendChecklist", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -13315,12 +11703,11 @@ type SendContactParams struct {
 // SendContactOption configures SendContactParams.
 type SendContactOption = Option[SendContactParams]
 
-// Option applies one or more SendContactOption values and returns the last rollback option.
-func (r *SendContactParams) Option(opts ...SendContactOption) (previous SendContactOption) {
+// Option applies opts to r in order.
+func (r *SendContactParams) Option(opts ...SendContactOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendContactBusinessConnectionID sets the BusinessConnectionID field.
@@ -13487,29 +11874,17 @@ func WithSendContactReplyMarkup(value *ReplyMarkup) SendContactOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendContact(ctx context.Context, params *SendContactParams) (ret *Message, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendContact", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*Message](ctx, c, "sendContact", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -13570,12 +11945,11 @@ type SendDiceParams struct {
 // SendDiceOption configures SendDiceParams.
 type SendDiceOption = Option[SendDiceParams]
 
-// Option applies one or more SendDiceOption values and returns the last rollback option.
-func (r *SendDiceParams) Option(opts ...SendDiceOption) (previous SendDiceOption) {
+// Option applies opts to r in order.
+func (r *SendDiceParams) Option(opts ...SendDiceOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendDiceBusinessConnectionID sets the BusinessConnectionID field.
@@ -13707,29 +12081,17 @@ func WithSendDiceReplyMarkup(value *ReplyMarkup) SendDiceOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendDice(ctx context.Context, params *SendDiceParams) (ret *Message, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendDice", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*Message](ctx, c, "sendDice", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -13819,12 +12181,11 @@ type SendDocumentParams struct {
 // SendDocumentOption configures SendDocumentParams.
 type SendDocumentOption = Option[SendDocumentParams]
 
-// Option applies one or more SendDocumentOption values and returns the last rollback option.
-func (r *SendDocumentParams) Option(opts ...SendDocumentOption) (previous SendDocumentOption) {
+// Option applies opts to r in order.
+func (r *SendDocumentParams) Option(opts ...SendDocumentOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendDocumentBusinessConnectionID sets the BusinessConnectionID field.
@@ -14079,19 +12440,12 @@ func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (
 		}
 
 		if params.EphemeralMessageParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.EphemeralMessageParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("ephemeral_message_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.EphemeralMessageParameters)
 			if err != nil {
 				return
 			}
@@ -14140,19 +12494,12 @@ func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			var bs []byte
-			bs, err = json.Marshal(&params.CaptionEntities)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("caption_entities")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.CaptionEntities)
 			if err != nil {
 				return
 			}
@@ -14199,57 +12546,36 @@ func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (
 		}
 
 		if params.SuggestedPostParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.SuggestedPostParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.SuggestedPostParameters)
 			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyParameters)
 			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyMarkup)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyMarkup)
 			if err != nil {
 				return
 			}
@@ -14257,25 +12583,14 @@ func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendDocument", reader, contentType, nil)
+	ret, err = call[*Message](ctx, c, "sendDocument", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -14330,12 +12645,11 @@ type SendGameParams struct {
 // SendGameOption configures SendGameParams.
 type SendGameOption = Option[SendGameParams]
 
-// Option applies one or more SendGameOption values and returns the last rollback option.
-func (r *SendGameParams) Option(opts ...SendGameOption) (previous SendGameOption) {
+// Option applies opts to r in order.
+func (r *SendGameParams) Option(opts ...SendGameOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendGameBusinessConnectionID sets the BusinessConnectionID field.
@@ -14449,29 +12763,17 @@ func WithSendGameReplyMarkup(value *InlineKeyboardMarkup) SendGameOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendGame(ctx context.Context, params *SendGameParams) (ret *Message, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendGame", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*Message](ctx, c, "sendGame", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -14511,12 +12813,11 @@ type SendGiftParams struct {
 // SendGiftOption configures SendGiftParams.
 type SendGiftOption = Option[SendGiftParams]
 
-// Option applies one or more SendGiftOption values and returns the last rollback option.
-func (r *SendGiftParams) Option(opts ...SendGiftOption) (previous SendGiftOption) {
+// Option applies opts to r in order.
+func (r *SendGiftParams) Option(opts ...SendGiftOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendGiftUserID sets the UserID field.
@@ -14596,28 +12897,17 @@ func WithSendGiftTextEntities(value []MessageEntity) SendGiftOption {
 // The gift can't be converted to Telegram Stars by the receiver.
 // Returns True on success.
 func (c *Client) SendGift(ctx context.Context, params *SendGiftParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendGift", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "sendGift", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -14780,12 +13070,11 @@ type SendInvoiceParams struct {
 // SendInvoiceOption configures SendInvoiceParams.
 type SendInvoiceOption = Option[SendInvoiceParams]
 
-// Option applies one or more SendInvoiceOption values and returns the last rollback option.
-func (r *SendInvoiceParams) Option(opts ...SendInvoiceOption) (previous SendInvoiceOption) {
+// Option applies opts to r in order.
+func (r *SendInvoiceParams) Option(opts ...SendInvoiceOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendInvoiceChatID sets the ChatID field.
@@ -15133,29 +13422,17 @@ func WithSendInvoiceReplyMarkup(value *InlineKeyboardMarkup) SendInvoiceOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendInvoice(ctx context.Context, params *SendInvoiceParams) (ret *Message, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendInvoice", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*Message](ctx, c, "sendInvoice", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -15248,12 +13525,11 @@ type SendLivePhotoParams struct {
 // SendLivePhotoOption configures SendLivePhotoParams.
 type SendLivePhotoOption = Option[SendLivePhotoParams]
 
-// Option applies one or more SendLivePhotoOption values and returns the last rollback option.
-func (r *SendLivePhotoParams) Option(opts ...SendLivePhotoOption) (previous SendLivePhotoOption) {
+// Option applies opts to r in order.
+func (r *SendLivePhotoParams) Option(opts ...SendLivePhotoOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendLivePhotoBusinessConnectionID sets the BusinessConnectionID field.
@@ -15516,19 +13792,12 @@ func (c *Client) SendLivePhoto(ctx context.Context, params *SendLivePhotoParams)
 		}
 
 		if params.EphemeralMessageParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.EphemeralMessageParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("ephemeral_message_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.EphemeralMessageParameters)
 			if err != nil {
 				return
 			}
@@ -15575,19 +13844,12 @@ func (c *Client) SendLivePhoto(ctx context.Context, params *SendLivePhotoParams)
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			var bs []byte
-			bs, err = json.Marshal(&params.CaptionEntities)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("caption_entities")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.CaptionEntities)
 			if err != nil {
 				return
 			}
@@ -15642,57 +13904,36 @@ func (c *Client) SendLivePhoto(ctx context.Context, params *SendLivePhotoParams)
 		}
 
 		if params.SuggestedPostParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.SuggestedPostParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.SuggestedPostParameters)
 			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyParameters)
 			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyMarkup)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyMarkup)
 			if err != nil {
 				return
 			}
@@ -15700,25 +13941,14 @@ func (c *Client) SendLivePhoto(ctx context.Context, params *SendLivePhotoParams)
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendLivePhoto", reader, contentType, nil)
+	ret, err = call[*Message](ctx, c, "sendLivePhoto", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -15799,12 +14029,11 @@ type SendLocationParams struct {
 // SendLocationOption configures SendLocationParams.
 type SendLocationOption = Option[SendLocationParams]
 
-// Option applies one or more SendLocationOption values and returns the last rollback option.
-func (r *SendLocationParams) Option(opts ...SendLocationOption) (previous SendLocationOption) {
+// Option applies opts to r in order.
+func (r *SendLocationParams) Option(opts ...SendLocationOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendLocationBusinessConnectionID sets the BusinessConnectionID field.
@@ -15992,29 +14221,17 @@ func WithSendLocationReplyMarkup(value *ReplyMarkup) SendLocationOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendLocation(ctx context.Context, params *SendLocationParams) (ret *Message, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendLocation", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*Message](ctx, c, "sendLocation", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -16061,12 +14278,11 @@ type SendMediaGroupParams struct {
 // SendMediaGroupOption configures SendMediaGroupParams.
 type SendMediaGroupOption = Option[SendMediaGroupParams]
 
-// Option applies one or more SendMediaGroupOption values and returns the last rollback option.
-func (r *SendMediaGroupParams) Option(opts ...SendMediaGroupOption) (previous SendMediaGroupOption) {
+// Option applies opts to r in order.
+func (r *SendMediaGroupParams) Option(opts ...SendMediaGroupOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendMediaGroupBusinessConnectionID sets the BusinessConnectionID field.
@@ -16347,19 +14563,12 @@ func (c *Client) SendMediaGroup(ctx context.Context, params *SendMediaGroupParam
 				}
 			}
 
-			var bs []byte
-			bs, err = json.Marshal(&params.Media)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("media")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.Media)
 			if err != nil {
 				return
 			}
@@ -16398,19 +14607,12 @@ func (c *Client) SendMediaGroup(ctx context.Context, params *SendMediaGroupParam
 		}
 
 		if params.ReplyParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyParameters)
 			if err != nil {
 				return
 			}
@@ -16418,25 +14620,14 @@ func (c *Client) SendMediaGroup(ctx context.Context, params *SendMediaGroupParam
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendMediaGroup", reader, contentType, nil)
+	ret, err = call[[]Message](ctx, c, "sendMediaGroup", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ret = make([]Message, 0, 100)
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -16509,12 +14700,11 @@ type SendMessageParams struct {
 // SendMessageOption configures SendMessageParams.
 type SendMessageOption = Option[SendMessageParams]
 
-// Option applies one or more SendMessageOption values and returns the last rollback option.
-func (r *SendMessageParams) Option(opts ...SendMessageOption) (previous SendMessageOption) {
+// Option applies opts to r in order.
+func (r *SendMessageParams) Option(opts ...SendMessageOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendMessageBusinessConnectionID sets the BusinessConnectionID field.
@@ -16682,29 +14872,17 @@ func WithSendMessageReplyMarkup(value *ReplyMarkup) SendMessageOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendMessage(ctx context.Context, params *SendMessageParams) (ret *Message, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendMessage", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*Message](ctx, c, "sendMessage", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -16750,12 +14928,11 @@ type SendMessageDraftParams struct {
 // SendMessageDraftOption configures SendMessageDraftParams.
 type SendMessageDraftOption = Option[SendMessageDraftParams]
 
-// Option applies one or more SendMessageDraftOption values and returns the last rollback option.
-func (r *SendMessageDraftParams) Option(opts ...SendMessageDraftOption) (previous SendMessageDraftOption) {
+// Option applies opts to r in order.
+func (r *SendMessageDraftParams) Option(opts ...SendMessageDraftOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendMessageDraftChatID sets the ChatID field.
@@ -16849,28 +15026,17 @@ func WithSendMessageDraftKeepOnStop(value bool) SendMessageDraftOption {
 //
 // [sendMessage]: https://core.telegram.org/bots/api#sendmessage
 func (c *Client) SendMessageDraft(ctx context.Context, params *SendMessageDraftParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendMessageDraft", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "sendMessageDraft", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -16949,12 +15115,11 @@ type SendPaidMediaParams struct {
 // SendPaidMediaOption configures SendPaidMediaParams.
 type SendPaidMediaOption = Option[SendPaidMediaParams]
 
-// Option applies one or more SendPaidMediaOption values and returns the last rollback option.
-func (r *SendPaidMediaParams) Option(opts ...SendPaidMediaOption) (previous SendPaidMediaOption) {
+// Option applies opts to r in order.
+func (r *SendPaidMediaParams) Option(opts ...SendPaidMediaOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendPaidMediaBusinessConnectionID sets the BusinessConnectionID field.
@@ -17259,19 +15424,12 @@ func (c *Client) SendPaidMedia(ctx context.Context, params *SendPaidMediaParams)
 				}
 			}
 
-			var bs []byte
-			bs, err = json.Marshal(&params.Media)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("media")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.Media)
 			if err != nil {
 				return
 			}
@@ -17302,19 +15460,12 @@ func (c *Client) SendPaidMedia(ctx context.Context, params *SendPaidMediaParams)
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			var bs []byte
-			bs, err = json.Marshal(&params.CaptionEntities)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("caption_entities")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.CaptionEntities)
 			if err != nil {
 				return
 			}
@@ -17353,57 +15504,36 @@ func (c *Client) SendPaidMedia(ctx context.Context, params *SendPaidMediaParams)
 		}
 
 		if params.SuggestedPostParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.SuggestedPostParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.SuggestedPostParameters)
 			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyParameters)
 			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyMarkup)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyMarkup)
 			if err != nil {
 				return
 			}
@@ -17411,25 +15541,14 @@ func (c *Client) SendPaidMedia(ctx context.Context, params *SendPaidMediaParams)
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendPaidMedia", reader, contentType, nil)
+	ret, err = call[*Message](ctx, c, "sendPaidMedia", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -17515,12 +15634,11 @@ type SendPhotoParams struct {
 // SendPhotoOption configures SendPhotoParams.
 type SendPhotoOption = Option[SendPhotoParams]
 
-// Option applies one or more SendPhotoOption values and returns the last rollback option.
-func (r *SendPhotoParams) Option(opts ...SendPhotoOption) (previous SendPhotoOption) {
+// Option applies opts to r in order.
+func (r *SendPhotoParams) Option(opts ...SendPhotoOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendPhotoBusinessConnectionID sets the BusinessConnectionID field.
@@ -17770,19 +15888,12 @@ func (c *Client) SendPhoto(ctx context.Context, params *SendPhotoParams) (ret *M
 		}
 
 		if params.EphemeralMessageParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.EphemeralMessageParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("ephemeral_message_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.EphemeralMessageParameters)
 			if err != nil {
 				return
 			}
@@ -17817,19 +15928,12 @@ func (c *Client) SendPhoto(ctx context.Context, params *SendPhotoParams) (ret *M
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			var bs []byte
-			bs, err = json.Marshal(&params.CaptionEntities)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("caption_entities")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.CaptionEntities)
 			if err != nil {
 				return
 			}
@@ -17884,57 +15988,36 @@ func (c *Client) SendPhoto(ctx context.Context, params *SendPhotoParams) (ret *M
 		}
 
 		if params.SuggestedPostParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.SuggestedPostParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.SuggestedPostParameters)
 			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyParameters)
 			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyMarkup)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyMarkup)
 			if err != nil {
 				return
 			}
@@ -17942,25 +16025,14 @@ func (c *Client) SendPhoto(ctx context.Context, params *SendPhotoParams) (ret *M
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendPhoto", reader, contentType, nil)
+	ret, err = call[*Message](ctx, c, "sendPhoto", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -18104,12 +16176,11 @@ type SendPollParams struct {
 // SendPollOption configures SendPollParams.
 type SendPollOption = Option[SendPollParams]
 
-// Option applies one or more SendPollOption values and returns the last rollback option.
-func (r *SendPollParams) Option(opts ...SendPollOption) (previous SendPollOption) {
+// Option applies opts to r in order.
+func (r *SendPollParams) Option(opts ...SendPollOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendPollBusinessConnectionID sets the BusinessConnectionID field.
@@ -18521,38 +16592,24 @@ func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Mes
 		}
 
 		if len(params.QuestionEntities) != 0 {
-			var bs []byte
-			bs, err = json.Marshal(&params.QuestionEntities)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("question_entities")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.QuestionEntities)
 			if err != nil {
 				return
 			}
 		}
 
 		{
-			var bs []byte
-			bs, err = json.Marshal(&params.Options)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("options")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.Options)
 			if err != nil {
 				return
 			}
@@ -18623,38 +16680,24 @@ func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Mes
 		}
 
 		if len(params.CountryCodes) != 0 {
-			var bs []byte
-			bs, err = json.Marshal(&params.CountryCodes)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("country_codes")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.CountryCodes)
 			if err != nil {
 				return
 			}
 		}
 
 		if len(params.CorrectOptionIDs) != 0 {
-			var bs []byte
-			bs, err = json.Marshal(&params.CorrectOptionIDs)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("correct_option_ids")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.CorrectOptionIDs)
 			if err != nil {
 				return
 			}
@@ -18677,19 +16720,12 @@ func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Mes
 		}
 
 		if len(params.ExplanationEntities) != 0 {
-			var bs []byte
-			bs, err = json.Marshal(&params.ExplanationEntities)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("explanation_entities")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ExplanationEntities)
 			if err != nil {
 				return
 			}
@@ -18813,19 +16849,12 @@ func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Mes
 				}
 			}
 
-			var bs []byte
-			bs, err = json.Marshal(&params.ExplanationMedia)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("explanation_media")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ExplanationMedia)
 			if err != nil {
 				return
 			}
@@ -18872,19 +16901,12 @@ func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Mes
 		}
 
 		if len(params.DescriptionEntities) != 0 {
-			var bs []byte
-			bs, err = json.Marshal(&params.DescriptionEntities)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("description_entities")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.DescriptionEntities)
 			if err != nil {
 				return
 			}
@@ -19008,19 +17030,12 @@ func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Mes
 				}
 			}
 
-			var bs []byte
-			bs, err = json.Marshal(&params.Media)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("media")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.Media)
 			if err != nil {
 				return
 			}
@@ -19059,38 +17074,24 @@ func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Mes
 		}
 
 		if params.ReplyParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyParameters)
 			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyMarkup)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyMarkup)
 			if err != nil {
 				return
 			}
@@ -19098,25 +17099,14 @@ func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Mes
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendPoll", reader, contentType, nil)
+	ret, err = call[*Message](ctx, c, "sendPoll", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -19178,12 +17168,11 @@ type SendRichMessageParams struct {
 // SendRichMessageOption configures SendRichMessageParams.
 type SendRichMessageOption = Option[SendRichMessageParams]
 
-// Option applies one or more SendRichMessageOption values and returns the last rollback option.
-func (r *SendRichMessageParams) Option(opts ...SendRichMessageOption) (previous SendRichMessageOption) {
+// Option applies opts to r in order.
+func (r *SendRichMessageParams) Option(opts ...SendRichMessageOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendRichMessageBusinessConnectionID sets the BusinessConnectionID field.
@@ -19323,29 +17312,17 @@ func WithSendRichMessageReplyMarkup(value *ReplyMarkup) SendRichMessageOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendRichMessage(ctx context.Context, params *SendRichMessageParams) (ret *Message, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendRichMessage", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*Message](ctx, c, "sendRichMessage", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -19382,12 +17359,11 @@ type SendRichMessageDraftParams struct {
 // SendRichMessageDraftOption configures SendRichMessageDraftParams.
 type SendRichMessageDraftOption = Option[SendRichMessageDraftParams]
 
-// Option applies one or more SendRichMessageDraftOption values and returns the last rollback option.
-func (r *SendRichMessageDraftParams) Option(opts ...SendRichMessageDraftOption) (previous SendRichMessageDraftOption) {
+// Option applies opts to r in order.
+func (r *SendRichMessageDraftParams) Option(opts ...SendRichMessageDraftOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendRichMessageDraftChatID sets the ChatID field.
@@ -19460,28 +17436,17 @@ func WithSendRichMessageDraftKeepOnStop(value bool) SendRichMessageDraftOption {
 //
 // [sendRichMessage]: https://core.telegram.org/bots/api#sendrichmessage
 func (c *Client) SendRichMessageDraft(ctx context.Context, params *SendRichMessageDraftParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendRichMessageDraft", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "sendRichMessageDraft", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -19550,12 +17515,11 @@ type SendStickerParams struct {
 // SendStickerOption configures SendStickerParams.
 type SendStickerOption = Option[SendStickerParams]
 
-// Option applies one or more SendStickerOption values and returns the last rollback option.
-func (r *SendStickerParams) Option(opts ...SendStickerOption) (previous SendStickerOption) {
+// Option applies opts to r in order.
+func (r *SendStickerParams) Option(opts ...SendStickerOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendStickerBusinessConnectionID sets the BusinessConnectionID field.
@@ -19766,19 +17730,12 @@ func (c *Client) SendSticker(ctx context.Context, params *SendStickerParams) (re
 		}
 
 		if params.EphemeralMessageParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.EphemeralMessageParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("ephemeral_message_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.EphemeralMessageParameters)
 			if err != nil {
 				return
 			}
@@ -19837,57 +17794,36 @@ func (c *Client) SendSticker(ctx context.Context, params *SendStickerParams) (re
 		}
 
 		if params.SuggestedPostParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.SuggestedPostParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.SuggestedPostParameters)
 			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyParameters)
 			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyMarkup)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyMarkup)
 			if err != nil {
 				return
 			}
@@ -19895,25 +17831,14 @@ func (c *Client) SendSticker(ctx context.Context, params *SendStickerParams) (re
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendSticker", reader, contentType, nil)
+	ret, err = call[*Message](ctx, c, "sendSticker", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -19999,12 +17924,11 @@ type SendVenueParams struct {
 // SendVenueOption configures SendVenueParams.
 type SendVenueOption = Option[SendVenueParams]
 
-// Option applies one or more SendVenueOption values and returns the last rollback option.
-func (r *SendVenueParams) Option(opts ...SendVenueOption) (previous SendVenueOption) {
+// Option applies opts to r in order.
+func (r *SendVenueParams) Option(opts ...SendVenueOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendVenueBusinessConnectionID sets the BusinessConnectionID field.
@@ -20209,29 +18133,17 @@ func WithSendVenueReplyMarkup(value *ReplyMarkup) SendVenueOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendVenue(ctx context.Context, params *SendVenueParams) (ret *Message, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendVenue", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*Message](ctx, c, "sendVenue", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -20346,12 +18258,11 @@ type SendVideoParams struct {
 // SendVideoOption configures SendVideoParams.
 type SendVideoOption = Option[SendVideoParams]
 
-// Option applies one or more SendVideoOption values and returns the last rollback option.
-func (r *SendVideoParams) Option(opts ...SendVideoOption) (previous SendVideoOption) {
+// Option applies opts to r in order.
+func (r *SendVideoParams) Option(opts ...SendVideoOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendVideoBusinessConnectionID sets the BusinessConnectionID field.
@@ -20674,19 +18585,12 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 		}
 
 		if params.EphemeralMessageParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.EphemeralMessageParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("ephemeral_message_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.EphemeralMessageParameters)
 			if err != nil {
 				return
 			}
@@ -20781,19 +18685,12 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			var bs []byte
-			bs, err = json.Marshal(&params.CaptionEntities)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("caption_entities")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.CaptionEntities)
 			if err != nil {
 				return
 			}
@@ -20856,57 +18753,36 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 		}
 
 		if params.SuggestedPostParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.SuggestedPostParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.SuggestedPostParameters)
 			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyParameters)
 			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyMarkup)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyMarkup)
 			if err != nil {
 				return
 			}
@@ -20914,25 +18790,14 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendVideo", reader, contentType, nil)
+	ret, err = call[*Message](ctx, c, "sendVideo", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -21015,12 +18880,11 @@ type SendVideoNoteParams struct {
 // SendVideoNoteOption configures SendVideoNoteParams.
 type SendVideoNoteOption = Option[SendVideoNoteParams]
 
-// Option applies one or more SendVideoNoteOption values and returns the last rollback option.
-func (r *SendVideoNoteParams) Option(opts ...SendVideoNoteOption) (previous SendVideoNoteOption) {
+// Option applies opts to r in order.
+func (r *SendVideoNoteParams) Option(opts ...SendVideoNoteOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendVideoNoteBusinessConnectionID sets the BusinessConnectionID field.
@@ -21255,19 +19119,12 @@ func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams)
 		}
 
 		if params.EphemeralMessageParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.EphemeralMessageParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("ephemeral_message_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.EphemeralMessageParameters)
 			if err != nil {
 				return
 			}
@@ -21348,57 +19205,36 @@ func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams)
 		}
 
 		if params.SuggestedPostParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.SuggestedPostParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.SuggestedPostParameters)
 			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyParameters)
 			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyMarkup)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyMarkup)
 			if err != nil {
 				return
 			}
@@ -21406,25 +19242,14 @@ func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams)
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendVideoNote", reader, contentType, nil)
+	ret, err = call[*Message](ctx, c, "sendVideoNote", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -21504,12 +19329,11 @@ type SendVoiceParams struct {
 // SendVoiceOption configures SendVoiceParams.
 type SendVoiceOption = Option[SendVoiceParams]
 
-// Option applies one or more SendVoiceOption values and returns the last rollback option.
-func (r *SendVoiceParams) Option(opts ...SendVoiceOption) (previous SendVoiceOption) {
+// Option applies opts to r in order.
+func (r *SendVoiceParams) Option(opts ...SendVoiceOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSendVoiceBusinessConnectionID sets the BusinessConnectionID field.
@@ -21751,19 +19575,12 @@ func (c *Client) SendVoice(ctx context.Context, params *SendVoiceParams) (ret *M
 		}
 
 		if params.EphemeralMessageParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.EphemeralMessageParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("ephemeral_message_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.EphemeralMessageParameters)
 			if err != nil {
 				return
 			}
@@ -21798,19 +19615,12 @@ func (c *Client) SendVoice(ctx context.Context, params *SendVoiceParams) (ret *M
 		}
 
 		if len(params.CaptionEntities) != 0 {
-			var bs []byte
-			bs, err = json.Marshal(&params.CaptionEntities)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("caption_entities")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.CaptionEntities)
 			if err != nil {
 				return
 			}
@@ -21857,57 +19667,36 @@ func (c *Client) SendVoice(ctx context.Context, params *SendVoiceParams) (ret *M
 		}
 
 		if params.SuggestedPostParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.SuggestedPostParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("suggested_post_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.SuggestedPostParameters)
 			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyParameters != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyParameters)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_parameters")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyParameters)
 			if err != nil {
 				return
 			}
 		}
 
 		if params.ReplyMarkup != nil {
-			var bs []byte
-			bs, err = json.Marshal(&params.ReplyMarkup)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("reply_markup")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.ReplyMarkup)
 			if err != nil {
 				return
 			}
@@ -21915,25 +19704,14 @@ func (c *Client) SendVoice(ctx context.Context, params *SendVoiceParams) (ret *M
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "sendVoice", reader, contentType, nil)
+	ret, err = call[*Message](ctx, c, "sendVoice", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -21950,12 +19728,11 @@ type SetBusinessAccountBioParams struct {
 // SetBusinessAccountBioOption configures SetBusinessAccountBioParams.
 type SetBusinessAccountBioOption = Option[SetBusinessAccountBioParams]
 
-// Option applies one or more SetBusinessAccountBioOption values and returns the last rollback option.
-func (r *SetBusinessAccountBioParams) Option(opts ...SetBusinessAccountBioOption) (previous SetBusinessAccountBioOption) {
+// Option applies opts to r in order.
+func (r *SetBusinessAccountBioParams) Option(opts ...SetBusinessAccountBioOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetBusinessAccountBioBusinessConnectionID sets the BusinessConnectionID field.
@@ -21982,28 +19759,17 @@ func WithSetBusinessAccountBioBio(value string) SetBusinessAccountBioOption {
 // Requires the can_change_bio business bot right.
 // Returns True on success.
 func (c *Client) SetBusinessAccountBio(ctx context.Context, params *SetBusinessAccountBioParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setBusinessAccountBio", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setBusinessAccountBio", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -22023,12 +19789,11 @@ type SetBusinessAccountGiftSettingsParams struct {
 // SetBusinessAccountGiftSettingsOption configures SetBusinessAccountGiftSettingsParams.
 type SetBusinessAccountGiftSettingsOption = Option[SetBusinessAccountGiftSettingsParams]
 
-// Option applies one or more SetBusinessAccountGiftSettingsOption values and returns the last rollback option.
-func (r *SetBusinessAccountGiftSettingsParams) Option(opts ...SetBusinessAccountGiftSettingsOption) (previous SetBusinessAccountGiftSettingsOption) {
+// Option applies opts to r in order.
+func (r *SetBusinessAccountGiftSettingsParams) Option(opts ...SetBusinessAccountGiftSettingsOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetBusinessAccountGiftSettingsBusinessConnectionID sets the BusinessConnectionID field.
@@ -22064,28 +19829,17 @@ func WithSetBusinessAccountGiftSettingsAcceptedGiftTypes(value AcceptedGiftTypes
 // Requires the can_change_gift_settings business bot right.
 // Returns True on success.
 func (c *Client) SetBusinessAccountGiftSettings(ctx context.Context, params *SetBusinessAccountGiftSettingsParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setBusinessAccountGiftSettings", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setBusinessAccountGiftSettings", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -22105,12 +19859,11 @@ type SetBusinessAccountNameParams struct {
 // SetBusinessAccountNameOption configures SetBusinessAccountNameParams.
 type SetBusinessAccountNameOption = Option[SetBusinessAccountNameParams]
 
-// Option applies one or more SetBusinessAccountNameOption values and returns the last rollback option.
-func (r *SetBusinessAccountNameParams) Option(opts ...SetBusinessAccountNameOption) (previous SetBusinessAccountNameOption) {
+// Option applies opts to r in order.
+func (r *SetBusinessAccountNameParams) Option(opts ...SetBusinessAccountNameOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetBusinessAccountNameBusinessConnectionID sets the BusinessConnectionID field.
@@ -22146,28 +19899,17 @@ func WithSetBusinessAccountNameLastName(value string) SetBusinessAccountNameOpti
 // Requires the can_change_name business bot right.
 // Returns True on success.
 func (c *Client) SetBusinessAccountName(ctx context.Context, params *SetBusinessAccountNameParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setBusinessAccountName", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setBusinessAccountName", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -22188,12 +19930,11 @@ type SetBusinessAccountProfilePhotoParams struct {
 // SetBusinessAccountProfilePhotoOption configures SetBusinessAccountProfilePhotoParams.
 type SetBusinessAccountProfilePhotoOption = Option[SetBusinessAccountProfilePhotoParams]
 
-// Option applies one or more SetBusinessAccountProfilePhotoOption values and returns the last rollback option.
-func (r *SetBusinessAccountProfilePhotoParams) Option(opts ...SetBusinessAccountProfilePhotoOption) (previous SetBusinessAccountProfilePhotoOption) {
+// Option applies opts to r in order.
+func (r *SetBusinessAccountProfilePhotoParams) Option(opts ...SetBusinessAccountProfilePhotoOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetBusinessAccountProfilePhotoBusinessConnectionID sets the BusinessConnectionID field.
@@ -22284,19 +20025,12 @@ func (c *Client) SetBusinessAccountProfilePhoto(ctx context.Context, params *Set
 				}
 			}
 
-			var bs []byte
-			bs, err = json.Marshal(&params.Photo)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("photo")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.Photo)
 			if err != nil {
 				return
 			}
@@ -22312,24 +20046,14 @@ func (c *Client) SetBusinessAccountProfilePhoto(ctx context.Context, params *Set
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setBusinessAccountProfilePhoto", reader, contentType, nil)
+	ret, err = call[bool](ctx, c, "setBusinessAccountProfilePhoto", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -22346,12 +20070,11 @@ type SetBusinessAccountUsernameParams struct {
 // SetBusinessAccountUsernameOption configures SetBusinessAccountUsernameParams.
 type SetBusinessAccountUsernameOption = Option[SetBusinessAccountUsernameParams]
 
-// Option applies one or more SetBusinessAccountUsernameOption values and returns the last rollback option.
-func (r *SetBusinessAccountUsernameParams) Option(opts ...SetBusinessAccountUsernameOption) (previous SetBusinessAccountUsernameOption) {
+// Option applies opts to r in order.
+func (r *SetBusinessAccountUsernameParams) Option(opts ...SetBusinessAccountUsernameOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetBusinessAccountUsernameBusinessConnectionID sets the BusinessConnectionID field.
@@ -22378,28 +20101,17 @@ func WithSetBusinessAccountUsernameUsername(value string) SetBusinessAccountUser
 // Requires the can_change_username business bot right.
 // Returns True on success.
 func (c *Client) SetBusinessAccountUsername(ctx context.Context, params *SetBusinessAccountUsernameParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setBusinessAccountUsername", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setBusinessAccountUsername", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -22419,12 +20131,11 @@ type SetChatAdministratorCustomTitleParams struct {
 // SetChatAdministratorCustomTitleOption configures SetChatAdministratorCustomTitleParams.
 type SetChatAdministratorCustomTitleOption = Option[SetChatAdministratorCustomTitleParams]
 
-// Option applies one or more SetChatAdministratorCustomTitleOption values and returns the last rollback option.
-func (r *SetChatAdministratorCustomTitleParams) Option(opts ...SetChatAdministratorCustomTitleOption) (previous SetChatAdministratorCustomTitleOption) {
+// Option applies opts to r in order.
+func (r *SetChatAdministratorCustomTitleParams) Option(opts ...SetChatAdministratorCustomTitleOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetChatAdministratorCustomTitleChatID sets the ChatID field.
@@ -22459,28 +20170,17 @@ func WithSetChatAdministratorCustomTitleCustomTitle(value string) SetChatAdminis
 // Use this method to set a custom title for an administrator in a supergroup promoted by the bot.
 // Returns True on success.
 func (c *Client) SetChatAdministratorCustomTitle(ctx context.Context, params *SetChatAdministratorCustomTitleParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setChatAdministratorCustomTitle", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setChatAdministratorCustomTitle", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -22497,12 +20197,11 @@ type SetChatDescriptionParams struct {
 // SetChatDescriptionOption configures SetChatDescriptionParams.
 type SetChatDescriptionOption = Option[SetChatDescriptionParams]
 
-// Option applies one or more SetChatDescriptionOption values and returns the last rollback option.
-func (r *SetChatDescriptionParams) Option(opts ...SetChatDescriptionOption) (previous SetChatDescriptionOption) {
+// Option applies opts to r in order.
+func (r *SetChatDescriptionParams) Option(opts ...SetChatDescriptionOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetChatDescriptionChatID sets the ChatID field.
@@ -22529,28 +20228,17 @@ func WithSetChatDescriptionDescription(value string) SetChatDescriptionOption {
 // The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
 // Returns True on success.
 func (c *Client) SetChatDescription(ctx context.Context, params *SetChatDescriptionParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setChatDescription", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setChatDescription", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -22570,12 +20258,11 @@ type SetChatMemberTagParams struct {
 // SetChatMemberTagOption configures SetChatMemberTagParams.
 type SetChatMemberTagOption = Option[SetChatMemberTagParams]
 
-// Option applies one or more SetChatMemberTagOption values and returns the last rollback option.
-func (r *SetChatMemberTagParams) Option(opts ...SetChatMemberTagOption) (previous SetChatMemberTagOption) {
+// Option applies opts to r in order.
+func (r *SetChatMemberTagParams) Option(opts ...SetChatMemberTagOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetChatMemberTagChatID sets the ChatID field.
@@ -22611,28 +20298,17 @@ func WithSetChatMemberTagTag(value string) SetChatMemberTagOption {
 // The bot must be an administrator in the chat for this to work and must have the can_manage_tags administrator right.
 // Returns True on success.
 func (c *Client) SetChatMemberTag(ctx context.Context, params *SetChatMemberTagParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setChatMemberTag", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setChatMemberTag", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -22653,12 +20329,11 @@ type SetChatMenuButtonParams struct {
 // SetChatMenuButtonOption configures SetChatMenuButtonParams.
 type SetChatMenuButtonOption = Option[SetChatMenuButtonParams]
 
-// Option applies one or more SetChatMenuButtonOption values and returns the last rollback option.
-func (r *SetChatMenuButtonParams) Option(opts ...SetChatMenuButtonOption) (previous SetChatMenuButtonOption) {
+// Option applies opts to r in order.
+func (r *SetChatMenuButtonParams) Option(opts ...SetChatMenuButtonOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetChatMenuButtonChatID sets the ChatID field.
@@ -22688,28 +20363,17 @@ func WithSetChatMenuButtonMenuButton(value *MenuButton) SetChatMenuButtonOption 
 // Use this method to change the bot's menu button in a private chat, or the default menu button.
 // Returns True on success.
 func (c *Client) SetChatMenuButton(ctx context.Context, params *SetChatMenuButtonParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setChatMenuButton", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setChatMenuButton", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -22730,12 +20394,11 @@ type SetChatPermissionsParams struct {
 // SetChatPermissionsOption configures SetChatPermissionsParams.
 type SetChatPermissionsOption = Option[SetChatPermissionsParams]
 
-// Option applies one or more SetChatPermissionsOption values and returns the last rollback option.
-func (r *SetChatPermissionsParams) Option(opts ...SetChatPermissionsOption) (previous SetChatPermissionsOption) {
+// Option applies opts to r in order.
+func (r *SetChatPermissionsParams) Option(opts ...SetChatPermissionsOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetChatPermissionsChatID sets the ChatID field.
@@ -22772,28 +20435,17 @@ func WithSetChatPermissionsUseIndependentChatPermissions(value bool) SetChatPerm
 // The bot must be an administrator in the group or a supergroup for this to work and must have the can_restrict_members administrator rights.
 // Returns True on success.
 func (c *Client) SetChatPermissions(ctx context.Context, params *SetChatPermissionsParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setChatPermissions", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setChatPermissions", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -22810,12 +20462,11 @@ type SetChatPhotoParams struct {
 // SetChatPhotoOption configures SetChatPhotoParams.
 type SetChatPhotoOption = Option[SetChatPhotoParams]
 
-// Option applies one or more SetChatPhotoOption values and returns the last rollback option.
-func (r *SetChatPhotoParams) Option(opts ...SetChatPhotoOption) (previous SetChatPhotoOption) {
+// Option applies opts to r in order.
+func (r *SetChatPhotoParams) Option(opts ...SetChatPhotoOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetChatPhotoChatID sets the ChatID field.
@@ -22889,24 +20540,14 @@ func (c *Client) SetChatPhoto(ctx context.Context, params *SetChatPhotoParams) (
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setChatPhoto", reader, contentType, nil)
+	ret, err = call[bool](ctx, c, "setChatPhoto", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -22923,12 +20564,11 @@ type SetChatStickerSetParams struct {
 // SetChatStickerSetOption configures SetChatStickerSetParams.
 type SetChatStickerSetOption = Option[SetChatStickerSetParams]
 
-// Option applies one or more SetChatStickerSetOption values and returns the last rollback option.
-func (r *SetChatStickerSetParams) Option(opts ...SetChatStickerSetOption) (previous SetChatStickerSetOption) {
+// Option applies opts to r in order.
+func (r *SetChatStickerSetParams) Option(opts ...SetChatStickerSetOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetChatStickerSetChatID sets the ChatID field.
@@ -22958,28 +20598,17 @@ func WithSetChatStickerSetStickerSetName(value string) SetChatStickerSetOption {
 //
 // [getChat]: https://core.telegram.org/bots/api#getchat
 func (c *Client) SetChatStickerSet(ctx context.Context, params *SetChatStickerSetParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setChatStickerSet", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setChatStickerSet", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -22996,12 +20625,11 @@ type SetChatTitleParams struct {
 // SetChatTitleOption configures SetChatTitleParams.
 type SetChatTitleOption = Option[SetChatTitleParams]
 
-// Option applies one or more SetChatTitleOption values and returns the last rollback option.
-func (r *SetChatTitleParams) Option(opts ...SetChatTitleOption) (previous SetChatTitleOption) {
+// Option applies opts to r in order.
+func (r *SetChatTitleParams) Option(opts ...SetChatTitleOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetChatTitleChatID sets the ChatID field.
@@ -23029,28 +20657,17 @@ func WithSetChatTitleTitle(value string) SetChatTitleOption {
 // The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
 // Returns True on success.
 func (c *Client) SetChatTitle(ctx context.Context, params *SetChatTitleParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setChatTitle", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setChatTitle", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -23067,12 +20684,11 @@ type SetCustomEmojiStickerSetThumbnailParams struct {
 // SetCustomEmojiStickerSetThumbnailOption configures SetCustomEmojiStickerSetThumbnailParams.
 type SetCustomEmojiStickerSetThumbnailOption = Option[SetCustomEmojiStickerSetThumbnailParams]
 
-// Option applies one or more SetCustomEmojiStickerSetThumbnailOption values and returns the last rollback option.
-func (r *SetCustomEmojiStickerSetThumbnailParams) Option(opts ...SetCustomEmojiStickerSetThumbnailOption) (previous SetCustomEmojiStickerSetThumbnailOption) {
+// Option applies opts to r in order.
+func (r *SetCustomEmojiStickerSetThumbnailParams) Option(opts ...SetCustomEmojiStickerSetThumbnailOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetCustomEmojiStickerSetThumbnailName sets the Name field.
@@ -23098,28 +20714,17 @@ func WithSetCustomEmojiStickerSetThumbnailCustomEmojiID(value string) SetCustomE
 // Use this method to set the thumbnail of a custom emoji sticker set.
 // Returns True on success.
 func (c *Client) SetCustomEmojiStickerSetThumbnail(ctx context.Context, params *SetCustomEmojiStickerSetThumbnailParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setCustomEmojiStickerSetThumbnail", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setCustomEmojiStickerSetThumbnail", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -23155,12 +20760,11 @@ type SetGameScoreParams struct {
 // SetGameScoreOption configures SetGameScoreParams.
 type SetGameScoreOption = Option[SetGameScoreParams]
 
-// Option applies one or more SetGameScoreOption values and returns the last rollback option.
-func (r *SetGameScoreParams) Option(opts ...SetGameScoreOption) (previous SetGameScoreOption) {
+// Option applies opts to r in order.
+func (r *SetGameScoreParams) Option(opts ...SetGameScoreOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetGameScoreUserID sets the UserID field.
@@ -23238,29 +20842,17 @@ func WithSetGameScoreInlineMessageID(value string) SetGameScoreOption {
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SetGameScore(ctx context.Context, params *SetGameScoreParams) (ret *Message, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setGameScore", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*Message](ctx, c, "setGameScore", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -23282,12 +20874,11 @@ type SetManagedBotAccessSettingsParams struct {
 // SetManagedBotAccessSettingsOption configures SetManagedBotAccessSettingsParams.
 type SetManagedBotAccessSettingsOption = Option[SetManagedBotAccessSettingsParams]
 
-// Option applies one or more SetManagedBotAccessSettingsOption values and returns the last rollback option.
-func (r *SetManagedBotAccessSettingsParams) Option(opts ...SetManagedBotAccessSettingsOption) (previous SetManagedBotAccessSettingsOption) {
+// Option applies opts to r in order.
+func (r *SetManagedBotAccessSettingsParams) Option(opts ...SetManagedBotAccessSettingsOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetManagedBotAccessSettingsUserID sets the UserID field.
@@ -23324,28 +20915,17 @@ func WithSetManagedBotAccessSettingsAddedUserIDs(value []int64) SetManagedBotAcc
 // Use this method to change the access settings of a managed bot.
 // Returns True on success.
 func (c *Client) SetManagedBotAccessSettings(ctx context.Context, params *SetManagedBotAccessSettingsParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setManagedBotAccessSettings", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setManagedBotAccessSettings", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -23372,12 +20952,11 @@ type SetMessageReactionParams struct {
 // SetMessageReactionOption configures SetMessageReactionParams.
 type SetMessageReactionOption = Option[SetMessageReactionParams]
 
-// Option applies one or more SetMessageReactionOption values and returns the last rollback option.
-func (r *SetMessageReactionParams) Option(opts ...SetMessageReactionOption) (previous SetMessageReactionOption) {
+// Option applies opts to r in order.
+func (r *SetMessageReactionParams) Option(opts ...SetMessageReactionOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetMessageReactionChatID sets the ChatID field.
@@ -23428,28 +21007,17 @@ func WithSetMessageReactionIsBig(value bool) SetMessageReactionOption {
 // Bots can't use paid reactions.
 // Returns True on success.
 func (c *Client) SetMessageReaction(ctx context.Context, params *SetMessageReactionParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setMessageReaction", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setMessageReaction", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -23474,12 +21042,11 @@ type SetMyCommandsParams struct {
 // SetMyCommandsOption configures SetMyCommandsParams.
 type SetMyCommandsOption = Option[SetMyCommandsParams]
 
-// Option applies one or more SetMyCommandsOption values and returns the last rollback option.
-func (r *SetMyCommandsParams) Option(opts ...SetMyCommandsOption) (previous SetMyCommandsOption) {
+// Option applies opts to r in order.
+func (r *SetMyCommandsParams) Option(opts ...SetMyCommandsOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetMyCommandsCommands sets the Commands field.
@@ -23522,28 +21089,17 @@ func WithSetMyCommandsLanguageCode(value string) SetMyCommandsOption {
 //
 // [this manual]: https://core.telegram.org/bots/features#commands
 func (c *Client) SetMyCommands(ctx context.Context, params *SetMyCommandsParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setMyCommands", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setMyCommands", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -23562,12 +21118,11 @@ type SetMyDefaultAdministratorRightsParams struct {
 // SetMyDefaultAdministratorRightsOption configures SetMyDefaultAdministratorRightsParams.
 type SetMyDefaultAdministratorRightsOption = Option[SetMyDefaultAdministratorRightsParams]
 
-// Option applies one or more SetMyDefaultAdministratorRightsOption values and returns the last rollback option.
-func (r *SetMyDefaultAdministratorRightsParams) Option(opts ...SetMyDefaultAdministratorRightsOption) (previous SetMyDefaultAdministratorRightsOption) {
+// Option applies opts to r in order.
+func (r *SetMyDefaultAdministratorRightsParams) Option(opts ...SetMyDefaultAdministratorRightsOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetMyDefaultAdministratorRightsRights sets the Rights field.
@@ -23596,28 +21151,17 @@ func WithSetMyDefaultAdministratorRightsForChannels(value bool) SetMyDefaultAdmi
 // These rights will be suggested to users, but they are free to modify the list before adding the bot.
 // Returns True on success.
 func (c *Client) SetMyDefaultAdministratorRights(ctx context.Context, params *SetMyDefaultAdministratorRightsParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setMyDefaultAdministratorRights", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setMyDefaultAdministratorRights", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -23636,12 +21180,11 @@ type SetMyDescriptionParams struct {
 // SetMyDescriptionOption configures SetMyDescriptionParams.
 type SetMyDescriptionOption = Option[SetMyDescriptionParams]
 
-// Option applies one or more SetMyDescriptionOption values and returns the last rollback option.
-func (r *SetMyDescriptionParams) Option(opts ...SetMyDescriptionOption) (previous SetMyDescriptionOption) {
+// Option applies opts to r in order.
+func (r *SetMyDescriptionParams) Option(opts ...SetMyDescriptionOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetMyDescriptionDescription sets the Description field.
@@ -23669,28 +21212,17 @@ func WithSetMyDescriptionLanguageCode(value string) SetMyDescriptionOption {
 // Use this method to change the bot's description, which is shown in the chat with the bot if the chat is empty.
 // Returns True on success.
 func (c *Client) SetMyDescription(ctx context.Context, params *SetMyDescriptionParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setMyDescription", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setMyDescription", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -23709,12 +21241,11 @@ type SetMyNameParams struct {
 // SetMyNameOption configures SetMyNameParams.
 type SetMyNameOption = Option[SetMyNameParams]
 
-// Option applies one or more SetMyNameOption values and returns the last rollback option.
-func (r *SetMyNameParams) Option(opts ...SetMyNameOption) (previous SetMyNameOption) {
+// Option applies opts to r in order.
+func (r *SetMyNameParams) Option(opts ...SetMyNameOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetMyNameName sets the Name field.
@@ -23742,28 +21273,17 @@ func WithSetMyNameLanguageCode(value string) SetMyNameOption {
 // Use this method to change the bot's name.
 // Returns True on success.
 func (c *Client) SetMyName(ctx context.Context, params *SetMyNameParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setMyName", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setMyName", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -23777,12 +21297,11 @@ type SetMyProfilePhotoParams struct {
 // SetMyProfilePhotoOption configures SetMyProfilePhotoParams.
 type SetMyProfilePhotoOption = Option[SetMyProfilePhotoParams]
 
-// Option applies one or more SetMyProfilePhotoOption values and returns the last rollback option.
-func (r *SetMyProfilePhotoParams) Option(opts ...SetMyProfilePhotoOption) (previous SetMyProfilePhotoOption) {
+// Option applies opts to r in order.
+func (r *SetMyProfilePhotoParams) Option(opts ...SetMyProfilePhotoOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetMyProfilePhotoPhoto sets the Photo field.
@@ -23845,19 +21364,12 @@ func (c *Client) SetMyProfilePhoto(ctx context.Context, params *SetMyProfilePhot
 				}
 			}
 
-			var bs []byte
-			bs, err = json.Marshal(&params.Photo)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("photo")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.Photo)
 			if err != nil {
 				return
 			}
@@ -23865,24 +21377,14 @@ func (c *Client) SetMyProfilePhoto(ctx context.Context, params *SetMyProfilePhot
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setMyProfilePhoto", reader, contentType, nil)
+	ret, err = call[bool](ctx, c, "setMyProfilePhoto", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -23901,12 +21403,11 @@ type SetMyShortDescriptionParams struct {
 // SetMyShortDescriptionOption configures SetMyShortDescriptionParams.
 type SetMyShortDescriptionOption = Option[SetMyShortDescriptionParams]
 
-// Option applies one or more SetMyShortDescriptionOption values and returns the last rollback option.
-func (r *SetMyShortDescriptionParams) Option(opts ...SetMyShortDescriptionOption) (previous SetMyShortDescriptionOption) {
+// Option applies opts to r in order.
+func (r *SetMyShortDescriptionParams) Option(opts ...SetMyShortDescriptionOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetMyShortDescriptionShortDescription sets the ShortDescription field.
@@ -23934,28 +21435,17 @@ func WithSetMyShortDescriptionLanguageCode(value string) SetMyShortDescriptionOp
 // Use this method to change the bot's short description, which is shown on the bot's profile page and is sent together with the link when users share the bot.
 // Returns True on success.
 func (c *Client) SetMyShortDescription(ctx context.Context, params *SetMyShortDescriptionParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setMyShortDescription", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setMyShortDescription", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -23972,12 +21462,11 @@ type SetPassportDataErrorsParams struct {
 // SetPassportDataErrorsOption configures SetPassportDataErrorsParams.
 type SetPassportDataErrorsOption = Option[SetPassportDataErrorsParams]
 
-// Option applies one or more SetPassportDataErrorsOption values and returns the last rollback option.
-func (r *SetPassportDataErrorsParams) Option(opts ...SetPassportDataErrorsOption) (previous SetPassportDataErrorsOption) {
+// Option applies opts to r in order.
+func (r *SetPassportDataErrorsParams) Option(opts ...SetPassportDataErrorsOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetPassportDataErrorsUserID sets the UserID field.
@@ -24007,28 +21496,17 @@ func WithSetPassportDataErrorsErrors(value []PassportElementError) SetPassportDa
 // For example, if a birthday date seems invalid, a submitted document is blurry, a scan shows evidence of tampering, etc.
 // Supply some details in the error message to make sure the user knows how to correct the issues.
 func (c *Client) SetPassportDataErrors(ctx context.Context, params *SetPassportDataErrorsParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setPassportDataErrors", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setPassportDataErrors", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -24045,12 +21523,11 @@ type SetStickerEmojiListParams struct {
 // SetStickerEmojiListOption configures SetStickerEmojiListParams.
 type SetStickerEmojiListOption = Option[SetStickerEmojiListParams]
 
-// Option applies one or more SetStickerEmojiListOption values and returns the last rollback option.
-func (r *SetStickerEmojiListParams) Option(opts ...SetStickerEmojiListOption) (previous SetStickerEmojiListOption) {
+// Option applies opts to r in order.
+func (r *SetStickerEmojiListParams) Option(opts ...SetStickerEmojiListOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetStickerEmojiListSticker sets the Sticker field.
@@ -24077,28 +21554,17 @@ func WithSetStickerEmojiListEmojiList(value []string) SetStickerEmojiListOption 
 // The sticker must belong to a sticker set created by the bot.
 // Returns True on success.
 func (c *Client) SetStickerEmojiList(ctx context.Context, params *SetStickerEmojiListParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setStickerEmojiList", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setStickerEmojiList", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -24115,12 +21581,11 @@ type SetStickerKeywordsParams struct {
 // SetStickerKeywordsOption configures SetStickerKeywordsParams.
 type SetStickerKeywordsOption = Option[SetStickerKeywordsParams]
 
-// Option applies one or more SetStickerKeywordsOption values and returns the last rollback option.
-func (r *SetStickerKeywordsParams) Option(opts ...SetStickerKeywordsOption) (previous SetStickerKeywordsOption) {
+// Option applies opts to r in order.
+func (r *SetStickerKeywordsParams) Option(opts ...SetStickerKeywordsOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetStickerKeywordsSticker sets the Sticker field.
@@ -24147,28 +21612,17 @@ func WithSetStickerKeywordsKeywords(value []string) SetStickerKeywordsOption {
 // The sticker must belong to a sticker set created by the bot.
 // Returns True on success.
 func (c *Client) SetStickerKeywords(ctx context.Context, params *SetStickerKeywordsParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setStickerKeywords", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setStickerKeywords", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -24186,12 +21640,11 @@ type SetStickerMaskPositionParams struct {
 // SetStickerMaskPositionOption configures SetStickerMaskPositionParams.
 type SetStickerMaskPositionOption = Option[SetStickerMaskPositionParams]
 
-// Option applies one or more SetStickerMaskPositionOption values and returns the last rollback option.
-func (r *SetStickerMaskPositionParams) Option(opts ...SetStickerMaskPositionOption) (previous SetStickerMaskPositionOption) {
+// Option applies opts to r in order.
+func (r *SetStickerMaskPositionParams) Option(opts ...SetStickerMaskPositionOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetStickerMaskPositionSticker sets the Sticker field.
@@ -24221,28 +21674,17 @@ func WithSetStickerMaskPositionMaskPosition(value *MaskPosition) SetStickerMaskP
 //
 // [mask position]: https://core.telegram.org/bots/api#maskposition
 func (c *Client) SetStickerMaskPosition(ctx context.Context, params *SetStickerMaskPositionParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setStickerMaskPosition", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setStickerMaskPosition", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -24259,12 +21701,11 @@ type SetStickerPositionInSetParams struct {
 // SetStickerPositionInSetOption configures SetStickerPositionInSetParams.
 type SetStickerPositionInSetOption = Option[SetStickerPositionInSetParams]
 
-// Option applies one or more SetStickerPositionInSetOption values and returns the last rollback option.
-func (r *SetStickerPositionInSetParams) Option(opts ...SetStickerPositionInSetOption) (previous SetStickerPositionInSetOption) {
+// Option applies opts to r in order.
+func (r *SetStickerPositionInSetParams) Option(opts ...SetStickerPositionInSetOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetStickerPositionInSetSticker sets the Sticker field.
@@ -24290,28 +21731,17 @@ func WithSetStickerPositionInSetPosition(value int64) SetStickerPositionInSetOpt
 // Use this method to move a sticker in a set created by the bot to a specific position.
 // Returns True on success.
 func (c *Client) SetStickerPositionInSet(ctx context.Context, params *SetStickerPositionInSetParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setStickerPositionInSet", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setStickerPositionInSet", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -24342,12 +21772,11 @@ type SetStickerSetThumbnailParams struct {
 // SetStickerSetThumbnailOption configures SetStickerSetThumbnailParams.
 type SetStickerSetThumbnailOption = Option[SetStickerSetThumbnailParams]
 
-// Option applies one or more SetStickerSetThumbnailOption values and returns the last rollback option.
-func (r *SetStickerSetThumbnailParams) Option(opts ...SetStickerSetThumbnailOption) (previous SetStickerSetThumbnailOption) {
+// Option applies opts to r in order.
+func (r *SetStickerSetThumbnailParams) Option(opts ...SetStickerSetThumbnailOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetStickerSetThumbnailName sets the Name field.
@@ -24464,24 +21893,14 @@ func (c *Client) SetStickerSetThumbnail(ctx context.Context, params *SetStickerS
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setStickerSetThumbnail", reader, contentType, nil)
+	ret, err = call[bool](ctx, c, "setStickerSetThumbnail", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -24498,12 +21917,11 @@ type SetStickerSetTitleParams struct {
 // SetStickerSetTitleOption configures SetStickerSetTitleParams.
 type SetStickerSetTitleOption = Option[SetStickerSetTitleParams]
 
-// Option applies one or more SetStickerSetTitleOption values and returns the last rollback option.
-func (r *SetStickerSetTitleParams) Option(opts ...SetStickerSetTitleOption) (previous SetStickerSetTitleOption) {
+// Option applies opts to r in order.
+func (r *SetStickerSetTitleParams) Option(opts ...SetStickerSetTitleOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetStickerSetTitleName sets the Name field.
@@ -24529,28 +21947,17 @@ func WithSetStickerSetTitleTitle(value string) SetStickerSetTitleOption {
 // Use this method to set the title of a created sticker set.
 // Returns True on success.
 func (c *Client) SetStickerSetTitle(ctx context.Context, params *SetStickerSetTitleParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setStickerSetTitle", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setStickerSetTitle", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -24571,12 +21978,11 @@ type SetUserEmojiStatusParams struct {
 // SetUserEmojiStatusOption configures SetUserEmojiStatusParams.
 type SetUserEmojiStatusOption = Option[SetUserEmojiStatusParams]
 
-// Option applies one or more SetUserEmojiStatusOption values and returns the last rollback option.
-func (r *SetUserEmojiStatusParams) Option(opts ...SetUserEmojiStatusOption) (previous SetUserEmojiStatusOption) {
+// Option applies opts to r in order.
+func (r *SetUserEmojiStatusParams) Option(opts ...SetUserEmojiStatusOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetUserEmojiStatusUserID sets the UserID field.
@@ -24614,28 +22020,17 @@ func WithSetUserEmojiStatusEmojiStatusExpirationDate(value int64) SetUserEmojiSt
 //
 // [requestEmojiStatusAccess]: https://core.telegram.org/bots/webapps#initializing-mini-apps
 func (c *Client) SetUserEmojiStatus(ctx context.Context, params *SetUserEmojiStatusParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setUserEmojiStatus", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "setUserEmojiStatus", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -24682,12 +22077,11 @@ type SetWebhookParams struct {
 // SetWebhookOption configures SetWebhookParams.
 type SetWebhookOption = Option[SetWebhookParams]
 
-// Option applies one or more SetWebhookOption values and returns the last rollback option.
-func (r *SetWebhookParams) Option(opts ...SetWebhookOption) (previous SetWebhookOption) {
+// Option applies opts to r in order.
+func (r *SetWebhookParams) Option(opts ...SetWebhookOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithSetWebhookURL sets the URL field.
@@ -24843,19 +22237,12 @@ func (c *Client) SetWebhook(ctx context.Context, params *SetWebhookParams) (ret 
 		}
 
 		if len(params.AllowedUpdates) != 0 {
-			var bs []byte
-			bs, err = json.Marshal(&params.AllowedUpdates)
-			if err != nil {
-				return
-			}
-
 			var p io.Writer
 			p, err = writer.CreateFormField("allowed_updates")
 			if err != nil {
 				return
 			}
-
-			_, err = p.Write(bs)
+			err = json.NewEncoder(p).Encode(&params.AllowedUpdates)
 			if err != nil {
 				return
 			}
@@ -24879,24 +22266,14 @@ func (c *Client) SetWebhook(ctx context.Context, params *SetWebhookParams) (ret 
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "setWebhook", reader, contentType, nil)
+	ret, err = call[bool](ctx, c, "setWebhook", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -24927,12 +22304,11 @@ type StopMessageLiveLocationParams struct {
 // StopMessageLiveLocationOption configures StopMessageLiveLocationParams.
 type StopMessageLiveLocationOption = Option[StopMessageLiveLocationParams]
 
-// Option applies one or more StopMessageLiveLocationOption values and returns the last rollback option.
-func (r *StopMessageLiveLocationParams) Option(opts ...StopMessageLiveLocationOption) (previous StopMessageLiveLocationOption) {
+// Option applies opts to r in order.
+func (r *StopMessageLiveLocationParams) Option(opts ...StopMessageLiveLocationOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithStopMessageLiveLocationBusinessConnectionID sets the BusinessConnectionID field.
@@ -24992,29 +22368,17 @@ func WithStopMessageLiveLocationReplyMarkup(value *InlineKeyboardMarkup) StopMes
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) StopMessageLiveLocation(ctx context.Context, params *StopMessageLiveLocationParams) (ret *Message, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "stopMessageLiveLocation", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(Message)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*Message](ctx, c, "stopMessageLiveLocation", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -25039,12 +22403,11 @@ type StopPollParams struct {
 // StopPollOption configures StopPollParams.
 type StopPollOption = Option[StopPollParams]
 
-// Option applies one or more StopPollOption values and returns the last rollback option.
-func (r *StopPollParams) Option(opts ...StopPollOption) (previous StopPollOption) {
+// Option applies opts to r in order.
+func (r *StopPollParams) Option(opts ...StopPollOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithStopPollBusinessConnectionID sets the BusinessConnectionID field.
@@ -25092,29 +22455,17 @@ func WithStopPollReplyMarkup(value *InlineKeyboardMarkup) StopPollOption {
 //
 // [Poll]: https://core.telegram.org/bots/api#poll
 func (c *Client) StopPoll(ctx context.Context, params *StopPollParams) (ret *Poll, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "stopPoll", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ret = new(Poll)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[*Poll](ctx, c, "stopPoll", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -25131,12 +22482,11 @@ type TransferBusinessAccountStarsParams struct {
 // TransferBusinessAccountStarsOption configures TransferBusinessAccountStarsParams.
 type TransferBusinessAccountStarsOption = Option[TransferBusinessAccountStarsParams]
 
-// Option applies one or more TransferBusinessAccountStarsOption values and returns the last rollback option.
-func (r *TransferBusinessAccountStarsParams) Option(opts ...TransferBusinessAccountStarsOption) (previous TransferBusinessAccountStarsOption) {
+// Option applies opts to r in order.
+func (r *TransferBusinessAccountStarsParams) Option(opts ...TransferBusinessAccountStarsOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithTransferBusinessAccountStarsBusinessConnectionID sets the BusinessConnectionID field.
@@ -25163,28 +22513,17 @@ func WithTransferBusinessAccountStarsStarCount(value int64) TransferBusinessAcco
 // Requires the can_transfer_stars business bot right.
 // Returns True on success.
 func (c *Client) TransferBusinessAccountStars(ctx context.Context, params *TransferBusinessAccountStarsParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "transferBusinessAccountStars", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "transferBusinessAccountStars", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -25209,12 +22548,11 @@ type TransferGiftParams struct {
 // TransferGiftOption configures TransferGiftParams.
 type TransferGiftOption = Option[TransferGiftParams]
 
-// Option applies one or more TransferGiftOption values and returns the last rollback option.
-func (r *TransferGiftParams) Option(opts ...TransferGiftOption) (previous TransferGiftOption) {
+// Option applies opts to r in order.
+func (r *TransferGiftParams) Option(opts ...TransferGiftOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithTransferGiftBusinessConnectionID sets the BusinessConnectionID field.
@@ -25262,28 +22600,17 @@ func WithTransferGiftStarCount(value int64) TransferGiftOption {
 // Requires can_transfer_stars business bot right if the transfer is paid.
 // Returns True on success.
 func (c *Client) TransferGift(ctx context.Context, params *TransferGiftParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "transferGift", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "transferGift", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -25303,12 +22630,11 @@ type UnbanChatMemberParams struct {
 // UnbanChatMemberOption configures UnbanChatMemberParams.
 type UnbanChatMemberOption = Option[UnbanChatMemberParams]
 
-// Option applies one or more UnbanChatMemberOption values and returns the last rollback option.
-func (r *UnbanChatMemberParams) Option(opts ...UnbanChatMemberOption) (previous UnbanChatMemberOption) {
+// Option applies opts to r in order.
+func (r *UnbanChatMemberParams) Option(opts ...UnbanChatMemberOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithUnbanChatMemberChatID sets the ChatID field.
@@ -25348,28 +22674,17 @@ func WithUnbanChatMemberOnlyIfBanned(value bool) UnbanChatMemberOption {
 // If you don't want this, use the parameter only_if_banned.
 // Returns True on success.
 func (c *Client) UnbanChatMember(ctx context.Context, params *UnbanChatMemberParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "unbanChatMember", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "unbanChatMember", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -25386,12 +22701,11 @@ type UnbanChatSenderChatParams struct {
 // UnbanChatSenderChatOption configures UnbanChatSenderChatParams.
 type UnbanChatSenderChatOption = Option[UnbanChatSenderChatParams]
 
-// Option applies one or more UnbanChatSenderChatOption values and returns the last rollback option.
-func (r *UnbanChatSenderChatParams) Option(opts ...UnbanChatSenderChatOption) (previous UnbanChatSenderChatOption) {
+// Option applies opts to r in order.
+func (r *UnbanChatSenderChatParams) Option(opts ...UnbanChatSenderChatOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithUnbanChatSenderChatChatID sets the ChatID field.
@@ -25418,28 +22732,17 @@ func WithUnbanChatSenderChatSenderChatID(value int64) UnbanChatSenderChatOption 
 // The bot must be an administrator for this to work and must have the appropriate administrator rights.
 // Returns True on success.
 func (c *Client) UnbanChatSenderChat(ctx context.Context, params *UnbanChatSenderChatParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "unbanChatSenderChat", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "unbanChatSenderChat", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -25453,12 +22756,11 @@ type UnhideGeneralForumTopicParams struct {
 // UnhideGeneralForumTopicOption configures UnhideGeneralForumTopicParams.
 type UnhideGeneralForumTopicOption = Option[UnhideGeneralForumTopicParams]
 
-// Option applies one or more UnhideGeneralForumTopicOption values and returns the last rollback option.
-func (r *UnhideGeneralForumTopicParams) Option(opts ...UnhideGeneralForumTopicOption) (previous UnhideGeneralForumTopicOption) {
+// Option applies opts to r in order.
+func (r *UnhideGeneralForumTopicParams) Option(opts ...UnhideGeneralForumTopicOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithUnhideGeneralForumTopicChatID sets the ChatID field.
@@ -25476,28 +22778,17 @@ func WithUnhideGeneralForumTopicChatID(value string) UnhideGeneralForumTopicOpti
 // The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights.
 // Returns True on success.
 func (c *Client) UnhideGeneralForumTopic(ctx context.Context, params *UnhideGeneralForumTopicParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "unhideGeneralForumTopic", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "unhideGeneralForumTopic", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -25511,12 +22802,11 @@ type UnpinAllChatMessagesParams struct {
 // UnpinAllChatMessagesOption configures UnpinAllChatMessagesParams.
 type UnpinAllChatMessagesOption = Option[UnpinAllChatMessagesParams]
 
-// Option applies one or more UnpinAllChatMessagesOption values and returns the last rollback option.
-func (r *UnpinAllChatMessagesParams) Option(opts ...UnpinAllChatMessagesOption) (previous UnpinAllChatMessagesOption) {
+// Option applies opts to r in order.
+func (r *UnpinAllChatMessagesParams) Option(opts ...UnpinAllChatMessagesOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithUnpinAllChatMessagesChatID sets the ChatID field.
@@ -25535,28 +22825,17 @@ func WithUnpinAllChatMessagesChatID(value string) UnpinAllChatMessagesOption {
 // Conversely, the bot must be an administrator with the 'can_pin_messages' right or the 'can_edit_messages' right to unpin all pinned messages in groups and channels respectively.
 // Returns True on success.
 func (c *Client) UnpinAllChatMessages(ctx context.Context, params *UnpinAllChatMessagesParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "unpinAllChatMessages", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "unpinAllChatMessages", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -25573,12 +22852,11 @@ type UnpinAllForumTopicMessagesParams struct {
 // UnpinAllForumTopicMessagesOption configures UnpinAllForumTopicMessagesParams.
 type UnpinAllForumTopicMessagesOption = Option[UnpinAllForumTopicMessagesParams]
 
-// Option applies one or more UnpinAllForumTopicMessagesOption values and returns the last rollback option.
-func (r *UnpinAllForumTopicMessagesParams) Option(opts ...UnpinAllForumTopicMessagesOption) (previous UnpinAllForumTopicMessagesOption) {
+// Option applies opts to r in order.
+func (r *UnpinAllForumTopicMessagesParams) Option(opts ...UnpinAllForumTopicMessagesOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithUnpinAllForumTopicMessagesChatID sets the ChatID field.
@@ -25605,28 +22883,17 @@ func WithUnpinAllForumTopicMessagesMessageThreadID(value int64) UnpinAllForumTop
 // In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_pin_messages administrator right in the supergroup.
 // Returns True on success.
 func (c *Client) UnpinAllForumTopicMessages(ctx context.Context, params *UnpinAllForumTopicMessagesParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "unpinAllForumTopicMessages", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "unpinAllForumTopicMessages", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -25640,12 +22907,11 @@ type UnpinAllGeneralForumTopicMessagesParams struct {
 // UnpinAllGeneralForumTopicMessagesOption configures UnpinAllGeneralForumTopicMessagesParams.
 type UnpinAllGeneralForumTopicMessagesOption = Option[UnpinAllGeneralForumTopicMessagesParams]
 
-// Option applies one or more UnpinAllGeneralForumTopicMessagesOption values and returns the last rollback option.
-func (r *UnpinAllGeneralForumTopicMessagesParams) Option(opts ...UnpinAllGeneralForumTopicMessagesOption) (previous UnpinAllGeneralForumTopicMessagesOption) {
+// Option applies opts to r in order.
+func (r *UnpinAllGeneralForumTopicMessagesParams) Option(opts ...UnpinAllGeneralForumTopicMessagesOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithUnpinAllGeneralForumTopicMessagesChatID sets the ChatID field.
@@ -25663,28 +22929,17 @@ func WithUnpinAllGeneralForumTopicMessagesChatID(value string) UnpinAllGeneralFo
 // The bot must be an administrator in the chat for this to work and must have the can_pin_messages administrator right in the supergroup.
 // Returns True on success.
 func (c *Client) UnpinAllGeneralForumTopicMessages(ctx context.Context, params *UnpinAllGeneralForumTopicMessagesParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "unpinAllGeneralForumTopicMessages", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "unpinAllGeneralForumTopicMessages", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -25706,12 +22961,11 @@ type UnpinChatMessageParams struct {
 // UnpinChatMessageOption configures UnpinChatMessageParams.
 type UnpinChatMessageOption = Option[UnpinChatMessageParams]
 
-// Option applies one or more UnpinChatMessageOption values and returns the last rollback option.
-func (r *UnpinChatMessageParams) Option(opts ...UnpinChatMessageOption) (previous UnpinChatMessageOption) {
+// Option applies opts to r in order.
+func (r *UnpinChatMessageParams) Option(opts ...UnpinChatMessageOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithUnpinChatMessageBusinessConnectionID sets the BusinessConnectionID field.
@@ -25750,28 +23004,17 @@ func WithUnpinChatMessageMessageID(value int64) UnpinChatMessageOption {
 // Conversely, the bot must be an administrator with the 'can_pin_messages' right or the 'can_edit_messages' right to unpin messages in groups and channels respectively.
 // Returns True on success.
 func (c *Client) UnpinChatMessage(ctx context.Context, params *UnpinChatMessageParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "unpinChatMessage", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "unpinChatMessage", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -25795,12 +23038,11 @@ type UpgradeGiftParams struct {
 // UpgradeGiftOption configures UpgradeGiftParams.
 type UpgradeGiftOption = Option[UpgradeGiftParams]
 
-// Option applies one or more UpgradeGiftOption values and returns the last rollback option.
-func (r *UpgradeGiftParams) Option(opts ...UpgradeGiftOption) (previous UpgradeGiftOption) {
+// Option applies opts to r in order.
+func (r *UpgradeGiftParams) Option(opts ...UpgradeGiftOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithUpgradeGiftBusinessConnectionID sets the BusinessConnectionID field.
@@ -25847,28 +23089,17 @@ func WithUpgradeGiftStarCount(value int64) UpgradeGiftOption {
 // Additionally requires the can_transfer_stars business bot right if the upgrade is paid.
 // Returns True on success.
 func (c *Client) UpgradeGift(ctx context.Context, params *UpgradeGiftParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "upgradeGift", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "upgradeGift", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -25893,12 +23124,11 @@ type UploadStickerFileParams struct {
 // UploadStickerFileOption configures UploadStickerFileParams.
 type UploadStickerFileOption = Option[UploadStickerFileParams]
 
-// Option applies one or more UploadStickerFileOption values and returns the last rollback option.
-func (r *UploadStickerFileParams) Option(opts ...UploadStickerFileOption) (previous UploadStickerFileOption) {
+// Option applies opts to r in order.
+func (r *UploadStickerFileParams) Option(opts ...UploadStickerFileOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithUploadStickerFileUserID sets the UserID field.
@@ -25997,25 +23227,14 @@ func (c *Client) UploadStickerFile(ctx context.Context, params *UploadStickerFil
 
 	}()
 
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "uploadStickerFile", reader, contentType, nil)
+	ret, err = call[*File](ctx, c, "uploadStickerFile", reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
 		return
 	}
-	if err = <-writeErr; err != nil {
-		return
-	}
 
-	ret = new(File)
-	ref := ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	err = <-writeErr
 
 	return ret, err
 }
@@ -26034,12 +23253,11 @@ type VerifyChatParams struct {
 // VerifyChatOption configures VerifyChatParams.
 type VerifyChatOption = Option[VerifyChatParams]
 
-// Option applies one or more VerifyChatOption values and returns the last rollback option.
-func (r *VerifyChatParams) Option(opts ...VerifyChatOption) (previous VerifyChatOption) {
+// Option applies opts to r in order.
+func (r *VerifyChatParams) Option(opts ...VerifyChatOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithVerifyChatChatID sets the ChatID field.
@@ -26069,28 +23287,17 @@ func WithVerifyChatCustomDescription(value string) VerifyChatOption {
 //
 // [on behalf of the organization]: https://telegram.org/verify#third-party-verification
 func (c *Client) VerifyChat(ctx context.Context, params *VerifyChatParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "verifyChat", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "verifyChat", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -26108,12 +23315,11 @@ type VerifyUserParams struct {
 // VerifyUserOption configures VerifyUserParams.
 type VerifyUserOption = Option[VerifyUserParams]
 
-// Option applies one or more VerifyUserOption values and returns the last rollback option.
-func (r *VerifyUserParams) Option(opts ...VerifyUserOption) (previous VerifyUserOption) {
+// Option applies opts to r in order.
+func (r *VerifyUserParams) Option(opts ...VerifyUserOption) {
 	for _, opt := range opts {
-		previous = opt(r)
+		opt(r)
 	}
-	return previous
 }
 
 // WithVerifyUserUserID sets the UserID field.
@@ -26142,58 +23348,36 @@ func WithVerifyUserCustomDescription(value string) VerifyUserOption {
 //
 // [on behalf of the organization]: https://telegram.org/verify#third-party-verification
 func (c *Client) VerifyUser(ctx context.Context, params *VerifyUserParams) (ret bool, err error) {
-	buffer := new(bytes.Buffer)
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
 	if err = json.NewEncoder(buffer).Encode(params); err != nil {
 		return
 	}
 
-	reader := bytes.NewReader(buffer.Bytes())
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
 
-	contentType := "application/json"
-
-	var result json.RawMessage
-
-	result, err = c.Raw(ctx, "verifyUser", reader, contentType, nil)
-	if err != nil {
-		return
-	}
-
-	ref := &ret
-
-	err = json.Unmarshal(result, ref)
-	if err != nil {
-		return
-	}
+	ret, err = call[bool](ctx, c, "verifyUser", reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
 
+// createFormFileFromInputFile streams f.File into the multipart body.
+// The caller owns f.File and closes it after the API call returns.
 func createFormFileFromInputFile(writer *multipart.Writer, f *InputFile, name string) error {
 	if f.File == nil {
 		return nil
 	}
 
-	var w io.Writer
-	var err error
-
 	f.fieldName = name
 
-	w, err = writer.CreateFormFile(f.fieldName, f.FileName)
+	w, err := writer.CreateFormFile(f.fieldName, f.FileName)
 	if err != nil {
 		return err
 	}
 
 	_, err = io.Copy(w, f.File)
-	if err != nil {
-		return err
-	}
 
-	if closer, ok := f.File.(io.Closer); ok {
-		err = closer.Close()
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return err
 }

@@ -97,35 +97,14 @@ func (field Field) AutoFillCode(types map[string]Type) string {
 	case "chat_id":
 		switch toType(field.Type, field.IsRequired) {
 		case "string":
-			return `func(ctx *Context) string {
-			    c := ctx.Chat()
-				if c == nil {
-				    return ""
-				}
-
-				return c.Identifier()
-			}(ctx)`
+			return "ctx.chatIdentifier()"
 
 		case "int64":
-			return `func(ctx *Context) int64 {
-			    c := ctx.Chat()
-				if c == nil {
-				    return 0
-				}
-
-				return c.ID
-			}(ctx)`
+			return "ctx.chatID()"
 		}
 
 	case "user_id":
-		return `func(ctx *Context) int64 {
-		    u := ctx.User()
-			if u == nil {
-			    return 0
-			}
-
-			return u.ID
-		}(ctx)`
+		return "ctx.userID()"
 
 	case "direct_messages_topic_id":
 		return `func(ctx *Context) int64 {
@@ -275,7 +254,7 @@ func main() {
 }
 
 func retrievePageRC() io.ReadCloser {
-	const timeout = 5 * time.Second
+	const timeout = 30 * time.Second
 
 	if localPath := os.Getenv("GOGRAM_HTML"); localPath != "" {
 		//nolint:gosec // G703: we can use any file for tests
@@ -301,7 +280,8 @@ func retrievePageRC() io.ReadCloser {
 }
 
 func writeFile(filePath string, code []byte) {
-	if err := os.WriteFile(filePath, code, 0o600); err != nil {
+	//nolint:gosec // G306: generated source, not a secret
+	if err := os.WriteFile(filePath, code, 0o644); err != nil {
 		log.Fatalln("failed to write file:", err)
 	}
 }

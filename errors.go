@@ -74,6 +74,13 @@ func NewError(code int, text string) error {
 func genError(code int, text, description string, params *ResponseParameters) error {
 	switch code {
 	case http.StatusBadRequest:
+		// "EOF" means Telegram hit the end of our request body early
+		// (connection dropped mid-upload): transient, retried when the
+		// body can be rewound.
+		if description == errTextEOF {
+			return &RetryError{Err: ErrEOF, RetryAfter: defaultTimeoutOnError}
+		}
+
 		return &APIError{
 			Err:         errors.Join(ErrBadRequest, genErrorBadRequest(description)),
 			Description: description,
@@ -172,39 +179,56 @@ var (
 	// ErrGatewayTimeout indicates a Telegram upstream timeout.
 	ErrGatewayTimeout = NewError(http.StatusGatewayTimeout, http.StatusText(http.StatusGatewayTimeout))
 
-	// ErrEOF indicates an empty response body where JSON was expected.
-	ErrEOF = NewError(http.StatusBadRequest, "EOF")
+	// ErrEOF indicates Telegram answered "EOF": a bare "EOF" or empty body,
+	// or a 400 with description "EOF". The client wraps it in a [RetryError].
+	ErrEOF = NewError(http.StatusBadRequest, errTextEOF)
+)
+
+// Error texts of known Telegram descriptions; constants so genError* can
+// switch on them without method calls.
+//
+//nolint:lll
+const (
+	errTextWrongRemoteFileID    = "Bad Request: wrong remote file identifier specified: Wrong character in the string"
+	errTextDocumentAsPhoto      = "Bad Request: can't use file of type Document as Photo"
+	errTextParticipantIDInvalid = "Bad Request: PARTICIPANT_ID_INVALID"
+	errTextChatNotFound         = "Bad Request: chat not found"
+	errTextFileMustBeNonEmpty   = "Bad Request: file must be non-empty"
+	errTextBotBlockedByUser     = "Forbidden: bot was blocked by the user"
+	errTextBanned               = "Contact https://t.me/BotSupport for assistance"
+	errTextConflictWithBot      = "Conflict: terminated by other getUpdates request; make sure that only one bot instance is running"
+	errTextEOF                  = "EOF"
 )
 
 // Known custom bad request errors returned by Telegram.
-//
-//nolint:lll
 var (
-	ErrBadRequestWrongRemoteFileIdentifierSpecified = NewError(http.StatusBadRequest, "Bad Request: wrong remote file identifier specified: Wrong character in the string")
-	ErrBadRequestCantUseFileOfTypeDocumentAsPhoto   = NewError(http.StatusBadRequest, "Bad Request: can't use file of type Document as Photo")
+	// ErrBadRequestWrongRemoteFileIdentifierSpecified indicates a malformed file_id.
+	ErrBadRequestWrongRemoteFileIdentifierSpecified = NewError(http.StatusBadRequest, errTextWrongRemoteFileID)
+	// ErrBadRequestCantUseFileOfTypeDocumentAsPhoto indicates a document file_id sent as a photo.
+	ErrBadRequestCantUseFileOfTypeDocumentAsPhoto = NewError(http.StatusBadRequest, errTextDocumentAsPhoto)
 	// ErrBadRequestParticipantIDInvalid indicates the bot cannot access this user yet.
-	ErrBadRequestParticipantIDInvalid = NewError(http.StatusBadRequest, "Bad Request: PARTICIPANT_ID_INVALID")
+	ErrBadRequestParticipantIDInvalid = NewError(http.StatusBadRequest, errTextParticipantIDInvalid)
 	// ErrBadRequestChatNotFound indicates that the target chat does not exist or is inaccessible.
-	ErrBadRequestChatNotFound = NewError(http.StatusBadRequest, "Bad Request: chat not found")
+	ErrBadRequestChatNotFound = NewError(http.StatusBadRequest, errTextChatNotFound)
 	// ErrBadRequestFileMustBeNonEmpty indicates that an uploaded file is empty.
-	ErrBadRequestFileMustBeNonEmpty = NewError(http.StatusBadRequest, "Bad Request: file must be non-empty")
+	ErrBadRequestFileMustBeNonEmpty = NewError(http.StatusBadRequest, errTextFileMustBeNonEmpty)
 )
 
 func genErrorBadRequest(description string) error {
 	switch description {
-	case ErrBadRequestWrongRemoteFileIdentifierSpecified.Error():
+	case errTextWrongRemoteFileID:
 		return ErrBadRequestWrongRemoteFileIdentifierSpecified
 
-	case ErrBadRequestCantUseFileOfTypeDocumentAsPhoto.Error():
+	case errTextDocumentAsPhoto:
 		return ErrBadRequestCantUseFileOfTypeDocumentAsPhoto
 
-	case ErrBadRequestParticipantIDInvalid.Error():
+	case errTextParticipantIDInvalid:
 		return ErrBadRequestParticipantIDInvalid
 
-	case ErrBadRequestChatNotFound.Error():
+	case errTextChatNotFound:
 		return ErrBadRequestChatNotFound
 
-	case ErrBadRequestFileMustBeNonEmpty.Error():
+	case errTextFileMustBeNonEmpty:
 		return ErrBadRequestFileMustBeNonEmpty
 
 	default:
@@ -215,18 +239,18 @@ func genErrorBadRequest(description string) error {
 // Forbidden errors returned by Telegram.
 var (
 	// ErrForbiddenBotWasBlockedByTheUser indicates that the user blocked the bot.
-	ErrForbiddenBotWasBlockedByTheUser = NewError(http.StatusForbidden, "Forbidden: bot was blocked by the user")
+	ErrForbiddenBotWasBlockedByTheUser = NewError(http.StatusForbidden, errTextBotBlockedByUser)
 )
 
 // Not-found flavored errors returned by Telegram.
 var (
 	// ErrNotFoundBanned indicates that the bot has been banned.
-	ErrNotFoundBanned = NewError(http.StatusNotFound, "Contact https://t.me/BotSupport for assistance")
+	ErrNotFoundBanned = NewError(http.StatusNotFound, errTextBanned)
 )
 
 func genErrorNotFound(description string) error {
 	switch description {
-	case ErrNotFoundBanned.Error():
+	case errTextBanned:
 		return ErrNotFoundBanned
 
 	default:
@@ -235,16 +259,14 @@ func genErrorNotFound(description string) error {
 }
 
 // Conflict errors returned by Telegram.
-//
-//nolint:lll
 var (
 	// ErrConflictWithBot indicates another getUpdates consumer is already running.
-	ErrConflictWithBot = NewError(http.StatusConflict, "Conflict: terminated by other getUpdates request; make sure that only one bot instance is running")
+	ErrConflictWithBot = NewError(http.StatusConflict, errTextConflictWithBot)
 )
 
 func genErrorConflict(description string) error {
 	switch description {
-	case ErrConflictWithBot.Error():
+	case errTextConflictWithBot:
 		return ErrConflictWithBot
 
 	default:

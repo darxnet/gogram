@@ -13,20 +13,14 @@ import (
 	"github.com/darxnet/gogram"
 )
 
-func TestMethodOptionAliasRollsBack(t *testing.T) {
+func TestMethodOptionApplies(t *testing.T) {
 	t.Parallel()
 
 	params := gogram.SendMessageParams{Text: "before"}
-	option := gogram.WithSendMessageText("after")
+	params.Option(gogram.WithSendMessageText("after"), gogram.WithSendMessageParseMode(gogram.ParseModeHTML))
 
-	rollback := params.Option(option)
-	if params.Text != "after" {
-		t.Fatalf("Text after apply = %q, want %q", params.Text, "after")
-	}
-
-	params.Option(rollback)
-	if params.Text != "before" {
-		t.Fatalf("Text after rollback = %q, want %q", params.Text, "before")
+	if params.Text != "after" || params.ParseMode != gogram.ParseModeHTML {
+		t.Fatalf("params = %+v, want Text=after ParseMode=HTML", params)
 	}
 }
 
@@ -490,5 +484,32 @@ func TestEditStory_Upload(t *testing.T) {
 	}
 	if contentObj["type"] != "photo" {
 		t.Errorf("content.type: got %v, want photo", contentObj["type"])
+	}
+}
+
+// TestUnion_UnmarshalJSON_UnknownSubtype verifies that a discriminator value
+// this build does not know is ignored rather than failing the whole update:
+// a Bot API release must never stall getUpdates.
+//
+//nolint:lll // literal JSON fixtures
+func TestUnion_UnmarshalJSON_UnknownSubtype(t *testing.T) {
+	t.Parallel()
+
+	var member gogram.ChatMember
+	if err := json.Unmarshal([]byte(`{"status":"from_the_future","user":{"id":1,"is_bot":false,"first_name":"x"}}`), &member); err != nil {
+		t.Fatalf("unknown subtype must not fail: %v", err)
+	}
+
+	if member.ChatMemberMember != nil || member.ChatMemberOwner != nil {
+		t.Fatalf("no subtype must be set for an unknown discriminator: %+v", member)
+	}
+
+	var update gogram.Update
+	if err := json.Unmarshal([]byte(`{"update_id":1,"my_chat_member":{"chat":{"id":7,"type":"private"},"from":{"id":1,"is_bot":false,"first_name":"x"},"date":1,"old_chat_member":{"status":"member","user":{"id":1,"is_bot":false,"first_name":"x"}},"new_chat_member":{"status":"from_the_future","user":{"id":1,"is_bot":false,"first_name":"x"}}}}`), &update); err != nil {
+		t.Fatalf("update with unknown subtype must decode: %v", err)
+	}
+
+	if update.MyChatMember == nil || update.MyChatMember.OldChatMember.ChatMemberMember == nil {
+		t.Fatalf("known subtype must still decode: %+v", update.MyChatMember)
 	}
 }

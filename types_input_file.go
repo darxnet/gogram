@@ -6,6 +6,9 @@ import (
 )
 
 // InputFile represents a file upload or an existing file reference.
+//
+// File is streamed into the request body as it is read. It is owned by the
+// caller: close it after the API call returns.
 type InputFile struct {
 	FileID   string
 	FileURL  string

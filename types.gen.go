@@ -4,7 +4,6 @@ package gogram
 
 import (
 	"encoding/json"
-	"errors"
 )
 
 // AcceptedGiftTypes
@@ -202,7 +201,10 @@ func (r *BackgroundFill) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(data, r.BackgroundFillFreeformGradient)
 
 	default:
-		return errors.New("unknown subtype value: " + v.Discriminator)
+		// A subtype this build does not know yet: leave every
+		// field nil instead of failing the whole update, so a
+		// Bot API release never stalls getUpdates.
+		return nil
 	}
 }
 
@@ -330,7 +332,10 @@ func (r *BackgroundType) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(data, r.BackgroundTypeChatTheme)
 
 	default:
-		return errors.New("unknown subtype value: " + v.Discriminator)
+		// A subtype this build does not know yet: leave every
+		// field nil instead of failing the whole update, so a
+		// Bot API release never stalls getUpdates.
+		return nil
 	}
 }
 
@@ -576,7 +581,10 @@ func (r *BotCommandScope) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(data, r.BotCommandScopeChatMember)
 
 	default:
-		return errors.New("unknown subtype value: " + v.Discriminator)
+		// A subtype this build does not know yet: leave every
+		// field nil instead of failing the whole update, so a
+		// Bot API release never stalls getUpdates.
+		return nil
 	}
 }
 
@@ -1137,7 +1145,10 @@ func (r *ChatBoostSource) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(data, r.ChatBoostSourceGiveaway)
 
 	default:
-		return errors.New("unknown subtype value: " + v.Discriminator)
+		// A subtype this build does not know yet: leave every
+		// field nil instead of failing the whole update, so a
+		// Bot API release never stalls getUpdates.
+		return nil
 	}
 }
 
@@ -1640,7 +1651,10 @@ func (r *ChatMember) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(data, r.ChatMemberBanned)
 
 	default:
-		return errors.New("unknown subtype value: " + v.Discriminator)
+		// A subtype this build does not know yet: leave every
+		// field nil instead of failing the whole update, so a
+		// Bot API release never stalls getUpdates.
+		return nil
 	}
 }
 
@@ -4730,7 +4744,10 @@ func (r *InputMedia) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(data, r.InputMediaVideo)
 
 	default:
-		return errors.New("unknown subtype value: " + v.Discriminator)
+		// A subtype this build does not know yet: leave every
+		// field nil instead of failing the whole update, so a
+		// Bot API release never stalls getUpdates.
+		return nil
 	}
 }
 
@@ -5313,7 +5330,10 @@ func (r *InputPaidMedia) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(data, r.InputPaidMediaVideo)
 
 	default:
-		return errors.New("unknown subtype value: " + v.Discriminator)
+		// A subtype this build does not know yet: leave every
+		// field nil instead of failing the whole update, so a
+		// Bot API release never stalls getUpdates.
+		return nil
 	}
 }
 
@@ -5547,7 +5567,10 @@ func (r *InputPollMedia) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(data, r.InputMediaVideo)
 
 	default:
-		return errors.New("unknown subtype value: " + v.Discriminator)
+		// A subtype this build does not know yet: leave every
+		// field nil instead of failing the whole update, so a
+		// Bot API release never stalls getUpdates.
+		return nil
 	}
 }
 
@@ -5713,7 +5736,10 @@ func (r *InputPollOptionMedia) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(data, r.InputMediaVideo)
 
 	default:
-		return errors.New("unknown subtype value: " + v.Discriminator)
+		// A subtype this build does not know yet: leave every
+		// field nil instead of failing the whole update, so a
+		// Bot API release never stalls getUpdates.
+		return nil
 	}
 }
 
@@ -5776,7 +5802,10 @@ func (r *InputProfilePhoto) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(data, r.InputProfilePhotoAnimated)
 
 	default:
-		return errors.New("unknown subtype value: " + v.Discriminator)
+		// A subtype this build does not know yet: leave every
+		// field nil instead of failing the whole update, so a
+		// Bot API release never stalls getUpdates.
+		return nil
 	}
 }
 
@@ -6160,7 +6189,10 @@ func (r *InputRichBlock) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(data, r.InputRichBlockThinking)
 
 	default:
-		return errors.New("unknown subtype value: " + v.Discriminator)
+		// A subtype this build does not know yet: leave every
+		// field nil instead of failing the whole update, so a
+		// Bot API release never stalls getUpdates.
+		return nil
 	}
 }
 
@@ -6710,7 +6742,10 @@ func (r *InputStoryContent) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(data, r.InputStoryContentVideo)
 
 	default:
-		return errors.New("unknown subtype value: " + v.Discriminator)
+		// A subtype this build does not know yet: leave every
+		// field nil instead of failing the whole update, so a
+		// Bot API release never stalls getUpdates.
+		return nil
 	}
 }
 
@@ -7380,7 +7415,10 @@ func (r *MenuButton) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(data, r.MenuButtonDefault)
 
 	default:
-		return errors.New("unknown subtype value: " + v.Discriminator)
+		// A subtype this build does not know yet: leave every
+		// field nil instead of failing the whole update, so a
+		// Bot API release never stalls getUpdates.
+		return nil
 	}
 }
 
@@ -8136,7 +8174,10 @@ func (r *MessageOrigin) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(data, r.MessageOriginChannel)
 
 	default:
-		return errors.New("unknown subtype value: " + v.Discriminator)
+		// A subtype this build does not know yet: leave every
+		// field nil instead of failing the whole update, so a
+		// Bot API release never stalls getUpdates.
+		return nil
 	}
 }
 
@@ -8332,7 +8373,10 @@ func (r *OwnedGift) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(data, r.OwnedGiftUnique)
 
 	default:
-		return errors.New("unknown subtype value: " + v.Discriminator)
+		// A subtype this build does not know yet: leave every
+		// field nil instead of failing the whole update, so a
+		// Bot API release never stalls getUpdates.
+		return nil
 	}
 }
 
@@ -8541,7 +8585,10 @@ func (r *PaidMedia) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(data, r.PaidMediaVideo)
 
 	default:
-		return errors.New("unknown subtype value: " + v.Discriminator)
+		// A subtype this build does not know yet: leave every
+		// field nil instead of failing the whole update, so a
+		// Bot API release never stalls getUpdates.
+		return nil
 	}
 }
 
@@ -8791,7 +8838,10 @@ func (r *PassportElementError) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(data, r.PassportElementErrorUnspecified)
 
 	default:
-		return errors.New("unknown subtype value: " + v.Discriminator)
+		// A subtype this build does not know yet: leave every
+		// field nil instead of failing the whole update, so a
+		// Bot API release never stalls getUpdates.
+		return nil
 	}
 }
 
@@ -9395,7 +9445,10 @@ func (r *ReactionType) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(data, r.ReactionTypePaid)
 
 	default:
-		return errors.New("unknown subtype value: " + v.Discriminator)
+		// A subtype this build does not know yet: leave every
+		// field nil instead of failing the whole update, so a
+		// Bot API release never stalls getUpdates.
+		return nil
 	}
 }
 
@@ -9677,7 +9730,10 @@ func (r *RevenueWithdrawalState) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(data, r.RevenueWithdrawalStateFailed)
 
 	default:
-		return errors.New("unknown subtype value: " + v.Discriminator)
+		// A subtype this build does not know yet: leave every
+		// field nil instead of failing the whole update, so a
+		// Bot API release never stalls getUpdates.
+		return nil
 	}
 }
 
@@ -10056,7 +10112,10 @@ func (r *RichBlock) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(data, r.RichBlockThinking)
 
 	default:
-		return errors.New("unknown subtype value: " + v.Discriminator)
+		// A subtype this build does not know yet: leave every
+		// field nil instead of failing the whole update, so a
+		// Bot API release never stalls getUpdates.
+		return nil
 	}
 }
 
@@ -10979,7 +11038,10 @@ func (r *RichText) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(data, r.RichTextReferenceLink)
 
 	default:
-		return errors.New("unknown subtype value: " + v.Discriminator)
+		// A subtype this build does not know yet: leave every
+		// field nil instead of failing the whole update, so a
+		// Bot API release never stalls getUpdates.
+		return nil
 	}
 }
 
@@ -11708,7 +11770,10 @@ func (r *StoryAreaType) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(data, r.StoryAreaTypeUniqueGift)
 
 	default:
-		return errors.New("unknown subtype value: " + v.Discriminator)
+		// A subtype this build does not know yet: leave every
+		// field nil instead of failing the whole update, so a
+		// Bot API release never stalls getUpdates.
+		return nil
 	}
 }
 
@@ -12153,7 +12218,10 @@ func (r *TransactionPartner) UnmarshalJSON(data []byte) error {
 		return json.Unmarshal(data, r.TransactionPartnerOther)
 
 	default:
-		return errors.New("unknown subtype value: " + v.Discriminator)
+		// A subtype this build does not know yet: leave every
+		// field nil instead of failing the whole update, so a
+		// Bot API release never stalls getUpdates.
+		return nil
 	}
 }
 
