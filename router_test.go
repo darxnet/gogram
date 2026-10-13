@@ -322,3 +322,25 @@ func TestFilterByID(t *testing.T) {
 		t.Error("FilterChat(999) should be false")
 	}
 }
+
+func TestRouter_BotCommands(t *testing.T) {
+	t.Parallel()
+
+	r := gogram.NewRouter()
+	noop := func(*gogram.Context, *gogram.Message) error { return nil }
+
+	r.HandleCommand("/start", noop, "Start")
+	r.HandleCommand("help", noop)
+	r.HandleCommand("/settings", noop, "Settings")
+	r.HandleCommand("/start", noop, "Start again")
+
+	got := r.BotCommands()
+	want := []gogram.BotCommand{
+		{Command: "start", Description: "Start again"},
+		{Command: "settings", Description: "Settings"},
+	}
+
+	if len(got) != len(want) || got[0] != want[0] || got[1] != want[1] {
+		t.Fatalf("BotCommands = %+v, want %+v", got, want)
+	}
+}

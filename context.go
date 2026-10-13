@@ -42,9 +42,10 @@ type Context struct {
 	values  map[any]any
 
 	// Per-update memos: computed on first use, dropped on release.
-	detachedCtx context.Context // context without cancellation for API calls
-	chatTargetMemo   string          // Chat().Target()
-	fsm         fsmMemo
+	detachedCtx    context.Context // context without cancellation for API calls
+	chatTargetMemo string          // Chat().Target()
+	fsm            fsmMemo
+	answered       bool // AnswerCallbackQuery was called, see AutoAnswer
 }
 
 // Detached returns ctx without cancellation but with its values, so API calls

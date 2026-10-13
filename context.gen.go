@@ -292,6 +292,9 @@ func (ctx *Context) AnswerCallbackQuery(
 	)
 
 	_, err := ctx.client.AnswerCallbackQuery(ctx.Detached(), params)
+	if err == nil {
+		ctx.answered = true
+	}
 
 	return err
 }

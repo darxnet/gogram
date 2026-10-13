@@ -23,10 +23,10 @@ var (
 	ErrInvalidWebhookAddr = errors.New("gogram: invalid webhook listen address")
 )
 
-// StartWebhook starts an HTTP server that receives Telegram webhook updates.
-// It blocks until ctx is cancelled, then gracefully shuts down.
-//
-// Set up the webhook on Telegram's side with [Client.SetWebhook] before calling this.
+// StartWebhook registers params with setWebhook, then serves the webhook
+// on addr until ctx is cancelled and shuts down gracefully. The webhook
+// stays registered: a later [Client.Start] removes it when getUpdates
+// reports the conflict.
 func (c *Client) StartWebhook(ctx context.Context, addr string, params *SetWebhookParams) error {
 	if addr == "" {
 		return ErrInvalidWebhookAddr
@@ -58,6 +58,10 @@ func (c *Client) StartWebhook(ctx context.Context, addr string, params *SetWebho
 		return err
 	}
 	defer c.finishRun(state)
+
+	if _, err = c.SetWebhook(ctx, params); err != nil {
+		return err
+	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST "+pattern, c.webhookHandler(params.SecretToken))

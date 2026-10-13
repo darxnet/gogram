@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -681,5 +682,66 @@ func TestClient_Call_RetriesNonJSONBody(t *testing.T) {
 				t.Fatalf("requests = %d, want 1", n)
 			}
 		})
+	}
+}
+
+// TestClient_Start_DeletesStaleWebhook validates that polling recovers from a
+// webhook left by a previous deployment: getUpdates conflicts, the client
+// deletes the webhook and polls again without reporting an error.
+func TestClient_Start_DeletesStaleWebhook(t *testing.T) {
+	t.Parallel()
+
+	var (
+		calls    []string
+		mu       sync.Mutex
+		polls    atomic.Int32
+		errCount atomic.Int32
+	)
+
+	caller := gogram.CallerFunc(func(_ context.Context, req gogram.Request, result any) error {
+		mu.Lock()
+		calls = append(calls, req.Method)
+		mu.Unlock()
+
+		switch req.Method {
+		case "getUpdates":
+			if polls.Add(1) == 1 {
+				return &gogram.APIError{Err: gogram.ErrConflictWebhookActive, Description: "webhook is active"}
+			}
+
+			time.Sleep(10 * time.Millisecond)
+
+			return json.Unmarshal([]byte(`[]`), result)
+		case "deleteWebhook":
+			return json.Unmarshal([]byte(`true`), result)
+		}
+
+		return nil
+	})
+
+	router := gogram.NewRouter()
+	router.SetHandlerErr(func(*gogram.Context, error) { errCount.Add(1) })
+
+	client, err := gogram.NewClient(testToken, gogram.WithCaller(caller), gogram.WithRouter(router), gogram.WithWorkers(1))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ctx, cancel := context.WithTimeout(t.Context(), 100*time.Millisecond)
+	defer cancel()
+
+	if err = client.Start(ctx, nil); !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("Start = %v", err)
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+
+	if len(calls) < 3 || calls[0] != "getUpdates" || calls[1] != "deleteWebhook" || calls[2] != "getUpdates" {
+		t.Fatalf("calls = %v", calls)
+	}
+
+	if errCount.Load() != 0 {
+		t.Fatalf("conflict must be handled silently, got %d errors", errCount.Load())
 	}
 }

@@ -79,3 +79,41 @@ func TestMessage_CommandEntity(t *testing.T) {
 		t.Fatal("plain text must have no entities")
 	}
 }
+
+func TestAutoAnswerAndSyncCommands(t *testing.T) {
+	t.Parallel()
+
+	rec := tgtest.NewRecorder()
+
+	router := gogram.NewRouter()
+	router.Use(gogram.AutoAnswer())
+
+	router.HandleCommand("/start", func(*gogram.Context, *gogram.Message) error { return nil }, "Start")
+	router.HandleCallback("silent", func(*gogram.Context, *gogram.CallbackQuery) error { return nil })
+	router.HandleCallback("loud", func(ctx *gogram.Context, _ *gogram.CallbackQuery) error {
+		return ctx.AnswerCallbackQuery(gogram.WithAnswerCallbackQueryText("done"))
+	})
+
+	client, err := gogram.NewClient("123:abc", gogram.WithCaller(rec), gogram.WithRouter(router))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	router.Process(tgtest.NewContext(t, client, tgtest.Callback(7, "silent")))
+	router.Process(tgtest.NewContext(t, client, tgtest.Callback(7, "loud")))
+	router.Process(tgtest.NewContext(t, client, tgtest.Text(7, "/start")))
+
+	// One answer per callback: the middleware answers "silent", the handler answers "loud".
+	rec.AssertSequence(t, "answerCallbackQuery", "answerCallbackQuery")
+	rec.AssertCalled(t, "answerCallbackQuery", tgtest.Match(func(p *gogram.AnswerCallbackQueryParams) bool {
+		return p.Text == "done"
+	}))
+
+	if err = client.SyncCommands(t.Context()); err != nil {
+		t.Fatal(err)
+	}
+
+	rec.AssertCalled(t, "setMyCommands", tgtest.Match(func(p *gogram.SetMyCommandsParams) bool {
+		return len(p.Commands) == 1 && p.Commands[0].Command == "start"
+	}))
+}

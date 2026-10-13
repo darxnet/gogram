@@ -1,6 +1,7 @@
 package gogram
 
 import (
+	"errors"
 	"log"
 	"slices"
 	"strings"
@@ -40,6 +41,8 @@ type Router struct {
 	handlersCallbacks map[string][]route
 
 	handlersOn [handleOnCount][]route
+
+	commands []BotCommand // described commands in registration order, for setMyCommands
 
 	handlerDefault HandlerFunc
 	handlerErr     HandlerFuncErr
@@ -257,8 +260,9 @@ func (rg *RouterGroup) handleOn(on handleOn, handler HandlerFunc, filters ...Fil
 // HandleCommand registers a command handler using an O(1) map lookup.
 //
 // The command must not contain spaces. A leading slash is added automatically
-// if omitted (e.g. "start" → "/start").
-func (rg *RouterGroup) HandleCommand(command string, handler func(*Context, *Message) error) {
+// if omitted (e.g. "start" → "/start"). An optional description makes the
+// command part of [Router.BotCommands], published by [Client.SyncCommands].
+func (rg *RouterGroup) HandleCommand(command string, handler func(*Context, *Message) error, description ...string) {
 	if command == "" {
 		return
 	}
@@ -279,6 +283,46 @@ func (rg *RouterGroup) HandleCommand(command string, handler func(*Context, *Mes
 		filter:  rg.filter,
 		handler: rg.applyMiddlewares(fn),
 	})
+
+	if len(description) != 0 && description[0] != "" {
+		rg.router.describeCommand(command[1:], description[0])
+	}
+}
+
+// describeCommand records a command for setMyCommands, replacing an earlier description.
+func (r *Router) describeCommand(command, description string) {
+	for i := range r.commands {
+		if r.commands[i].Command == command {
+			r.commands[i].Description = description
+			return
+		}
+	}
+
+	r.commands = append(r.commands, BotCommand{Command: command, Description: description})
+}
+
+// BotCommands returns the commands registered with a description, in
+// registration order, ready for setMyCommands.
+func (r *Router) BotCommands() []BotCommand {
+	return slices.Clone(r.commands)
+}
+
+// AutoAnswer returns a middleware that answers a callback query after its
+// handler returns, unless the handler already answered it through
+// [Context.AnswerCallbackQuery]. Without an answer Telegram keeps the
+// button's loading spinner for up to a minute.
+func AutoAnswer() MiddlewareFunc {
+	return func(next HandlerFunc) HandlerFunc {
+		return func(ctx *Context) error {
+			err := next(ctx)
+
+			if ctx.update != nil && ctx.update.CallbackQuery != nil && !ctx.answered {
+				err = errors.Join(err, ctx.AnswerCallbackQuery())
+			}
+
+			return err
+		}
+	}
 }
 
 // HandleKeyboardButton registers a handler triggered by a reply-keyboard button text.

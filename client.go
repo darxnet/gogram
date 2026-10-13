@@ -403,25 +403,14 @@ func (c *Client) getUpdates(ctx context.Context, params *GetUpdatesParams) ([]Up
 // the API error when the bot is unauthorized or banned.
 func (c *Client) poll(ctx context.Context, params *GetUpdatesParams, workers []chan *Context) error {
 	numWorkers := int64(len(workers))
-	router := c.cfg.router
 
-	for {
+	// ctx is checked here as well as inside getUpdates: a Caller that
+	// ignores cancellation (a mock) must not keep the loop alive.
+	for ctx.Err() == nil {
 		batch, err := c.getUpdates(ctx, params)
 		if err != nil {
-			if ctxErr := ctx.Err(); ctxErr != nil {
-				return ctxErr
-			}
-
-			gogramCtx := c.acquireContext(ctx, nil)
-			router.HandleErr(gogramCtx, err)
-			c.releaseContext(gogramCtx)
-
-			if errors.Is(err, ErrUnauthorized) || errors.Is(err, ErrNotFoundBanned) {
-				return err
-			}
-
-			if sleepErr := sleep(ctx, defaultTimeoutOnError); sleepErr != nil {
-				return sleepErr
+			if stop := c.handlePollError(ctx, err); stop != nil {
+				return stop
 			}
 
 			continue
@@ -450,6 +439,34 @@ func (c *Client) poll(ctx context.Context, params *GetUpdatesParams, workers []c
 			}
 		}
 	}
+
+	return ctx.Err()
+}
+
+// handlePollError classifies a getUpdates error: nil means poll again now,
+// a non-nil error ends polling (context done, bot unauthorized or banned).
+// Other errors are reported to the router and followed by a back-off.
+func (c *Client) handlePollError(ctx context.Context, err error) error {
+	if ctxErr := ctx.Err(); ctxErr != nil {
+		return ctxErr
+	}
+
+	// A webhook left over from a previous deployment: drop it and go on.
+	if errors.Is(err, ErrConflictWebhookActive) {
+		if _, delErr := c.DeleteWebhook(ctx, nil); delErr == nil {
+			return nil
+		}
+	}
+
+	gogramCtx := c.acquireContext(ctx, nil)
+	c.cfg.router.HandleErr(gogramCtx, err)
+	c.releaseContext(gogramCtx)
+
+	if errors.Is(err, ErrUnauthorized) || errors.Is(err, ErrNotFoundBanned) {
+		return err
+	}
+
+	return sleep(ctx, defaultTimeoutOnError)
 }
 
 func (c *Client) beginRun(ctx context.Context) (context.Context, *runState, error) {
@@ -467,6 +484,25 @@ func (c *Client) beginRun(ctx context.Context) (context.Context, *runState, erro
 func (c *Client) finishRun(state *runState) {
 	state.cancel()
 	c.run.CompareAndSwap(state, nil)
+}
+
+// SyncCommands publishes the commands registered on the client's [Router]
+// with a description (see [RouterGroup.HandleCommand]) via setMyCommands.
+// It is a no-op when the router is not a [Router] or has no described commands.
+func (c *Client) SyncCommands(ctx context.Context) error {
+	router, ok := c.cfg.router.(*Router)
+	if !ok {
+		return nil
+	}
+
+	commands := router.BotCommands()
+	if len(commands) == 0 {
+		return nil
+	}
+
+	_, err := c.SetMyCommands(ctx, &SetMyCommandsParams{Commands: commands})
+
+	return err
 }
 
 // Stop requests the active polling or webhook run to stop.

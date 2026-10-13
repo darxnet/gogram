@@ -210,6 +210,11 @@ func (ctx *Context) {{ $method }}(
     )
 
     _, err := ctx.client.{{ $method }}(ctx.Detached(), params)
+    {{- if eq .Name "answerCallbackQuery" }}
+    if err == nil {
+        ctx.answered = true
+    }
+    {{- end }}
 
     return err
 }

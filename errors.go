@@ -198,6 +198,7 @@ const (
 	errTextBanned               = "Contact https://t.me/BotSupport for assistance"
 	errTextConflictWithBot      = "Conflict: terminated by other getUpdates request; make sure that only one bot instance is running"
 	errTextEOF                  = "EOF"
+	errTextConflictWebhook      = "Conflict: can't use getUpdates method while webhook is active; use deleteWebhook to delete the webhook first"
 )
 
 // Known custom bad request errors returned by Telegram.
@@ -262,12 +263,18 @@ func genErrorNotFound(description string) error {
 var (
 	// ErrConflictWithBot indicates another getUpdates consumer is already running.
 	ErrConflictWithBot = NewError(http.StatusConflict, errTextConflictWithBot)
+	// ErrConflictWebhookActive indicates getUpdates was called while a webhook is set;
+	// [Client.Start] deletes the webhook and retries on it.
+	ErrConflictWebhookActive = NewError(http.StatusConflict, errTextConflictWebhook)
 )
 
 func genErrorConflict(description string) error {
 	switch description {
 	case errTextConflictWithBot:
 		return ErrConflictWithBot
+
+	case errTextConflictWebhook:
+		return ErrConflictWebhookActive
 
 	default:
 		return nil
