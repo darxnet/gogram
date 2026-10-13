@@ -401,9 +401,7 @@ func (c *Client) getUpdates(ctx context.Context, params *GetUpdatesParams) ([]Up
 
 // poll runs the long-polling loop and returns ctx.Err() when ctx is done or
 // the API error when the bot is unauthorized or banned.
-func (c *Client) poll(ctx context.Context, params *GetUpdatesParams, workers []chan *Context) error {
-	numWorkers := int64(len(workers))
-
+func (c *Client) poll(ctx context.Context, params *GetUpdatesParams, pool *workerPool) error {
 	// ctx is checked here as well as inside getUpdates: a Caller that
 	// ignores cancellation (a mock) must not keep the loop alive.
 	for ctx.Err() == nil {
@@ -418,23 +416,8 @@ func (c *Client) poll(ctx context.Context, params *GetUpdatesParams, workers []c
 
 		for i := range batch {
 			params.Offset = batch[i].UpdateID + 1
-			gogramCtx := c.acquireContext(ctx, &batch[i])
 
-			// Updates of one chat always go to the same worker: ordering per chat.
-			key := batch[i].UpdateID
-			if chat := gogramCtx.Chat(); chat != nil {
-				key = chat.ID
-			}
-
-			idx := key % numWorkers
-			if idx < 0 {
-				idx = -idx
-			}
-
-			select {
-			case workers[idx] <- gogramCtx:
-			case <-ctx.Done():
-				c.releaseContext(gogramCtx)
+			if !pool.dispatch(ctx, c.acquireContext(ctx, &batch[i])) {
 				return ctx.Err()
 			}
 		}

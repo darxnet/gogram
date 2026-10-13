@@ -3,7 +3,6 @@ package gogram
 import (
 	"context"
 	"errors"
-	"sync"
 )
 
 // Start starts the client and listens for updates using long polling.
@@ -29,36 +28,13 @@ func (c *Client) Start(ctx context.Context, params *GetUpdatesParams) error {
 		local.Timeout = int64(defaultTimeout.Seconds())
 	}
 
-	numWorkers := local.Limit
-	if c.cfg.numWorkers > 0 {
-		numWorkers = int64(c.cfg.numWorkers)
-	}
+	numWorkers := c.workerCount(local.Limit)
+	pool := c.startWorkers(numWorkers, max(local.Limit/numWorkers, 1))
 
-	workers := make([]chan *Context, numWorkers)
-	for i := range workers {
-		workers[i] = make(chan *Context, max(local.Limit/numWorkers, 1))
-	}
+	// The caller's goroutine polls; the workers drain after it returns.
+	err = c.poll(innerCtx, &local, pool)
 
-	var wg sync.WaitGroup
-	for _, ch := range workers {
-		wg.Add(1)
-
-		go func() {
-			defer wg.Done()
-
-			for gogramCtx := range ch {
-				c.processUpdate(gogramCtx)
-			}
-		}()
-	}
-
-	// The caller's goroutine polls; no extra goroutine, no close-on-defer dance.
-	err = c.poll(innerCtx, &local, workers)
-
-	for _, ch := range workers {
-		close(ch)
-	}
-	wg.Wait()
+	pool.stop()
 
 	// Stop and a cancelled ctx are a normal shutdown; a deadline and
 	// fatal API errors are reported.

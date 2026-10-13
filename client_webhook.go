@@ -24,9 +24,12 @@ var (
 )
 
 // StartWebhook registers params with setWebhook, then serves the webhook
-// on addr until ctx is cancelled and shuts down gracefully. The webhook
-// stays registered: a later [Client.Start] removes it when getUpdates
-// reports the conflict.
+// on addr until ctx is cancelled and shuts down gracefully. A request is
+// answered as soon as its update is queued; handlers run on the same kind
+// of worker pool as polling (see [WithWorkers]), so a slow handler never
+// makes Telegram retry the delivery, and updates of one chat stay ordered.
+// The webhook stays registered: a later [Client.Start] removes it when
+// getUpdates reports the conflict.
 func (c *Client) StartWebhook(ctx context.Context, addr string, params *SetWebhookParams) error {
 	if addr == "" {
 		return ErrInvalidWebhookAddr
@@ -63,8 +66,12 @@ func (c *Client) StartWebhook(ctx context.Context, addr string, params *SetWebho
 		return err
 	}
 
+	numWorkers := c.workerCount(defaultUpdates)
+	pool := c.startWorkers(numWorkers, 1)
+	defer pool.stop()
+
 	mux := http.NewServeMux()
-	mux.HandleFunc("POST "+pattern, c.webhookHandler(params.SecretToken))
+	mux.HandleFunc("POST "+pattern, c.webhookHandler(innerCtx, pool, params.SecretToken))
 
 	readHeaderTimeout := defaultWebhookReadHeaderTimeout
 	if c.cfg.timeout > 0 {
@@ -111,7 +118,7 @@ func (c *Client) StartWebhook(ctx context.Context, addr string, params *SetWebho
 	return err
 }
 
-func (c *Client) webhookHandler(secretToken string) http.HandlerFunc {
+func (c *Client) webhookHandler(ctx context.Context, pool *workerPool, secretToken string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if secretToken != "" && !validSecretToken(r.Header.Get("X-Telegram-Bot-Api-Secret-Token"), secretToken) {
 			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
@@ -123,21 +130,29 @@ func (c *Client) webhookHandler(secretToken string) http.HandlerFunc {
 
 		if _, copyErr := io.Copy(buffer, http.MaxBytesReader(w, r.Body, defaultWebhookMaxBodyBytes)); copyErr != nil {
 			status := http.StatusBadRequest
+
 			var tooLarge *http.MaxBytesError
 			if errors.As(copyErr, &tooLarge) {
 				status = http.StatusRequestEntityTooLarge
 			}
+
 			http.Error(w, http.StatusText(status), status)
+
 			return
 		}
 
-		var update Update
-		if unmarshalErr := json.Unmarshal(buffer.B, &update); unmarshalErr != nil {
+		update := new(Update)
+		if unmarshalErr := json.Unmarshal(buffer.B, update); unmarshalErr != nil {
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
 
-		c.processUpdate(c.acquireContext(r.Context(), &update))
+		// The handler runs after this request ends, under the run's context.
+		if !pool.dispatch(ctx, c.acquireContext(ctx, update)) {
+			http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
+			return
+		}
+
 		w.WriteHeader(http.StatusOK)
 	}
 }
