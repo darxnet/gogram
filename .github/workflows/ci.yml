@@ -111,7 +111,6 @@ jobs:
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
-        continue-on-error: true # until the repository is enabled on Codecov
         with:
           files: coverage.out
           use_oidc: true

@@ -1,0 +1,18 @@
+# Codecov measures the hand-written code: the generated Bot API bindings and
+# the generator are excluded, matching the gate in .github/workflows/ci.yml.
+ignore:
+  - "**/*.gen.go"
+  - "cmd/gen"
+  - "sqlstore/sqlitetest"
+
+coverage:
+  status:
+    project:
+      default:
+        target: 60%
+        threshold: 2%
+    patch:
+      default:
+        informational: true
+
+comment: false

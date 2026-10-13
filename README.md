@@ -1,5 +1,9 @@
 # gogram
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/darxnet/gogram.svg)](https://pkg.go.dev/github.com/darxnet/gogram)
+[![Go](https://github.com/darxnet/gogram/actions/workflows/release.yml/badge.svg)](https://github.com/darxnet/gogram/actions/workflows/release.yml)
+[![Coverage](https://codecov.io/gh/darxnet/gogram/graph/badge.svg)](https://codecov.io/gh/darxnet/gogram)
+
 Telegram Bot API client for Go, generated from the official documentation,
 built for high-load bots: one JSON pass per call, pooled buffers, an
 allocation-free router, per-chat flood control and `context.Context`
