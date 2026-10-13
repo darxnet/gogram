@@ -181,10 +181,7 @@ func (p *Paginator[T]) Handle(rg *gogram.RouterGroup) {
 			return ctx.EditMessageReplyMarkup(gogram.WithEditMessageReplyMarkupReplyMarkup(kb.Markup()))
 		}
 
-		return ctx.EditMessageText(
-			gogram.WithEditMessageTextText(p.text(ctx, page, pages)),
-			gogram.WithEditMessageTextReplyMarkup(kb.Markup()),
-		)
+		return ctx.EditMessageText(p.text(ctx, page, pages), gogram.WithEditMessageTextReplyMarkup(kb.Markup()))
 	})
 }
 

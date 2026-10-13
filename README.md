@@ -64,7 +64,7 @@ update and applies the client's default parse mode:
 
 ```go
 ctx.SendChatAction(gogram.ChatActionTyping)
-ctx.EditMessageText(gogram.WithEditMessageTextText("done"), gogram.WithEditMessageTextReplyMarkup(kb.Markup()))
+ctx.EditMessageText("done", gogram.WithEditMessageTextReplyMarkup(kb.Markup()))
 ctx.AnswerCallbackQuery(gogram.WithAnswerCallbackQueryText("saved"))
 ctx.DeleteMessage()
 ```
@@ -128,10 +128,7 @@ kb := gogram.NewInlineKeyboardBuilder().
 	URL("Docs", "https://example.com")
 
 pageCB.Handle(router.RouterGroup, func(ctx *gogram.Context, cq *gogram.CallbackQuery, p Page) error {
-	return ctx.EditMessageText(
-		gogram.WithEditMessageTextText(render(p.List, p.N)),
-		gogram.WithEditMessageTextReplyMarkup(kb.Markup()),
-	)
+	return ctx.EditMessageText(render(p.List, p.N), gogram.WithEditMessageTextReplyMarkup(kb.Markup()))
 })
 ```
 
@@ -185,7 +182,7 @@ users.Handle(router.RouterGroup)
 
 cal := calendar.New("cal", calendar.Min(time.Now()))
 cal.Handle(router.RouterGroup, func(ctx *gogram.Context, _ *gogram.CallbackQuery, date time.Time) error {
-	return ctx.EditMessageText(gogram.WithEditMessageTextText("Booked " + date.Format("2006-01-02")))
+	return ctx.EditMessageText("Booked " + date.Format("2006-01-02"))
 })
 ```
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"regexp"
 	"strings"
 	"unicode"
 
@@ -11,6 +12,18 @@ import (
 const prefixArrayOf = "Array of "
 
 var replacerDescription = strings.NewReplacer("\n", "\n// ", ". ", ".\n// ")
+
+// alternativeRe matches "required if <field> isn't specified".
+var alternativeRe = regexp.MustCompile(`(?i)required if ([a-z_]+) isn't specified`)
+
+// parseAlternative returns the field this one is an alternative to, if any.
+func parseAlternative(desc string) string {
+	if m := alternativeRe.FindStringSubmatch(desc); m != nil {
+		return m[1]
+	}
+
+	return ""
+}
 
 // detectVariants inspects the raw text of a type's description paragraphs to
 // determine whether the type can also be encoded as a plain string or as
@@ -299,6 +312,8 @@ func parseParams(tables []*html.Node) []Param {
 			if strings.Contains(param.Desc, "attach://<file_attach_name>") {
 				param.Type = "InputFile"
 			}
+
+			param.Alternative = parseAlternative(param.Desc)
 
 			params = append(params, param)
 		}

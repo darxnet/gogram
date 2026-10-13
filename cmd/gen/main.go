@@ -25,6 +25,7 @@ type Field struct {
 	Type          string
 	IsRequired    bool
 	Discriminator string // unique value for subtypes
+	Alternative   string // "required if <Alternative> isn't specified": one of the two must be set
 }
 
 func (field Field) FileUploadCode(types map[string]Type) string {
@@ -167,6 +168,59 @@ type Method struct {
 	Name, Desc string
 	Params     []Param
 	Result     string
+}
+
+// Variant is one generated Context method of a Method: Suffix on the name
+// and the parameters passed positionally. The main variant (empty Suffix)
+// takes the required parameters plus the first field of every
+// "required if the other isn't specified" pair; each further variant swaps
+// in the other field of a pair, e.g. EditMessageTextWithRichMessage.
+type Variant struct {
+	Suffix string
+	Params []Param
+}
+
+// Variants lists the Context method variants of m.
+func (m Method) Variants(types map[string]Type) []Variant {
+	positional := func(include func(i int, p Param) bool) []Param {
+		var out []Param
+
+		for i, p := range m.Params {
+			if p.AutoFillCode(types) != "" {
+				continue
+			}
+
+			if p.IsRequired || include(i, p) {
+				out = append(out, p)
+			}
+		}
+
+		return out
+	}
+
+	indexOf := func(name string) int {
+		return slices.IndexFunc(m.Params, func(p Param) bool { return p.Name == name })
+	}
+
+	// A pair is ordered as in the docs: the first field is the main variant.
+	isFirst := func(i int, p Param) bool {
+		return p.Alternative != "" && indexOf(p.Alternative) > i
+	}
+
+	variants := []Variant{{Params: positional(isFirst)}}
+
+	for i, p := range m.Params {
+		if p.Alternative == "" || isFirst(i, p) || indexOf(p.Alternative) == -1 {
+			continue
+		}
+
+		variants = append(variants, Variant{
+			Suffix: "With" + toTitle(p.Name),
+			Params: positional(func(j int, _ Param) bool { return j == i }),
+		})
+	}
+
+	return variants
 }
 
 // Multipart reports whether the generated method should use multipart/form-data.

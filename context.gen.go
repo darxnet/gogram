@@ -861,8 +861,8 @@ func (ctx *Context) NewCopyMessageParams(
 		ChatID:                ctx.chatTarget(),
 		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
-		FromChatID:            fromChatID,
 		MessageID:             messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		FromChatID:            fromChatID,
 	}
 
 	params.Option(opts...)
@@ -1404,8 +1404,8 @@ func (ctx *Context) NewDeleteEphemeralMessageParams(
 ) *DeleteEphemeralMessageParams {
 	params := &DeleteEphemeralMessageParams{
 		ChatID:             ctx.chatTarget(),
-		ReceiverUserID:     receiverUserID,
 		EphemeralMessageID: messageField(ctx, func(m *Message) int64 { return m.EphemeralMessageID }),
+		ReceiverUserID:     receiverUserID,
 	}
 
 	params.Option(opts...)
@@ -1852,8 +1852,8 @@ func (ctx *Context) NewEditEphemeralMessageCaptionParams(
 ) *EditEphemeralMessageCaptionParams {
 	params := &EditEphemeralMessageCaptionParams{
 		ChatID:             ctx.chatTarget(),
-		ReceiverUserID:     receiverUserID,
 		EphemeralMessageID: messageField(ctx, func(m *Message) int64 { return m.EphemeralMessageID }),
+		ReceiverUserID:     receiverUserID,
 	}
 
 	params.Option(opts...)
@@ -1898,8 +1898,8 @@ func (ctx *Context) NewEditEphemeralMessageMediaParams(
 ) *EditEphemeralMessageMediaParams {
 	params := &EditEphemeralMessageMediaParams{
 		ChatID:             ctx.chatTarget(),
-		ReceiverUserID:     receiverUserID,
 		EphemeralMessageID: messageField(ctx, func(m *Message) int64 { return m.EphemeralMessageID }),
+		ReceiverUserID:     receiverUserID,
 		Media:              media,
 	}
 
@@ -1944,8 +1944,8 @@ func (ctx *Context) NewEditEphemeralMessageReplyMarkupParams(
 ) *EditEphemeralMessageReplyMarkupParams {
 	params := &EditEphemeralMessageReplyMarkupParams{
 		ChatID:             ctx.chatTarget(),
-		ReceiverUserID:     receiverUserID,
 		EphemeralMessageID: messageField(ctx, func(m *Message) int64 { return m.EphemeralMessageID }),
+		ReceiverUserID:     receiverUserID,
 	}
 
 	params.Option(opts...)
@@ -1979,12 +1979,14 @@ func (ctx *Context) EditEphemeralMessageReplyMarkup(
 //	ret, err := ctx.Client().EditEphemeralMessageText(ctx.Detached(), ctx.NewEditEphemeralMessageTextParams(...))
 func (ctx *Context) NewEditEphemeralMessageTextParams(
 	receiverUserID int64,
+	text string,
 	opts ...EditEphemeralMessageTextOption,
 ) *EditEphemeralMessageTextParams {
 	params := &EditEphemeralMessageTextParams{
 		ChatID:             ctx.chatTarget(),
-		ReceiverUserID:     receiverUserID,
 		EphemeralMessageID: messageField(ctx, func(m *Message) int64 { return m.EphemeralMessageID }),
+		ReceiverUserID:     receiverUserID,
+		Text:               text,
 	}
 
 	params.Option(opts...)
@@ -2005,10 +2007,61 @@ func (ctx *Context) NewEditEphemeralMessageTextParams(
 // On success, True is returned.
 func (ctx *Context) EditEphemeralMessageText(
 	receiverUserID int64,
+	text string,
 	opts ...EditEphemeralMessageTextOption,
 ) error {
 	params := ctx.NewEditEphemeralMessageTextParams(
 		receiverUserID,
+		text,
+		opts...,
+	)
+
+	_, err := ctx.client.EditEphemeralMessageText(ctx.Detached(), params)
+
+	return err
+}
+
+// NewEditEphemeralMessageTextWithRichMessageParams builds EditEphemeralMessageTextParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.EditEphemeralMessageText is needed:
+//
+//	ret, err := ctx.Client().EditEphemeralMessageText(ctx.Detached(), ctx.NewEditEphemeralMessageTextWithRichMessageParams(...))
+func (ctx *Context) NewEditEphemeralMessageTextWithRichMessageParams(
+	receiverUserID int64,
+	richMessage *InputRichMessage,
+	opts ...EditEphemeralMessageTextOption,
+) *EditEphemeralMessageTextParams {
+	params := &EditEphemeralMessageTextParams{
+		ChatID:             ctx.chatTarget(),
+		EphemeralMessageID: messageField(ctx, func(m *Message) int64 { return m.EphemeralMessageID }),
+		ReceiverUserID:     receiverUserID,
+		RichMessage:        richMessage,
+	}
+
+	params.Option(opts...)
+
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+		if params.ParseMode == "" && len(params.Entities) == 0 {
+			params.ParseMode = defaultParseMode
+		}
+	}
+
+	return params
+}
+
+// EditEphemeralMessageTextWithRichMessage calls Client.EditEphemeralMessageText with context-derived defaults.
+//
+// Use this method to edit an ephemeral text or rich message.
+// Note that it is not guaranteed that the user will receive the message edit event, especially if they are offline.
+// On success, True is returned.
+func (ctx *Context) EditEphemeralMessageTextWithRichMessage(
+	receiverUserID int64,
+	richMessage *InputRichMessage,
+	opts ...EditEphemeralMessageTextOption,
+) error {
+	params := ctx.NewEditEphemeralMessageTextWithRichMessageParams(
+		receiverUserID,
+		richMessage,
 		opts...,
 	)
 
@@ -2318,6 +2371,7 @@ func (ctx *Context) EditMessageReplyMarkup(
 //
 //	ret, err := ctx.Client().EditMessageText(ctx.Detached(), ctx.NewEditMessageTextParams(...))
 func (ctx *Context) NewEditMessageTextParams(
+	text string,
 	opts ...EditMessageTextOption,
 ) *EditMessageTextParams {
 	params := &EditMessageTextParams{
@@ -2325,6 +2379,7 @@ func (ctx *Context) NewEditMessageTextParams(
 		ChatID:               ctx.chatTarget(),
 		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
 		InlineMessageID:      ctx.inlineMessageID(),
+		Text:                 text,
 	}
 
 	params.Option(opts...)
@@ -2347,9 +2402,61 @@ func (ctx *Context) NewEditMessageTextParams(
 // [game]: https://core.telegram.org/bots/api#games
 // [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) EditMessageText(
+	text string,
 	opts ...EditMessageTextOption,
 ) error {
 	params := ctx.NewEditMessageTextParams(
+		text,
+		opts...,
+	)
+
+	_, err := ctx.client.EditMessageText(ctx.Detached(), params)
+
+	return err
+}
+
+// NewEditMessageTextWithRichMessageParams builds EditMessageTextParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.EditMessageText is needed:
+//
+//	ret, err := ctx.Client().EditMessageText(ctx.Detached(), ctx.NewEditMessageTextWithRichMessageParams(...))
+func (ctx *Context) NewEditMessageTextWithRichMessageParams(
+	richMessage *InputRichMessage,
+	opts ...EditMessageTextOption,
+) *EditMessageTextParams {
+	params := &EditMessageTextParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:               ctx.chatTarget(),
+		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		InlineMessageID:      ctx.inlineMessageID(),
+		RichMessage:          richMessage,
+	}
+
+	params.Option(opts...)
+
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+		if params.ParseMode == "" && len(params.Entities) == 0 {
+			params.ParseMode = defaultParseMode
+		}
+	}
+
+	return params
+}
+
+// EditMessageTextWithRichMessage calls Client.EditMessageText with context-derived defaults.
+//
+// Use this method to edit text, rich and [game] messages.
+// On success, if the edited message is not an inline message, the edited [Message] is returned, otherwise True is returned.
+// Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within 48 hours from the time they were sent.
+//
+// [game]: https://core.telegram.org/bots/api#games
+// [Message]: https://core.telegram.org/bots/api#message
+func (ctx *Context) EditMessageTextWithRichMessage(
+	richMessage *InputRichMessage,
+	opts ...EditMessageTextOption,
+) error {
+	params := ctx.NewEditMessageTextWithRichMessageParams(
+		richMessage,
 		opts...,
 	)
 
@@ -2496,8 +2603,8 @@ func (ctx *Context) NewForwardMessageParams(
 		ChatID:                ctx.chatTarget(),
 		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
-		FromChatID:            fromChatID,
 		MessageID:             messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		FromChatID:            fromChatID,
 	}
 
 	params.Option(opts...)
@@ -6294,10 +6401,10 @@ func (ctx *Context) NewSetGameScoreParams(
 ) *SetGameScoreParams {
 	params := &SetGameScoreParams{
 		UserID:          ctx.userID(),
-		Score:           score,
 		ChatID:          ctx.chatID(),
 		MessageID:       messageField(ctx, func(m *Message) int64 { return m.MessageID }),
 		InlineMessageID: ctx.inlineMessageID(),
+		Score:           score,
 	}
 
 	params.Option(opts...)
@@ -6809,8 +6916,8 @@ func (ctx *Context) NewSetStickerSetThumbnailParams(
 	opts ...SetStickerSetThumbnailOption,
 ) *SetStickerSetThumbnailParams {
 	params := &SetStickerSetThumbnailParams{
-		Name:   name,
 		UserID: ctx.userID(),
+		Name:   name,
 		Format: format,
 	}
 

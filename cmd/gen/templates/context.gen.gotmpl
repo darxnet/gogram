@@ -114,6 +114,9 @@ func (ctx *Context) Payload() string {
     {{ $method := toTitle .Name }}
     {{ $params := print $method "Params" }}
     {{ $option := print $method "Option" }}
+    {{- $allParams := .Params }}
+    {{- $desc := .Desc }}
+    {{- $isAnswerCallback := eq .Name "answerCallbackQuery" }}
     {{- $parseModeName := "" }}
     {{- $entitiesName := "" }}
     {{- $inputMediaName := "" }}
@@ -132,32 +135,29 @@ func (ctx *Context) Payload() string {
             {{- $inputMediasName = toTitle .Name }}
         {{- end }}
     {{- end }}
+{{ range .Variants $root.Types }}
+    {{- $suffix := .Suffix }}
+    {{- $positional := .Params }}
 
-// New{{ $params }} builds {{ $params }} with context-derived defaults
+// New{{ $method }}{{ $suffix }}Params builds {{ $params }} with context-derived defaults
 // (chat, thread, business connection, default parse mode) and applies opts.
 // Use it when the result of Client.{{ $method }} is needed:
 //
-//	ret, err := ctx.Client().{{ $method }}(ctx.Detached(), ctx.New{{ $params }}(...))
-func (ctx *Context) New{{ $params }}(
-    {{- range .Params }}
-        {{- if .AutoFillCode $root.Types }}
-            {{- continue }}
-        {{- end }}
-        {{- if .IsRequired }}
-            {{ toTitle .Name | toLowerFirst }} {{ toType .Type .IsRequired }},
-        {{- end }}
+//	ret, err := ctx.Client().{{ $method }}(ctx.Detached(), ctx.New{{ $method }}{{ $suffix }}Params(...))
+func (ctx *Context) New{{ $method }}{{ $suffix }}Params(
+    {{- range $positional }}
+        {{ toTitle .Name | toLowerFirst }} {{ toType .Type .IsRequired }},
     {{- end }}
     opts ...{{ $option }},
 ) *{{ $params }} {
     params := &{{ $params }}{
-        {{- range .Params }}
+        {{- range $allParams }}
             {{- if $code := .AutoFillCode $root.Types }}
                 {{ toTitle .Name }}: {{ $code }},
-                {{- continue }}
             {{- end }}
-            {{- if .IsRequired  }}
-                {{ toTitle .Name }}: {{ toTitle .Name | toLowerFirst }},
-            {{- end }}
+        {{- end }}
+        {{- range $positional }}
+            {{ toTitle .Name }}: {{ toTitle .Name | toLowerFirst }},
         {{- end }}
     }
 
@@ -184,33 +184,23 @@ func (ctx *Context) New{{ $params }}(
     return params
 }
 
-// {{ $method }} calls Client.{{ $method }} with context-derived defaults.
-// {{ .Desc }}
-func (ctx *Context) {{ $method }}(
-    {{- range .Params }}
-        {{- if .AutoFillCode $root.Types }}
-            {{- continue }}
-        {{- end }}
-        {{- if .IsRequired }}
-            {{ toTitle .Name | toLowerFirst }} {{ toType .Type .IsRequired }},
-        {{- end }}
+// {{ $method }}{{ $suffix }} calls Client.{{ $method }} with context-derived defaults.
+// {{ $desc }}
+func (ctx *Context) {{ $method }}{{ $suffix }}(
+    {{- range $positional }}
+        {{ toTitle .Name | toLowerFirst }} {{ toType .Type .IsRequired }},
     {{- end }}
     opts ...{{ $option }},
 ) error {
-    params := ctx.New{{ $params }}(
-        {{- range .Params }}
-            {{- if .AutoFillCode $root.Types }}
-                {{- continue }}
-            {{- end }}
-            {{- if .IsRequired }}
-                {{ toTitle .Name | toLowerFirst }},
-            {{- end }}
+    params := ctx.New{{ $method }}{{ $suffix }}Params(
+        {{- range $positional }}
+            {{ toTitle .Name | toLowerFirst }},
         {{- end }}
         opts...,
     )
 
     _, err := ctx.client.{{ $method }}(ctx.Detached(), params)
-    {{- if eq .Name "answerCallbackQuery" }}
+    {{- if $isAnswerCallback }}
     if err == nil {
         ctx.answered = true
     }
@@ -218,7 +208,7 @@ func (ctx *Context) {{ $method }}(
 
     return err
 }
-
+{{ end }}
 {{ end }}
 
 func defaultParseModeToInputMedia(media *InputMedia, parseMode string) {
