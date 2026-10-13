@@ -73,3 +73,23 @@ func BenchmarkGetUpdates_OneUpdate(b *testing.B) {
 		}
 	}
 }
+
+// BenchmarkSendDocument streams a 1 MiB upload through the multipart body:
+// B/op stays far below the file size because nothing is buffered.
+func BenchmarkSendDocument(b *testing.B) {
+	data := make([]byte, 1<<20)
+
+	client := newStubClient(b, `{"ok":true,"result":{"message_id":1,"date":1700000000,"chat":{"id":7,"type":"private"}}}`)
+	params := &gogram.SendDocumentParams{ChatID: gogram.ChatID{ID: 7}, Document: gogram.FromBytes("f.bin", data)}
+	ctx := b.Context()
+
+	b.SetBytes(int64(len(data)))
+	b.ReportAllocs()
+	b.ResetTimer()
+
+	for range b.N {
+		if _, err := client.SendDocument(ctx, params); err != nil {
+			b.Fatal(err)
+		}
+	}
+}
