@@ -92,16 +92,22 @@ ctx.SendMessage(text,
 
 Commands and callback buttons are dispatched with a map lookup, other
 routes with filters in registration order; groups share filters and
-middleware:
+middleware; filters compose:
 
 ```go
 admin := router.Group(gogram.FilterChat(adminChatID))
 admin.Use(audit)
-admin.HandleCommand("/stats", stats)
+admin.HandleCommand("/stats", stats, "Usage statistics") // the description goes to setMyCommands
 
-router.HandleOnMessage(onDocument, gogram.FilterMessageDocument())
+router.HandleOnMessage(onDocument, gogram.FilterPrivate().And(gogram.FilterMessageDocument()))
+router.Use(gogram.AutoAnswer()) // answers callback queries the handler did not
 router.SetHandlerErr(func(ctx *gogram.Context, err error) { log.Println(err) })
+
+client.SyncCommands(ctx) // publishes every described command
 ```
+
+`StartWebhook` registers the webhook itself; `Start` removes a webhook
+left by a previous deployment when getUpdates reports it.
 
 ## Inline keyboards and typed callback data
 
@@ -141,7 +147,8 @@ router.HandleOnMessage(func(ctx *gogram.Context, m *gogram.Message) error {
 
 client, err := gogram.NewClient(token,
 	gogram.WithRouter(router),
-	gogram.WithStateStore(gogram.NewMemoryStateStore(gogram.WithTTL(time.Hour))), // or sqlstore.New(ctx, sqlstore.PostgreSQL, db)
+	gogram.WithStateStore(gogram.NewMemoryStateStore(gogram.WithTTL(time.Hour))),
+	// or sqlstore.New(ctx, sqlstore.PostgreSQL, db, sqlstore.WithTTL(time.Hour), sqlstore.WithCleanupInterval(time.Minute))
 )
 ```
 
@@ -180,6 +187,12 @@ rec.AssertCalled(t, "sendMessage", tgtest.Match(func(p *gogram.SendMessageParams
 	return p.Text == "Hello"
 }))
 ```
+
+## Text and links
+
+`EscapeMarkdownV2`, `EscapeHTML`, `Message.EntityText(e)` (UTF-16 aware),
+`UTF16Len`, `client.StartLink(ctx, "ref")` and `client.StartGroupLink`
+(deep links built from `client.Me()`).
 
 ## Files
 
