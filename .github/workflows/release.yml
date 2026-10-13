@@ -36,7 +36,7 @@ jobs:
         id: svu
         run: |
           go install github.com/caarlos0/svu/v2@latest
-          NEXT=$(svu next)
+          NEXT=$(svu next --no-increment-v0)
           echo "version=$NEXT" >> $GITHUB_OUTPUT
           if [ "$(svu current)" != "$NEXT" ]; then
             echo "changed=true" >> $GITHUB_OUTPUT
