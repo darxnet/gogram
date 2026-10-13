@@ -5,15 +5,24 @@ on:
     branches:
       - main
 
-concurrency:
-  group: ${{ github.workflow }}
-  cancel-in-progress: false
-
 permissions:
   contents: write
 
+concurrency:
+  group: release
+  cancel-in-progress: false
+
 jobs:
+  ci:
+    name: CI
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+      id-token: write # for the Codecov upload in the coverage job
+
   release:
+    name: Release
+    needs: ci
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -23,31 +32,21 @@ jobs:
 
       - uses: actions/setup-go@v7
         with:
-          go-version-file: 'go.mod'
+          go-version-file: go.mod
           cache: true
 
-      - name: Verify Build
-        run: go build -v ./...
+      - name: Install svu
+        run: go install github.com/caarlos0/svu/v2@latest
 
-      - name: Run Tests
-        run: go test -race -failfast ./...
-
-      - name: Calculate Next Version
-        id: svu
+      - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          go install github.com/caarlos0/svu/v2@latest
+          # Breaking changes stay within v0 until v1 is released deliberately.
           NEXT=$(svu next --no-increment-v0)
-          echo "version=$NEXT" >> $GITHUB_OUTPUT
-          if [ "$(svu current)" != "$NEXT" ]; then
-            echo "changed=true" >> $GITHUB_OUTPUT
+          if [ "$(svu current)" == "$NEXT" ]; then
+            echo "Version $NEXT already exists, skipping release."
           else
-            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "Releasing $NEXT..."
+            gh release create "$NEXT" --generate-notes
           fi
-
-      - name: Push Tag
-        if: steps.svu.outputs.changed == 'true'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "${{ steps.svu.outputs.version }}" -m "chore(release): ${{ steps.svu.outputs.version }}"
-          git push origin "${{ steps.svu.outputs.version }}"
