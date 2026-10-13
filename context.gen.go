@@ -211,6 +211,27 @@ func (ctx *Context) Payload() string {
 	return ExtractPayload(ctx.Text())
 }
 
+// NewAddStickerToSetParams builds AddStickerToSetParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.AddStickerToSet is needed:
+//
+//	ret, err := ctx.Client().AddStickerToSet(ctx.Detached(), ctx.NewAddStickerToSetParams(...))
+func (ctx *Context) NewAddStickerToSetParams(
+	name string,
+	sticker InputSticker,
+	opts ...AddStickerToSetOption,
+) *AddStickerToSetParams {
+	params := &AddStickerToSetParams{
+		UserID:  ctx.userID(),
+		Name:    name,
+		Sticker: sticker,
+	}
+
+	params.Option(opts...)
+
+	return params
+}
+
 // AddStickerToSet calls Client.AddStickerToSet with context-derived defaults.
 //
 // Use this method to add a new sticker to a set created by the bot.
@@ -222,17 +243,38 @@ func (ctx *Context) AddStickerToSet(
 	sticker InputSticker,
 	opts ...AddStickerToSetOption,
 ) error {
-	params := &AddStickerToSetParams{
-		UserID:  ctx.userID(),
-		Name:    name,
-		Sticker: sticker,
+	params := ctx.NewAddStickerToSetParams(
+		name,
+		sticker,
+		opts...,
+	)
+
+	_, err := ctx.client.AddStickerToSet(ctx.Detached(), params)
+
+	return err
+}
+
+// NewAnswerCallbackQueryParams builds AnswerCallbackQueryParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.AnswerCallbackQuery is needed:
+//
+//	ret, err := ctx.Client().AnswerCallbackQuery(ctx.Detached(), ctx.NewAnswerCallbackQueryParams(...))
+func (ctx *Context) NewAnswerCallbackQueryParams(
+	opts ...AnswerCallbackQueryOption,
+) *AnswerCallbackQueryParams {
+	params := &AnswerCallbackQueryParams{
+		CallbackQueryID: updateField(ctx, func(u *Update) string {
+			if u.CallbackQuery == nil {
+				return ""
+			}
+
+			return u.CallbackQuery.ID
+		}),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.AddStickerToSet(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // AnswerCallbackQuery calls Client.AnswerCallbackQuery with context-derived defaults.
@@ -245,25 +287,33 @@ func (ctx *Context) AddStickerToSet(
 func (ctx *Context) AnswerCallbackQuery(
 	opts ...AnswerCallbackQueryOption,
 ) error {
-	params := &AnswerCallbackQueryParams{
-		CallbackQueryID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
+	params := ctx.NewAnswerCallbackQueryParams(
+		opts...,
+	)
 
-			if ctx.update.CallbackQuery == nil {
-				return ""
-			}
+	_, err := ctx.client.AnswerCallbackQuery(ctx.Detached(), params)
 
-			return ctx.update.CallbackQuery.ID
-		}(ctx),
+	return err
+}
+
+// NewAnswerChatJoinRequestQueryParams builds AnswerChatJoinRequestQueryParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.AnswerChatJoinRequestQuery is needed:
+//
+//	ret, err := ctx.Client().AnswerChatJoinRequestQuery(ctx.Detached(), ctx.NewAnswerChatJoinRequestQueryParams(...))
+func (ctx *Context) NewAnswerChatJoinRequestQueryParams(
+	chatJoinRequestQueryID string,
+	result string,
+	opts ...AnswerChatJoinRequestQueryOption,
+) *AnswerChatJoinRequestQueryParams {
+	params := &AnswerChatJoinRequestQueryParams{
+		ChatJoinRequestQueryID: chatJoinRequestQueryID,
+		Result:                 result,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.AnswerCallbackQuery(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // AnswerChatJoinRequestQuery calls Client.AnswerChatJoinRequestQuery with context-derived defaults.
@@ -275,16 +325,34 @@ func (ctx *Context) AnswerChatJoinRequestQuery(
 	result string,
 	opts ...AnswerChatJoinRequestQueryOption,
 ) error {
-	params := &AnswerChatJoinRequestQueryParams{
-		ChatJoinRequestQueryID: chatJoinRequestQueryID,
-		Result:                 result,
+	params := ctx.NewAnswerChatJoinRequestQueryParams(
+		chatJoinRequestQueryID,
+		result,
+		opts...,
+	)
+
+	_, err := ctx.client.AnswerChatJoinRequestQuery(ctx.Detached(), params)
+
+	return err
+}
+
+// NewAnswerGuestQueryParams builds AnswerGuestQueryParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.AnswerGuestQuery is needed:
+//
+//	ret, err := ctx.Client().AnswerGuestQuery(ctx.Detached(), ctx.NewAnswerGuestQueryParams(...))
+func (ctx *Context) NewAnswerGuestQueryParams(
+	result InlineQueryResult,
+	opts ...AnswerGuestQueryOption,
+) *AnswerGuestQueryParams {
+	params := &AnswerGuestQueryParams{
+		GuestQueryID: messageField(ctx, func(m *Message) string { return m.GuestQueryID }),
+		Result:       result,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.AnswerChatJoinRequestQuery(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // AnswerGuestQuery calls Client.AnswerGuestQuery with context-derived defaults.
@@ -297,23 +365,39 @@ func (ctx *Context) AnswerGuestQuery(
 	result InlineQueryResult,
 	opts ...AnswerGuestQueryOption,
 ) error {
-	params := &AnswerGuestQueryParams{
-		GuestQueryID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
+	params := ctx.NewAnswerGuestQueryParams(
+		result,
+		opts...,
+	)
+
+	_, err := ctx.client.AnswerGuestQuery(ctx.Detached(), params)
+
+	return err
+}
+
+// NewAnswerInlineQueryParams builds AnswerInlineQueryParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.AnswerInlineQuery is needed:
+//
+//	ret, err := ctx.Client().AnswerInlineQuery(ctx.Detached(), ctx.NewAnswerInlineQueryParams(...))
+func (ctx *Context) NewAnswerInlineQueryParams(
+	results []InlineQueryResult,
+	opts ...AnswerInlineQueryOption,
+) *AnswerInlineQueryParams {
+	params := &AnswerInlineQueryParams{
+		InlineQueryID: updateField(ctx, func(u *Update) string {
+			if u.InlineQuery == nil {
 				return ""
 			}
 
-			return m.GuestQueryID
-		}(ctx),
-		Result: result,
+			return u.InlineQuery.ID
+		}),
+		Results: results,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.AnswerGuestQuery(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // AnswerInlineQuery calls Client.AnswerInlineQuery with context-derived defaults.
@@ -325,26 +409,39 @@ func (ctx *Context) AnswerInlineQuery(
 	results []InlineQueryResult,
 	opts ...AnswerInlineQueryOption,
 ) error {
-	params := &AnswerInlineQueryParams{
-		InlineQueryID: func(ctx *Context) string {
-			if ctx.update == nil {
+	params := ctx.NewAnswerInlineQueryParams(
+		results,
+		opts...,
+	)
+
+	_, err := ctx.client.AnswerInlineQuery(ctx.Detached(), params)
+
+	return err
+}
+
+// NewAnswerPreCheckoutQueryParams builds AnswerPreCheckoutQueryParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.AnswerPreCheckoutQuery is needed:
+//
+//	ret, err := ctx.Client().AnswerPreCheckoutQuery(ctx.Detached(), ctx.NewAnswerPreCheckoutQueryParams(...))
+func (ctx *Context) NewAnswerPreCheckoutQueryParams(
+	ok bool,
+	opts ...AnswerPreCheckoutQueryOption,
+) *AnswerPreCheckoutQueryParams {
+	params := &AnswerPreCheckoutQueryParams{
+		PreCheckoutQueryID: updateField(ctx, func(u *Update) string {
+			if u.PreCheckoutQuery == nil {
 				return ""
 			}
 
-			if ctx.update.InlineQuery == nil {
-				return ""
-			}
-
-			return ctx.update.InlineQuery.ID
-		}(ctx),
-		Results: results,
+			return u.PreCheckoutQuery.ID
+		}),
+		Ok: ok,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.AnswerInlineQuery(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // AnswerPreCheckoutQuery calls Client.AnswerPreCheckoutQuery with context-derived defaults.
@@ -359,26 +456,39 @@ func (ctx *Context) AnswerPreCheckoutQuery(
 	ok bool,
 	opts ...AnswerPreCheckoutQueryOption,
 ) error {
-	params := &AnswerPreCheckoutQueryParams{
-		PreCheckoutQueryID: func(ctx *Context) string {
-			if ctx.update == nil {
+	params := ctx.NewAnswerPreCheckoutQueryParams(
+		ok,
+		opts...,
+	)
+
+	_, err := ctx.client.AnswerPreCheckoutQuery(ctx.Detached(), params)
+
+	return err
+}
+
+// NewAnswerShippingQueryParams builds AnswerShippingQueryParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.AnswerShippingQuery is needed:
+//
+//	ret, err := ctx.Client().AnswerShippingQuery(ctx.Detached(), ctx.NewAnswerShippingQueryParams(...))
+func (ctx *Context) NewAnswerShippingQueryParams(
+	ok bool,
+	opts ...AnswerShippingQueryOption,
+) *AnswerShippingQueryParams {
+	params := &AnswerShippingQueryParams{
+		ShippingQueryID: updateField(ctx, func(u *Update) string {
+			if u.ShippingQuery == nil {
 				return ""
 			}
 
-			if ctx.update.PreCheckoutQuery == nil {
-				return ""
-			}
-
-			return ctx.update.PreCheckoutQuery.ID
-		}(ctx),
+			return u.ShippingQuery.ID
+		}),
 		Ok: ok,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.AnswerPreCheckoutQuery(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // AnswerShippingQuery calls Client.AnswerShippingQuery with context-derived defaults.
@@ -392,26 +502,34 @@ func (ctx *Context) AnswerShippingQuery(
 	ok bool,
 	opts ...AnswerShippingQueryOption,
 ) error {
-	params := &AnswerShippingQueryParams{
-		ShippingQueryID: func(ctx *Context) string {
-			if ctx.update == nil {
-				return ""
-			}
+	params := ctx.NewAnswerShippingQueryParams(
+		ok,
+		opts...,
+	)
 
-			if ctx.update.ShippingQuery == nil {
-				return ""
-			}
+	_, err := ctx.client.AnswerShippingQuery(ctx.Detached(), params)
 
-			return ctx.update.ShippingQuery.ID
-		}(ctx),
-		Ok: ok,
+	return err
+}
+
+// NewAnswerWebAppQueryParams builds AnswerWebAppQueryParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.AnswerWebAppQuery is needed:
+//
+//	ret, err := ctx.Client().AnswerWebAppQuery(ctx.Detached(), ctx.NewAnswerWebAppQueryParams(...))
+func (ctx *Context) NewAnswerWebAppQueryParams(
+	webAppQueryID string,
+	result InlineQueryResult,
+	opts ...AnswerWebAppQueryOption,
+) *AnswerWebAppQueryParams {
+	params := &AnswerWebAppQueryParams{
+		WebAppQueryID: webAppQueryID,
+		Result:        result,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.AnswerShippingQuery(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // AnswerWebAppQuery calls Client.AnswerWebAppQuery with context-derived defaults.
@@ -426,16 +544,33 @@ func (ctx *Context) AnswerWebAppQuery(
 	result InlineQueryResult,
 	opts ...AnswerWebAppQueryOption,
 ) error {
-	params := &AnswerWebAppQueryParams{
-		WebAppQueryID: webAppQueryID,
-		Result:        result,
+	params := ctx.NewAnswerWebAppQueryParams(
+		webAppQueryID,
+		result,
+		opts...,
+	)
+
+	_, err := ctx.client.AnswerWebAppQuery(ctx.Detached(), params)
+
+	return err
+}
+
+// NewApproveChatJoinRequestParams builds ApproveChatJoinRequestParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.ApproveChatJoinRequest is needed:
+//
+//	ret, err := ctx.Client().ApproveChatJoinRequest(ctx.Detached(), ctx.NewApproveChatJoinRequestParams(...))
+func (ctx *Context) NewApproveChatJoinRequestParams(
+	opts ...ApproveChatJoinRequestOption,
+) *ApproveChatJoinRequestParams {
+	params := &ApproveChatJoinRequestParams{
+		ChatID: ctx.chatIdentifier(),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.AnswerWebAppQuery(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // ApproveChatJoinRequest calls Client.ApproveChatJoinRequest with context-derived defaults.
@@ -446,16 +581,31 @@ func (ctx *Context) AnswerWebAppQuery(
 func (ctx *Context) ApproveChatJoinRequest(
 	opts ...ApproveChatJoinRequestOption,
 ) error {
-	params := &ApproveChatJoinRequestParams{
-		ChatID: ctx.chatIdentifier(),
-		UserID: ctx.userID(),
+	params := ctx.NewApproveChatJoinRequestParams(
+		opts...,
+	)
+
+	_, err := ctx.client.ApproveChatJoinRequest(ctx.Detached(), params)
+
+	return err
+}
+
+// NewApproveSuggestedPostParams builds ApproveSuggestedPostParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.ApproveSuggestedPost is needed:
+//
+//	ret, err := ctx.Client().ApproveSuggestedPost(ctx.Detached(), ctx.NewApproveSuggestedPostParams(...))
+func (ctx *Context) NewApproveSuggestedPostParams(
+	opts ...ApproveSuggestedPostOption,
+) *ApproveSuggestedPostParams {
+	params := &ApproveSuggestedPostParams{
+		ChatID:    ctx.chatID(),
+		MessageID: messageField(ctx, func(m *Message) int64 { return m.MessageID }),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.ApproveChatJoinRequest(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // ApproveSuggestedPost calls Client.ApproveSuggestedPost with context-derived defaults.
@@ -466,23 +616,31 @@ func (ctx *Context) ApproveChatJoinRequest(
 func (ctx *Context) ApproveSuggestedPost(
 	opts ...ApproveSuggestedPostOption,
 ) error {
-	params := &ApproveSuggestedPostParams{
-		ChatID: ctx.chatID(),
-		MessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	params := ctx.NewApproveSuggestedPostParams(
+		opts...,
+	)
 
-			return m.MessageID
-		}(ctx),
+	_, err := ctx.client.ApproveSuggestedPost(ctx.Detached(), params)
+
+	return err
+}
+
+// NewBanChatMemberParams builds BanChatMemberParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.BanChatMember is needed:
+//
+//	ret, err := ctx.Client().BanChatMember(ctx.Detached(), ctx.NewBanChatMemberParams(...))
+func (ctx *Context) NewBanChatMemberParams(
+	opts ...BanChatMemberOption,
+) *BanChatMemberParams {
+	params := &BanChatMemberParams{
+		ChatID: ctx.chatIdentifier(),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.ApproveSuggestedPost(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // BanChatMember calls Client.BanChatMember with context-derived defaults.
@@ -496,16 +654,32 @@ func (ctx *Context) ApproveSuggestedPost(
 func (ctx *Context) BanChatMember(
 	opts ...BanChatMemberOption,
 ) error {
-	params := &BanChatMemberParams{
-		ChatID: ctx.chatIdentifier(),
-		UserID: ctx.userID(),
+	params := ctx.NewBanChatMemberParams(
+		opts...,
+	)
+
+	_, err := ctx.client.BanChatMember(ctx.Detached(), params)
+
+	return err
+}
+
+// NewBanChatSenderChatParams builds BanChatSenderChatParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.BanChatSenderChat is needed:
+//
+//	ret, err := ctx.Client().BanChatSenderChat(ctx.Detached(), ctx.NewBanChatSenderChatParams(...))
+func (ctx *Context) NewBanChatSenderChatParams(
+	senderChatID int64,
+	opts ...BanChatSenderChatOption,
+) *BanChatSenderChatParams {
+	params := &BanChatSenderChatParams{
+		ChatID:       ctx.chatIdentifier(),
+		SenderChatID: senderChatID,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.BanChatMember(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // BanChatSenderChat calls Client.BanChatSenderChat with context-derived defaults.
@@ -520,16 +694,29 @@ func (ctx *Context) BanChatSenderChat(
 	senderChatID int64,
 	opts ...BanChatSenderChatOption,
 ) error {
-	params := &BanChatSenderChatParams{
-		ChatID:       ctx.chatIdentifier(),
-		SenderChatID: senderChatID,
-	}
+	params := ctx.NewBanChatSenderChatParams(
+		senderChatID,
+		opts...,
+	)
+
+	_, err := ctx.client.BanChatSenderChat(ctx.Detached(), params)
+
+	return err
+}
+
+// NewCloseParams builds CloseParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.Close is needed:
+//
+//	ret, err := ctx.Client().Close(ctx.Detached(), ctx.NewCloseParams(...))
+func (ctx *Context) NewCloseParams(
+	opts ...CloseOption,
+) *CloseParams {
+	params := &CloseParams{}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.BanChatSenderChat(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // Close calls Client.Close with context-derived defaults.
@@ -542,13 +729,31 @@ func (ctx *Context) BanChatSenderChat(
 func (ctx *Context) Close(
 	opts ...CloseOption,
 ) error {
-	params := &CloseParams{}
+	params := ctx.NewCloseParams(
+		opts...,
+	)
+
+	_, err := ctx.client.Close(ctx.Detached(), params)
+
+	return err
+}
+
+// NewCloseForumTopicParams builds CloseForumTopicParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.CloseForumTopic is needed:
+//
+//	ret, err := ctx.Client().CloseForumTopic(ctx.Detached(), ctx.NewCloseForumTopicParams(...))
+func (ctx *Context) NewCloseForumTopicParams(
+	opts ...CloseForumTopicOption,
+) *CloseForumTopicParams {
+	params := &CloseForumTopicParams{
+		ChatID:          ctx.chatIdentifier(),
+		MessageThreadID: messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.Close(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // CloseForumTopic calls Client.CloseForumTopic with context-derived defaults.
@@ -559,23 +764,30 @@ func (ctx *Context) Close(
 func (ctx *Context) CloseForumTopic(
 	opts ...CloseForumTopicOption,
 ) error {
-	params := &CloseForumTopicParams{
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	params := ctx.NewCloseForumTopicParams(
+		opts...,
+	)
 
-			return m.MessageThreadID
-		}(ctx),
+	_, err := ctx.client.CloseForumTopic(ctx.Detached(), params)
+
+	return err
+}
+
+// NewCloseGeneralForumTopicParams builds CloseGeneralForumTopicParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.CloseGeneralForumTopic is needed:
+//
+//	ret, err := ctx.Client().CloseGeneralForumTopic(ctx.Detached(), ctx.NewCloseGeneralForumTopicParams(...))
+func (ctx *Context) NewCloseGeneralForumTopicParams(
+	opts ...CloseGeneralForumTopicOption,
+) *CloseGeneralForumTopicParams {
+	params := &CloseGeneralForumTopicParams{
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.CloseForumTopic(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // CloseGeneralForumTopic calls Client.CloseGeneralForumTopic with context-derived defaults.
@@ -586,15 +798,32 @@ func (ctx *Context) CloseForumTopic(
 func (ctx *Context) CloseGeneralForumTopic(
 	opts ...CloseGeneralForumTopicOption,
 ) error {
-	params := &CloseGeneralForumTopicParams{
-		ChatID: ctx.chatIdentifier(),
+	params := ctx.NewCloseGeneralForumTopicParams(
+		opts...,
+	)
+
+	_, err := ctx.client.CloseGeneralForumTopic(ctx.Detached(), params)
+
+	return err
+}
+
+// NewConvertGiftToStarsParams builds ConvertGiftToStarsParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.ConvertGiftToStars is needed:
+//
+//	ret, err := ctx.Client().ConvertGiftToStars(ctx.Detached(), ctx.NewConvertGiftToStarsParams(...))
+func (ctx *Context) NewConvertGiftToStarsParams(
+	ownedGiftID string,
+	opts ...ConvertGiftToStarsOption,
+) *ConvertGiftToStarsParams {
+	params := &ConvertGiftToStarsParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		OwnedGiftID:          ownedGiftID,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.CloseGeneralForumTopic(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // ConvertGiftToStars calls Client.ConvertGiftToStars with context-derived defaults.
@@ -606,23 +835,42 @@ func (ctx *Context) ConvertGiftToStars(
 	ownedGiftID string,
 	opts ...ConvertGiftToStarsOption,
 ) error {
-	params := &ConvertGiftToStarsParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewConvertGiftToStarsParams(
+		ownedGiftID,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		OwnedGiftID: ownedGiftID,
+	_, err := ctx.client.ConvertGiftToStars(ctx.Detached(), params)
+
+	return err
+}
+
+// NewCopyMessageParams builds CopyMessageParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.CopyMessage is needed:
+//
+//	ret, err := ctx.Client().CopyMessage(ctx.Detached(), ctx.NewCopyMessageParams(...))
+func (ctx *Context) NewCopyMessageParams(
+	fromChatID string,
+	opts ...CopyMessageOption,
+) *CopyMessageParams {
+	params := &CopyMessageParams{
+		ChatID:                ctx.chatIdentifier(),
+		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DirectMessagesTopicID: ctx.directMessagesTopicID(),
+		FromChatID:            fromChatID,
+		MessageID:             messageField(ctx, func(m *Message) int64 { return m.MessageID }),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.ConvertGiftToStars(ctx.detached(), params)
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
+			params.ParseMode = defaultParseMode
+		}
+	}
 
-	return err
+	return params
 }
 
 // CopyMessage calls Client.CopyMessage with context-derived defaults.
@@ -640,52 +888,37 @@ func (ctx *Context) CopyMessage(
 	fromChatID string,
 	opts ...CopyMessageOption,
 ) error {
-	params := &CopyMessageParams{
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	params := ctx.NewCopyMessageParams(
+		fromChatID,
+		opts...,
+	)
 
-			return m.MessageThreadID
-		}(ctx),
-		DirectMessagesTopicID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.CopyMessage(ctx.Detached(), params)
 
-			if m.DirectMessagesTopic == nil {
-				return 0
-			}
+	return err
+}
 
-			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		FromChatID: fromChatID,
-		MessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
-
-			return m.MessageID
-		}(ctx),
+// NewCopyMessagesParams builds CopyMessagesParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.CopyMessages is needed:
+//
+//	ret, err := ctx.Client().CopyMessages(ctx.Detached(), ctx.NewCopyMessagesParams(...))
+func (ctx *Context) NewCopyMessagesParams(
+	fromChatID string,
+	messageIDs []int64,
+	opts ...CopyMessagesOption,
+) *CopyMessagesParams {
+	params := &CopyMessagesParams{
+		ChatID:                ctx.chatIdentifier(),
+		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DirectMessagesTopicID: ctx.directMessagesTopicID(),
+		FromChatID:            fromChatID,
+		MessageIDs:            messageIDs,
 	}
 
 	params.Option(opts...)
 
-	defaultParseMode := ctx.client.defaultParseMode()
-
-	if defaultParseMode != "" {
-		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
-			params.ParseMode = defaultParseMode
-		}
-	}
-
-	_, err := ctx.client.CopyMessage(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // CopyMessages calls Client.CopyMessages with context-derived defaults.
@@ -706,37 +939,32 @@ func (ctx *Context) CopyMessages(
 	messageIDs []int64,
 	opts ...CopyMessagesOption,
 ) error {
-	params := &CopyMessagesParams{
+	params := ctx.NewCopyMessagesParams(
+		fromChatID,
+		messageIDs,
+		opts...,
+	)
+
+	_, err := ctx.client.CopyMessages(ctx.Detached(), params)
+
+	return err
+}
+
+// NewCreateChatInviteLinkParams builds CreateChatInviteLinkParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.CreateChatInviteLink is needed:
+//
+//	ret, err := ctx.Client().CreateChatInviteLink(ctx.Detached(), ctx.NewCreateChatInviteLinkParams(...))
+func (ctx *Context) NewCreateChatInviteLinkParams(
+	opts ...CreateChatInviteLinkOption,
+) *CreateChatInviteLinkParams {
+	params := &CreateChatInviteLinkParams{
 		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
-
-			return m.MessageThreadID
-		}(ctx),
-		DirectMessagesTopicID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
-
-			if m.DirectMessagesTopic == nil {
-				return 0
-			}
-
-			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		FromChatID: fromChatID,
-		MessageIDs: messageIDs,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.CopyMessages(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // CreateChatInviteLink calls Client.CreateChatInviteLink with context-derived defaults.
@@ -751,15 +979,34 @@ func (ctx *Context) CopyMessages(
 func (ctx *Context) CreateChatInviteLink(
 	opts ...CreateChatInviteLinkOption,
 ) error {
-	params := &CreateChatInviteLinkParams{
-		ChatID: ctx.chatIdentifier(),
+	params := ctx.NewCreateChatInviteLinkParams(
+		opts...,
+	)
+
+	_, err := ctx.client.CreateChatInviteLink(ctx.Detached(), params)
+
+	return err
+}
+
+// NewCreateChatSubscriptionInviteLinkParams builds CreateChatSubscriptionInviteLinkParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.CreateChatSubscriptionInviteLink is needed:
+//
+//	ret, err := ctx.Client().CreateChatSubscriptionInviteLink(ctx.Detached(), ctx.NewCreateChatSubscriptionInviteLinkParams(...))
+func (ctx *Context) NewCreateChatSubscriptionInviteLinkParams(
+	subscriptionPeriod int64,
+	subscriptionPrice int64,
+	opts ...CreateChatSubscriptionInviteLinkOption,
+) *CreateChatSubscriptionInviteLinkParams {
+	params := &CreateChatSubscriptionInviteLinkParams{
+		ChatID:             ctx.chatIdentifier(),
+		SubscriptionPeriod: subscriptionPeriod,
+		SubscriptionPrice:  subscriptionPrice,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.CreateChatInviteLink(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // CreateChatSubscriptionInviteLink calls Client.CreateChatSubscriptionInviteLink with context-derived defaults.
@@ -778,17 +1025,34 @@ func (ctx *Context) CreateChatSubscriptionInviteLink(
 	subscriptionPrice int64,
 	opts ...CreateChatSubscriptionInviteLinkOption,
 ) error {
-	params := &CreateChatSubscriptionInviteLinkParams{
-		ChatID:             ctx.chatIdentifier(),
-		SubscriptionPeriod: subscriptionPeriod,
-		SubscriptionPrice:  subscriptionPrice,
+	params := ctx.NewCreateChatSubscriptionInviteLinkParams(
+		subscriptionPeriod,
+		subscriptionPrice,
+		opts...,
+	)
+
+	_, err := ctx.client.CreateChatSubscriptionInviteLink(ctx.Detached(), params)
+
+	return err
+}
+
+// NewCreateForumTopicParams builds CreateForumTopicParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.CreateForumTopic is needed:
+//
+//	ret, err := ctx.Client().CreateForumTopic(ctx.Detached(), ctx.NewCreateForumTopicParams(...))
+func (ctx *Context) NewCreateForumTopicParams(
+	name string,
+	opts ...CreateForumTopicOption,
+) *CreateForumTopicParams {
+	params := &CreateForumTopicParams{
+		ChatID: ctx.chatIdentifier(),
+		Name:   name,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.CreateChatSubscriptionInviteLink(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // CreateForumTopic calls Client.CreateForumTopic with context-derived defaults.
@@ -802,16 +1066,41 @@ func (ctx *Context) CreateForumTopic(
 	name string,
 	opts ...CreateForumTopicOption,
 ) error {
-	params := &CreateForumTopicParams{
-		ChatID: ctx.chatIdentifier(),
-		Name:   name,
+	params := ctx.NewCreateForumTopicParams(
+		name,
+		opts...,
+	)
+
+	_, err := ctx.client.CreateForumTopic(ctx.Detached(), params)
+
+	return err
+}
+
+// NewCreateInvoiceLinkParams builds CreateInvoiceLinkParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.CreateInvoiceLink is needed:
+//
+//	ret, err := ctx.Client().CreateInvoiceLink(ctx.Detached(), ctx.NewCreateInvoiceLinkParams(...))
+func (ctx *Context) NewCreateInvoiceLinkParams(
+	title string,
+	description string,
+	payload string,
+	currency string,
+	prices []LabeledPrice,
+	opts ...CreateInvoiceLinkOption,
+) *CreateInvoiceLinkParams {
+	params := &CreateInvoiceLinkParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		Title:                title,
+		Description:          description,
+		Payload:              payload,
+		Currency:             currency,
+		Prices:               prices,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.CreateForumTopic(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // CreateInvoiceLink calls Client.CreateInvoiceLink with context-derived defaults.
@@ -826,27 +1115,41 @@ func (ctx *Context) CreateInvoiceLink(
 	prices []LabeledPrice,
 	opts ...CreateInvoiceLinkOption,
 ) error {
-	params := &CreateInvoiceLinkParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewCreateInvoiceLinkParams(
+		title,
+		description,
+		payload,
+		currency,
+		prices,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		Title:       title,
-		Description: description,
-		Payload:     payload,
-		Currency:    currency,
-		Prices:      prices,
+	_, err := ctx.client.CreateInvoiceLink(ctx.Detached(), params)
+
+	return err
+}
+
+// NewCreateNewStickerSetParams builds CreateNewStickerSetParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.CreateNewStickerSet is needed:
+//
+//	ret, err := ctx.Client().CreateNewStickerSet(ctx.Detached(), ctx.NewCreateNewStickerSetParams(...))
+func (ctx *Context) NewCreateNewStickerSetParams(
+	name string,
+	title string,
+	stickers []InputSticker,
+	opts ...CreateNewStickerSetOption,
+) *CreateNewStickerSetParams {
+	params := &CreateNewStickerSetParams{
+		UserID:   ctx.userID(),
+		Name:     name,
+		Title:    title,
+		Stickers: stickers,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.CreateInvoiceLink(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // CreateNewStickerSet calls Client.CreateNewStickerSet with context-derived defaults.
@@ -860,18 +1163,34 @@ func (ctx *Context) CreateNewStickerSet(
 	stickers []InputSticker,
 	opts ...CreateNewStickerSetOption,
 ) error {
-	params := &CreateNewStickerSetParams{
-		UserID:   ctx.userID(),
-		Name:     name,
-		Title:    title,
-		Stickers: stickers,
+	params := ctx.NewCreateNewStickerSetParams(
+		name,
+		title,
+		stickers,
+		opts...,
+	)
+
+	_, err := ctx.client.CreateNewStickerSet(ctx.Detached(), params)
+
+	return err
+}
+
+// NewDeclineChatJoinRequestParams builds DeclineChatJoinRequestParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.DeclineChatJoinRequest is needed:
+//
+//	ret, err := ctx.Client().DeclineChatJoinRequest(ctx.Detached(), ctx.NewDeclineChatJoinRequestParams(...))
+func (ctx *Context) NewDeclineChatJoinRequestParams(
+	opts ...DeclineChatJoinRequestOption,
+) *DeclineChatJoinRequestParams {
+	params := &DeclineChatJoinRequestParams{
+		ChatID: ctx.chatIdentifier(),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.CreateNewStickerSet(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // DeclineChatJoinRequest calls Client.DeclineChatJoinRequest with context-derived defaults.
@@ -882,16 +1201,31 @@ func (ctx *Context) CreateNewStickerSet(
 func (ctx *Context) DeclineChatJoinRequest(
 	opts ...DeclineChatJoinRequestOption,
 ) error {
-	params := &DeclineChatJoinRequestParams{
-		ChatID: ctx.chatIdentifier(),
-		UserID: ctx.userID(),
+	params := ctx.NewDeclineChatJoinRequestParams(
+		opts...,
+	)
+
+	_, err := ctx.client.DeclineChatJoinRequest(ctx.Detached(), params)
+
+	return err
+}
+
+// NewDeclineSuggestedPostParams builds DeclineSuggestedPostParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.DeclineSuggestedPost is needed:
+//
+//	ret, err := ctx.Client().DeclineSuggestedPost(ctx.Detached(), ctx.NewDeclineSuggestedPostParams(...))
+func (ctx *Context) NewDeclineSuggestedPostParams(
+	opts ...DeclineSuggestedPostOption,
+) *DeclineSuggestedPostParams {
+	params := &DeclineSuggestedPostParams{
+		ChatID:    ctx.chatID(),
+		MessageID: messageField(ctx, func(m *Message) int64 { return m.MessageID }),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeclineChatJoinRequest(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // DeclineSuggestedPost calls Client.DeclineSuggestedPost with context-derived defaults.
@@ -902,23 +1236,31 @@ func (ctx *Context) DeclineChatJoinRequest(
 func (ctx *Context) DeclineSuggestedPost(
 	opts ...DeclineSuggestedPostOption,
 ) error {
-	params := &DeclineSuggestedPostParams{
-		ChatID: ctx.chatID(),
-		MessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	params := ctx.NewDeclineSuggestedPostParams(
+		opts...,
+	)
 
-			return m.MessageID
-		}(ctx),
+	_, err := ctx.client.DeclineSuggestedPost(ctx.Detached(), params)
+
+	return err
+}
+
+// NewDeleteAllMessageReactionsParams builds DeleteAllMessageReactionsParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.DeleteAllMessageReactions is needed:
+//
+//	ret, err := ctx.Client().DeleteAllMessageReactions(ctx.Detached(), ctx.NewDeleteAllMessageReactionsParams(...))
+func (ctx *Context) NewDeleteAllMessageReactionsParams(
+	opts ...DeleteAllMessageReactionsOption,
+) *DeleteAllMessageReactionsParams {
+	params := &DeleteAllMessageReactionsParams{
+		ChatID: ctx.chatIdentifier(),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeclineSuggestedPost(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // DeleteAllMessageReactions calls Client.DeleteAllMessageReactions with context-derived defaults.
@@ -929,16 +1271,32 @@ func (ctx *Context) DeclineSuggestedPost(
 func (ctx *Context) DeleteAllMessageReactions(
 	opts ...DeleteAllMessageReactionsOption,
 ) error {
-	params := &DeleteAllMessageReactionsParams{
-		ChatID: ctx.chatIdentifier(),
-		UserID: ctx.userID(),
+	params := ctx.NewDeleteAllMessageReactionsParams(
+		opts...,
+	)
+
+	_, err := ctx.client.DeleteAllMessageReactions(ctx.Detached(), params)
+
+	return err
+}
+
+// NewDeleteBusinessMessagesParams builds DeleteBusinessMessagesParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.DeleteBusinessMessages is needed:
+//
+//	ret, err := ctx.Client().DeleteBusinessMessages(ctx.Detached(), ctx.NewDeleteBusinessMessagesParams(...))
+func (ctx *Context) NewDeleteBusinessMessagesParams(
+	messageIDs []int64,
+	opts ...DeleteBusinessMessagesOption,
+) *DeleteBusinessMessagesParams {
+	params := &DeleteBusinessMessagesParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		MessageIDs:           messageIDs,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteAllMessageReactions(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // DeleteBusinessMessages calls Client.DeleteBusinessMessages with context-derived defaults.
@@ -950,23 +1308,31 @@ func (ctx *Context) DeleteBusinessMessages(
 	messageIDs []int64,
 	opts ...DeleteBusinessMessagesOption,
 ) error {
-	params := &DeleteBusinessMessagesParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewDeleteBusinessMessagesParams(
+		messageIDs,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		MessageIDs: messageIDs,
+	_, err := ctx.client.DeleteBusinessMessages(ctx.Detached(), params)
+
+	return err
+}
+
+// NewDeleteChatPhotoParams builds DeleteChatPhotoParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.DeleteChatPhoto is needed:
+//
+//	ret, err := ctx.Client().DeleteChatPhoto(ctx.Detached(), ctx.NewDeleteChatPhotoParams(...))
+func (ctx *Context) NewDeleteChatPhotoParams(
+	opts ...DeleteChatPhotoOption,
+) *DeleteChatPhotoParams {
+	params := &DeleteChatPhotoParams{
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteBusinessMessages(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // DeleteChatPhoto calls Client.DeleteChatPhoto with context-derived defaults.
@@ -978,15 +1344,30 @@ func (ctx *Context) DeleteBusinessMessages(
 func (ctx *Context) DeleteChatPhoto(
 	opts ...DeleteChatPhotoOption,
 ) error {
-	params := &DeleteChatPhotoParams{
+	params := ctx.NewDeleteChatPhotoParams(
+		opts...,
+	)
+
+	_, err := ctx.client.DeleteChatPhoto(ctx.Detached(), params)
+
+	return err
+}
+
+// NewDeleteChatStickerSetParams builds DeleteChatStickerSetParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.DeleteChatStickerSet is needed:
+//
+//	ret, err := ctx.Client().DeleteChatStickerSet(ctx.Detached(), ctx.NewDeleteChatStickerSetParams(...))
+func (ctx *Context) NewDeleteChatStickerSetParams(
+	opts ...DeleteChatStickerSetOption,
+) *DeleteChatStickerSetParams {
+	params := &DeleteChatStickerSetParams{
 		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteChatPhoto(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // DeleteChatStickerSet calls Client.DeleteChatStickerSet with context-derived defaults.
@@ -1000,15 +1381,33 @@ func (ctx *Context) DeleteChatPhoto(
 func (ctx *Context) DeleteChatStickerSet(
 	opts ...DeleteChatStickerSetOption,
 ) error {
-	params := &DeleteChatStickerSetParams{
-		ChatID: ctx.chatIdentifier(),
+	params := ctx.NewDeleteChatStickerSetParams(
+		opts...,
+	)
+
+	_, err := ctx.client.DeleteChatStickerSet(ctx.Detached(), params)
+
+	return err
+}
+
+// NewDeleteEphemeralMessageParams builds DeleteEphemeralMessageParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.DeleteEphemeralMessage is needed:
+//
+//	ret, err := ctx.Client().DeleteEphemeralMessage(ctx.Detached(), ctx.NewDeleteEphemeralMessageParams(...))
+func (ctx *Context) NewDeleteEphemeralMessageParams(
+	receiverUserID int64,
+	opts ...DeleteEphemeralMessageOption,
+) *DeleteEphemeralMessageParams {
+	params := &DeleteEphemeralMessageParams{
+		ChatID:             ctx.chatIdentifier(),
+		ReceiverUserID:     receiverUserID,
+		EphemeralMessageID: messageField(ctx, func(m *Message) int64 { return m.EphemeralMessageID }),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteChatStickerSet(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // DeleteEphemeralMessage calls Client.DeleteEphemeralMessage with context-derived defaults.
@@ -1020,24 +1419,32 @@ func (ctx *Context) DeleteEphemeralMessage(
 	receiverUserID int64,
 	opts ...DeleteEphemeralMessageOption,
 ) error {
-	params := &DeleteEphemeralMessageParams{
-		ChatID:         ctx.chatIdentifier(),
-		ReceiverUserID: receiverUserID,
-		EphemeralMessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	params := ctx.NewDeleteEphemeralMessageParams(
+		receiverUserID,
+		opts...,
+	)
 
-			return m.EphemeralMessageID
-		}(ctx),
+	_, err := ctx.client.DeleteEphemeralMessage(ctx.Detached(), params)
+
+	return err
+}
+
+// NewDeleteForumTopicParams builds DeleteForumTopicParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.DeleteForumTopic is needed:
+//
+//	ret, err := ctx.Client().DeleteForumTopic(ctx.Detached(), ctx.NewDeleteForumTopicParams(...))
+func (ctx *Context) NewDeleteForumTopicParams(
+	opts ...DeleteForumTopicOption,
+) *DeleteForumTopicParams {
+	params := &DeleteForumTopicParams{
+		ChatID:          ctx.chatIdentifier(),
+		MessageThreadID: messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteEphemeralMessage(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // DeleteForumTopic calls Client.DeleteForumTopic with context-derived defaults.
@@ -1048,23 +1455,31 @@ func (ctx *Context) DeleteEphemeralMessage(
 func (ctx *Context) DeleteForumTopic(
 	opts ...DeleteForumTopicOption,
 ) error {
-	params := &DeleteForumTopicParams{
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	params := ctx.NewDeleteForumTopicParams(
+		opts...,
+	)
 
-			return m.MessageThreadID
-		}(ctx),
+	_, err := ctx.client.DeleteForumTopic(ctx.Detached(), params)
+
+	return err
+}
+
+// NewDeleteMessageParams builds DeleteMessageParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.DeleteMessage is needed:
+//
+//	ret, err := ctx.Client().DeleteMessage(ctx.Detached(), ctx.NewDeleteMessageParams(...))
+func (ctx *Context) NewDeleteMessageParams(
+	opts ...DeleteMessageOption,
+) *DeleteMessageParams {
+	params := &DeleteMessageParams{
+		ChatID:    ctx.chatIdentifier(),
+		MessageID: messageField(ctx, func(m *Message) int64 { return m.MessageID }),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteForumTopic(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // DeleteMessage calls Client.DeleteMessage with context-derived defaults.
@@ -1083,23 +1498,32 @@ func (ctx *Context) DeleteForumTopic(
 func (ctx *Context) DeleteMessage(
 	opts ...DeleteMessageOption,
 ) error {
-	params := &DeleteMessageParams{
-		ChatID: ctx.chatIdentifier(),
-		MessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	params := ctx.NewDeleteMessageParams(
+		opts...,
+	)
 
-			return m.MessageID
-		}(ctx),
+	_, err := ctx.client.DeleteMessage(ctx.Detached(), params)
+
+	return err
+}
+
+// NewDeleteMessageReactionParams builds DeleteMessageReactionParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.DeleteMessageReaction is needed:
+//
+//	ret, err := ctx.Client().DeleteMessageReaction(ctx.Detached(), ctx.NewDeleteMessageReactionParams(...))
+func (ctx *Context) NewDeleteMessageReactionParams(
+	opts ...DeleteMessageReactionOption,
+) *DeleteMessageReactionParams {
+	params := &DeleteMessageReactionParams{
+		ChatID:    ctx.chatIdentifier(),
+		MessageID: messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		UserID:    ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteMessage(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // DeleteMessageReaction calls Client.DeleteMessageReaction with context-derived defaults.
@@ -1110,24 +1534,32 @@ func (ctx *Context) DeleteMessage(
 func (ctx *Context) DeleteMessageReaction(
 	opts ...DeleteMessageReactionOption,
 ) error {
-	params := &DeleteMessageReactionParams{
-		ChatID: ctx.chatIdentifier(),
-		MessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	params := ctx.NewDeleteMessageReactionParams(
+		opts...,
+	)
 
-			return m.MessageID
-		}(ctx),
-		UserID: ctx.userID(),
+	_, err := ctx.client.DeleteMessageReaction(ctx.Detached(), params)
+
+	return err
+}
+
+// NewDeleteMessagesParams builds DeleteMessagesParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.DeleteMessages is needed:
+//
+//	ret, err := ctx.Client().DeleteMessages(ctx.Detached(), ctx.NewDeleteMessagesParams(...))
+func (ctx *Context) NewDeleteMessagesParams(
+	messageIDs []int64,
+	opts ...DeleteMessagesOption,
+) *DeleteMessagesParams {
+	params := &DeleteMessagesParams{
+		ChatID:     ctx.chatIdentifier(),
+		MessageIDs: messageIDs,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteMessageReaction(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // DeleteMessages calls Client.DeleteMessages with context-derived defaults.
@@ -1139,16 +1571,29 @@ func (ctx *Context) DeleteMessages(
 	messageIDs []int64,
 	opts ...DeleteMessagesOption,
 ) error {
-	params := &DeleteMessagesParams{
-		ChatID:     ctx.chatIdentifier(),
-		MessageIDs: messageIDs,
-	}
+	params := ctx.NewDeleteMessagesParams(
+		messageIDs,
+		opts...,
+	)
+
+	_, err := ctx.client.DeleteMessages(ctx.Detached(), params)
+
+	return err
+}
+
+// NewDeleteMyCommandsParams builds DeleteMyCommandsParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.DeleteMyCommands is needed:
+//
+//	ret, err := ctx.Client().DeleteMyCommands(ctx.Detached(), ctx.NewDeleteMyCommandsParams(...))
+func (ctx *Context) NewDeleteMyCommandsParams(
+	opts ...DeleteMyCommandsOption,
+) *DeleteMyCommandsParams {
+	params := &DeleteMyCommandsParams{}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteMessages(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // DeleteMyCommands calls Client.DeleteMyCommands with context-derived defaults.
@@ -1161,13 +1606,31 @@ func (ctx *Context) DeleteMessages(
 func (ctx *Context) DeleteMyCommands(
 	opts ...DeleteMyCommandsOption,
 ) error {
-	params := &DeleteMyCommandsParams{}
+	params := ctx.NewDeleteMyCommandsParams(
+		opts...,
+	)
+
+	_, err := ctx.client.DeleteMyCommands(ctx.Detached(), params)
+
+	return err
+}
+
+// NewDeleteStickerFromSetParams builds DeleteStickerFromSetParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.DeleteStickerFromSet is needed:
+//
+//	ret, err := ctx.Client().DeleteStickerFromSet(ctx.Detached(), ctx.NewDeleteStickerFromSetParams(...))
+func (ctx *Context) NewDeleteStickerFromSetParams(
+	sticker string,
+	opts ...DeleteStickerFromSetOption,
+) *DeleteStickerFromSetParams {
+	params := &DeleteStickerFromSetParams{
+		Sticker: sticker,
+	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteMyCommands(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // DeleteStickerFromSet calls Client.DeleteStickerFromSet with context-derived defaults.
@@ -1178,15 +1641,32 @@ func (ctx *Context) DeleteStickerFromSet(
 	sticker string,
 	opts ...DeleteStickerFromSetOption,
 ) error {
-	params := &DeleteStickerFromSetParams{
-		Sticker: sticker,
+	params := ctx.NewDeleteStickerFromSetParams(
+		sticker,
+		opts...,
+	)
+
+	_, err := ctx.client.DeleteStickerFromSet(ctx.Detached(), params)
+
+	return err
+}
+
+// NewDeleteStickerSetParams builds DeleteStickerSetParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.DeleteStickerSet is needed:
+//
+//	ret, err := ctx.Client().DeleteStickerSet(ctx.Detached(), ctx.NewDeleteStickerSetParams(...))
+func (ctx *Context) NewDeleteStickerSetParams(
+	name string,
+	opts ...DeleteStickerSetOption,
+) *DeleteStickerSetParams {
+	params := &DeleteStickerSetParams{
+		Name: name,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteStickerFromSet(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // DeleteStickerSet calls Client.DeleteStickerSet with context-derived defaults.
@@ -1197,15 +1677,33 @@ func (ctx *Context) DeleteStickerSet(
 	name string,
 	opts ...DeleteStickerSetOption,
 ) error {
-	params := &DeleteStickerSetParams{
-		Name: name,
+	params := ctx.NewDeleteStickerSetParams(
+		name,
+		opts...,
+	)
+
+	_, err := ctx.client.DeleteStickerSet(ctx.Detached(), params)
+
+	return err
+}
+
+// NewDeleteStoryParams builds DeleteStoryParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.DeleteStory is needed:
+//
+//	ret, err := ctx.Client().DeleteStory(ctx.Detached(), ctx.NewDeleteStoryParams(...))
+func (ctx *Context) NewDeleteStoryParams(
+	storyID int64,
+	opts ...DeleteStoryOption,
+) *DeleteStoryParams {
+	params := &DeleteStoryParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		StoryID:              storyID,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteStickerSet(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // DeleteStory calls Client.DeleteStory with context-derived defaults.
@@ -1217,23 +1715,29 @@ func (ctx *Context) DeleteStory(
 	storyID int64,
 	opts ...DeleteStoryOption,
 ) error {
-	params := &DeleteStoryParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewDeleteStoryParams(
+		storyID,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		StoryID: storyID,
-	}
+	_, err := ctx.client.DeleteStory(ctx.Detached(), params)
+
+	return err
+}
+
+// NewDeleteWebhookParams builds DeleteWebhookParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.DeleteWebhook is needed:
+//
+//	ret, err := ctx.Client().DeleteWebhook(ctx.Detached(), ctx.NewDeleteWebhookParams(...))
+func (ctx *Context) NewDeleteWebhookParams(
+	opts ...DeleteWebhookOption,
+) *DeleteWebhookParams {
+	params := &DeleteWebhookParams{}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteStory(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // DeleteWebhook calls Client.DeleteWebhook with context-derived defaults.
@@ -1245,13 +1749,32 @@ func (ctx *Context) DeleteStory(
 func (ctx *Context) DeleteWebhook(
 	opts ...DeleteWebhookOption,
 ) error {
-	params := &DeleteWebhookParams{}
+	params := ctx.NewDeleteWebhookParams(
+		opts...,
+	)
+
+	_, err := ctx.client.DeleteWebhook(ctx.Detached(), params)
+
+	return err
+}
+
+// NewEditChatInviteLinkParams builds EditChatInviteLinkParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.EditChatInviteLink is needed:
+//
+//	ret, err := ctx.Client().EditChatInviteLink(ctx.Detached(), ctx.NewEditChatInviteLinkParams(...))
+func (ctx *Context) NewEditChatInviteLinkParams(
+	inviteLink string,
+	opts ...EditChatInviteLinkOption,
+) *EditChatInviteLinkParams {
+	params := &EditChatInviteLinkParams{
+		ChatID:     ctx.chatIdentifier(),
+		InviteLink: inviteLink,
+	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.DeleteWebhook(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // EditChatInviteLink calls Client.EditChatInviteLink with context-derived defaults.
@@ -1265,16 +1788,33 @@ func (ctx *Context) EditChatInviteLink(
 	inviteLink string,
 	opts ...EditChatInviteLinkOption,
 ) error {
-	params := &EditChatInviteLinkParams{
+	params := ctx.NewEditChatInviteLinkParams(
+		inviteLink,
+		opts...,
+	)
+
+	_, err := ctx.client.EditChatInviteLink(ctx.Detached(), params)
+
+	return err
+}
+
+// NewEditChatSubscriptionInviteLinkParams builds EditChatSubscriptionInviteLinkParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.EditChatSubscriptionInviteLink is needed:
+//
+//	ret, err := ctx.Client().EditChatSubscriptionInviteLink(ctx.Detached(), ctx.NewEditChatSubscriptionInviteLinkParams(...))
+func (ctx *Context) NewEditChatSubscriptionInviteLinkParams(
+	inviteLink string,
+	opts ...EditChatSubscriptionInviteLinkOption,
+) *EditChatSubscriptionInviteLinkParams {
+	params := &EditChatSubscriptionInviteLinkParams{
 		ChatID:     ctx.chatIdentifier(),
 		InviteLink: inviteLink,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.EditChatInviteLink(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // EditChatSubscriptionInviteLink calls Client.EditChatSubscriptionInviteLink with context-derived defaults.
@@ -1288,16 +1828,40 @@ func (ctx *Context) EditChatSubscriptionInviteLink(
 	inviteLink string,
 	opts ...EditChatSubscriptionInviteLinkOption,
 ) error {
-	params := &EditChatSubscriptionInviteLinkParams{
-		ChatID:     ctx.chatIdentifier(),
-		InviteLink: inviteLink,
+	params := ctx.NewEditChatSubscriptionInviteLinkParams(
+		inviteLink,
+		opts...,
+	)
+
+	_, err := ctx.client.EditChatSubscriptionInviteLink(ctx.Detached(), params)
+
+	return err
+}
+
+// NewEditEphemeralMessageCaptionParams builds EditEphemeralMessageCaptionParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.EditEphemeralMessageCaption is needed:
+//
+//	ret, err := ctx.Client().EditEphemeralMessageCaption(ctx.Detached(), ctx.NewEditEphemeralMessageCaptionParams(...))
+func (ctx *Context) NewEditEphemeralMessageCaptionParams(
+	receiverUserID int64,
+	opts ...EditEphemeralMessageCaptionOption,
+) *EditEphemeralMessageCaptionParams {
+	params := &EditEphemeralMessageCaptionParams{
+		ChatID:             ctx.chatIdentifier(),
+		ReceiverUserID:     receiverUserID,
+		EphemeralMessageID: messageField(ctx, func(m *Message) int64 { return m.EphemeralMessageID }),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.EditChatSubscriptionInviteLink(ctx.detached(), params)
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
+			params.ParseMode = defaultParseMode
+		}
+	}
 
-	return err
+	return params
 }
 
 // EditEphemeralMessageCaption calls Client.EditEphemeralMessageCaption with context-derived defaults.
@@ -1309,32 +1873,40 @@ func (ctx *Context) EditEphemeralMessageCaption(
 	receiverUserID int64,
 	opts ...EditEphemeralMessageCaptionOption,
 ) error {
-	params := &EditEphemeralMessageCaptionParams{
-		ChatID:         ctx.chatIdentifier(),
-		ReceiverUserID: receiverUserID,
-		EphemeralMessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	params := ctx.NewEditEphemeralMessageCaptionParams(
+		receiverUserID,
+		opts...,
+	)
 
-			return m.EphemeralMessageID
-		}(ctx),
+	_, err := ctx.client.EditEphemeralMessageCaption(ctx.Detached(), params)
+
+	return err
+}
+
+// NewEditEphemeralMessageMediaParams builds EditEphemeralMessageMediaParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.EditEphemeralMessageMedia is needed:
+//
+//	ret, err := ctx.Client().EditEphemeralMessageMedia(ctx.Detached(), ctx.NewEditEphemeralMessageMediaParams(...))
+func (ctx *Context) NewEditEphemeralMessageMediaParams(
+	receiverUserID int64,
+	media InputMedia,
+	opts ...EditEphemeralMessageMediaOption,
+) *EditEphemeralMessageMediaParams {
+	params := &EditEphemeralMessageMediaParams{
+		ChatID:             ctx.chatIdentifier(),
+		ReceiverUserID:     receiverUserID,
+		EphemeralMessageID: messageField(ctx, func(m *Message) int64 { return m.EphemeralMessageID }),
+		Media:              media,
 	}
 
 	params.Option(opts...)
 
-	defaultParseMode := ctx.client.defaultParseMode()
-
-	if defaultParseMode != "" {
-		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
-			params.ParseMode = defaultParseMode
-		}
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+		defaultParseModeToInputMedia(&params.Media, defaultParseMode)
 	}
 
-	_, err := ctx.client.EditEphemeralMessageCaption(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // EditEphemeralMessageMedia calls Client.EditEphemeralMessageMedia with context-derived defaults.
@@ -1347,31 +1919,35 @@ func (ctx *Context) EditEphemeralMessageMedia(
 	media InputMedia,
 	opts ...EditEphemeralMessageMediaOption,
 ) error {
-	params := &EditEphemeralMessageMediaParams{
-		ChatID:         ctx.chatIdentifier(),
-		ReceiverUserID: receiverUserID,
-		EphemeralMessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	params := ctx.NewEditEphemeralMessageMediaParams(
+		receiverUserID,
+		media,
+		opts...,
+	)
 
-			return m.EphemeralMessageID
-		}(ctx),
-		Media: media,
+	_, err := ctx.client.EditEphemeralMessageMedia(ctx.Detached(), params)
+
+	return err
+}
+
+// NewEditEphemeralMessageReplyMarkupParams builds EditEphemeralMessageReplyMarkupParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.EditEphemeralMessageReplyMarkup is needed:
+//
+//	ret, err := ctx.Client().EditEphemeralMessageReplyMarkup(ctx.Detached(), ctx.NewEditEphemeralMessageReplyMarkupParams(...))
+func (ctx *Context) NewEditEphemeralMessageReplyMarkupParams(
+	receiverUserID int64,
+	opts ...EditEphemeralMessageReplyMarkupOption,
+) *EditEphemeralMessageReplyMarkupParams {
+	params := &EditEphemeralMessageReplyMarkupParams{
+		ChatID:             ctx.chatIdentifier(),
+		ReceiverUserID:     receiverUserID,
+		EphemeralMessageID: messageField(ctx, func(m *Message) int64 { return m.EphemeralMessageID }),
 	}
 
 	params.Option(opts...)
 
-	defaultParseMode := ctx.client.defaultParseMode()
-
-	if defaultParseMode != "" {
-		defaultParseModeToInputMedia(&params.Media, defaultParseMode)
-	}
-
-	_, err := ctx.client.EditEphemeralMessageMedia(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // EditEphemeralMessageReplyMarkup calls Client.EditEphemeralMessageReplyMarkup with context-derived defaults.
@@ -1383,24 +1959,40 @@ func (ctx *Context) EditEphemeralMessageReplyMarkup(
 	receiverUserID int64,
 	opts ...EditEphemeralMessageReplyMarkupOption,
 ) error {
-	params := &EditEphemeralMessageReplyMarkupParams{
-		ChatID:         ctx.chatIdentifier(),
-		ReceiverUserID: receiverUserID,
-		EphemeralMessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	params := ctx.NewEditEphemeralMessageReplyMarkupParams(
+		receiverUserID,
+		opts...,
+	)
 
-			return m.EphemeralMessageID
-		}(ctx),
+	_, err := ctx.client.EditEphemeralMessageReplyMarkup(ctx.Detached(), params)
+
+	return err
+}
+
+// NewEditEphemeralMessageTextParams builds EditEphemeralMessageTextParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.EditEphemeralMessageText is needed:
+//
+//	ret, err := ctx.Client().EditEphemeralMessageText(ctx.Detached(), ctx.NewEditEphemeralMessageTextParams(...))
+func (ctx *Context) NewEditEphemeralMessageTextParams(
+	receiverUserID int64,
+	opts ...EditEphemeralMessageTextOption,
+) *EditEphemeralMessageTextParams {
+	params := &EditEphemeralMessageTextParams{
+		ChatID:             ctx.chatIdentifier(),
+		ReceiverUserID:     receiverUserID,
+		EphemeralMessageID: messageField(ctx, func(m *Message) int64 { return m.EphemeralMessageID }),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.EditEphemeralMessageReplyMarkup(ctx.detached(), params)
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+		if params.ParseMode == "" && len(params.Entities) == 0 {
+			params.ParseMode = defaultParseMode
+		}
+	}
 
-	return err
+	return params
 }
 
 // EditEphemeralMessageText calls Client.EditEphemeralMessageText with context-derived defaults.
@@ -1412,32 +2004,32 @@ func (ctx *Context) EditEphemeralMessageText(
 	receiverUserID int64,
 	opts ...EditEphemeralMessageTextOption,
 ) error {
-	params := &EditEphemeralMessageTextParams{
-		ChatID:         ctx.chatIdentifier(),
-		ReceiverUserID: receiverUserID,
-		EphemeralMessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	params := ctx.NewEditEphemeralMessageTextParams(
+		receiverUserID,
+		opts...,
+	)
 
-			return m.EphemeralMessageID
-		}(ctx),
+	_, err := ctx.client.EditEphemeralMessageText(ctx.Detached(), params)
+
+	return err
+}
+
+// NewEditForumTopicParams builds EditForumTopicParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.EditForumTopic is needed:
+//
+//	ret, err := ctx.Client().EditForumTopic(ctx.Detached(), ctx.NewEditForumTopicParams(...))
+func (ctx *Context) NewEditForumTopicParams(
+	opts ...EditForumTopicOption,
+) *EditForumTopicParams {
+	params := &EditForumTopicParams{
+		ChatID:          ctx.chatIdentifier(),
+		MessageThreadID: messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
 	}
 
 	params.Option(opts...)
 
-	defaultParseMode := ctx.client.defaultParseMode()
-
-	if defaultParseMode != "" {
-		if params.ParseMode == "" && len(params.Entities) == 0 {
-			params.ParseMode = defaultParseMode
-		}
-	}
-
-	_, err := ctx.client.EditEphemeralMessageText(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // EditForumTopic calls Client.EditForumTopic with context-derived defaults.
@@ -1448,23 +2040,32 @@ func (ctx *Context) EditEphemeralMessageText(
 func (ctx *Context) EditForumTopic(
 	opts ...EditForumTopicOption,
 ) error {
-	params := &EditForumTopicParams{
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	params := ctx.NewEditForumTopicParams(
+		opts...,
+	)
 
-			return m.MessageThreadID
-		}(ctx),
+	_, err := ctx.client.EditForumTopic(ctx.Detached(), params)
+
+	return err
+}
+
+// NewEditGeneralForumTopicParams builds EditGeneralForumTopicParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.EditGeneralForumTopic is needed:
+//
+//	ret, err := ctx.Client().EditGeneralForumTopic(ctx.Detached(), ctx.NewEditGeneralForumTopicParams(...))
+func (ctx *Context) NewEditGeneralForumTopicParams(
+	name string,
+	opts ...EditGeneralForumTopicOption,
+) *EditGeneralForumTopicParams {
+	params := &EditGeneralForumTopicParams{
+		ChatID: ctx.chatIdentifier(),
+		Name:   name,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.EditForumTopic(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // EditGeneralForumTopic calls Client.EditGeneralForumTopic with context-derived defaults.
@@ -1476,16 +2077,40 @@ func (ctx *Context) EditGeneralForumTopic(
 	name string,
 	opts ...EditGeneralForumTopicOption,
 ) error {
-	params := &EditGeneralForumTopicParams{
-		ChatID: ctx.chatIdentifier(),
-		Name:   name,
+	params := ctx.NewEditGeneralForumTopicParams(
+		name,
+		opts...,
+	)
+
+	_, err := ctx.client.EditGeneralForumTopic(ctx.Detached(), params)
+
+	return err
+}
+
+// NewEditMessageCaptionParams builds EditMessageCaptionParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.EditMessageCaption is needed:
+//
+//	ret, err := ctx.Client().EditMessageCaption(ctx.Detached(), ctx.NewEditMessageCaptionParams(...))
+func (ctx *Context) NewEditMessageCaptionParams(
+	opts ...EditMessageCaptionOption,
+) *EditMessageCaptionParams {
+	params := &EditMessageCaptionParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:               ctx.chatIdentifier(),
+		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		InlineMessageID:      ctx.inlineMessageID(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.EditGeneralForumTopic(ctx.detached(), params)
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
+			params.ParseMode = defaultParseMode
+		}
+	}
 
-	return err
+	return params
 }
 
 // EditMessageCaption calls Client.EditMessageCaption with context-derived defaults.
@@ -1498,46 +2123,34 @@ func (ctx *Context) EditGeneralForumTopic(
 func (ctx *Context) EditMessageCaption(
 	opts ...EditMessageCaptionOption,
 ) error {
-	params := &EditMessageCaptionParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewEditMessageCaptionParams(
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.EditMessageCaption(ctx.Detached(), params)
 
-			return m.MessageID
-		}(ctx),
-		InlineMessageID: func(ctx *Context) string {
-			if ctx.update.CallbackQuery == nil {
-				return ""
-			}
+	return err
+}
 
-			return ctx.update.CallbackQuery.InlineMessageID
-		}(ctx),
+// NewEditMessageChecklistParams builds EditMessageChecklistParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.EditMessageChecklist is needed:
+//
+//	ret, err := ctx.Client().EditMessageChecklist(ctx.Detached(), ctx.NewEditMessageChecklistParams(...))
+func (ctx *Context) NewEditMessageChecklistParams(
+	checklist InputChecklist,
+	opts ...EditMessageChecklistOption,
+) *EditMessageChecklistParams {
+	params := &EditMessageChecklistParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:               ctx.chatIdentifier(),
+		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		Checklist:            checklist,
 	}
 
 	params.Option(opts...)
 
-	defaultParseMode := ctx.client.defaultParseMode()
-
-	if defaultParseMode != "" {
-		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
-			params.ParseMode = defaultParseMode
-		}
-	}
-
-	_, err := ctx.client.EditMessageCaption(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // EditMessageChecklist calls Client.EditMessageChecklist with context-derived defaults.
@@ -1550,32 +2163,38 @@ func (ctx *Context) EditMessageChecklist(
 	checklist InputChecklist,
 	opts ...EditMessageChecklistOption,
 ) error {
-	params := &EditMessageChecklistParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewEditMessageChecklistParams(
+		checklist,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.EditMessageChecklist(ctx.Detached(), params)
 
-			return m.MessageID
-		}(ctx),
-		Checklist: checklist,
+	return err
+}
+
+// NewEditMessageLiveLocationParams builds EditMessageLiveLocationParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.EditMessageLiveLocation is needed:
+//
+//	ret, err := ctx.Client().EditMessageLiveLocation(ctx.Detached(), ctx.NewEditMessageLiveLocationParams(...))
+func (ctx *Context) NewEditMessageLiveLocationParams(
+	latitude float64,
+	longitude float64,
+	opts ...EditMessageLiveLocationOption,
+) *EditMessageLiveLocationParams {
+	params := &EditMessageLiveLocationParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:               ctx.chatIdentifier(),
+		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		InlineMessageID:      ctx.inlineMessageID(),
+		Latitude:             latitude,
+		Longitude:            longitude,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.EditMessageChecklist(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // EditMessageLiveLocation calls Client.EditMessageLiveLocation with context-derived defaults.
@@ -1591,40 +2210,41 @@ func (ctx *Context) EditMessageLiveLocation(
 	longitude float64,
 	opts ...EditMessageLiveLocationOption,
 ) error {
-	params := &EditMessageLiveLocationParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewEditMessageLiveLocationParams(
+		latitude,
+		longitude,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.EditMessageLiveLocation(ctx.Detached(), params)
 
-			return m.MessageID
-		}(ctx),
-		InlineMessageID: func(ctx *Context) string {
-			if ctx.update.CallbackQuery == nil {
-				return ""
-			}
+	return err
+}
 
-			return ctx.update.CallbackQuery.InlineMessageID
-		}(ctx),
-		Latitude:  latitude,
-		Longitude: longitude,
+// NewEditMessageMediaParams builds EditMessageMediaParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.EditMessageMedia is needed:
+//
+//	ret, err := ctx.Client().EditMessageMedia(ctx.Detached(), ctx.NewEditMessageMediaParams(...))
+func (ctx *Context) NewEditMessageMediaParams(
+	media InputMedia,
+	opts ...EditMessageMediaOption,
+) *EditMessageMediaParams {
+	params := &EditMessageMediaParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:               ctx.chatIdentifier(),
+		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		InlineMessageID:      ctx.inlineMessageID(),
+		Media:                media,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.EditMessageLiveLocation(ctx.detached(), params)
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+		defaultParseModeToInputMedia(&params.Media, defaultParseMode)
+	}
 
-	return err
+	return params
 }
 
 // EditMessageMedia calls Client.EditMessageMedia with context-derived defaults.
@@ -1640,45 +2260,34 @@ func (ctx *Context) EditMessageMedia(
 	media InputMedia,
 	opts ...EditMessageMediaOption,
 ) error {
-	params := &EditMessageMediaParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewEditMessageMediaParams(
+		media,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.EditMessageMedia(ctx.Detached(), params)
 
-			return m.MessageID
-		}(ctx),
-		InlineMessageID: func(ctx *Context) string {
-			if ctx.update.CallbackQuery == nil {
-				return ""
-			}
+	return err
+}
 
-			return ctx.update.CallbackQuery.InlineMessageID
-		}(ctx),
-		Media: media,
+// NewEditMessageReplyMarkupParams builds EditMessageReplyMarkupParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.EditMessageReplyMarkup is needed:
+//
+//	ret, err := ctx.Client().EditMessageReplyMarkup(ctx.Detached(), ctx.NewEditMessageReplyMarkupParams(...))
+func (ctx *Context) NewEditMessageReplyMarkupParams(
+	opts ...EditMessageReplyMarkupOption,
+) *EditMessageReplyMarkupParams {
+	params := &EditMessageReplyMarkupParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:               ctx.chatIdentifier(),
+		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		InlineMessageID:      ctx.inlineMessageID(),
 	}
 
 	params.Option(opts...)
 
-	defaultParseMode := ctx.client.defaultParseMode()
-
-	if defaultParseMode != "" {
-		defaultParseModeToInputMedia(&params.Media, defaultParseMode)
-	}
-
-	_, err := ctx.client.EditMessageMedia(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // EditMessageReplyMarkup calls Client.EditMessageReplyMarkup with context-derived defaults.
@@ -1691,38 +2300,39 @@ func (ctx *Context) EditMessageMedia(
 func (ctx *Context) EditMessageReplyMarkup(
 	opts ...EditMessageReplyMarkupOption,
 ) error {
-	params := &EditMessageReplyMarkupParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewEditMessageReplyMarkupParams(
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.EditMessageReplyMarkup(ctx.Detached(), params)
 
-			return m.MessageID
-		}(ctx),
-		InlineMessageID: func(ctx *Context) string {
-			if ctx.update.CallbackQuery == nil {
-				return ""
-			}
+	return err
+}
 
-			return ctx.update.CallbackQuery.InlineMessageID
-		}(ctx),
+// NewEditMessageTextParams builds EditMessageTextParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.EditMessageText is needed:
+//
+//	ret, err := ctx.Client().EditMessageText(ctx.Detached(), ctx.NewEditMessageTextParams(...))
+func (ctx *Context) NewEditMessageTextParams(
+	opts ...EditMessageTextOption,
+) *EditMessageTextParams {
+	params := &EditMessageTextParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:               ctx.chatIdentifier(),
+		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		InlineMessageID:      ctx.inlineMessageID(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.EditMessageReplyMarkup(ctx.detached(), params)
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+		if params.ParseMode == "" && len(params.Entities) == 0 {
+			params.ParseMode = defaultParseMode
+		}
+	}
 
-	return err
+	return params
 }
 
 // EditMessageText calls Client.EditMessageText with context-derived defaults.
@@ -1736,46 +2346,40 @@ func (ctx *Context) EditMessageReplyMarkup(
 func (ctx *Context) EditMessageText(
 	opts ...EditMessageTextOption,
 ) error {
-	params := &EditMessageTextParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewEditMessageTextParams(
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.EditMessageText(ctx.Detached(), params)
 
-			return m.MessageID
-		}(ctx),
-		InlineMessageID: func(ctx *Context) string {
-			if ctx.update.CallbackQuery == nil {
-				return ""
-			}
+	return err
+}
 
-			return ctx.update.CallbackQuery.InlineMessageID
-		}(ctx),
+// NewEditStoryParams builds EditStoryParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.EditStory is needed:
+//
+//	ret, err := ctx.Client().EditStory(ctx.Detached(), ctx.NewEditStoryParams(...))
+func (ctx *Context) NewEditStoryParams(
+	storyID int64,
+	content InputStoryContent,
+	opts ...EditStoryOption,
+) *EditStoryParams {
+	params := &EditStoryParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		StoryID:              storyID,
+		Content:              content,
 	}
 
 	params.Option(opts...)
 
-	defaultParseMode := ctx.client.defaultParseMode()
-
-	if defaultParseMode != "" {
-		if params.ParseMode == "" && len(params.Entities) == 0 {
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
 			params.ParseMode = defaultParseMode
 		}
 	}
 
-	_, err := ctx.client.EditMessageText(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // EditStory calls Client.EditStory with context-derived defaults.
@@ -1790,32 +2394,36 @@ func (ctx *Context) EditStory(
 	content InputStoryContent,
 	opts ...EditStoryOption,
 ) error {
-	params := &EditStoryParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewEditStoryParams(
+		storyID,
+		content,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		StoryID: storyID,
-		Content: content,
+	_, err := ctx.client.EditStory(ctx.Detached(), params)
+
+	return err
+}
+
+// NewEditUserStarSubscriptionParams builds EditUserStarSubscriptionParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.EditUserStarSubscription is needed:
+//
+//	ret, err := ctx.Client().EditUserStarSubscription(ctx.Detached(), ctx.NewEditUserStarSubscriptionParams(...))
+func (ctx *Context) NewEditUserStarSubscriptionParams(
+	telegramPaymentChargeID string,
+	isCanceled bool,
+	opts ...EditUserStarSubscriptionOption,
+) *EditUserStarSubscriptionParams {
+	params := &EditUserStarSubscriptionParams{
+		UserID:                  ctx.userID(),
+		TelegramPaymentChargeID: telegramPaymentChargeID,
+		IsCanceled:              isCanceled,
 	}
 
 	params.Option(opts...)
 
-	defaultParseMode := ctx.client.defaultParseMode()
-
-	if defaultParseMode != "" {
-		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
-			params.ParseMode = defaultParseMode
-		}
-	}
-
-	_, err := ctx.client.EditStory(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // EditUserStarSubscription calls Client.EditUserStarSubscription with context-derived defaults.
@@ -1827,17 +2435,32 @@ func (ctx *Context) EditUserStarSubscription(
 	isCanceled bool,
 	opts ...EditUserStarSubscriptionOption,
 ) error {
-	params := &EditUserStarSubscriptionParams{
-		UserID:                  ctx.userID(),
-		TelegramPaymentChargeID: telegramPaymentChargeID,
-		IsCanceled:              isCanceled,
+	params := ctx.NewEditUserStarSubscriptionParams(
+		telegramPaymentChargeID,
+		isCanceled,
+		opts...,
+	)
+
+	_, err := ctx.client.EditUserStarSubscription(ctx.Detached(), params)
+
+	return err
+}
+
+// NewExportChatInviteLinkParams builds ExportChatInviteLinkParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.ExportChatInviteLink is needed:
+//
+//	ret, err := ctx.Client().ExportChatInviteLink(ctx.Detached(), ctx.NewExportChatInviteLinkParams(...))
+func (ctx *Context) NewExportChatInviteLinkParams(
+	opts ...ExportChatInviteLinkOption,
+) *ExportChatInviteLinkParams {
+	params := &ExportChatInviteLinkParams{
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.EditUserStarSubscription(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // ExportChatInviteLink calls Client.ExportChatInviteLink with context-derived defaults.
@@ -1848,15 +2471,35 @@ func (ctx *Context) EditUserStarSubscription(
 func (ctx *Context) ExportChatInviteLink(
 	opts ...ExportChatInviteLinkOption,
 ) error {
-	params := &ExportChatInviteLinkParams{
-		ChatID: ctx.chatIdentifier(),
+	params := ctx.NewExportChatInviteLinkParams(
+		opts...,
+	)
+
+	_, err := ctx.client.ExportChatInviteLink(ctx.Detached(), params)
+
+	return err
+}
+
+// NewForwardMessageParams builds ForwardMessageParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.ForwardMessage is needed:
+//
+//	ret, err := ctx.Client().ForwardMessage(ctx.Detached(), ctx.NewForwardMessageParams(...))
+func (ctx *Context) NewForwardMessageParams(
+	fromChatID string,
+	opts ...ForwardMessageOption,
+) *ForwardMessageParams {
+	params := &ForwardMessageParams{
+		ChatID:                ctx.chatIdentifier(),
+		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DirectMessagesTopicID: ctx.directMessagesTopicID(),
+		FromChatID:            fromChatID,
+		MessageID:             messageField(ctx, func(m *Message) int64 { return m.MessageID }),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.ExportChatInviteLink(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // ForwardMessage calls Client.ForwardMessage with context-derived defaults.
@@ -1870,44 +2513,37 @@ func (ctx *Context) ForwardMessage(
 	fromChatID string,
 	opts ...ForwardMessageOption,
 ) error {
-	params := &ForwardMessageParams{
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	params := ctx.NewForwardMessageParams(
+		fromChatID,
+		opts...,
+	)
 
-			return m.MessageThreadID
-		}(ctx),
-		DirectMessagesTopicID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.ForwardMessage(ctx.Detached(), params)
 
-			if m.DirectMessagesTopic == nil {
-				return 0
-			}
+	return err
+}
 
-			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		FromChatID: fromChatID,
-		MessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
-
-			return m.MessageID
-		}(ctx),
+// NewForwardMessagesParams builds ForwardMessagesParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.ForwardMessages is needed:
+//
+//	ret, err := ctx.Client().ForwardMessages(ctx.Detached(), ctx.NewForwardMessagesParams(...))
+func (ctx *Context) NewForwardMessagesParams(
+	fromChatID string,
+	messageIDs []int64,
+	opts ...ForwardMessagesOption,
+) *ForwardMessagesParams {
+	params := &ForwardMessagesParams{
+		ChatID:                ctx.chatIdentifier(),
+		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DirectMessagesTopicID: ctx.directMessagesTopicID(),
+		FromChatID:            fromChatID,
+		MessageIDs:            messageIDs,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.ForwardMessage(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // ForwardMessages calls Client.ForwardMessages with context-derived defaults.
@@ -1924,37 +2560,30 @@ func (ctx *Context) ForwardMessages(
 	messageIDs []int64,
 	opts ...ForwardMessagesOption,
 ) error {
-	params := &ForwardMessagesParams{
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	params := ctx.NewForwardMessagesParams(
+		fromChatID,
+		messageIDs,
+		opts...,
+	)
 
-			return m.MessageThreadID
-		}(ctx),
-		DirectMessagesTopicID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.ForwardMessages(ctx.Detached(), params)
 
-			if m.DirectMessagesTopic == nil {
-				return 0
-			}
+	return err
+}
 
-			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		FromChatID: fromChatID,
-		MessageIDs: messageIDs,
-	}
+// NewGetAvailableGiftsParams builds GetAvailableGiftsParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetAvailableGifts is needed:
+//
+//	ret, err := ctx.Client().GetAvailableGifts(ctx.Detached(), ctx.NewGetAvailableGiftsParams(...))
+func (ctx *Context) NewGetAvailableGiftsParams(
+	opts ...GetAvailableGiftsOption,
+) *GetAvailableGiftsParams {
+	params := &GetAvailableGiftsParams{}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.ForwardMessages(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetAvailableGifts calls Client.GetAvailableGifts with context-derived defaults.
@@ -1967,13 +2596,30 @@ func (ctx *Context) ForwardMessages(
 func (ctx *Context) GetAvailableGifts(
 	opts ...GetAvailableGiftsOption,
 ) error {
-	params := &GetAvailableGiftsParams{}
+	params := ctx.NewGetAvailableGiftsParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetAvailableGifts(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetBusinessAccountGiftsParams builds GetBusinessAccountGiftsParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetBusinessAccountGifts is needed:
+//
+//	ret, err := ctx.Client().GetBusinessAccountGifts(ctx.Detached(), ctx.NewGetBusinessAccountGiftsParams(...))
+func (ctx *Context) NewGetBusinessAccountGiftsParams(
+	opts ...GetBusinessAccountGiftsOption,
+) *GetBusinessAccountGiftsParams {
+	params := &GetBusinessAccountGiftsParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetAvailableGifts(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetBusinessAccountGifts calls Client.GetBusinessAccountGifts with context-derived defaults.
@@ -1986,22 +2632,30 @@ func (ctx *Context) GetAvailableGifts(
 func (ctx *Context) GetBusinessAccountGifts(
 	opts ...GetBusinessAccountGiftsOption,
 ) error {
-	params := &GetBusinessAccountGiftsParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewGetBusinessAccountGiftsParams(
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
+	_, err := ctx.client.GetBusinessAccountGifts(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetBusinessAccountStarBalanceParams builds GetBusinessAccountStarBalanceParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetBusinessAccountStarBalance is needed:
+//
+//	ret, err := ctx.Client().GetBusinessAccountStarBalance(ctx.Detached(), ctx.NewGetBusinessAccountStarBalanceParams(...))
+func (ctx *Context) NewGetBusinessAccountStarBalanceParams(
+	opts ...GetBusinessAccountStarBalanceOption,
+) *GetBusinessAccountStarBalanceParams {
+	params := &GetBusinessAccountStarBalanceParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetBusinessAccountGifts(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetBusinessAccountStarBalance calls Client.GetBusinessAccountStarBalance with context-derived defaults.
@@ -2014,22 +2668,30 @@ func (ctx *Context) GetBusinessAccountGifts(
 func (ctx *Context) GetBusinessAccountStarBalance(
 	opts ...GetBusinessAccountStarBalanceOption,
 ) error {
-	params := &GetBusinessAccountStarBalanceParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewGetBusinessAccountStarBalanceParams(
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
+	_, err := ctx.client.GetBusinessAccountStarBalance(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetBusinessConnectionParams builds GetBusinessConnectionParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetBusinessConnection is needed:
+//
+//	ret, err := ctx.Client().GetBusinessConnection(ctx.Detached(), ctx.NewGetBusinessConnectionParams(...))
+func (ctx *Context) NewGetBusinessConnectionParams(
+	opts ...GetBusinessConnectionOption,
+) *GetBusinessConnectionParams {
+	params := &GetBusinessConnectionParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetBusinessAccountStarBalance(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetBusinessConnection calls Client.GetBusinessConnection with context-derived defaults.
@@ -2041,22 +2703,30 @@ func (ctx *Context) GetBusinessAccountStarBalance(
 func (ctx *Context) GetBusinessConnection(
 	opts ...GetBusinessConnectionOption,
 ) error {
-	params := &GetBusinessConnectionParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewGetBusinessConnectionParams(
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
+	_, err := ctx.client.GetBusinessConnection(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetChatParams builds GetChatParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetChat is needed:
+//
+//	ret, err := ctx.Client().GetChat(ctx.Detached(), ctx.NewGetChatParams(...))
+func (ctx *Context) NewGetChatParams(
+	opts ...GetChatOption,
+) *GetChatParams {
+	params := &GetChatParams{
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetBusinessConnection(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetChat calls Client.GetChat with context-derived defaults.
@@ -2068,15 +2738,30 @@ func (ctx *Context) GetBusinessConnection(
 func (ctx *Context) GetChat(
 	opts ...GetChatOption,
 ) error {
-	params := &GetChatParams{
+	params := ctx.NewGetChatParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetChat(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetChatAdministratorsParams builds GetChatAdministratorsParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetChatAdministrators is needed:
+//
+//	ret, err := ctx.Client().GetChatAdministrators(ctx.Detached(), ctx.NewGetChatAdministratorsParams(...))
+func (ctx *Context) NewGetChatAdministratorsParams(
+	opts ...GetChatAdministratorsOption,
+) *GetChatAdministratorsParams {
+	params := &GetChatAdministratorsParams{
 		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetChat(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetChatAdministrators calls Client.GetChatAdministrators with context-derived defaults.
@@ -2088,15 +2773,30 @@ func (ctx *Context) GetChat(
 func (ctx *Context) GetChatAdministrators(
 	opts ...GetChatAdministratorsOption,
 ) error {
-	params := &GetChatAdministratorsParams{
+	params := ctx.NewGetChatAdministratorsParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetChatAdministrators(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetChatGiftsParams builds GetChatGiftsParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetChatGifts is needed:
+//
+//	ret, err := ctx.Client().GetChatGifts(ctx.Detached(), ctx.NewGetChatGiftsParams(...))
+func (ctx *Context) NewGetChatGiftsParams(
+	opts ...GetChatGiftsOption,
+) *GetChatGiftsParams {
+	params := &GetChatGiftsParams{
 		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetChatAdministrators(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetChatGifts calls Client.GetChatGifts with context-derived defaults.
@@ -2108,15 +2808,31 @@ func (ctx *Context) GetChatAdministrators(
 func (ctx *Context) GetChatGifts(
 	opts ...GetChatGiftsOption,
 ) error {
-	params := &GetChatGiftsParams{
+	params := ctx.NewGetChatGiftsParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetChatGifts(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetChatMemberParams builds GetChatMemberParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetChatMember is needed:
+//
+//	ret, err := ctx.Client().GetChatMember(ctx.Detached(), ctx.NewGetChatMemberParams(...))
+func (ctx *Context) NewGetChatMemberParams(
+	opts ...GetChatMemberOption,
+) *GetChatMemberParams {
+	params := &GetChatMemberParams{
 		ChatID: ctx.chatIdentifier(),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetChatGifts(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetChatMember calls Client.GetChatMember with context-derived defaults.
@@ -2129,16 +2845,30 @@ func (ctx *Context) GetChatGifts(
 func (ctx *Context) GetChatMember(
 	opts ...GetChatMemberOption,
 ) error {
-	params := &GetChatMemberParams{
+	params := ctx.NewGetChatMemberParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetChatMember(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetChatMemberCountParams builds GetChatMemberCountParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetChatMemberCount is needed:
+//
+//	ret, err := ctx.Client().GetChatMemberCount(ctx.Detached(), ctx.NewGetChatMemberCountParams(...))
+func (ctx *Context) NewGetChatMemberCountParams(
+	opts ...GetChatMemberCountOption,
+) *GetChatMemberCountParams {
+	params := &GetChatMemberCountParams{
 		ChatID: ctx.chatIdentifier(),
-		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetChatMember(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetChatMemberCount calls Client.GetChatMemberCount with context-derived defaults.
@@ -2148,15 +2878,30 @@ func (ctx *Context) GetChatMember(
 func (ctx *Context) GetChatMemberCount(
 	opts ...GetChatMemberCountOption,
 ) error {
-	params := &GetChatMemberCountParams{
-		ChatID: ctx.chatIdentifier(),
+	params := ctx.NewGetChatMemberCountParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetChatMemberCount(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetChatMenuButtonParams builds GetChatMenuButtonParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetChatMenuButton is needed:
+//
+//	ret, err := ctx.Client().GetChatMenuButton(ctx.Detached(), ctx.NewGetChatMenuButtonParams(...))
+func (ctx *Context) NewGetChatMenuButtonParams(
+	opts ...GetChatMenuButtonOption,
+) *GetChatMenuButtonParams {
+	params := &GetChatMenuButtonParams{
+		ChatID: ctx.chatID(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetChatMemberCount(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetChatMenuButton calls Client.GetChatMenuButton with context-derived defaults.
@@ -2168,15 +2913,31 @@ func (ctx *Context) GetChatMemberCount(
 func (ctx *Context) GetChatMenuButton(
 	opts ...GetChatMenuButtonOption,
 ) error {
-	params := &GetChatMenuButtonParams{
-		ChatID: ctx.chatID(),
+	params := ctx.NewGetChatMenuButtonParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetChatMenuButton(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetCustomEmojiStickersParams builds GetCustomEmojiStickersParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetCustomEmojiStickers is needed:
+//
+//	ret, err := ctx.Client().GetCustomEmojiStickers(ctx.Detached(), ctx.NewGetCustomEmojiStickersParams(...))
+func (ctx *Context) NewGetCustomEmojiStickersParams(
+	customEmojiIDs []string,
+	opts ...GetCustomEmojiStickersOption,
+) *GetCustomEmojiStickersParams {
+	params := &GetCustomEmojiStickersParams{
+		CustomEmojiIDs: customEmojiIDs,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetChatMenuButton(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetCustomEmojiStickers calls Client.GetCustomEmojiStickers with context-derived defaults.
@@ -2189,15 +2950,32 @@ func (ctx *Context) GetCustomEmojiStickers(
 	customEmojiIDs []string,
 	opts ...GetCustomEmojiStickersOption,
 ) error {
-	params := &GetCustomEmojiStickersParams{
-		CustomEmojiIDs: customEmojiIDs,
+	params := ctx.NewGetCustomEmojiStickersParams(
+		customEmojiIDs,
+		opts...,
+	)
+
+	_, err := ctx.client.GetCustomEmojiStickers(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetFileParams builds GetFileParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetFile is needed:
+//
+//	ret, err := ctx.Client().GetFile(ctx.Detached(), ctx.NewGetFileParams(...))
+func (ctx *Context) NewGetFileParams(
+	fileID string,
+	opts ...GetFileOption,
+) *GetFileParams {
+	params := &GetFileParams{
+		FileID: fileID,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetCustomEmojiStickers(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetFile calls Client.GetFile with context-derived defaults.
@@ -2217,15 +2995,29 @@ func (ctx *Context) GetFile(
 	fileID string,
 	opts ...GetFileOption,
 ) error {
-	params := &GetFileParams{
-		FileID: fileID,
-	}
+	params := ctx.NewGetFileParams(
+		fileID,
+		opts...,
+	)
+
+	_, err := ctx.client.GetFile(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetForumTopicIconStickersParams builds GetForumTopicIconStickersParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetForumTopicIconStickers is needed:
+//
+//	ret, err := ctx.Client().GetForumTopicIconStickers(ctx.Detached(), ctx.NewGetForumTopicIconStickersParams(...))
+func (ctx *Context) NewGetForumTopicIconStickersParams(
+	opts ...GetForumTopicIconStickersOption,
+) *GetForumTopicIconStickersParams {
+	params := &GetForumTopicIconStickersParams{}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetFile(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetForumTopicIconStickers calls Client.GetForumTopicIconStickers with context-derived defaults.
@@ -2238,13 +3030,33 @@ func (ctx *Context) GetFile(
 func (ctx *Context) GetForumTopicIconStickers(
 	opts ...GetForumTopicIconStickersOption,
 ) error {
-	params := &GetForumTopicIconStickersParams{}
+	params := ctx.NewGetForumTopicIconStickersParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetForumTopicIconStickers(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetGameHighScoresParams builds GetGameHighScoresParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetGameHighScores is needed:
+//
+//	ret, err := ctx.Client().GetGameHighScores(ctx.Detached(), ctx.NewGetGameHighScoresParams(...))
+func (ctx *Context) NewGetGameHighScoresParams(
+	opts ...GetGameHighScoresOption,
+) *GetGameHighScoresParams {
+	params := &GetGameHighScoresParams{
+		UserID:          ctx.userID(),
+		ChatID:          ctx.chatID(),
+		MessageID:       messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		InlineMessageID: ctx.inlineMessageID(),
+	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetForumTopicIconStickers(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetGameHighScores calls Client.GetGameHighScores with context-derived defaults.
@@ -2257,31 +3069,30 @@ func (ctx *Context) GetForumTopicIconStickers(
 func (ctx *Context) GetGameHighScores(
 	opts ...GetGameHighScoresOption,
 ) error {
-	params := &GetGameHighScoresParams{
+	params := ctx.NewGetGameHighScoresParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetGameHighScores(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetManagedBotAccessSettingsParams builds GetManagedBotAccessSettingsParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetManagedBotAccessSettings is needed:
+//
+//	ret, err := ctx.Client().GetManagedBotAccessSettings(ctx.Detached(), ctx.NewGetManagedBotAccessSettingsParams(...))
+func (ctx *Context) NewGetManagedBotAccessSettingsParams(
+	opts ...GetManagedBotAccessSettingsOption,
+) *GetManagedBotAccessSettingsParams {
+	params := &GetManagedBotAccessSettingsParams{
 		UserID: ctx.userID(),
-		ChatID: ctx.chatID(),
-		MessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
-
-			return m.MessageID
-		}(ctx),
-		InlineMessageID: func(ctx *Context) string {
-			if ctx.update.CallbackQuery == nil {
-				return ""
-			}
-
-			return ctx.update.CallbackQuery.InlineMessageID
-		}(ctx),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetGameHighScores(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetManagedBotAccessSettings calls Client.GetManagedBotAccessSettings with context-derived defaults.
@@ -2293,15 +3104,30 @@ func (ctx *Context) GetGameHighScores(
 func (ctx *Context) GetManagedBotAccessSettings(
 	opts ...GetManagedBotAccessSettingsOption,
 ) error {
-	params := &GetManagedBotAccessSettingsParams{
+	params := ctx.NewGetManagedBotAccessSettingsParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetManagedBotAccessSettings(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetManagedBotTokenParams builds GetManagedBotTokenParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetManagedBotToken is needed:
+//
+//	ret, err := ctx.Client().GetManagedBotToken(ctx.Detached(), ctx.NewGetManagedBotTokenParams(...))
+func (ctx *Context) NewGetManagedBotTokenParams(
+	opts ...GetManagedBotTokenOption,
+) *GetManagedBotTokenParams {
+	params := &GetManagedBotTokenParams{
 		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetManagedBotAccessSettings(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetManagedBotToken calls Client.GetManagedBotToken with context-derived defaults.
@@ -2311,15 +3137,28 @@ func (ctx *Context) GetManagedBotAccessSettings(
 func (ctx *Context) GetManagedBotToken(
 	opts ...GetManagedBotTokenOption,
 ) error {
-	params := &GetManagedBotTokenParams{
-		UserID: ctx.userID(),
-	}
+	params := ctx.NewGetManagedBotTokenParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetManagedBotToken(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetMeParams builds GetMeParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetMe is needed:
+//
+//	ret, err := ctx.Client().GetMe(ctx.Detached(), ctx.NewGetMeParams(...))
+func (ctx *Context) NewGetMeParams(
+	opts ...GetMeOption,
+) *GetMeParams {
+	params := &GetMeParams{}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetManagedBotToken(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetMe calls Client.GetMe with context-derived defaults.
@@ -2332,13 +3171,28 @@ func (ctx *Context) GetManagedBotToken(
 func (ctx *Context) GetMe(
 	opts ...GetMeOption,
 ) error {
-	params := &GetMeParams{}
+	params := ctx.NewGetMeParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetMe(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetMyCommandsParams builds GetMyCommandsParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetMyCommands is needed:
+//
+//	ret, err := ctx.Client().GetMyCommands(ctx.Detached(), ctx.NewGetMyCommandsParams(...))
+func (ctx *Context) NewGetMyCommandsParams(
+	opts ...GetMyCommandsOption,
+) *GetMyCommandsParams {
+	params := &GetMyCommandsParams{}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetMe(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetMyCommands calls Client.GetMyCommands with context-derived defaults.
@@ -2351,13 +3205,28 @@ func (ctx *Context) GetMe(
 func (ctx *Context) GetMyCommands(
 	opts ...GetMyCommandsOption,
 ) error {
-	params := &GetMyCommandsParams{}
+	params := ctx.NewGetMyCommandsParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetMyCommands(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetMyDefaultAdministratorRightsParams builds GetMyDefaultAdministratorRightsParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetMyDefaultAdministratorRights is needed:
+//
+//	ret, err := ctx.Client().GetMyDefaultAdministratorRights(ctx.Detached(), ctx.NewGetMyDefaultAdministratorRightsParams(...))
+func (ctx *Context) NewGetMyDefaultAdministratorRightsParams(
+	opts ...GetMyDefaultAdministratorRightsOption,
+) *GetMyDefaultAdministratorRightsParams {
+	params := &GetMyDefaultAdministratorRightsParams{}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetMyCommands(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetMyDefaultAdministratorRights calls Client.GetMyDefaultAdministratorRights with context-derived defaults.
@@ -2369,13 +3238,28 @@ func (ctx *Context) GetMyCommands(
 func (ctx *Context) GetMyDefaultAdministratorRights(
 	opts ...GetMyDefaultAdministratorRightsOption,
 ) error {
-	params := &GetMyDefaultAdministratorRightsParams{}
+	params := ctx.NewGetMyDefaultAdministratorRightsParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetMyDefaultAdministratorRights(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetMyDescriptionParams builds GetMyDescriptionParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetMyDescription is needed:
+//
+//	ret, err := ctx.Client().GetMyDescription(ctx.Detached(), ctx.NewGetMyDescriptionParams(...))
+func (ctx *Context) NewGetMyDescriptionParams(
+	opts ...GetMyDescriptionOption,
+) *GetMyDescriptionParams {
+	params := &GetMyDescriptionParams{}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetMyDefaultAdministratorRights(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetMyDescription calls Client.GetMyDescription with context-derived defaults.
@@ -2387,13 +3271,28 @@ func (ctx *Context) GetMyDefaultAdministratorRights(
 func (ctx *Context) GetMyDescription(
 	opts ...GetMyDescriptionOption,
 ) error {
-	params := &GetMyDescriptionParams{}
+	params := ctx.NewGetMyDescriptionParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetMyDescription(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetMyNameParams builds GetMyNameParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetMyName is needed:
+//
+//	ret, err := ctx.Client().GetMyName(ctx.Detached(), ctx.NewGetMyNameParams(...))
+func (ctx *Context) NewGetMyNameParams(
+	opts ...GetMyNameOption,
+) *GetMyNameParams {
+	params := &GetMyNameParams{}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetMyDescription(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetMyName calls Client.GetMyName with context-derived defaults.
@@ -2405,13 +3304,28 @@ func (ctx *Context) GetMyDescription(
 func (ctx *Context) GetMyName(
 	opts ...GetMyNameOption,
 ) error {
-	params := &GetMyNameParams{}
+	params := ctx.NewGetMyNameParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetMyName(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetMyShortDescriptionParams builds GetMyShortDescriptionParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetMyShortDescription is needed:
+//
+//	ret, err := ctx.Client().GetMyShortDescription(ctx.Detached(), ctx.NewGetMyShortDescriptionParams(...))
+func (ctx *Context) NewGetMyShortDescriptionParams(
+	opts ...GetMyShortDescriptionOption,
+) *GetMyShortDescriptionParams {
+	params := &GetMyShortDescriptionParams{}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetMyName(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetMyShortDescription calls Client.GetMyShortDescription with context-derived defaults.
@@ -2423,13 +3337,28 @@ func (ctx *Context) GetMyName(
 func (ctx *Context) GetMyShortDescription(
 	opts ...GetMyShortDescriptionOption,
 ) error {
-	params := &GetMyShortDescriptionParams{}
+	params := ctx.NewGetMyShortDescriptionParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetMyShortDescription(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetMyStarBalanceParams builds GetMyStarBalanceParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetMyStarBalance is needed:
+//
+//	ret, err := ctx.Client().GetMyStarBalance(ctx.Detached(), ctx.NewGetMyStarBalanceParams(...))
+func (ctx *Context) NewGetMyStarBalanceParams(
+	opts ...GetMyStarBalanceOption,
+) *GetMyStarBalanceParams {
+	params := &GetMyStarBalanceParams{}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetMyShortDescription(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetMyStarBalance calls Client.GetMyStarBalance with context-derived defaults.
@@ -2442,13 +3371,28 @@ func (ctx *Context) GetMyShortDescription(
 func (ctx *Context) GetMyStarBalance(
 	opts ...GetMyStarBalanceOption,
 ) error {
-	params := &GetMyStarBalanceParams{}
+	params := ctx.NewGetMyStarBalanceParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetMyStarBalance(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetStarTransactionsParams builds GetStarTransactionsParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetStarTransactions is needed:
+//
+//	ret, err := ctx.Client().GetStarTransactions(ctx.Detached(), ctx.NewGetStarTransactionsParams(...))
+func (ctx *Context) NewGetStarTransactionsParams(
+	opts ...GetStarTransactionsOption,
+) *GetStarTransactionsParams {
+	params := &GetStarTransactionsParams{}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetMyStarBalance(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetStarTransactions calls Client.GetStarTransactions with context-derived defaults.
@@ -2460,13 +3404,31 @@ func (ctx *Context) GetMyStarBalance(
 func (ctx *Context) GetStarTransactions(
 	opts ...GetStarTransactionsOption,
 ) error {
-	params := &GetStarTransactionsParams{}
+	params := ctx.NewGetStarTransactionsParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetStarTransactions(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetStickerSetParams builds GetStickerSetParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetStickerSet is needed:
+//
+//	ret, err := ctx.Client().GetStickerSet(ctx.Detached(), ctx.NewGetStickerSetParams(...))
+func (ctx *Context) NewGetStickerSetParams(
+	name string,
+	opts ...GetStickerSetOption,
+) *GetStickerSetParams {
+	params := &GetStickerSetParams{
+		Name: name,
+	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetStarTransactions(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetStickerSet calls Client.GetStickerSet with context-derived defaults.
@@ -2479,15 +3441,29 @@ func (ctx *Context) GetStickerSet(
 	name string,
 	opts ...GetStickerSetOption,
 ) error {
-	params := &GetStickerSetParams{
-		Name: name,
-	}
+	params := ctx.NewGetStickerSetParams(
+		name,
+		opts...,
+	)
+
+	_, err := ctx.client.GetStickerSet(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetUpdatesParams builds GetUpdatesParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetUpdates is needed:
+//
+//	ret, err := ctx.Client().GetUpdates(ctx.Detached(), ctx.NewGetUpdatesParams(...))
+func (ctx *Context) NewGetUpdatesParams(
+	opts ...GetUpdatesOption,
+) *GetUpdatesParams {
+	params := &GetUpdatesParams{}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetStickerSet(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetUpdates calls Client.GetUpdates with context-derived defaults.
@@ -2500,13 +3476,31 @@ func (ctx *Context) GetStickerSet(
 func (ctx *Context) GetUpdates(
 	opts ...GetUpdatesOption,
 ) error {
-	params := &GetUpdatesParams{}
+	params := ctx.NewGetUpdatesParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetUpdates(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetUserChatBoostsParams builds GetUserChatBoostsParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetUserChatBoosts is needed:
+//
+//	ret, err := ctx.Client().GetUserChatBoosts(ctx.Detached(), ctx.NewGetUserChatBoostsParams(...))
+func (ctx *Context) NewGetUserChatBoostsParams(
+	opts ...GetUserChatBoostsOption,
+) *GetUserChatBoostsParams {
+	params := &GetUserChatBoostsParams{
+		ChatID: ctx.chatIdentifier(),
+		UserID: ctx.userID(),
+	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetUpdates(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetUserChatBoosts calls Client.GetUserChatBoosts with context-derived defaults.
@@ -2519,16 +3513,30 @@ func (ctx *Context) GetUpdates(
 func (ctx *Context) GetUserChatBoosts(
 	opts ...GetUserChatBoostsOption,
 ) error {
-	params := &GetUserChatBoostsParams{
-		ChatID: ctx.chatIdentifier(),
+	params := ctx.NewGetUserChatBoostsParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetUserChatBoosts(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetUserGiftsParams builds GetUserGiftsParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetUserGifts is needed:
+//
+//	ret, err := ctx.Client().GetUserGifts(ctx.Detached(), ctx.NewGetUserGiftsParams(...))
+func (ctx *Context) NewGetUserGiftsParams(
+	opts ...GetUserGiftsOption,
+) *GetUserGiftsParams {
+	params := &GetUserGiftsParams{
 		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetUserChatBoosts(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetUserGifts calls Client.GetUserGifts with context-derived defaults.
@@ -2540,15 +3548,32 @@ func (ctx *Context) GetUserChatBoosts(
 func (ctx *Context) GetUserGifts(
 	opts ...GetUserGiftsOption,
 ) error {
-	params := &GetUserGiftsParams{
+	params := ctx.NewGetUserGiftsParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetUserGifts(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetUserPersonalChatMessagesParams builds GetUserPersonalChatMessagesParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetUserPersonalChatMessages is needed:
+//
+//	ret, err := ctx.Client().GetUserPersonalChatMessages(ctx.Detached(), ctx.NewGetUserPersonalChatMessagesParams(...))
+func (ctx *Context) NewGetUserPersonalChatMessagesParams(
+	limit int64,
+	opts ...GetUserPersonalChatMessagesOption,
+) *GetUserPersonalChatMessagesParams {
+	params := &GetUserPersonalChatMessagesParams{
 		UserID: ctx.userID(),
+		Limit:  limit,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetUserGifts(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetUserPersonalChatMessages calls Client.GetUserPersonalChatMessages with context-derived defaults.
@@ -2561,16 +3586,31 @@ func (ctx *Context) GetUserPersonalChatMessages(
 	limit int64,
 	opts ...GetUserPersonalChatMessagesOption,
 ) error {
-	params := &GetUserPersonalChatMessagesParams{
+	params := ctx.NewGetUserPersonalChatMessagesParams(
+		limit,
+		opts...,
+	)
+
+	_, err := ctx.client.GetUserPersonalChatMessages(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetUserProfileAudiosParams builds GetUserProfileAudiosParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetUserProfileAudios is needed:
+//
+//	ret, err := ctx.Client().GetUserProfileAudios(ctx.Detached(), ctx.NewGetUserProfileAudiosParams(...))
+func (ctx *Context) NewGetUserProfileAudiosParams(
+	opts ...GetUserProfileAudiosOption,
+) *GetUserProfileAudiosParams {
+	params := &GetUserProfileAudiosParams{
 		UserID: ctx.userID(),
-		Limit:  limit,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetUserPersonalChatMessages(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetUserProfileAudios calls Client.GetUserProfileAudios with context-derived defaults.
@@ -2582,15 +3622,30 @@ func (ctx *Context) GetUserPersonalChatMessages(
 func (ctx *Context) GetUserProfileAudios(
 	opts ...GetUserProfileAudiosOption,
 ) error {
-	params := &GetUserProfileAudiosParams{
+	params := ctx.NewGetUserProfileAudiosParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetUserProfileAudios(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetUserProfilePhotosParams builds GetUserProfilePhotosParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetUserProfilePhotos is needed:
+//
+//	ret, err := ctx.Client().GetUserProfilePhotos(ctx.Detached(), ctx.NewGetUserProfilePhotosParams(...))
+func (ctx *Context) NewGetUserProfilePhotosParams(
+	opts ...GetUserProfilePhotosOption,
+) *GetUserProfilePhotosParams {
+	params := &GetUserProfilePhotosParams{
 		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetUserProfileAudios(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetUserProfilePhotos calls Client.GetUserProfilePhotos with context-derived defaults.
@@ -2602,15 +3657,28 @@ func (ctx *Context) GetUserProfileAudios(
 func (ctx *Context) GetUserProfilePhotos(
 	opts ...GetUserProfilePhotosOption,
 ) error {
-	params := &GetUserProfilePhotosParams{
-		UserID: ctx.userID(),
-	}
+	params := ctx.NewGetUserProfilePhotosParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetUserProfilePhotos(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetWebhookInfoParams builds GetWebhookInfoParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetWebhookInfo is needed:
+//
+//	ret, err := ctx.Client().GetWebhookInfo(ctx.Detached(), ctx.NewGetWebhookInfoParams(...))
+func (ctx *Context) NewGetWebhookInfoParams(
+	opts ...GetWebhookInfoOption,
+) *GetWebhookInfoParams {
+	params := &GetWebhookInfoParams{}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetUserProfilePhotos(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // GetWebhookInfo calls Client.GetWebhookInfo with context-derived defaults.
@@ -2625,13 +3693,37 @@ func (ctx *Context) GetUserProfilePhotos(
 func (ctx *Context) GetWebhookInfo(
 	opts ...GetWebhookInfoOption,
 ) error {
-	params := &GetWebhookInfoParams{}
+	params := ctx.NewGetWebhookInfoParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetWebhookInfo(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGiftPremiumSubscriptionParams builds GiftPremiumSubscriptionParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GiftPremiumSubscription is needed:
+//
+//	ret, err := ctx.Client().GiftPremiumSubscription(ctx.Detached(), ctx.NewGiftPremiumSubscriptionParams(...))
+func (ctx *Context) NewGiftPremiumSubscriptionParams(
+	monthCount int64,
+	starCount int64,
+	opts ...GiftPremiumSubscriptionOption,
+) *GiftPremiumSubscriptionParams {
+	params := &GiftPremiumSubscriptionParams{
+		UserID:     ctx.userID(),
+		MonthCount: monthCount,
+		StarCount:  starCount,
+	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.GetWebhookInfo(ctx.detached(), params)
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+	}
 
-	return err
+	return params
 }
 
 // GiftPremiumSubscription calls Client.GiftPremiumSubscription with context-derived defaults.
@@ -2643,22 +3735,32 @@ func (ctx *Context) GiftPremiumSubscription(
 	starCount int64,
 	opts ...GiftPremiumSubscriptionOption,
 ) error {
-	params := &GiftPremiumSubscriptionParams{
-		UserID:     ctx.userID(),
-		MonthCount: monthCount,
-		StarCount:  starCount,
+	params := ctx.NewGiftPremiumSubscriptionParams(
+		monthCount,
+		starCount,
+		opts...,
+	)
+
+	_, err := ctx.client.GiftPremiumSubscription(ctx.Detached(), params)
+
+	return err
+}
+
+// NewHideGeneralForumTopicParams builds HideGeneralForumTopicParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.HideGeneralForumTopic is needed:
+//
+//	ret, err := ctx.Client().HideGeneralForumTopic(ctx.Detached(), ctx.NewHideGeneralForumTopicParams(...))
+func (ctx *Context) NewHideGeneralForumTopicParams(
+	opts ...HideGeneralForumTopicOption,
+) *HideGeneralForumTopicParams {
+	params := &HideGeneralForumTopicParams{
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	defaultParseMode := ctx.client.defaultParseMode()
-
-	if defaultParseMode != "" {
-	}
-
-	_, err := ctx.client.GiftPremiumSubscription(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // HideGeneralForumTopic calls Client.HideGeneralForumTopic with context-derived defaults.
@@ -2670,15 +3772,30 @@ func (ctx *Context) GiftPremiumSubscription(
 func (ctx *Context) HideGeneralForumTopic(
 	opts ...HideGeneralForumTopicOption,
 ) error {
-	params := &HideGeneralForumTopicParams{
+	params := ctx.NewHideGeneralForumTopicParams(
+		opts...,
+	)
+
+	_, err := ctx.client.HideGeneralForumTopic(ctx.Detached(), params)
+
+	return err
+}
+
+// NewLeaveChatParams builds LeaveChatParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.LeaveChat is needed:
+//
+//	ret, err := ctx.Client().LeaveChat(ctx.Detached(), ctx.NewLeaveChatParams(...))
+func (ctx *Context) NewLeaveChatParams(
+	opts ...LeaveChatOption,
+) *LeaveChatParams {
+	params := &LeaveChatParams{
 		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.HideGeneralForumTopic(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // LeaveChat calls Client.LeaveChat with context-derived defaults.
@@ -2688,15 +3805,28 @@ func (ctx *Context) HideGeneralForumTopic(
 func (ctx *Context) LeaveChat(
 	opts ...LeaveChatOption,
 ) error {
-	params := &LeaveChatParams{
-		ChatID: ctx.chatIdentifier(),
-	}
+	params := ctx.NewLeaveChatParams(
+		opts...,
+	)
+
+	_, err := ctx.client.LeaveChat(ctx.Detached(), params)
+
+	return err
+}
+
+// NewLogOutParams builds LogOutParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.LogOut is needed:
+//
+//	ret, err := ctx.Client().LogOut(ctx.Detached(), ctx.NewLogOutParams(...))
+func (ctx *Context) NewLogOutParams(
+	opts ...LogOutOption,
+) *LogOutParams {
+	params := &LogOutParams{}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.LeaveChat(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // LogOut calls Client.LogOut with context-derived defaults.
@@ -2709,13 +3839,32 @@ func (ctx *Context) LeaveChat(
 func (ctx *Context) LogOut(
 	opts ...LogOutOption,
 ) error {
-	params := &LogOutParams{}
+	params := ctx.NewLogOutParams(
+		opts...,
+	)
+
+	_, err := ctx.client.LogOut(ctx.Detached(), params)
+
+	return err
+}
+
+// NewPinChatMessageParams builds PinChatMessageParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.PinChatMessage is needed:
+//
+//	ret, err := ctx.Client().PinChatMessage(ctx.Detached(), ctx.NewPinChatMessageParams(...))
+func (ctx *Context) NewPinChatMessageParams(
+	opts ...PinChatMessageOption,
+) *PinChatMessageParams {
+	params := &PinChatMessageParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:               ctx.chatIdentifier(),
+		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.LogOut(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // PinChatMessage calls Client.PinChatMessage with context-derived defaults.
@@ -2727,31 +3876,40 @@ func (ctx *Context) LogOut(
 func (ctx *Context) PinChatMessage(
 	opts ...PinChatMessageOption,
 ) error {
-	params := &PinChatMessageParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewPinChatMessageParams(
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.PinChatMessage(ctx.Detached(), params)
 
-			return m.MessageID
-		}(ctx),
+	return err
+}
+
+// NewPostStoryParams builds PostStoryParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.PostStory is needed:
+//
+//	ret, err := ctx.Client().PostStory(ctx.Detached(), ctx.NewPostStoryParams(...))
+func (ctx *Context) NewPostStoryParams(
+	content InputStoryContent,
+	activePeriod int64,
+	opts ...PostStoryOption,
+) *PostStoryParams {
+	params := &PostStoryParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		Content:              content,
+		ActivePeriod:         activePeriod,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.PinChatMessage(ctx.detached(), params)
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
+			params.ParseMode = defaultParseMode
+		}
+	}
 
-	return err
+	return params
 }
 
 // PostStory calls Client.PostStory with context-derived defaults.
@@ -2766,32 +3924,33 @@ func (ctx *Context) PostStory(
 	activePeriod int64,
 	opts ...PostStoryOption,
 ) error {
-	params := &PostStoryParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewPostStoryParams(
+		content,
+		activePeriod,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		Content:      content,
-		ActivePeriod: activePeriod,
+	_, err := ctx.client.PostStory(ctx.Detached(), params)
+
+	return err
+}
+
+// NewPromoteChatMemberParams builds PromoteChatMemberParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.PromoteChatMember is needed:
+//
+//	ret, err := ctx.Client().PromoteChatMember(ctx.Detached(), ctx.NewPromoteChatMemberParams(...))
+func (ctx *Context) NewPromoteChatMemberParams(
+	opts ...PromoteChatMemberOption,
+) *PromoteChatMemberParams {
+	params := &PromoteChatMemberParams{
+		ChatID: ctx.chatIdentifier(),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	defaultParseMode := ctx.client.defaultParseMode()
-
-	if defaultParseMode != "" {
-		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
-			params.ParseMode = defaultParseMode
-		}
-	}
-
-	_, err := ctx.client.PostStory(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // PromoteChatMember calls Client.PromoteChatMember with context-derived defaults.
@@ -2803,16 +3962,32 @@ func (ctx *Context) PostStory(
 func (ctx *Context) PromoteChatMember(
 	opts ...PromoteChatMemberOption,
 ) error {
-	params := &PromoteChatMemberParams{
-		ChatID: ctx.chatIdentifier(),
-		UserID: ctx.userID(),
+	params := ctx.NewPromoteChatMemberParams(
+		opts...,
+	)
+
+	_, err := ctx.client.PromoteChatMember(ctx.Detached(), params)
+
+	return err
+}
+
+// NewReadBusinessMessageParams builds ReadBusinessMessageParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.ReadBusinessMessage is needed:
+//
+//	ret, err := ctx.Client().ReadBusinessMessage(ctx.Detached(), ctx.NewReadBusinessMessageParams(...))
+func (ctx *Context) NewReadBusinessMessageParams(
+	opts ...ReadBusinessMessageOption,
+) *ReadBusinessMessageParams {
+	params := &ReadBusinessMessageParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:               ctx.chatID(),
+		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.PromoteChatMember(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // ReadBusinessMessage calls Client.ReadBusinessMessage with context-derived defaults.
@@ -2823,31 +3998,32 @@ func (ctx *Context) PromoteChatMember(
 func (ctx *Context) ReadBusinessMessage(
 	opts ...ReadBusinessMessageOption,
 ) error {
-	params := &ReadBusinessMessageParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewReadBusinessMessageParams(
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatID(),
-		MessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.ReadBusinessMessage(ctx.Detached(), params)
 
-			return m.MessageID
-		}(ctx),
+	return err
+}
+
+// NewRefundStarPaymentParams builds RefundStarPaymentParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.RefundStarPayment is needed:
+//
+//	ret, err := ctx.Client().RefundStarPayment(ctx.Detached(), ctx.NewRefundStarPaymentParams(...))
+func (ctx *Context) NewRefundStarPaymentParams(
+	telegramPaymentChargeID string,
+	opts ...RefundStarPaymentOption,
+) *RefundStarPaymentParams {
+	params := &RefundStarPaymentParams{
+		UserID:                  ctx.userID(),
+		TelegramPaymentChargeID: telegramPaymentChargeID,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.ReadBusinessMessage(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // RefundStarPayment calls Client.RefundStarPayment with context-derived defaults.
@@ -2860,16 +4036,31 @@ func (ctx *Context) RefundStarPayment(
 	telegramPaymentChargeID string,
 	opts ...RefundStarPaymentOption,
 ) error {
-	params := &RefundStarPaymentParams{
-		UserID:                  ctx.userID(),
-		TelegramPaymentChargeID: telegramPaymentChargeID,
+	params := ctx.NewRefundStarPaymentParams(
+		telegramPaymentChargeID,
+		opts...,
+	)
+
+	_, err := ctx.client.RefundStarPayment(ctx.Detached(), params)
+
+	return err
+}
+
+// NewRemoveBusinessAccountProfilePhotoParams builds RemoveBusinessAccountProfilePhotoParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.RemoveBusinessAccountProfilePhoto is needed:
+//
+//	ret, err := ctx.Client().RemoveBusinessAccountProfilePhoto(ctx.Detached(), ctx.NewRemoveBusinessAccountProfilePhotoParams(...))
+func (ctx *Context) NewRemoveBusinessAccountProfilePhotoParams(
+	opts ...RemoveBusinessAccountProfilePhotoOption,
+) *RemoveBusinessAccountProfilePhotoParams {
+	params := &RemoveBusinessAccountProfilePhotoParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.RefundStarPayment(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // RemoveBusinessAccountProfilePhoto calls Client.RemoveBusinessAccountProfilePhoto with context-derived defaults.
@@ -2880,22 +4071,30 @@ func (ctx *Context) RefundStarPayment(
 func (ctx *Context) RemoveBusinessAccountProfilePhoto(
 	opts ...RemoveBusinessAccountProfilePhotoOption,
 ) error {
-	params := &RemoveBusinessAccountProfilePhotoParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewRemoveBusinessAccountProfilePhotoParams(
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
+	_, err := ctx.client.RemoveBusinessAccountProfilePhoto(ctx.Detached(), params)
+
+	return err
+}
+
+// NewRemoveChatVerificationParams builds RemoveChatVerificationParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.RemoveChatVerification is needed:
+//
+//	ret, err := ctx.Client().RemoveChatVerification(ctx.Detached(), ctx.NewRemoveChatVerificationParams(...))
+func (ctx *Context) NewRemoveChatVerificationParams(
+	opts ...RemoveChatVerificationOption,
+) *RemoveChatVerificationParams {
+	params := &RemoveChatVerificationParams{
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.RemoveBusinessAccountProfilePhoto(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // RemoveChatVerification calls Client.RemoveChatVerification with context-derived defaults.
@@ -2907,15 +4106,28 @@ func (ctx *Context) RemoveBusinessAccountProfilePhoto(
 func (ctx *Context) RemoveChatVerification(
 	opts ...RemoveChatVerificationOption,
 ) error {
-	params := &RemoveChatVerificationParams{
-		ChatID: ctx.chatIdentifier(),
-	}
+	params := ctx.NewRemoveChatVerificationParams(
+		opts...,
+	)
+
+	_, err := ctx.client.RemoveChatVerification(ctx.Detached(), params)
+
+	return err
+}
+
+// NewRemoveMyProfilePhotoParams builds RemoveMyProfilePhotoParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.RemoveMyProfilePhoto is needed:
+//
+//	ret, err := ctx.Client().RemoveMyProfilePhoto(ctx.Detached(), ctx.NewRemoveMyProfilePhotoParams(...))
+func (ctx *Context) NewRemoveMyProfilePhotoParams(
+	opts ...RemoveMyProfilePhotoOption,
+) *RemoveMyProfilePhotoParams {
+	params := &RemoveMyProfilePhotoParams{}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.RemoveChatVerification(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // RemoveMyProfilePhoto calls Client.RemoveMyProfilePhoto with context-derived defaults.
@@ -2926,13 +4138,30 @@ func (ctx *Context) RemoveChatVerification(
 func (ctx *Context) RemoveMyProfilePhoto(
 	opts ...RemoveMyProfilePhotoOption,
 ) error {
-	params := &RemoveMyProfilePhotoParams{}
+	params := ctx.NewRemoveMyProfilePhotoParams(
+		opts...,
+	)
+
+	_, err := ctx.client.RemoveMyProfilePhoto(ctx.Detached(), params)
+
+	return err
+}
+
+// NewRemoveUserVerificationParams builds RemoveUserVerificationParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.RemoveUserVerification is needed:
+//
+//	ret, err := ctx.Client().RemoveUserVerification(ctx.Detached(), ctx.NewRemoveUserVerificationParams(...))
+func (ctx *Context) NewRemoveUserVerificationParams(
+	opts ...RemoveUserVerificationOption,
+) *RemoveUserVerificationParams {
+	params := &RemoveUserVerificationParams{
+		UserID: ctx.userID(),
+	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.RemoveMyProfilePhoto(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // RemoveUserVerification calls Client.RemoveUserVerification with context-derived defaults.
@@ -2944,15 +4173,31 @@ func (ctx *Context) RemoveMyProfilePhoto(
 func (ctx *Context) RemoveUserVerification(
 	opts ...RemoveUserVerificationOption,
 ) error {
-	params := &RemoveUserVerificationParams{
-		UserID: ctx.userID(),
+	params := ctx.NewRemoveUserVerificationParams(
+		opts...,
+	)
+
+	_, err := ctx.client.RemoveUserVerification(ctx.Detached(), params)
+
+	return err
+}
+
+// NewReopenForumTopicParams builds ReopenForumTopicParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.ReopenForumTopic is needed:
+//
+//	ret, err := ctx.Client().ReopenForumTopic(ctx.Detached(), ctx.NewReopenForumTopicParams(...))
+func (ctx *Context) NewReopenForumTopicParams(
+	opts ...ReopenForumTopicOption,
+) *ReopenForumTopicParams {
+	params := &ReopenForumTopicParams{
+		ChatID:          ctx.chatIdentifier(),
+		MessageThreadID: messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.RemoveUserVerification(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // ReopenForumTopic calls Client.ReopenForumTopic with context-derived defaults.
@@ -2963,23 +4208,30 @@ func (ctx *Context) RemoveUserVerification(
 func (ctx *Context) ReopenForumTopic(
 	opts ...ReopenForumTopicOption,
 ) error {
-	params := &ReopenForumTopicParams{
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	params := ctx.NewReopenForumTopicParams(
+		opts...,
+	)
 
-			return m.MessageThreadID
-		}(ctx),
+	_, err := ctx.client.ReopenForumTopic(ctx.Detached(), params)
+
+	return err
+}
+
+// NewReopenGeneralForumTopicParams builds ReopenGeneralForumTopicParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.ReopenGeneralForumTopic is needed:
+//
+//	ret, err := ctx.Client().ReopenGeneralForumTopic(ctx.Detached(), ctx.NewReopenGeneralForumTopicParams(...))
+func (ctx *Context) NewReopenGeneralForumTopicParams(
+	opts ...ReopenGeneralForumTopicOption,
+) *ReopenGeneralForumTopicParams {
+	params := &ReopenGeneralForumTopicParams{
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.ReopenForumTopic(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // ReopenGeneralForumTopic calls Client.ReopenGeneralForumTopic with context-derived defaults.
@@ -2991,15 +4243,30 @@ func (ctx *Context) ReopenForumTopic(
 func (ctx *Context) ReopenGeneralForumTopic(
 	opts ...ReopenGeneralForumTopicOption,
 ) error {
-	params := &ReopenGeneralForumTopicParams{
-		ChatID: ctx.chatIdentifier(),
+	params := ctx.NewReopenGeneralForumTopicParams(
+		opts...,
+	)
+
+	_, err := ctx.client.ReopenGeneralForumTopic(ctx.Detached(), params)
+
+	return err
+}
+
+// NewReplaceManagedBotTokenParams builds ReplaceManagedBotTokenParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.ReplaceManagedBotToken is needed:
+//
+//	ret, err := ctx.Client().ReplaceManagedBotToken(ctx.Detached(), ctx.NewReplaceManagedBotTokenParams(...))
+func (ctx *Context) NewReplaceManagedBotTokenParams(
+	opts ...ReplaceManagedBotTokenOption,
+) *ReplaceManagedBotTokenParams {
+	params := &ReplaceManagedBotTokenParams{
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.ReopenGeneralForumTopic(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // ReplaceManagedBotToken calls Client.ReplaceManagedBotToken with context-derived defaults.
@@ -3009,15 +4276,36 @@ func (ctx *Context) ReopenGeneralForumTopic(
 func (ctx *Context) ReplaceManagedBotToken(
 	opts ...ReplaceManagedBotTokenOption,
 ) error {
-	params := &ReplaceManagedBotTokenParams{
-		UserID: ctx.userID(),
+	params := ctx.NewReplaceManagedBotTokenParams(
+		opts...,
+	)
+
+	_, err := ctx.client.ReplaceManagedBotToken(ctx.Detached(), params)
+
+	return err
+}
+
+// NewReplaceStickerInSetParams builds ReplaceStickerInSetParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.ReplaceStickerInSet is needed:
+//
+//	ret, err := ctx.Client().ReplaceStickerInSet(ctx.Detached(), ctx.NewReplaceStickerInSetParams(...))
+func (ctx *Context) NewReplaceStickerInSetParams(
+	name string,
+	oldSticker string,
+	sticker InputSticker,
+	opts ...ReplaceStickerInSetOption,
+) *ReplaceStickerInSetParams {
+	params := &ReplaceStickerInSetParams{
+		UserID:     ctx.userID(),
+		Name:       name,
+		OldSticker: oldSticker,
+		Sticker:    sticker,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.ReplaceManagedBotToken(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // ReplaceStickerInSet calls Client.ReplaceStickerInSet with context-derived defaults.
@@ -3035,18 +4323,39 @@ func (ctx *Context) ReplaceStickerInSet(
 	sticker InputSticker,
 	opts ...ReplaceStickerInSetOption,
 ) error {
-	params := &ReplaceStickerInSetParams{
-		UserID:     ctx.userID(),
-		Name:       name,
-		OldSticker: oldSticker,
-		Sticker:    sticker,
+	params := ctx.NewReplaceStickerInSetParams(
+		name,
+		oldSticker,
+		sticker,
+		opts...,
+	)
+
+	_, err := ctx.client.ReplaceStickerInSet(ctx.Detached(), params)
+
+	return err
+}
+
+// NewRepostStoryParams builds RepostStoryParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.RepostStory is needed:
+//
+//	ret, err := ctx.Client().RepostStory(ctx.Detached(), ctx.NewRepostStoryParams(...))
+func (ctx *Context) NewRepostStoryParams(
+	fromChatID int64,
+	fromStoryID int64,
+	activePeriod int64,
+	opts ...RepostStoryOption,
+) *RepostStoryParams {
+	params := &RepostStoryParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		FromChatID:           fromChatID,
+		FromStoryID:          fromStoryID,
+		ActivePeriod:         activePeriod,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.ReplaceStickerInSet(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // RepostStory calls Client.RepostStory with context-derived defaults.
@@ -3063,25 +4372,36 @@ func (ctx *Context) RepostStory(
 	activePeriod int64,
 	opts ...RepostStoryOption,
 ) error {
-	params := &RepostStoryParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewRepostStoryParams(
+		fromChatID,
+		fromStoryID,
+		activePeriod,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		FromChatID:   fromChatID,
-		FromStoryID:  fromStoryID,
-		ActivePeriod: activePeriod,
+	_, err := ctx.client.RepostStory(ctx.Detached(), params)
+
+	return err
+}
+
+// NewRestrictChatMemberParams builds RestrictChatMemberParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.RestrictChatMember is needed:
+//
+//	ret, err := ctx.Client().RestrictChatMember(ctx.Detached(), ctx.NewRestrictChatMemberParams(...))
+func (ctx *Context) NewRestrictChatMemberParams(
+	permissions ChatPermissions,
+	opts ...RestrictChatMemberOption,
+) *RestrictChatMemberParams {
+	params := &RestrictChatMemberParams{
+		ChatID:      ctx.chatIdentifier(),
+		UserID:      ctx.userID(),
+		Permissions: permissions,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.RepostStory(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // RestrictChatMember calls Client.RestrictChatMember with context-derived defaults.
@@ -3094,17 +4414,33 @@ func (ctx *Context) RestrictChatMember(
 	permissions ChatPermissions,
 	opts ...RestrictChatMemberOption,
 ) error {
-	params := &RestrictChatMemberParams{
-		ChatID:      ctx.chatIdentifier(),
-		UserID:      ctx.userID(),
-		Permissions: permissions,
+	params := ctx.NewRestrictChatMemberParams(
+		permissions,
+		opts...,
+	)
+
+	_, err := ctx.client.RestrictChatMember(ctx.Detached(), params)
+
+	return err
+}
+
+// NewRevokeChatInviteLinkParams builds RevokeChatInviteLinkParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.RevokeChatInviteLink is needed:
+//
+//	ret, err := ctx.Client().RevokeChatInviteLink(ctx.Detached(), ctx.NewRevokeChatInviteLinkParams(...))
+func (ctx *Context) NewRevokeChatInviteLinkParams(
+	inviteLink string,
+	opts ...RevokeChatInviteLinkOption,
+) *RevokeChatInviteLinkParams {
+	params := &RevokeChatInviteLinkParams{
+		ChatID:     ctx.chatIdentifier(),
+		InviteLink: inviteLink,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.RestrictChatMember(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // RevokeChatInviteLink calls Client.RevokeChatInviteLink with context-derived defaults.
@@ -3119,16 +4455,33 @@ func (ctx *Context) RevokeChatInviteLink(
 	inviteLink string,
 	opts ...RevokeChatInviteLinkOption,
 ) error {
-	params := &RevokeChatInviteLinkParams{
-		ChatID:     ctx.chatIdentifier(),
-		InviteLink: inviteLink,
+	params := ctx.NewRevokeChatInviteLinkParams(
+		inviteLink,
+		opts...,
+	)
+
+	_, err := ctx.client.RevokeChatInviteLink(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSavePreparedInlineMessageParams builds SavePreparedInlineMessageParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SavePreparedInlineMessage is needed:
+//
+//	ret, err := ctx.Client().SavePreparedInlineMessage(ctx.Detached(), ctx.NewSavePreparedInlineMessageParams(...))
+func (ctx *Context) NewSavePreparedInlineMessageParams(
+	result InlineQueryResult,
+	opts ...SavePreparedInlineMessageOption,
+) *SavePreparedInlineMessageParams {
+	params := &SavePreparedInlineMessageParams{
+		UserID: ctx.userID(),
+		Result: result,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.RevokeChatInviteLink(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SavePreparedInlineMessage calls Client.SavePreparedInlineMessage with context-derived defaults.
@@ -3141,16 +4494,33 @@ func (ctx *Context) SavePreparedInlineMessage(
 	result InlineQueryResult,
 	opts ...SavePreparedInlineMessageOption,
 ) error {
-	params := &SavePreparedInlineMessageParams{
+	params := ctx.NewSavePreparedInlineMessageParams(
+		result,
+		opts...,
+	)
+
+	_, err := ctx.client.SavePreparedInlineMessage(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSavePreparedKeyboardButtonParams builds SavePreparedKeyboardButtonParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SavePreparedKeyboardButton is needed:
+//
+//	ret, err := ctx.Client().SavePreparedKeyboardButton(ctx.Detached(), ctx.NewSavePreparedKeyboardButtonParams(...))
+func (ctx *Context) NewSavePreparedKeyboardButtonParams(
+	button KeyboardButton,
+	opts ...SavePreparedKeyboardButtonOption,
+) *SavePreparedKeyboardButtonParams {
+	params := &SavePreparedKeyboardButtonParams{
 		UserID: ctx.userID(),
-		Result: result,
+		Button: button,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SavePreparedInlineMessage(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SavePreparedKeyboardButton calls Client.SavePreparedKeyboardButton with context-derived defaults.
@@ -3163,16 +4533,42 @@ func (ctx *Context) SavePreparedKeyboardButton(
 	button KeyboardButton,
 	opts ...SavePreparedKeyboardButtonOption,
 ) error {
-	params := &SavePreparedKeyboardButtonParams{
-		UserID: ctx.userID(),
-		Button: button,
+	params := ctx.NewSavePreparedKeyboardButtonParams(
+		button,
+		opts...,
+	)
+
+	_, err := ctx.client.SavePreparedKeyboardButton(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSendAnimationParams builds SendAnimationParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendAnimation is needed:
+//
+//	ret, err := ctx.Client().SendAnimation(ctx.Detached(), ctx.NewSendAnimationParams(...))
+func (ctx *Context) NewSendAnimationParams(
+	animation InputFile,
+	opts ...SendAnimationOption,
+) *SendAnimationParams {
+	params := &SendAnimationParams{
+		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:                ctx.chatIdentifier(),
+		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DirectMessagesTopicID: ctx.directMessagesTopicID(),
+		Animation:             animation,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SavePreparedKeyboardButton(ctx.detached(), params)
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
+			params.ParseMode = defaultParseMode
+		}
+	}
 
-	return err
+	return params
 }
 
 // SendAnimation calls Client.SendAnimation with context-derived defaults.
@@ -3186,52 +4582,42 @@ func (ctx *Context) SendAnimation(
 	animation InputFile,
 	opts ...SendAnimationOption,
 ) error {
-	params := &SendAnimationParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSendAnimationParams(
+		animation,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.SendAnimation(ctx.Detached(), params)
 
-			return m.MessageThreadID
-		}(ctx),
-		DirectMessagesTopicID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	return err
+}
 
-			if m.DirectMessagesTopic == nil {
-				return 0
-			}
-
-			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		Animation: animation,
+// NewSendAudioParams builds SendAudioParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendAudio is needed:
+//
+//	ret, err := ctx.Client().SendAudio(ctx.Detached(), ctx.NewSendAudioParams(...))
+func (ctx *Context) NewSendAudioParams(
+	audio InputFile,
+	opts ...SendAudioOption,
+) *SendAudioParams {
+	params := &SendAudioParams{
+		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:                ctx.chatIdentifier(),
+		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DirectMessagesTopicID: ctx.directMessagesTopicID(),
+		Audio:                 audio,
 	}
 
 	params.Option(opts...)
 
-	defaultParseMode := ctx.client.defaultParseMode()
-
-	if defaultParseMode != "" {
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
 		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
 			params.ParseMode = defaultParseMode
 		}
 	}
 
-	_, err := ctx.client.SendAnimation(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SendAudio calls Client.SendAudio with context-derived defaults.
@@ -3248,52 +4634,35 @@ func (ctx *Context) SendAudio(
 	audio InputFile,
 	opts ...SendAudioOption,
 ) error {
-	params := &SendAudioParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSendAudioParams(
+		audio,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.SendAudio(ctx.Detached(), params)
 
-			return m.MessageThreadID
-		}(ctx),
-		DirectMessagesTopicID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	return err
+}
 
-			if m.DirectMessagesTopic == nil {
-				return 0
-			}
-
-			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		Audio: audio,
+// NewSendChatActionParams builds SendChatActionParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendChatAction is needed:
+//
+//	ret, err := ctx.Client().SendChatAction(ctx.Detached(), ctx.NewSendChatActionParams(...))
+func (ctx *Context) NewSendChatActionParams(
+	action string,
+	opts ...SendChatActionOption,
+) *SendChatActionParams {
+	params := &SendChatActionParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:               ctx.chatIdentifier(),
+		MessageThreadID:      messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		Action:               action,
 	}
 
 	params.Option(opts...)
 
-	defaultParseMode := ctx.client.defaultParseMode()
-
-	if defaultParseMode != "" {
-		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
-			params.ParseMode = defaultParseMode
-		}
-	}
-
-	_, err := ctx.client.SendAudio(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SendChatAction calls Client.SendChatAction with context-derived defaults.
@@ -3306,32 +4675,34 @@ func (ctx *Context) SendChatAction(
 	action string,
 	opts ...SendChatActionOption,
 ) error {
-	params := &SendChatActionParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSendChatActionParams(
+		action,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.SendChatAction(ctx.Detached(), params)
 
-			return m.MessageThreadID
-		}(ctx),
-		Action: action,
+	return err
+}
+
+// NewSendChatJoinRequestWebAppParams builds SendChatJoinRequestWebAppParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendChatJoinRequestWebApp is needed:
+//
+//	ret, err := ctx.Client().SendChatJoinRequestWebApp(ctx.Detached(), ctx.NewSendChatJoinRequestWebAppParams(...))
+func (ctx *Context) NewSendChatJoinRequestWebAppParams(
+	chatJoinRequestQueryID string,
+	webAppUrl string,
+	opts ...SendChatJoinRequestWebAppOption,
+) *SendChatJoinRequestWebAppParams {
+	params := &SendChatJoinRequestWebAppParams{
+		ChatJoinRequestQueryID: chatJoinRequestQueryID,
+		WebAppUrl:              webAppUrl,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SendChatAction(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SendChatJoinRequestWebApp calls Client.SendChatJoinRequestWebApp with context-derived defaults.
@@ -3346,16 +4717,35 @@ func (ctx *Context) SendChatJoinRequestWebApp(
 	webAppUrl string,
 	opts ...SendChatJoinRequestWebAppOption,
 ) error {
-	params := &SendChatJoinRequestWebAppParams{
-		ChatJoinRequestQueryID: chatJoinRequestQueryID,
-		WebAppUrl:              webAppUrl,
+	params := ctx.NewSendChatJoinRequestWebAppParams(
+		chatJoinRequestQueryID,
+		webAppUrl,
+		opts...,
+	)
+
+	_, err := ctx.client.SendChatJoinRequestWebApp(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSendChecklistParams builds SendChecklistParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendChecklist is needed:
+//
+//	ret, err := ctx.Client().SendChecklist(ctx.Detached(), ctx.NewSendChecklistParams(...))
+func (ctx *Context) NewSendChecklistParams(
+	checklist InputChecklist,
+	opts ...SendChecklistOption,
+) *SendChecklistParams {
+	params := &SendChecklistParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:               ctx.chatIdentifier(),
+		Checklist:            checklist,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SendChatJoinRequestWebApp(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SendChecklist calls Client.SendChecklist with context-derived defaults.
@@ -3368,24 +4758,38 @@ func (ctx *Context) SendChecklist(
 	checklist InputChecklist,
 	opts ...SendChecklistOption,
 ) error {
-	params := &SendChecklistParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSendChecklistParams(
+		checklist,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID:    ctx.chatIdentifier(),
-		Checklist: checklist,
+	_, err := ctx.client.SendChecklist(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSendContactParams builds SendContactParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendContact is needed:
+//
+//	ret, err := ctx.Client().SendContact(ctx.Detached(), ctx.NewSendContactParams(...))
+func (ctx *Context) NewSendContactParams(
+	phoneNumber string,
+	firstName string,
+	opts ...SendContactOption,
+) *SendContactParams {
+	params := &SendContactParams{
+		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:                ctx.chatIdentifier(),
+		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DirectMessagesTopicID: ctx.directMessagesTopicID(),
+		PhoneNumber:           phoneNumber,
+		FirstName:             firstName,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SendChecklist(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SendContact calls Client.SendContact with context-derived defaults.
@@ -3399,45 +4803,35 @@ func (ctx *Context) SendContact(
 	firstName string,
 	opts ...SendContactOption,
 ) error {
-	params := &SendContactParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSendContactParams(
+		phoneNumber,
+		firstName,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.SendContact(ctx.Detached(), params)
 
-			return m.MessageThreadID
-		}(ctx),
-		DirectMessagesTopicID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	return err
+}
 
-			if m.DirectMessagesTopic == nil {
-				return 0
-			}
-
-			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		PhoneNumber: phoneNumber,
-		FirstName:   firstName,
+// NewSendDiceParams builds SendDiceParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendDice is needed:
+//
+//	ret, err := ctx.Client().SendDice(ctx.Detached(), ctx.NewSendDiceParams(...))
+func (ctx *Context) NewSendDiceParams(
+	opts ...SendDiceOption,
+) *SendDiceParams {
+	params := &SendDiceParams{
+		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:                ctx.chatIdentifier(),
+		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DirectMessagesTopicID: ctx.directMessagesTopicID(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SendContact(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SendDice calls Client.SendDice with context-derived defaults.
@@ -3449,43 +4843,41 @@ func (ctx *Context) SendContact(
 func (ctx *Context) SendDice(
 	opts ...SendDiceOption,
 ) error {
-	params := &SendDiceParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSendDiceParams(
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.SendDice(ctx.Detached(), params)
 
-			return m.MessageThreadID
-		}(ctx),
-		DirectMessagesTopicID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	return err
+}
 
-			if m.DirectMessagesTopic == nil {
-				return 0
-			}
-
-			return m.DirectMessagesTopic.TopicID
-		}(ctx),
+// NewSendDocumentParams builds SendDocumentParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendDocument is needed:
+//
+//	ret, err := ctx.Client().SendDocument(ctx.Detached(), ctx.NewSendDocumentParams(...))
+func (ctx *Context) NewSendDocumentParams(
+	document InputFile,
+	opts ...SendDocumentOption,
+) *SendDocumentParams {
+	params := &SendDocumentParams{
+		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:                ctx.chatIdentifier(),
+		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DirectMessagesTopicID: ctx.directMessagesTopicID(),
+		Document:              document,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SendDice(ctx.detached(), params)
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
+			params.ParseMode = defaultParseMode
+		}
+	}
 
-	return err
+	return params
 }
 
 // SendDocument calls Client.SendDocument with context-derived defaults.
@@ -3499,52 +4891,35 @@ func (ctx *Context) SendDocument(
 	document InputFile,
 	opts ...SendDocumentOption,
 ) error {
-	params := &SendDocumentParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSendDocumentParams(
+		document,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.SendDocument(ctx.Detached(), params)
 
-			return m.MessageThreadID
-		}(ctx),
-		DirectMessagesTopicID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	return err
+}
 
-			if m.DirectMessagesTopic == nil {
-				return 0
-			}
-
-			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		Document: document,
+// NewSendGameParams builds SendGameParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendGame is needed:
+//
+//	ret, err := ctx.Client().SendGame(ctx.Detached(), ctx.NewSendGameParams(...))
+func (ctx *Context) NewSendGameParams(
+	gameShortName string,
+	opts ...SendGameOption,
+) *SendGameParams {
+	params := &SendGameParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:               ctx.chatIdentifier(),
+		MessageThreadID:      messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		GameShortName:        gameShortName,
 	}
 
 	params.Option(opts...)
 
-	defaultParseMode := ctx.client.defaultParseMode()
-
-	if defaultParseMode != "" {
-		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
-			params.ParseMode = defaultParseMode
-		}
-	}
-
-	_, err := ctx.client.SendDocument(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SendGame calls Client.SendGame with context-derived defaults.
@@ -3557,32 +4932,37 @@ func (ctx *Context) SendGame(
 	gameShortName string,
 	opts ...SendGameOption,
 ) error {
-	params := &SendGameParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSendGameParams(
+		gameShortName,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
+	_, err := ctx.client.SendGame(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSendGiftParams builds SendGiftParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendGift is needed:
+//
+//	ret, err := ctx.Client().SendGift(ctx.Detached(), ctx.NewSendGiftParams(...))
+func (ctx *Context) NewSendGiftParams(
+	giftID string,
+	opts ...SendGiftOption,
+) *SendGiftParams {
+	params := &SendGiftParams{
+		UserID: ctx.userID(),
 		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
-
-			return m.MessageThreadID
-		}(ctx),
-		GameShortName: gameShortName,
+		GiftID: giftID,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SendGame(ctx.detached(), params)
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+	}
 
-	return err
+	return params
 }
 
 // SendGift calls Client.SendGift with context-derived defaults.
@@ -3594,22 +4974,43 @@ func (ctx *Context) SendGift(
 	giftID string,
 	opts ...SendGiftOption,
 ) error {
-	params := &SendGiftParams{
-		UserID: ctx.userID(),
-		ChatID: ctx.chatIdentifier(),
-		GiftID: giftID,
+	params := ctx.NewSendGiftParams(
+		giftID,
+		opts...,
+	)
+
+	_, err := ctx.client.SendGift(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSendInvoiceParams builds SendInvoiceParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendInvoice is needed:
+//
+//	ret, err := ctx.Client().SendInvoice(ctx.Detached(), ctx.NewSendInvoiceParams(...))
+func (ctx *Context) NewSendInvoiceParams(
+	title string,
+	description string,
+	payload string,
+	currency string,
+	prices []LabeledPrice,
+	opts ...SendInvoiceOption,
+) *SendInvoiceParams {
+	params := &SendInvoiceParams{
+		ChatID:                ctx.chatIdentifier(),
+		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DirectMessagesTopicID: ctx.directMessagesTopicID(),
+		Title:                 title,
+		Description:           description,
+		Payload:               payload,
+		Currency:              currency,
+		Prices:                prices,
 	}
 
 	params.Option(opts...)
 
-	defaultParseMode := ctx.client.defaultParseMode()
-
-	if defaultParseMode != "" {
-	}
-
-	_, err := ctx.client.SendGift(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SendInvoice calls Client.SendInvoice with context-derived defaults.
@@ -3626,40 +5027,48 @@ func (ctx *Context) SendInvoice(
 	prices []LabeledPrice,
 	opts ...SendInvoiceOption,
 ) error {
-	params := &SendInvoiceParams{
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	params := ctx.NewSendInvoiceParams(
+		title,
+		description,
+		payload,
+		currency,
+		prices,
+		opts...,
+	)
 
-			return m.MessageThreadID
-		}(ctx),
-		DirectMessagesTopicID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.SendInvoice(ctx.Detached(), params)
 
-			if m.DirectMessagesTopic == nil {
-				return 0
-			}
+	return err
+}
 
-			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		Title:       title,
-		Description: description,
-		Payload:     payload,
-		Currency:    currency,
-		Prices:      prices,
+// NewSendLivePhotoParams builds SendLivePhotoParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendLivePhoto is needed:
+//
+//	ret, err := ctx.Client().SendLivePhoto(ctx.Detached(), ctx.NewSendLivePhotoParams(...))
+func (ctx *Context) NewSendLivePhotoParams(
+	livePhoto InputFile,
+	photo InputFile,
+	opts ...SendLivePhotoOption,
+) *SendLivePhotoParams {
+	params := &SendLivePhotoParams{
+		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:                ctx.chatIdentifier(),
+		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DirectMessagesTopicID: ctx.directMessagesTopicID(),
+		LivePhoto:             livePhoto,
+		Photo:                 photo,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SendInvoice(ctx.detached(), params)
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
+			params.ParseMode = defaultParseMode
+		}
+	}
 
-	return err
+	return params
 }
 
 // SendLivePhoto calls Client.SendLivePhoto with context-derived defaults.
@@ -3673,53 +5082,39 @@ func (ctx *Context) SendLivePhoto(
 	photo InputFile,
 	opts ...SendLivePhotoOption,
 ) error {
-	params := &SendLivePhotoParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSendLivePhotoParams(
+		livePhoto,
+		photo,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.SendLivePhoto(ctx.Detached(), params)
 
-			return m.MessageThreadID
-		}(ctx),
-		DirectMessagesTopicID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	return err
+}
 
-			if m.DirectMessagesTopic == nil {
-				return 0
-			}
-
-			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		LivePhoto: livePhoto,
-		Photo:     photo,
+// NewSendLocationParams builds SendLocationParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendLocation is needed:
+//
+//	ret, err := ctx.Client().SendLocation(ctx.Detached(), ctx.NewSendLocationParams(...))
+func (ctx *Context) NewSendLocationParams(
+	latitude float64,
+	longitude float64,
+	opts ...SendLocationOption,
+) *SendLocationParams {
+	params := &SendLocationParams{
+		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:                ctx.chatIdentifier(),
+		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DirectMessagesTopicID: ctx.directMessagesTopicID(),
+		Latitude:              latitude,
+		Longitude:             longitude,
 	}
 
 	params.Option(opts...)
 
-	defaultParseMode := ctx.client.defaultParseMode()
-
-	if defaultParseMode != "" {
-		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
-			params.ParseMode = defaultParseMode
-		}
-	}
-
-	_, err := ctx.client.SendLivePhoto(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SendLocation calls Client.SendLocation with context-derived defaults.
@@ -3733,45 +5128,43 @@ func (ctx *Context) SendLocation(
 	longitude float64,
 	opts ...SendLocationOption,
 ) error {
-	params := &SendLocationParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSendLocationParams(
+		latitude,
+		longitude,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.SendLocation(ctx.Detached(), params)
 
-			return m.MessageThreadID
-		}(ctx),
-		DirectMessagesTopicID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	return err
+}
 
-			if m.DirectMessagesTopic == nil {
-				return 0
-			}
-
-			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		Latitude:  latitude,
-		Longitude: longitude,
+// NewSendMediaGroupParams builds SendMediaGroupParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendMediaGroup is needed:
+//
+//	ret, err := ctx.Client().SendMediaGroup(ctx.Detached(), ctx.NewSendMediaGroupParams(...))
+func (ctx *Context) NewSendMediaGroupParams(
+	media []InputMedia,
+	opts ...SendMediaGroupOption,
+) *SendMediaGroupParams {
+	params := &SendMediaGroupParams{
+		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:                ctx.chatIdentifier(),
+		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DirectMessagesTopicID: ctx.directMessagesTopicID(),
+		Media:                 media,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SendLocation(ctx.detached(), params)
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+		for i := range params.Media {
+			defaultParseModeToInputMedia(&params.Media[i], defaultParseMode)
+		}
+	}
 
-	return err
+	return params
 }
 
 // SendMediaGroup calls Client.SendMediaGroup with context-derived defaults.
@@ -3785,52 +5178,42 @@ func (ctx *Context) SendMediaGroup(
 	media []InputMedia,
 	opts ...SendMediaGroupOption,
 ) error {
-	params := &SendMediaGroupParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSendMediaGroupParams(
+		media,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.SendMediaGroup(ctx.Detached(), params)
 
-			return m.MessageThreadID
-		}(ctx),
-		DirectMessagesTopicID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	return err
+}
 
-			if m.DirectMessagesTopic == nil {
-				return 0
-			}
-
-			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		Media: media,
+// NewSendMessageParams builds SendMessageParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendMessage is needed:
+//
+//	ret, err := ctx.Client().SendMessage(ctx.Detached(), ctx.NewSendMessageParams(...))
+func (ctx *Context) NewSendMessageParams(
+	text string,
+	opts ...SendMessageOption,
+) *SendMessageParams {
+	params := &SendMessageParams{
+		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:                ctx.chatIdentifier(),
+		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DirectMessagesTopicID: ctx.directMessagesTopicID(),
+		Text:                  text,
 	}
 
 	params.Option(opts...)
 
-	defaultParseMode := ctx.client.defaultParseMode()
-
-	if defaultParseMode != "" {
-		for i := range params.Media {
-			defaultParseModeToInputMedia(&params.Media[i], defaultParseMode)
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+		if params.ParseMode == "" && len(params.Entities) == 0 {
+			params.ParseMode = defaultParseMode
 		}
 	}
 
-	_, err := ctx.client.SendMediaGroup(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SendMessage calls Client.SendMessage with context-derived defaults.
@@ -3843,52 +5226,40 @@ func (ctx *Context) SendMessage(
 	text string,
 	opts ...SendMessageOption,
 ) error {
-	params := &SendMessageParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSendMessageParams(
+		text,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.SendMessage(ctx.Detached(), params)
 
-			return m.MessageThreadID
-		}(ctx),
-		DirectMessagesTopicID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	return err
+}
 
-			if m.DirectMessagesTopic == nil {
-				return 0
-			}
-
-			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		Text: text,
+// NewSendMessageDraftParams builds SendMessageDraftParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendMessageDraft is needed:
+//
+//	ret, err := ctx.Client().SendMessageDraft(ctx.Detached(), ctx.NewSendMessageDraftParams(...))
+func (ctx *Context) NewSendMessageDraftParams(
+	draftID int64,
+	opts ...SendMessageDraftOption,
+) *SendMessageDraftParams {
+	params := &SendMessageDraftParams{
+		ChatID:          ctx.chatID(),
+		MessageThreadID: messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DraftID:         draftID,
 	}
 
 	params.Option(opts...)
 
-	defaultParseMode := ctx.client.defaultParseMode()
-
-	if defaultParseMode != "" {
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
 		if params.ParseMode == "" && len(params.Entities) == 0 {
 			params.ParseMode = defaultParseMode
 		}
 	}
 
-	_, err := ctx.client.SendMessage(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SendMessageDraft calls Client.SendMessageDraft with context-derived defaults.
@@ -3902,32 +5273,44 @@ func (ctx *Context) SendMessageDraft(
 	draftID int64,
 	opts ...SendMessageDraftOption,
 ) error {
-	params := &SendMessageDraftParams{
-		ChatID: ctx.chatID(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	params := ctx.NewSendMessageDraftParams(
+		draftID,
+		opts...,
+	)
 
-			return m.MessageThreadID
-		}(ctx),
-		DraftID: draftID,
+	_, err := ctx.client.SendMessageDraft(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSendPaidMediaParams builds SendPaidMediaParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendPaidMedia is needed:
+//
+//	ret, err := ctx.Client().SendPaidMedia(ctx.Detached(), ctx.NewSendPaidMediaParams(...))
+func (ctx *Context) NewSendPaidMediaParams(
+	starCount int64,
+	media []InputPaidMedia,
+	opts ...SendPaidMediaOption,
+) *SendPaidMediaParams {
+	params := &SendPaidMediaParams{
+		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:                ctx.chatIdentifier(),
+		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DirectMessagesTopicID: ctx.directMessagesTopicID(),
+		StarCount:             starCount,
+		Media:                 media,
 	}
 
 	params.Option(opts...)
 
-	defaultParseMode := ctx.client.defaultParseMode()
-
-	if defaultParseMode != "" {
-		if params.ParseMode == "" && len(params.Entities) == 0 {
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
 			params.ParseMode = defaultParseMode
 		}
 	}
 
-	_, err := ctx.client.SendMessageDraft(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SendPaidMedia calls Client.SendPaidMedia with context-derived defaults.
@@ -3941,53 +5324,43 @@ func (ctx *Context) SendPaidMedia(
 	media []InputPaidMedia,
 	opts ...SendPaidMediaOption,
 ) error {
-	params := &SendPaidMediaParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSendPaidMediaParams(
+		starCount,
+		media,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.SendPaidMedia(ctx.Detached(), params)
 
-			return m.MessageThreadID
-		}(ctx),
-		DirectMessagesTopicID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	return err
+}
 
-			if m.DirectMessagesTopic == nil {
-				return 0
-			}
-
-			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		StarCount: starCount,
-		Media:     media,
+// NewSendPhotoParams builds SendPhotoParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendPhoto is needed:
+//
+//	ret, err := ctx.Client().SendPhoto(ctx.Detached(), ctx.NewSendPhotoParams(...))
+func (ctx *Context) NewSendPhotoParams(
+	photo InputFile,
+	opts ...SendPhotoOption,
+) *SendPhotoParams {
+	params := &SendPhotoParams{
+		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:                ctx.chatIdentifier(),
+		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DirectMessagesTopicID: ctx.directMessagesTopicID(),
+		Photo:                 photo,
 	}
 
 	params.Option(opts...)
 
-	defaultParseMode := ctx.client.defaultParseMode()
-
-	if defaultParseMode != "" {
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
 		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
 			params.ParseMode = defaultParseMode
 		}
 	}
 
-	_, err := ctx.client.SendPaidMedia(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SendPhoto calls Client.SendPhoto with context-derived defaults.
@@ -4000,52 +5373,40 @@ func (ctx *Context) SendPhoto(
 	photo InputFile,
 	opts ...SendPhotoOption,
 ) error {
-	params := &SendPhotoParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSendPhotoParams(
+		photo,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.SendPhoto(ctx.Detached(), params)
 
-			return m.MessageThreadID
-		}(ctx),
-		DirectMessagesTopicID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	return err
+}
 
-			if m.DirectMessagesTopic == nil {
-				return 0
-			}
-
-			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		Photo: photo,
+// NewSendPollParams builds SendPollParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendPoll is needed:
+//
+//	ret, err := ctx.Client().SendPoll(ctx.Detached(), ctx.NewSendPollParams(...))
+func (ctx *Context) NewSendPollParams(
+	question string,
+	options []InputPollOption,
+	opts ...SendPollOption,
+) *SendPollParams {
+	params := &SendPollParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:               ctx.chatIdentifier(),
+		MessageThreadID:      messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		Question:             question,
+		Options:              options,
 	}
 
 	params.Option(opts...)
 
-	defaultParseMode := ctx.client.defaultParseMode()
-
-	if defaultParseMode != "" {
-		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
-			params.ParseMode = defaultParseMode
-		}
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
 	}
 
-	_, err := ctx.client.SendPhoto(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SendPoll calls Client.SendPoll with context-derived defaults.
@@ -4059,38 +5420,37 @@ func (ctx *Context) SendPoll(
 	options []InputPollOption,
 	opts ...SendPollOption,
 ) error {
-	params := &SendPollParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSendPollParams(
+		question,
+		options,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.SendPoll(ctx.Detached(), params)
 
-			return m.MessageThreadID
-		}(ctx),
-		Question: question,
-		Options:  options,
+	return err
+}
+
+// NewSendRichMessageParams builds SendRichMessageParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendRichMessage is needed:
+//
+//	ret, err := ctx.Client().SendRichMessage(ctx.Detached(), ctx.NewSendRichMessageParams(...))
+func (ctx *Context) NewSendRichMessageParams(
+	richMessage InputRichMessage,
+	opts ...SendRichMessageOption,
+) *SendRichMessageParams {
+	params := &SendRichMessageParams{
+		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:                ctx.chatIdentifier(),
+		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DirectMessagesTopicID: ctx.directMessagesTopicID(),
+		RichMessage:           richMessage,
 	}
 
 	params.Option(opts...)
 
-	defaultParseMode := ctx.client.defaultParseMode()
-
-	if defaultParseMode != "" {
-	}
-
-	_, err := ctx.client.SendPoll(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SendRichMessage calls Client.SendRichMessage with context-derived defaults.
@@ -4104,44 +5464,36 @@ func (ctx *Context) SendRichMessage(
 	richMessage InputRichMessage,
 	opts ...SendRichMessageOption,
 ) error {
-	params := &SendRichMessageParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSendRichMessageParams(
+		richMessage,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.SendRichMessage(ctx.Detached(), params)
 
-			return m.MessageThreadID
-		}(ctx),
-		DirectMessagesTopicID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	return err
+}
 
-			if m.DirectMessagesTopic == nil {
-				return 0
-			}
-
-			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		RichMessage: richMessage,
+// NewSendRichMessageDraftParams builds SendRichMessageDraftParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendRichMessageDraft is needed:
+//
+//	ret, err := ctx.Client().SendRichMessageDraft(ctx.Detached(), ctx.NewSendRichMessageDraftParams(...))
+func (ctx *Context) NewSendRichMessageDraftParams(
+	draftID int64,
+	richMessage InputRichMessage,
+	opts ...SendRichMessageDraftOption,
+) *SendRichMessageDraftParams {
+	params := &SendRichMessageDraftParams{
+		ChatID:          ctx.chatID(),
+		MessageThreadID: messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DraftID:         draftID,
+		RichMessage:     richMessage,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SendRichMessage(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SendRichMessageDraft calls Client.SendRichMessageDraft with context-derived defaults.
@@ -4156,25 +5508,37 @@ func (ctx *Context) SendRichMessageDraft(
 	richMessage InputRichMessage,
 	opts ...SendRichMessageDraftOption,
 ) error {
-	params := &SendRichMessageDraftParams{
-		ChatID: ctx.chatID(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	params := ctx.NewSendRichMessageDraftParams(
+		draftID,
+		richMessage,
+		opts...,
+	)
 
-			return m.MessageThreadID
-		}(ctx),
-		DraftID:     draftID,
-		RichMessage: richMessage,
+	_, err := ctx.client.SendRichMessageDraft(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSendStickerParams builds SendStickerParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendSticker is needed:
+//
+//	ret, err := ctx.Client().SendSticker(ctx.Detached(), ctx.NewSendStickerParams(...))
+func (ctx *Context) NewSendStickerParams(
+	sticker InputFile,
+	opts ...SendStickerOption,
+) *SendStickerParams {
+	params := &SendStickerParams{
+		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:                ctx.chatIdentifier(),
+		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DirectMessagesTopicID: ctx.directMessagesTopicID(),
+		Sticker:               sticker,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SendRichMessageDraft(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SendSticker calls Client.SendSticker with context-derived defaults.
@@ -4189,44 +5553,42 @@ func (ctx *Context) SendSticker(
 	sticker InputFile,
 	opts ...SendStickerOption,
 ) error {
-	params := &SendStickerParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSendStickerParams(
+		sticker,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.SendSticker(ctx.Detached(), params)
 
-			return m.MessageThreadID
-		}(ctx),
-		DirectMessagesTopicID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	return err
+}
 
-			if m.DirectMessagesTopic == nil {
-				return 0
-			}
-
-			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		Sticker: sticker,
+// NewSendVenueParams builds SendVenueParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendVenue is needed:
+//
+//	ret, err := ctx.Client().SendVenue(ctx.Detached(), ctx.NewSendVenueParams(...))
+func (ctx *Context) NewSendVenueParams(
+	latitude float64,
+	longitude float64,
+	title string,
+	address string,
+	opts ...SendVenueOption,
+) *SendVenueParams {
+	params := &SendVenueParams{
+		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:                ctx.chatIdentifier(),
+		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DirectMessagesTopicID: ctx.directMessagesTopicID(),
+		Latitude:              latitude,
+		Longitude:             longitude,
+		Title:                 title,
+		Address:               address,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SendSticker(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SendVenue calls Client.SendVenue with context-derived defaults.
@@ -4242,47 +5604,45 @@ func (ctx *Context) SendVenue(
 	address string,
 	opts ...SendVenueOption,
 ) error {
-	params := &SendVenueParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSendVenueParams(
+		latitude,
+		longitude,
+		title,
+		address,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.SendVenue(ctx.Detached(), params)
 
-			return m.MessageThreadID
-		}(ctx),
-		DirectMessagesTopicID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	return err
+}
 
-			if m.DirectMessagesTopic == nil {
-				return 0
-			}
-
-			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		Latitude:  latitude,
-		Longitude: longitude,
-		Title:     title,
-		Address:   address,
+// NewSendVideoParams builds SendVideoParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendVideo is needed:
+//
+//	ret, err := ctx.Client().SendVideo(ctx.Detached(), ctx.NewSendVideoParams(...))
+func (ctx *Context) NewSendVideoParams(
+	video InputFile,
+	opts ...SendVideoOption,
+) *SendVideoParams {
+	params := &SendVideoParams{
+		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:                ctx.chatIdentifier(),
+		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DirectMessagesTopicID: ctx.directMessagesTopicID(),
+		Video:                 video,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SendVenue(ctx.detached(), params)
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
+			params.ParseMode = defaultParseMode
+		}
+	}
 
-	return err
+	return params
 }
 
 // SendVideo calls Client.SendVideo with context-derived defaults.
@@ -4297,52 +5657,36 @@ func (ctx *Context) SendVideo(
 	video InputFile,
 	opts ...SendVideoOption,
 ) error {
-	params := &SendVideoParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSendVideoParams(
+		video,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.SendVideo(ctx.Detached(), params)
 
-			return m.MessageThreadID
-		}(ctx),
-		DirectMessagesTopicID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	return err
+}
 
-			if m.DirectMessagesTopic == nil {
-				return 0
-			}
-
-			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		Video: video,
+// NewSendVideoNoteParams builds SendVideoNoteParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendVideoNote is needed:
+//
+//	ret, err := ctx.Client().SendVideoNote(ctx.Detached(), ctx.NewSendVideoNoteParams(...))
+func (ctx *Context) NewSendVideoNoteParams(
+	videoNote InputFile,
+	opts ...SendVideoNoteOption,
+) *SendVideoNoteParams {
+	params := &SendVideoNoteParams{
+		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:                ctx.chatIdentifier(),
+		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DirectMessagesTopicID: ctx.directMessagesTopicID(),
+		VideoNote:             videoNote,
 	}
 
 	params.Option(opts...)
 
-	defaultParseMode := ctx.client.defaultParseMode()
-
-	if defaultParseMode != "" {
-		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
-			params.ParseMode = defaultParseMode
-		}
-	}
-
-	_, err := ctx.client.SendVideo(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SendVideoNote calls Client.SendVideoNote with context-derived defaults.
@@ -4355,44 +5699,42 @@ func (ctx *Context) SendVideoNote(
 	videoNote InputFile,
 	opts ...SendVideoNoteOption,
 ) error {
-	params := &SendVideoNoteParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSendVideoNoteParams(
+		videoNote,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.SendVideoNote(ctx.Detached(), params)
 
-			return m.MessageThreadID
-		}(ctx),
-		DirectMessagesTopicID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	return err
+}
 
-			if m.DirectMessagesTopic == nil {
-				return 0
-			}
-
-			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		VideoNote: videoNote,
+// NewSendVoiceParams builds SendVoiceParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendVoice is needed:
+//
+//	ret, err := ctx.Client().SendVoice(ctx.Detached(), ctx.NewSendVoiceParams(...))
+func (ctx *Context) NewSendVoiceParams(
+	voice InputFile,
+	opts ...SendVoiceOption,
+) *SendVoiceParams {
+	params := &SendVoiceParams{
+		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:                ctx.chatIdentifier(),
+		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		DirectMessagesTopicID: ctx.directMessagesTopicID(),
+		Voice:                 voice,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SendVideoNote(ctx.detached(), params)
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
+			params.ParseMode = defaultParseMode
+		}
+	}
 
-	return err
+	return params
 }
 
 // SendVoice calls Client.SendVoice with context-derived defaults.
@@ -4409,52 +5751,31 @@ func (ctx *Context) SendVoice(
 	voice InputFile,
 	opts ...SendVoiceOption,
 ) error {
-	params := &SendVoiceParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSendVoiceParams(
+		voice,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.SendVoice(ctx.Detached(), params)
 
-			return m.MessageThreadID
-		}(ctx),
-		DirectMessagesTopicID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	return err
+}
 
-			if m.DirectMessagesTopic == nil {
-				return 0
-			}
-
-			return m.DirectMessagesTopic.TopicID
-		}(ctx),
-		Voice: voice,
+// NewSetBusinessAccountBioParams builds SetBusinessAccountBioParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetBusinessAccountBio is needed:
+//
+//	ret, err := ctx.Client().SetBusinessAccountBio(ctx.Detached(), ctx.NewSetBusinessAccountBioParams(...))
+func (ctx *Context) NewSetBusinessAccountBioParams(
+	opts ...SetBusinessAccountBioOption,
+) *SetBusinessAccountBioParams {
+	params := &SetBusinessAccountBioParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 	}
 
 	params.Option(opts...)
 
-	defaultParseMode := ctx.client.defaultParseMode()
-
-	if defaultParseMode != "" {
-		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
-			params.ParseMode = defaultParseMode
-		}
-	}
-
-	_, err := ctx.client.SendVoice(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetBusinessAccountBio calls Client.SetBusinessAccountBio with context-derived defaults.
@@ -4465,22 +5786,34 @@ func (ctx *Context) SendVoice(
 func (ctx *Context) SetBusinessAccountBio(
 	opts ...SetBusinessAccountBioOption,
 ) error {
-	params := &SetBusinessAccountBioParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSetBusinessAccountBioParams(
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
+	_, err := ctx.client.SetBusinessAccountBio(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetBusinessAccountGiftSettingsParams builds SetBusinessAccountGiftSettingsParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetBusinessAccountGiftSettings is needed:
+//
+//	ret, err := ctx.Client().SetBusinessAccountGiftSettings(ctx.Detached(), ctx.NewSetBusinessAccountGiftSettingsParams(...))
+func (ctx *Context) NewSetBusinessAccountGiftSettingsParams(
+	showGiftButton bool,
+	acceptedGiftTypes AcceptedGiftTypes,
+	opts ...SetBusinessAccountGiftSettingsOption,
+) *SetBusinessAccountGiftSettingsParams {
+	params := &SetBusinessAccountGiftSettingsParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ShowGiftButton:       showGiftButton,
+		AcceptedGiftTypes:    acceptedGiftTypes,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetBusinessAccountBio(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetBusinessAccountGiftSettings calls Client.SetBusinessAccountGiftSettings with context-derived defaults.
@@ -4493,24 +5826,34 @@ func (ctx *Context) SetBusinessAccountGiftSettings(
 	acceptedGiftTypes AcceptedGiftTypes,
 	opts ...SetBusinessAccountGiftSettingsOption,
 ) error {
-	params := &SetBusinessAccountGiftSettingsParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSetBusinessAccountGiftSettingsParams(
+		showGiftButton,
+		acceptedGiftTypes,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ShowGiftButton:    showGiftButton,
-		AcceptedGiftTypes: acceptedGiftTypes,
+	_, err := ctx.client.SetBusinessAccountGiftSettings(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetBusinessAccountNameParams builds SetBusinessAccountNameParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetBusinessAccountName is needed:
+//
+//	ret, err := ctx.Client().SetBusinessAccountName(ctx.Detached(), ctx.NewSetBusinessAccountNameParams(...))
+func (ctx *Context) NewSetBusinessAccountNameParams(
+	firstName string,
+	opts ...SetBusinessAccountNameOption,
+) *SetBusinessAccountNameParams {
+	params := &SetBusinessAccountNameParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		FirstName:            firstName,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetBusinessAccountGiftSettings(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetBusinessAccountName calls Client.SetBusinessAccountName with context-derived defaults.
@@ -4522,23 +5865,33 @@ func (ctx *Context) SetBusinessAccountName(
 	firstName string,
 	opts ...SetBusinessAccountNameOption,
 ) error {
-	params := &SetBusinessAccountNameParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSetBusinessAccountNameParams(
+		firstName,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		FirstName: firstName,
+	_, err := ctx.client.SetBusinessAccountName(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetBusinessAccountProfilePhotoParams builds SetBusinessAccountProfilePhotoParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetBusinessAccountProfilePhoto is needed:
+//
+//	ret, err := ctx.Client().SetBusinessAccountProfilePhoto(ctx.Detached(), ctx.NewSetBusinessAccountProfilePhotoParams(...))
+func (ctx *Context) NewSetBusinessAccountProfilePhotoParams(
+	photo InputProfilePhoto,
+	opts ...SetBusinessAccountProfilePhotoOption,
+) *SetBusinessAccountProfilePhotoParams {
+	params := &SetBusinessAccountProfilePhotoParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		Photo:                photo,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetBusinessAccountName(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetBusinessAccountProfilePhoto calls Client.SetBusinessAccountProfilePhoto with context-derived defaults.
@@ -4550,23 +5903,31 @@ func (ctx *Context) SetBusinessAccountProfilePhoto(
 	photo InputProfilePhoto,
 	opts ...SetBusinessAccountProfilePhotoOption,
 ) error {
-	params := &SetBusinessAccountProfilePhotoParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSetBusinessAccountProfilePhotoParams(
+		photo,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		Photo: photo,
+	_, err := ctx.client.SetBusinessAccountProfilePhoto(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetBusinessAccountUsernameParams builds SetBusinessAccountUsernameParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetBusinessAccountUsername is needed:
+//
+//	ret, err := ctx.Client().SetBusinessAccountUsername(ctx.Detached(), ctx.NewSetBusinessAccountUsernameParams(...))
+func (ctx *Context) NewSetBusinessAccountUsernameParams(
+	opts ...SetBusinessAccountUsernameOption,
+) *SetBusinessAccountUsernameParams {
+	params := &SetBusinessAccountUsernameParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetBusinessAccountProfilePhoto(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetBusinessAccountUsername calls Client.SetBusinessAccountUsername with context-derived defaults.
@@ -4577,22 +5938,33 @@ func (ctx *Context) SetBusinessAccountProfilePhoto(
 func (ctx *Context) SetBusinessAccountUsername(
 	opts ...SetBusinessAccountUsernameOption,
 ) error {
-	params := &SetBusinessAccountUsernameParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewSetBusinessAccountUsernameParams(
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
+	_, err := ctx.client.SetBusinessAccountUsername(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetChatAdministratorCustomTitleParams builds SetChatAdministratorCustomTitleParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetChatAdministratorCustomTitle is needed:
+//
+//	ret, err := ctx.Client().SetChatAdministratorCustomTitle(ctx.Detached(), ctx.NewSetChatAdministratorCustomTitleParams(...))
+func (ctx *Context) NewSetChatAdministratorCustomTitleParams(
+	customTitle string,
+	opts ...SetChatAdministratorCustomTitleOption,
+) *SetChatAdministratorCustomTitleParams {
+	params := &SetChatAdministratorCustomTitleParams{
+		ChatID:      ctx.chatIdentifier(),
+		UserID:      ctx.userID(),
+		CustomTitle: customTitle,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetBusinessAccountUsername(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetChatAdministratorCustomTitle calls Client.SetChatAdministratorCustomTitle with context-derived defaults.
@@ -4603,17 +5975,31 @@ func (ctx *Context) SetChatAdministratorCustomTitle(
 	customTitle string,
 	opts ...SetChatAdministratorCustomTitleOption,
 ) error {
-	params := &SetChatAdministratorCustomTitleParams{
-		ChatID:      ctx.chatIdentifier(),
-		UserID:      ctx.userID(),
-		CustomTitle: customTitle,
+	params := ctx.NewSetChatAdministratorCustomTitleParams(
+		customTitle,
+		opts...,
+	)
+
+	_, err := ctx.client.SetChatAdministratorCustomTitle(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetChatDescriptionParams builds SetChatDescriptionParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetChatDescription is needed:
+//
+//	ret, err := ctx.Client().SetChatDescription(ctx.Detached(), ctx.NewSetChatDescriptionParams(...))
+func (ctx *Context) NewSetChatDescriptionParams(
+	opts ...SetChatDescriptionOption,
+) *SetChatDescriptionParams {
+	params := &SetChatDescriptionParams{
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetChatAdministratorCustomTitle(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetChatDescription calls Client.SetChatDescription with context-derived defaults.
@@ -4624,15 +6010,31 @@ func (ctx *Context) SetChatAdministratorCustomTitle(
 func (ctx *Context) SetChatDescription(
 	opts ...SetChatDescriptionOption,
 ) error {
-	params := &SetChatDescriptionParams{
+	params := ctx.NewSetChatDescriptionParams(
+		opts...,
+	)
+
+	_, err := ctx.client.SetChatDescription(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetChatMemberTagParams builds SetChatMemberTagParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetChatMemberTag is needed:
+//
+//	ret, err := ctx.Client().SetChatMemberTag(ctx.Detached(), ctx.NewSetChatMemberTagParams(...))
+func (ctx *Context) NewSetChatMemberTagParams(
+	opts ...SetChatMemberTagOption,
+) *SetChatMemberTagParams {
+	params := &SetChatMemberTagParams{
 		ChatID: ctx.chatIdentifier(),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetChatDescription(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetChatMemberTag calls Client.SetChatMemberTag with context-derived defaults.
@@ -4643,16 +6045,30 @@ func (ctx *Context) SetChatDescription(
 func (ctx *Context) SetChatMemberTag(
 	opts ...SetChatMemberTagOption,
 ) error {
-	params := &SetChatMemberTagParams{
-		ChatID: ctx.chatIdentifier(),
-		UserID: ctx.userID(),
+	params := ctx.NewSetChatMemberTagParams(
+		opts...,
+	)
+
+	_, err := ctx.client.SetChatMemberTag(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetChatMenuButtonParams builds SetChatMenuButtonParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetChatMenuButton is needed:
+//
+//	ret, err := ctx.Client().SetChatMenuButton(ctx.Detached(), ctx.NewSetChatMenuButtonParams(...))
+func (ctx *Context) NewSetChatMenuButtonParams(
+	opts ...SetChatMenuButtonOption,
+) *SetChatMenuButtonParams {
+	params := &SetChatMenuButtonParams{
+		ChatID: ctx.chatID(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetChatMemberTag(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetChatMenuButton calls Client.SetChatMenuButton with context-derived defaults.
@@ -4662,15 +6078,32 @@ func (ctx *Context) SetChatMemberTag(
 func (ctx *Context) SetChatMenuButton(
 	opts ...SetChatMenuButtonOption,
 ) error {
-	params := &SetChatMenuButtonParams{
-		ChatID: ctx.chatID(),
+	params := ctx.NewSetChatMenuButtonParams(
+		opts...,
+	)
+
+	_, err := ctx.client.SetChatMenuButton(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetChatPermissionsParams builds SetChatPermissionsParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetChatPermissions is needed:
+//
+//	ret, err := ctx.Client().SetChatPermissions(ctx.Detached(), ctx.NewSetChatPermissionsParams(...))
+func (ctx *Context) NewSetChatPermissionsParams(
+	permissions ChatPermissions,
+	opts ...SetChatPermissionsOption,
+) *SetChatPermissionsParams {
+	params := &SetChatPermissionsParams{
+		ChatID:      ctx.chatIdentifier(),
+		Permissions: permissions,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetChatMenuButton(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetChatPermissions calls Client.SetChatPermissions with context-derived defaults.
@@ -4682,16 +6115,33 @@ func (ctx *Context) SetChatPermissions(
 	permissions ChatPermissions,
 	opts ...SetChatPermissionsOption,
 ) error {
-	params := &SetChatPermissionsParams{
-		ChatID:      ctx.chatIdentifier(),
-		Permissions: permissions,
+	params := ctx.NewSetChatPermissionsParams(
+		permissions,
+		opts...,
+	)
+
+	_, err := ctx.client.SetChatPermissions(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetChatPhotoParams builds SetChatPhotoParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetChatPhoto is needed:
+//
+//	ret, err := ctx.Client().SetChatPhoto(ctx.Detached(), ctx.NewSetChatPhotoParams(...))
+func (ctx *Context) NewSetChatPhotoParams(
+	photo InputFile,
+	opts ...SetChatPhotoOption,
+) *SetChatPhotoParams {
+	params := &SetChatPhotoParams{
+		ChatID: ctx.chatIdentifier(),
+		Photo:  photo,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetChatPermissions(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetChatPhoto calls Client.SetChatPhoto with context-derived defaults.
@@ -4704,16 +6154,33 @@ func (ctx *Context) SetChatPhoto(
 	photo InputFile,
 	opts ...SetChatPhotoOption,
 ) error {
-	params := &SetChatPhotoParams{
-		ChatID: ctx.chatIdentifier(),
-		Photo:  photo,
+	params := ctx.NewSetChatPhotoParams(
+		photo,
+		opts...,
+	)
+
+	_, err := ctx.client.SetChatPhoto(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetChatStickerSetParams builds SetChatStickerSetParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetChatStickerSet is needed:
+//
+//	ret, err := ctx.Client().SetChatStickerSet(ctx.Detached(), ctx.NewSetChatStickerSetParams(...))
+func (ctx *Context) NewSetChatStickerSetParams(
+	stickerSetName string,
+	opts ...SetChatStickerSetOption,
+) *SetChatStickerSetParams {
+	params := &SetChatStickerSetParams{
+		ChatID:         ctx.chatIdentifier(),
+		StickerSetName: stickerSetName,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetChatPhoto(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetChatStickerSet calls Client.SetChatStickerSet with context-derived defaults.
@@ -4728,16 +6195,33 @@ func (ctx *Context) SetChatStickerSet(
 	stickerSetName string,
 	opts ...SetChatStickerSetOption,
 ) error {
-	params := &SetChatStickerSetParams{
-		ChatID:         ctx.chatIdentifier(),
-		StickerSetName: stickerSetName,
+	params := ctx.NewSetChatStickerSetParams(
+		stickerSetName,
+		opts...,
+	)
+
+	_, err := ctx.client.SetChatStickerSet(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetChatTitleParams builds SetChatTitleParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetChatTitle is needed:
+//
+//	ret, err := ctx.Client().SetChatTitle(ctx.Detached(), ctx.NewSetChatTitleParams(...))
+func (ctx *Context) NewSetChatTitleParams(
+	title string,
+	opts ...SetChatTitleOption,
+) *SetChatTitleParams {
+	params := &SetChatTitleParams{
+		ChatID: ctx.chatIdentifier(),
+		Title:  title,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetChatStickerSet(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetChatTitle calls Client.SetChatTitle with context-derived defaults.
@@ -4750,16 +6234,32 @@ func (ctx *Context) SetChatTitle(
 	title string,
 	opts ...SetChatTitleOption,
 ) error {
-	params := &SetChatTitleParams{
-		ChatID: ctx.chatIdentifier(),
-		Title:  title,
+	params := ctx.NewSetChatTitleParams(
+		title,
+		opts...,
+	)
+
+	_, err := ctx.client.SetChatTitle(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetCustomEmojiStickerSetThumbnailParams builds SetCustomEmojiStickerSetThumbnailParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetCustomEmojiStickerSetThumbnail is needed:
+//
+//	ret, err := ctx.Client().SetCustomEmojiStickerSetThumbnail(ctx.Detached(), ctx.NewSetCustomEmojiStickerSetThumbnailParams(...))
+func (ctx *Context) NewSetCustomEmojiStickerSetThumbnailParams(
+	name string,
+	opts ...SetCustomEmojiStickerSetThumbnailOption,
+) *SetCustomEmojiStickerSetThumbnailParams {
+	params := &SetCustomEmojiStickerSetThumbnailParams{
+		Name: name,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetChatTitle(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetCustomEmojiStickerSetThumbnail calls Client.SetCustomEmojiStickerSetThumbnail with context-derived defaults.
@@ -4770,15 +6270,36 @@ func (ctx *Context) SetCustomEmojiStickerSetThumbnail(
 	name string,
 	opts ...SetCustomEmojiStickerSetThumbnailOption,
 ) error {
-	params := &SetCustomEmojiStickerSetThumbnailParams{
-		Name: name,
+	params := ctx.NewSetCustomEmojiStickerSetThumbnailParams(
+		name,
+		opts...,
+	)
+
+	_, err := ctx.client.SetCustomEmojiStickerSetThumbnail(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetGameScoreParams builds SetGameScoreParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetGameScore is needed:
+//
+//	ret, err := ctx.Client().SetGameScore(ctx.Detached(), ctx.NewSetGameScoreParams(...))
+func (ctx *Context) NewSetGameScoreParams(
+	score int64,
+	opts ...SetGameScoreOption,
+) *SetGameScoreParams {
+	params := &SetGameScoreParams{
+		UserID:          ctx.userID(),
+		Score:           score,
+		ChatID:          ctx.chatID(),
+		MessageID:       messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		InlineMessageID: ctx.inlineMessageID(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetCustomEmojiStickerSetThumbnail(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetGameScore calls Client.SetGameScore with context-derived defaults.
@@ -4792,32 +6313,33 @@ func (ctx *Context) SetGameScore(
 	score int64,
 	opts ...SetGameScoreOption,
 ) error {
-	params := &SetGameScoreParams{
-		UserID: ctx.userID(),
-		Score:  score,
-		ChatID: ctx.chatID(),
-		MessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	params := ctx.NewSetGameScoreParams(
+		score,
+		opts...,
+	)
 
-			return m.MessageID
-		}(ctx),
-		InlineMessageID: func(ctx *Context) string {
-			if ctx.update.CallbackQuery == nil {
-				return ""
-			}
+	_, err := ctx.client.SetGameScore(ctx.Detached(), params)
 
-			return ctx.update.CallbackQuery.InlineMessageID
-		}(ctx),
+	return err
+}
+
+// NewSetManagedBotAccessSettingsParams builds SetManagedBotAccessSettingsParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetManagedBotAccessSettings is needed:
+//
+//	ret, err := ctx.Client().SetManagedBotAccessSettings(ctx.Detached(), ctx.NewSetManagedBotAccessSettingsParams(...))
+func (ctx *Context) NewSetManagedBotAccessSettingsParams(
+	isAccessRestricted bool,
+	opts ...SetManagedBotAccessSettingsOption,
+) *SetManagedBotAccessSettingsParams {
+	params := &SetManagedBotAccessSettingsParams{
+		UserID:             ctx.userID(),
+		IsAccessRestricted: isAccessRestricted,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetGameScore(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetManagedBotAccessSettings calls Client.SetManagedBotAccessSettings with context-derived defaults.
@@ -4828,16 +6350,32 @@ func (ctx *Context) SetManagedBotAccessSettings(
 	isAccessRestricted bool,
 	opts ...SetManagedBotAccessSettingsOption,
 ) error {
-	params := &SetManagedBotAccessSettingsParams{
-		UserID:             ctx.userID(),
-		IsAccessRestricted: isAccessRestricted,
+	params := ctx.NewSetManagedBotAccessSettingsParams(
+		isAccessRestricted,
+		opts...,
+	)
+
+	_, err := ctx.client.SetManagedBotAccessSettings(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetMessageReactionParams builds SetMessageReactionParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetMessageReaction is needed:
+//
+//	ret, err := ctx.Client().SetMessageReaction(ctx.Detached(), ctx.NewSetMessageReactionParams(...))
+func (ctx *Context) NewSetMessageReactionParams(
+	opts ...SetMessageReactionOption,
+) *SetMessageReactionParams {
+	params := &SetMessageReactionParams{
+		ChatID:    ctx.chatIdentifier(),
+		MessageID: messageField(ctx, func(m *Message) int64 { return m.MessageID }),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetManagedBotAccessSettings(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetMessageReaction calls Client.SetMessageReaction with context-derived defaults.
@@ -4850,23 +6388,31 @@ func (ctx *Context) SetManagedBotAccessSettings(
 func (ctx *Context) SetMessageReaction(
 	opts ...SetMessageReactionOption,
 ) error {
-	params := &SetMessageReactionParams{
-		ChatID: ctx.chatIdentifier(),
-		MessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	params := ctx.NewSetMessageReactionParams(
+		opts...,
+	)
 
-			return m.MessageID
-		}(ctx),
+	_, err := ctx.client.SetMessageReaction(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetMyCommandsParams builds SetMyCommandsParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetMyCommands is needed:
+//
+//	ret, err := ctx.Client().SetMyCommands(ctx.Detached(), ctx.NewSetMyCommandsParams(...))
+func (ctx *Context) NewSetMyCommandsParams(
+	commands []BotCommand,
+	opts ...SetMyCommandsOption,
+) *SetMyCommandsParams {
+	params := &SetMyCommandsParams{
+		Commands: commands,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetMessageReaction(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetMyCommands calls Client.SetMyCommands with context-derived defaults.
@@ -4880,15 +6426,29 @@ func (ctx *Context) SetMyCommands(
 	commands []BotCommand,
 	opts ...SetMyCommandsOption,
 ) error {
-	params := &SetMyCommandsParams{
-		Commands: commands,
-	}
+	params := ctx.NewSetMyCommandsParams(
+		commands,
+		opts...,
+	)
+
+	_, err := ctx.client.SetMyCommands(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetMyDefaultAdministratorRightsParams builds SetMyDefaultAdministratorRightsParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetMyDefaultAdministratorRights is needed:
+//
+//	ret, err := ctx.Client().SetMyDefaultAdministratorRights(ctx.Detached(), ctx.NewSetMyDefaultAdministratorRightsParams(...))
+func (ctx *Context) NewSetMyDefaultAdministratorRightsParams(
+	opts ...SetMyDefaultAdministratorRightsOption,
+) *SetMyDefaultAdministratorRightsParams {
+	params := &SetMyDefaultAdministratorRightsParams{}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetMyCommands(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetMyDefaultAdministratorRights calls Client.SetMyDefaultAdministratorRights with context-derived defaults.
@@ -4899,13 +6459,28 @@ func (ctx *Context) SetMyCommands(
 func (ctx *Context) SetMyDefaultAdministratorRights(
 	opts ...SetMyDefaultAdministratorRightsOption,
 ) error {
-	params := &SetMyDefaultAdministratorRightsParams{}
+	params := ctx.NewSetMyDefaultAdministratorRightsParams(
+		opts...,
+	)
+
+	_, err := ctx.client.SetMyDefaultAdministratorRights(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetMyDescriptionParams builds SetMyDescriptionParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetMyDescription is needed:
+//
+//	ret, err := ctx.Client().SetMyDescription(ctx.Detached(), ctx.NewSetMyDescriptionParams(...))
+func (ctx *Context) NewSetMyDescriptionParams(
+	opts ...SetMyDescriptionOption,
+) *SetMyDescriptionParams {
+	params := &SetMyDescriptionParams{}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetMyDefaultAdministratorRights(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetMyDescription calls Client.SetMyDescription with context-derived defaults.
@@ -4915,13 +6490,28 @@ func (ctx *Context) SetMyDefaultAdministratorRights(
 func (ctx *Context) SetMyDescription(
 	opts ...SetMyDescriptionOption,
 ) error {
-	params := &SetMyDescriptionParams{}
+	params := ctx.NewSetMyDescriptionParams(
+		opts...,
+	)
+
+	_, err := ctx.client.SetMyDescription(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetMyNameParams builds SetMyNameParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetMyName is needed:
+//
+//	ret, err := ctx.Client().SetMyName(ctx.Detached(), ctx.NewSetMyNameParams(...))
+func (ctx *Context) NewSetMyNameParams(
+	opts ...SetMyNameOption,
+) *SetMyNameParams {
+	params := &SetMyNameParams{}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetMyDescription(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetMyName calls Client.SetMyName with context-derived defaults.
@@ -4931,13 +6521,31 @@ func (ctx *Context) SetMyDescription(
 func (ctx *Context) SetMyName(
 	opts ...SetMyNameOption,
 ) error {
-	params := &SetMyNameParams{}
+	params := ctx.NewSetMyNameParams(
+		opts...,
+	)
+
+	_, err := ctx.client.SetMyName(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetMyProfilePhotoParams builds SetMyProfilePhotoParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetMyProfilePhoto is needed:
+//
+//	ret, err := ctx.Client().SetMyProfilePhoto(ctx.Detached(), ctx.NewSetMyProfilePhotoParams(...))
+func (ctx *Context) NewSetMyProfilePhotoParams(
+	photo InputProfilePhoto,
+	opts ...SetMyProfilePhotoOption,
+) *SetMyProfilePhotoParams {
+	params := &SetMyProfilePhotoParams{
+		Photo: photo,
+	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetMyName(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetMyProfilePhoto calls Client.SetMyProfilePhoto with context-derived defaults.
@@ -4948,15 +6556,29 @@ func (ctx *Context) SetMyProfilePhoto(
 	photo InputProfilePhoto,
 	opts ...SetMyProfilePhotoOption,
 ) error {
-	params := &SetMyProfilePhotoParams{
-		Photo: photo,
-	}
+	params := ctx.NewSetMyProfilePhotoParams(
+		photo,
+		opts...,
+	)
+
+	_, err := ctx.client.SetMyProfilePhoto(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetMyShortDescriptionParams builds SetMyShortDescriptionParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetMyShortDescription is needed:
+//
+//	ret, err := ctx.Client().SetMyShortDescription(ctx.Detached(), ctx.NewSetMyShortDescriptionParams(...))
+func (ctx *Context) NewSetMyShortDescriptionParams(
+	opts ...SetMyShortDescriptionOption,
+) *SetMyShortDescriptionParams {
+	params := &SetMyShortDescriptionParams{}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetMyProfilePhoto(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetMyShortDescription calls Client.SetMyShortDescription with context-derived defaults.
@@ -4966,13 +6588,32 @@ func (ctx *Context) SetMyProfilePhoto(
 func (ctx *Context) SetMyShortDescription(
 	opts ...SetMyShortDescriptionOption,
 ) error {
-	params := &SetMyShortDescriptionParams{}
+	params := ctx.NewSetMyShortDescriptionParams(
+		opts...,
+	)
+
+	_, err := ctx.client.SetMyShortDescription(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetPassportDataErrorsParams builds SetPassportDataErrorsParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetPassportDataErrors is needed:
+//
+//	ret, err := ctx.Client().SetPassportDataErrors(ctx.Detached(), ctx.NewSetPassportDataErrorsParams(...))
+func (ctx *Context) NewSetPassportDataErrorsParams(
+	errors []PassportElementError,
+	opts ...SetPassportDataErrorsOption,
+) *SetPassportDataErrorsParams {
+	params := &SetPassportDataErrorsParams{
+		UserID: ctx.userID(),
+		Errors: errors,
+	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetMyShortDescription(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetPassportDataErrors calls Client.SetPassportDataErrors with context-derived defaults.
@@ -4987,16 +6628,34 @@ func (ctx *Context) SetPassportDataErrors(
 	errors []PassportElementError,
 	opts ...SetPassportDataErrorsOption,
 ) error {
-	params := &SetPassportDataErrorsParams{
-		UserID: ctx.userID(),
-		Errors: errors,
+	params := ctx.NewSetPassportDataErrorsParams(
+		errors,
+		opts...,
+	)
+
+	_, err := ctx.client.SetPassportDataErrors(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetStickerEmojiListParams builds SetStickerEmojiListParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetStickerEmojiList is needed:
+//
+//	ret, err := ctx.Client().SetStickerEmojiList(ctx.Detached(), ctx.NewSetStickerEmojiListParams(...))
+func (ctx *Context) NewSetStickerEmojiListParams(
+	sticker string,
+	emojiList []string,
+	opts ...SetStickerEmojiListOption,
+) *SetStickerEmojiListParams {
+	params := &SetStickerEmojiListParams{
+		Sticker:   sticker,
+		EmojiList: emojiList,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetPassportDataErrors(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetStickerEmojiList calls Client.SetStickerEmojiList with context-derived defaults.
@@ -5009,16 +6668,33 @@ func (ctx *Context) SetStickerEmojiList(
 	emojiList []string,
 	opts ...SetStickerEmojiListOption,
 ) error {
-	params := &SetStickerEmojiListParams{
-		Sticker:   sticker,
-		EmojiList: emojiList,
+	params := ctx.NewSetStickerEmojiListParams(
+		sticker,
+		emojiList,
+		opts...,
+	)
+
+	_, err := ctx.client.SetStickerEmojiList(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetStickerKeywordsParams builds SetStickerKeywordsParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetStickerKeywords is needed:
+//
+//	ret, err := ctx.Client().SetStickerKeywords(ctx.Detached(), ctx.NewSetStickerKeywordsParams(...))
+func (ctx *Context) NewSetStickerKeywordsParams(
+	sticker string,
+	opts ...SetStickerKeywordsOption,
+) *SetStickerKeywordsParams {
+	params := &SetStickerKeywordsParams{
+		Sticker: sticker,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetStickerEmojiList(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetStickerKeywords calls Client.SetStickerKeywords with context-derived defaults.
@@ -5030,15 +6706,32 @@ func (ctx *Context) SetStickerKeywords(
 	sticker string,
 	opts ...SetStickerKeywordsOption,
 ) error {
-	params := &SetStickerKeywordsParams{
+	params := ctx.NewSetStickerKeywordsParams(
+		sticker,
+		opts...,
+	)
+
+	_, err := ctx.client.SetStickerKeywords(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetStickerMaskPositionParams builds SetStickerMaskPositionParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetStickerMaskPosition is needed:
+//
+//	ret, err := ctx.Client().SetStickerMaskPosition(ctx.Detached(), ctx.NewSetStickerMaskPositionParams(...))
+func (ctx *Context) NewSetStickerMaskPositionParams(
+	sticker string,
+	opts ...SetStickerMaskPositionOption,
+) *SetStickerMaskPositionParams {
+	params := &SetStickerMaskPositionParams{
 		Sticker: sticker,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetStickerKeywords(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetStickerMaskPosition calls Client.SetStickerMaskPosition with context-derived defaults.
@@ -5052,15 +6745,34 @@ func (ctx *Context) SetStickerMaskPosition(
 	sticker string,
 	opts ...SetStickerMaskPositionOption,
 ) error {
-	params := &SetStickerMaskPositionParams{
-		Sticker: sticker,
+	params := ctx.NewSetStickerMaskPositionParams(
+		sticker,
+		opts...,
+	)
+
+	_, err := ctx.client.SetStickerMaskPosition(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetStickerPositionInSetParams builds SetStickerPositionInSetParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetStickerPositionInSet is needed:
+//
+//	ret, err := ctx.Client().SetStickerPositionInSet(ctx.Detached(), ctx.NewSetStickerPositionInSetParams(...))
+func (ctx *Context) NewSetStickerPositionInSetParams(
+	sticker string,
+	position int64,
+	opts ...SetStickerPositionInSetOption,
+) *SetStickerPositionInSetParams {
+	params := &SetStickerPositionInSetParams{
+		Sticker:  sticker,
+		Position: position,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetStickerMaskPosition(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetStickerPositionInSet calls Client.SetStickerPositionInSet with context-derived defaults.
@@ -5072,16 +6784,36 @@ func (ctx *Context) SetStickerPositionInSet(
 	position int64,
 	opts ...SetStickerPositionInSetOption,
 ) error {
-	params := &SetStickerPositionInSetParams{
-		Sticker:  sticker,
-		Position: position,
+	params := ctx.NewSetStickerPositionInSetParams(
+		sticker,
+		position,
+		opts...,
+	)
+
+	_, err := ctx.client.SetStickerPositionInSet(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetStickerSetThumbnailParams builds SetStickerSetThumbnailParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetStickerSetThumbnail is needed:
+//
+//	ret, err := ctx.Client().SetStickerSetThumbnail(ctx.Detached(), ctx.NewSetStickerSetThumbnailParams(...))
+func (ctx *Context) NewSetStickerSetThumbnailParams(
+	name string,
+	format string,
+	opts ...SetStickerSetThumbnailOption,
+) *SetStickerSetThumbnailParams {
+	params := &SetStickerSetThumbnailParams{
+		Name:   name,
+		UserID: ctx.userID(),
+		Format: format,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetStickerPositionInSet(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetStickerSetThumbnail calls Client.SetStickerSetThumbnail with context-derived defaults.
@@ -5094,17 +6826,35 @@ func (ctx *Context) SetStickerSetThumbnail(
 	format string,
 	opts ...SetStickerSetThumbnailOption,
 ) error {
-	params := &SetStickerSetThumbnailParams{
-		Name:   name,
-		UserID: ctx.userID(),
-		Format: format,
+	params := ctx.NewSetStickerSetThumbnailParams(
+		name,
+		format,
+		opts...,
+	)
+
+	_, err := ctx.client.SetStickerSetThumbnail(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetStickerSetTitleParams builds SetStickerSetTitleParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetStickerSetTitle is needed:
+//
+//	ret, err := ctx.Client().SetStickerSetTitle(ctx.Detached(), ctx.NewSetStickerSetTitleParams(...))
+func (ctx *Context) NewSetStickerSetTitleParams(
+	name string,
+	title string,
+	opts ...SetStickerSetTitleOption,
+) *SetStickerSetTitleParams {
+	params := &SetStickerSetTitleParams{
+		Name:  name,
+		Title: title,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetStickerSetThumbnail(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetStickerSetTitle calls Client.SetStickerSetTitle with context-derived defaults.
@@ -5116,16 +6866,32 @@ func (ctx *Context) SetStickerSetTitle(
 	title string,
 	opts ...SetStickerSetTitleOption,
 ) error {
-	params := &SetStickerSetTitleParams{
-		Name:  name,
-		Title: title,
+	params := ctx.NewSetStickerSetTitleParams(
+		name,
+		title,
+		opts...,
+	)
+
+	_, err := ctx.client.SetStickerSetTitle(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetUserEmojiStatusParams builds SetUserEmojiStatusParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetUserEmojiStatus is needed:
+//
+//	ret, err := ctx.Client().SetUserEmojiStatus(ctx.Detached(), ctx.NewSetUserEmojiStatusParams(...))
+func (ctx *Context) NewSetUserEmojiStatusParams(
+	opts ...SetUserEmojiStatusOption,
+) *SetUserEmojiStatusParams {
+	params := &SetUserEmojiStatusParams{
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetStickerSetTitle(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetUserEmojiStatus calls Client.SetUserEmojiStatus with context-derived defaults.
@@ -5137,15 +6903,31 @@ func (ctx *Context) SetStickerSetTitle(
 func (ctx *Context) SetUserEmojiStatus(
 	opts ...SetUserEmojiStatusOption,
 ) error {
-	params := &SetUserEmojiStatusParams{
-		UserID: ctx.userID(),
+	params := ctx.NewSetUserEmojiStatusParams(
+		opts...,
+	)
+
+	_, err := ctx.client.SetUserEmojiStatus(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSetWebhookParams builds SetWebhookParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetWebhook is needed:
+//
+//	ret, err := ctx.Client().SetWebhook(ctx.Detached(), ctx.NewSetWebhookParams(...))
+func (ctx *Context) NewSetWebhookParams(
+	uRL string,
+	opts ...SetWebhookOption,
+) *SetWebhookParams {
+	params := &SetWebhookParams{
+		URL: uRL,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetUserEmojiStatus(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // SetWebhook calls Client.SetWebhook with context-derived defaults.
@@ -5163,15 +6945,34 @@ func (ctx *Context) SetWebhook(
 	uRL string,
 	opts ...SetWebhookOption,
 ) error {
-	params := &SetWebhookParams{
-		URL: uRL,
+	params := ctx.NewSetWebhookParams(
+		uRL,
+		opts...,
+	)
+
+	_, err := ctx.client.SetWebhook(ctx.Detached(), params)
+
+	return err
+}
+
+// NewStopMessageLiveLocationParams builds StopMessageLiveLocationParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.StopMessageLiveLocation is needed:
+//
+//	ret, err := ctx.Client().StopMessageLiveLocation(ctx.Detached(), ctx.NewStopMessageLiveLocationParams(...))
+func (ctx *Context) NewStopMessageLiveLocationParams(
+	opts ...StopMessageLiveLocationOption,
+) *StopMessageLiveLocationParams {
+	params := &StopMessageLiveLocationParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:               ctx.chatIdentifier(),
+		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		InlineMessageID:      ctx.inlineMessageID(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.SetWebhook(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // StopMessageLiveLocation calls Client.StopMessageLiveLocation with context-derived defaults.
@@ -5183,38 +6984,32 @@ func (ctx *Context) SetWebhook(
 func (ctx *Context) StopMessageLiveLocation(
 	opts ...StopMessageLiveLocationOption,
 ) error {
-	params := &StopMessageLiveLocationParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewStopMessageLiveLocationParams(
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.StopMessageLiveLocation(ctx.Detached(), params)
 
-			return m.MessageID
-		}(ctx),
-		InlineMessageID: func(ctx *Context) string {
-			if ctx.update.CallbackQuery == nil {
-				return ""
-			}
+	return err
+}
 
-			return ctx.update.CallbackQuery.InlineMessageID
-		}(ctx),
+// NewStopPollParams builds StopPollParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.StopPoll is needed:
+//
+//	ret, err := ctx.Client().StopPoll(ctx.Detached(), ctx.NewStopPollParams(...))
+func (ctx *Context) NewStopPollParams(
+	opts ...StopPollOption,
+) *StopPollParams {
+	params := &StopPollParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:               ctx.chatIdentifier(),
+		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.StopMessageLiveLocation(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // StopPoll calls Client.StopPoll with context-derived defaults.
@@ -5226,31 +7021,32 @@ func (ctx *Context) StopMessageLiveLocation(
 func (ctx *Context) StopPoll(
 	opts ...StopPollOption,
 ) error {
-	params := &StopPollParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewStopPollParams(
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.StopPoll(ctx.Detached(), params)
 
-			return m.MessageID
-		}(ctx),
+	return err
+}
+
+// NewTransferBusinessAccountStarsParams builds TransferBusinessAccountStarsParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.TransferBusinessAccountStars is needed:
+//
+//	ret, err := ctx.Client().TransferBusinessAccountStars(ctx.Detached(), ctx.NewTransferBusinessAccountStarsParams(...))
+func (ctx *Context) NewTransferBusinessAccountStarsParams(
+	starCount int64,
+	opts ...TransferBusinessAccountStarsOption,
+) *TransferBusinessAccountStarsParams {
+	params := &TransferBusinessAccountStarsParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		StarCount:            starCount,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.StopPoll(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // TransferBusinessAccountStars calls Client.TransferBusinessAccountStars with context-derived defaults.
@@ -5262,23 +7058,35 @@ func (ctx *Context) TransferBusinessAccountStars(
 	starCount int64,
 	opts ...TransferBusinessAccountStarsOption,
 ) error {
-	params := &TransferBusinessAccountStarsParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewTransferBusinessAccountStarsParams(
+		starCount,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		StarCount: starCount,
+	_, err := ctx.client.TransferBusinessAccountStars(ctx.Detached(), params)
+
+	return err
+}
+
+// NewTransferGiftParams builds TransferGiftParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.TransferGift is needed:
+//
+//	ret, err := ctx.Client().TransferGift(ctx.Detached(), ctx.NewTransferGiftParams(...))
+func (ctx *Context) NewTransferGiftParams(
+	ownedGiftID string,
+	newOwnerChatID int64,
+	opts ...TransferGiftOption,
+) *TransferGiftParams {
+	params := &TransferGiftParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		OwnedGiftID:          ownedGiftID,
+		NewOwnerChatID:       newOwnerChatID,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.TransferBusinessAccountStars(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // TransferGift calls Client.TransferGift with context-derived defaults.
@@ -5292,24 +7100,33 @@ func (ctx *Context) TransferGift(
 	newOwnerChatID int64,
 	opts ...TransferGiftOption,
 ) error {
-	params := &TransferGiftParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewTransferGiftParams(
+		ownedGiftID,
+		newOwnerChatID,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		OwnedGiftID:    ownedGiftID,
-		NewOwnerChatID: newOwnerChatID,
+	_, err := ctx.client.TransferGift(ctx.Detached(), params)
+
+	return err
+}
+
+// NewUnbanChatMemberParams builds UnbanChatMemberParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.UnbanChatMember is needed:
+//
+//	ret, err := ctx.Client().UnbanChatMember(ctx.Detached(), ctx.NewUnbanChatMemberParams(...))
+func (ctx *Context) NewUnbanChatMemberParams(
+	opts ...UnbanChatMemberOption,
+) *UnbanChatMemberParams {
+	params := &UnbanChatMemberParams{
+		ChatID: ctx.chatIdentifier(),
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.TransferGift(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // UnbanChatMember calls Client.UnbanChatMember with context-derived defaults.
@@ -5324,16 +7141,32 @@ func (ctx *Context) TransferGift(
 func (ctx *Context) UnbanChatMember(
 	opts ...UnbanChatMemberOption,
 ) error {
-	params := &UnbanChatMemberParams{
-		ChatID: ctx.chatIdentifier(),
-		UserID: ctx.userID(),
+	params := ctx.NewUnbanChatMemberParams(
+		opts...,
+	)
+
+	_, err := ctx.client.UnbanChatMember(ctx.Detached(), params)
+
+	return err
+}
+
+// NewUnbanChatSenderChatParams builds UnbanChatSenderChatParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.UnbanChatSenderChat is needed:
+//
+//	ret, err := ctx.Client().UnbanChatSenderChat(ctx.Detached(), ctx.NewUnbanChatSenderChatParams(...))
+func (ctx *Context) NewUnbanChatSenderChatParams(
+	senderChatID int64,
+	opts ...UnbanChatSenderChatOption,
+) *UnbanChatSenderChatParams {
+	params := &UnbanChatSenderChatParams{
+		ChatID:       ctx.chatIdentifier(),
+		SenderChatID: senderChatID,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.UnbanChatMember(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // UnbanChatSenderChat calls Client.UnbanChatSenderChat with context-derived defaults.
@@ -5345,16 +7178,31 @@ func (ctx *Context) UnbanChatSenderChat(
 	senderChatID int64,
 	opts ...UnbanChatSenderChatOption,
 ) error {
-	params := &UnbanChatSenderChatParams{
-		ChatID:       ctx.chatIdentifier(),
-		SenderChatID: senderChatID,
+	params := ctx.NewUnbanChatSenderChatParams(
+		senderChatID,
+		opts...,
+	)
+
+	_, err := ctx.client.UnbanChatSenderChat(ctx.Detached(), params)
+
+	return err
+}
+
+// NewUnhideGeneralForumTopicParams builds UnhideGeneralForumTopicParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.UnhideGeneralForumTopic is needed:
+//
+//	ret, err := ctx.Client().UnhideGeneralForumTopic(ctx.Detached(), ctx.NewUnhideGeneralForumTopicParams(...))
+func (ctx *Context) NewUnhideGeneralForumTopicParams(
+	opts ...UnhideGeneralForumTopicOption,
+) *UnhideGeneralForumTopicParams {
+	params := &UnhideGeneralForumTopicParams{
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.UnbanChatSenderChat(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // UnhideGeneralForumTopic calls Client.UnhideGeneralForumTopic with context-derived defaults.
@@ -5365,15 +7213,30 @@ func (ctx *Context) UnbanChatSenderChat(
 func (ctx *Context) UnhideGeneralForumTopic(
 	opts ...UnhideGeneralForumTopicOption,
 ) error {
-	params := &UnhideGeneralForumTopicParams{
+	params := ctx.NewUnhideGeneralForumTopicParams(
+		opts...,
+	)
+
+	_, err := ctx.client.UnhideGeneralForumTopic(ctx.Detached(), params)
+
+	return err
+}
+
+// NewUnpinAllChatMessagesParams builds UnpinAllChatMessagesParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.UnpinAllChatMessages is needed:
+//
+//	ret, err := ctx.Client().UnpinAllChatMessages(ctx.Detached(), ctx.NewUnpinAllChatMessagesParams(...))
+func (ctx *Context) NewUnpinAllChatMessagesParams(
+	opts ...UnpinAllChatMessagesOption,
+) *UnpinAllChatMessagesParams {
+	params := &UnpinAllChatMessagesParams{
 		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.UnhideGeneralForumTopic(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // UnpinAllChatMessages calls Client.UnpinAllChatMessages with context-derived defaults.
@@ -5385,15 +7248,31 @@ func (ctx *Context) UnhideGeneralForumTopic(
 func (ctx *Context) UnpinAllChatMessages(
 	opts ...UnpinAllChatMessagesOption,
 ) error {
-	params := &UnpinAllChatMessagesParams{
-		ChatID: ctx.chatIdentifier(),
+	params := ctx.NewUnpinAllChatMessagesParams(
+		opts...,
+	)
+
+	_, err := ctx.client.UnpinAllChatMessages(ctx.Detached(), params)
+
+	return err
+}
+
+// NewUnpinAllForumTopicMessagesParams builds UnpinAllForumTopicMessagesParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.UnpinAllForumTopicMessages is needed:
+//
+//	ret, err := ctx.Client().UnpinAllForumTopicMessages(ctx.Detached(), ctx.NewUnpinAllForumTopicMessagesParams(...))
+func (ctx *Context) NewUnpinAllForumTopicMessagesParams(
+	opts ...UnpinAllForumTopicMessagesOption,
+) *UnpinAllForumTopicMessagesParams {
+	params := &UnpinAllForumTopicMessagesParams{
+		ChatID:          ctx.chatIdentifier(),
+		MessageThreadID: messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.UnpinAllChatMessages(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // UnpinAllForumTopicMessages calls Client.UnpinAllForumTopicMessages with context-derived defaults.
@@ -5404,23 +7283,30 @@ func (ctx *Context) UnpinAllChatMessages(
 func (ctx *Context) UnpinAllForumTopicMessages(
 	opts ...UnpinAllForumTopicMessagesOption,
 ) error {
-	params := &UnpinAllForumTopicMessagesParams{
-		ChatID: ctx.chatIdentifier(),
-		MessageThreadID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	params := ctx.NewUnpinAllForumTopicMessagesParams(
+		opts...,
+	)
 
-			return m.MessageThreadID
-		}(ctx),
+	_, err := ctx.client.UnpinAllForumTopicMessages(ctx.Detached(), params)
+
+	return err
+}
+
+// NewUnpinAllGeneralForumTopicMessagesParams builds UnpinAllGeneralForumTopicMessagesParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.UnpinAllGeneralForumTopicMessages is needed:
+//
+//	ret, err := ctx.Client().UnpinAllGeneralForumTopicMessages(ctx.Detached(), ctx.NewUnpinAllGeneralForumTopicMessagesParams(...))
+func (ctx *Context) NewUnpinAllGeneralForumTopicMessagesParams(
+	opts ...UnpinAllGeneralForumTopicMessagesOption,
+) *UnpinAllGeneralForumTopicMessagesParams {
+	params := &UnpinAllGeneralForumTopicMessagesParams{
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.UnpinAllForumTopicMessages(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // UnpinAllGeneralForumTopicMessages calls Client.UnpinAllGeneralForumTopicMessages with context-derived defaults.
@@ -5431,15 +7317,32 @@ func (ctx *Context) UnpinAllForumTopicMessages(
 func (ctx *Context) UnpinAllGeneralForumTopicMessages(
 	opts ...UnpinAllGeneralForumTopicMessagesOption,
 ) error {
-	params := &UnpinAllGeneralForumTopicMessagesParams{
-		ChatID: ctx.chatIdentifier(),
+	params := ctx.NewUnpinAllGeneralForumTopicMessagesParams(
+		opts...,
+	)
+
+	_, err := ctx.client.UnpinAllGeneralForumTopicMessages(ctx.Detached(), params)
+
+	return err
+}
+
+// NewUnpinChatMessageParams builds UnpinChatMessageParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.UnpinChatMessage is needed:
+//
+//	ret, err := ctx.Client().UnpinChatMessage(ctx.Detached(), ctx.NewUnpinChatMessageParams(...))
+func (ctx *Context) NewUnpinChatMessageParams(
+	opts ...UnpinChatMessageOption,
+) *UnpinChatMessageParams {
+	params := &UnpinChatMessageParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		ChatID:               ctx.chatIdentifier(),
+		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.UnpinAllGeneralForumTopicMessages(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // UnpinChatMessage calls Client.UnpinChatMessage with context-derived defaults.
@@ -5451,31 +7354,32 @@ func (ctx *Context) UnpinAllGeneralForumTopicMessages(
 func (ctx *Context) UnpinChatMessage(
 	opts ...UnpinChatMessageOption,
 ) error {
-	params := &UnpinChatMessageParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewUnpinChatMessageParams(
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		ChatID: ctx.chatIdentifier(),
-		MessageID: func(ctx *Context) int64 {
-			m := ctx.Message()
-			if m == nil {
-				return 0
-			}
+	_, err := ctx.client.UnpinChatMessage(ctx.Detached(), params)
 
-			return m.MessageID
-		}(ctx),
+	return err
+}
+
+// NewUpgradeGiftParams builds UpgradeGiftParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.UpgradeGift is needed:
+//
+//	ret, err := ctx.Client().UpgradeGift(ctx.Detached(), ctx.NewUpgradeGiftParams(...))
+func (ctx *Context) NewUpgradeGiftParams(
+	ownedGiftID string,
+	opts ...UpgradeGiftOption,
+) *UpgradeGiftParams {
+	params := &UpgradeGiftParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		OwnedGiftID:          ownedGiftID,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.UnpinChatMessage(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // UpgradeGift calls Client.UpgradeGift with context-derived defaults.
@@ -5488,23 +7392,35 @@ func (ctx *Context) UpgradeGift(
 	ownedGiftID string,
 	opts ...UpgradeGiftOption,
 ) error {
-	params := &UpgradeGiftParams{
-		BusinessConnectionID: func(ctx *Context) string {
-			m := ctx.Message()
-			if m == nil {
-				return ""
-			}
+	params := ctx.NewUpgradeGiftParams(
+		ownedGiftID,
+		opts...,
+	)
 
-			return m.BusinessConnectionID
-		}(ctx),
-		OwnedGiftID: ownedGiftID,
+	_, err := ctx.client.UpgradeGift(ctx.Detached(), params)
+
+	return err
+}
+
+// NewUploadStickerFileParams builds UploadStickerFileParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.UploadStickerFile is needed:
+//
+//	ret, err := ctx.Client().UploadStickerFile(ctx.Detached(), ctx.NewUploadStickerFileParams(...))
+func (ctx *Context) NewUploadStickerFileParams(
+	sticker InputFile,
+	stickerFormat string,
+	opts ...UploadStickerFileOption,
+) *UploadStickerFileParams {
+	params := &UploadStickerFileParams{
+		UserID:        ctx.userID(),
+		Sticker:       sticker,
+		StickerFormat: stickerFormat,
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.UpgradeGift(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // UploadStickerFile calls Client.UploadStickerFile with context-derived defaults.
@@ -5521,17 +7437,32 @@ func (ctx *Context) UploadStickerFile(
 	stickerFormat string,
 	opts ...UploadStickerFileOption,
 ) error {
-	params := &UploadStickerFileParams{
-		UserID:        ctx.userID(),
-		Sticker:       sticker,
-		StickerFormat: stickerFormat,
+	params := ctx.NewUploadStickerFileParams(
+		sticker,
+		stickerFormat,
+		opts...,
+	)
+
+	_, err := ctx.client.UploadStickerFile(ctx.Detached(), params)
+
+	return err
+}
+
+// NewVerifyChatParams builds VerifyChatParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.VerifyChat is needed:
+//
+//	ret, err := ctx.Client().VerifyChat(ctx.Detached(), ctx.NewVerifyChatParams(...))
+func (ctx *Context) NewVerifyChatParams(
+	opts ...VerifyChatOption,
+) *VerifyChatParams {
+	params := &VerifyChatParams{
+		ChatID: ctx.chatIdentifier(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.UploadStickerFile(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // VerifyChat calls Client.VerifyChat with context-derived defaults.
@@ -5543,15 +7474,30 @@ func (ctx *Context) UploadStickerFile(
 func (ctx *Context) VerifyChat(
 	opts ...VerifyChatOption,
 ) error {
-	params := &VerifyChatParams{
-		ChatID: ctx.chatIdentifier(),
+	params := ctx.NewVerifyChatParams(
+		opts...,
+	)
+
+	_, err := ctx.client.VerifyChat(ctx.Detached(), params)
+
+	return err
+}
+
+// NewVerifyUserParams builds VerifyUserParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.VerifyUser is needed:
+//
+//	ret, err := ctx.Client().VerifyUser(ctx.Detached(), ctx.NewVerifyUserParams(...))
+func (ctx *Context) NewVerifyUserParams(
+	opts ...VerifyUserOption,
+) *VerifyUserParams {
+	params := &VerifyUserParams{
+		UserID: ctx.userID(),
 	}
 
 	params.Option(opts...)
 
-	_, err := ctx.client.VerifyChat(ctx.detached(), params)
-
-	return err
+	return params
 }
 
 // VerifyUser calls Client.VerifyUser with context-derived defaults.
@@ -5563,13 +7509,11 @@ func (ctx *Context) VerifyChat(
 func (ctx *Context) VerifyUser(
 	opts ...VerifyUserOption,
 ) error {
-	params := &VerifyUserParams{
-		UserID: ctx.userID(),
-	}
+	params := ctx.NewVerifyUserParams(
+		opts...,
+	)
 
-	params.Option(opts...)
-
-	_, err := ctx.client.VerifyUser(ctx.detached(), params)
+	_, err := ctx.client.VerifyUser(ctx.Detached(), params)
 
 	return err
 }

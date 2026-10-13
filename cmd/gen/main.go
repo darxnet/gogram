@@ -107,27 +107,10 @@ func (field Field) AutoFillCode(types map[string]Type) string {
 		return "ctx.userID()"
 
 	case "direct_messages_topic_id":
-		return `func(ctx *Context) int64 {
-		    m := ctx.Message()
-			if m == nil {
-			    return 0
-			}
-
-			if m.DirectMessagesTopic == nil {
-				return 0
-			}
-
-			return m.DirectMessagesTopic.TopicID
-		}(ctx)`
+		return "ctx.directMessagesTopicID()"
 
 	case "inline_message_id":
-		return `func(ctx *Context) string {
-      		if ctx.update.CallbackQuery == nil {
-      		    return ""
-      		}
-
-      		return ctx.update.CallbackQuery.InlineMessageID
-       	}(ctx)`
+		return "ctx.inlineMessageID()"
 	}
 
 	// auto-fill if field.Name presents in Message
@@ -135,26 +118,9 @@ func (field Field) AutoFillCode(types map[string]Type) string {
 	if slices.ContainsFunc(types["Message"].Fields, func(f Field) bool {
 		return f.Name == field.Name && f.Type == field.Type
 	}) {
-		switch toType(field.Type, field.IsRequired) {
-		case "string":
-			return fmt.Sprintf(`func(ctx *Context) string {
-    			m := ctx.Message()
-    			if m == nil {
-    			    return ""
-    			}
-
-			return m.%s
-		}(ctx)`, toTitle(field.Name))
-
-		case "int64":
-			return fmt.Sprintf(`func(ctx *Context) int64 {
-    			m := ctx.Message()
-    			if m == nil {
-    			    return 0
-    			}
-
-			return m.%s
-		}(ctx)`, toTitle(field.Name))
+		typ := toType(field.Type, field.IsRequired)
+		if typ == "string" || typ == "int64" {
+			return fmt.Sprintf("messageField(ctx, func(m *Message) %s { return m.%s })", typ, toTitle(field.Name))
 		}
 	}
 
@@ -173,17 +139,13 @@ func (field Field) AutoFillCode(types map[string]Type) string {
 		return ""
 	}
 
-	return fmt.Sprintf(`func(ctx *Context) string {
-        if ctx.update == nil {
-            return ""
-        }
+	return fmt.Sprintf(`updateField(ctx, func(u *Update) string {
+		if u.%[1]s == nil {
+			return ""
+		}
 
-        if ctx.update.%[1]s == nil {
-            return ""
-        }
-
-        return ctx.update.%[1]s.ID
-    }(ctx)`, toTitle(before))
+		return u.%[1]s.ID
+	})`, toTitle(before))
 }
 
 // Type describes a Telegram API type for code generation.

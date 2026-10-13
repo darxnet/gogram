@@ -47,10 +47,12 @@ type Context struct {
 	fsm         fsmMemo
 }
 
-// detached returns ctx without cancellation but with its values, so API calls
-// made from a handler finish even if the update's context is cancelled.
-// Built once per update: every generated Context method shares it.
-func (ctx *Context) detached() context.Context {
+// Detached returns ctx without cancellation but with its values, so API calls
+// made from a handler finish even if the update's context is cancelled
+// (worker shutdown, webhook client gone). Built once per update: every
+// generated Context method shares it; pass it to Client methods called
+// directly from a handler.
+func (ctx *Context) Detached() context.Context {
 	if ctx.detachedCtx == nil {
 		ctx.detachedCtx = context.WithoutCancel(ctx.context)
 	}
@@ -88,6 +90,47 @@ func (ctx *Context) userID() int64 {
 	return 0
 }
 
+// directMessagesTopicID returns the direct messages topic of the current message, or 0.
+func (ctx *Context) directMessagesTopicID() int64 {
+	if m := ctx.Message(); m != nil && m.DirectMessagesTopic != nil {
+		return m.DirectMessagesTopic.TopicID
+	}
+
+	return 0
+}
+
+// inlineMessageID returns the inline message the callback query refers to, or "".
+func (ctx *Context) inlineMessageID() string {
+	if ctx.update != nil && ctx.update.CallbackQuery != nil {
+		return ctx.update.CallbackQuery.InlineMessageID
+	}
+
+	return ""
+}
+
+// messageField returns get(Message()) or the zero value when there is no message.
+// Generated builders use it to fill params from the current message.
+func messageField[T any](ctx *Context, get func(*Message) T) T {
+	if m := ctx.Message(); m != nil {
+		return get(m)
+	}
+
+	var zero T
+
+	return zero
+}
+
+// updateField returns get(Update()) or the zero value when there is no update.
+func updateField[T any](ctx *Context, get func(*Update) T) T {
+	if ctx.update != nil {
+		return get(ctx.update)
+	}
+
+	var zero T
+
+	return zero
+}
+
 // Deadline returns the time when work done on behalf of this context
 // should be cancelled.
 func (ctx *Context) Deadline() (deadline time.Time, ok bool) {
@@ -105,17 +148,45 @@ func (ctx *Context) Err() error {
 	return ctx.context.Err()
 }
 
-// SetValue sets a value in the context.
-func (ctx *Context) SetValue(key, value any) {
+// Key is a typed per-update value slot:
+//
+//	var userKey = gogram.NewKey[*User]("user")
+//	userKey.Set(ctx, u)
+//	u, ok := userKey.Get(ctx)
+//
+// Values live until the handler returns; [Context.Value] also finds them.
+type Key[T any] struct {
+	name string
+}
+
+// NewKey creates a typed context key; name is for debugging only.
+func NewKey[T any](name string) *Key[T] {
+	return &Key[T]{name: name}
+}
+
+// String returns the key name.
+func (k *Key[T]) String() string {
+	return k.name
+}
+
+// Set stores value in ctx under k.
+func (k *Key[T]) Set(ctx *Context, value T) {
 	if ctx.values == nil {
 		ctx.values = make(map[any]any, 1)
 	}
 
-	ctx.values[key] = value
+	ctx.values[k] = value
+}
+
+// Get returns the value stored under k and whether it was set.
+func (k *Key[T]) Get(ctx *Context) (value T, ok bool) {
+	value, ok = ctx.values[k].(T)
+	return value, ok
 }
 
 // Value returns the value associated with this context for key, or nil
-// if no value is associated with key.
+// if no value is associated with key. Keys set with [Key.Set] are found
+// first, then the parent context is consulted.
 func (ctx *Context) Value(key any) any {
 	if value, ok := ctx.values[key]; ok {
 		return value

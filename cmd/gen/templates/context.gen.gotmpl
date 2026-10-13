@@ -114,33 +114,6 @@ func (ctx *Context) Payload() string {
     {{ $method := toTitle .Name }}
     {{ $params := print $method "Params" }}
     {{ $option := print $method "Option" }}
-// {{ $method }} calls Client.{{ $method }} with context-derived defaults.
-// {{ .Desc }}
-func (ctx *Context) {{ $method }}(
-    {{- range .Params }}
-        {{- if .AutoFillCode $root.Types }}
-            {{- continue }}
-        {{- end }}
-        {{- if .IsRequired }}
-            {{ toTitle .Name | toLowerFirst }} {{ toType .Type .IsRequired }},
-        {{- end }}
-    {{- end }}
-    opts ...{{ $option }},
-) error {
-    params := &{{ $params }}{
-        {{- range .Params }}
-            {{- if $code := .AutoFillCode $root.Types }}
-                {{ toTitle .Name }}: {{ $code }},
-                {{- continue }}
-            {{- end }}
-            {{- if .IsRequired  }}
-                {{ toTitle .Name }}: {{ toTitle .Name | toLowerFirst }},
-            {{- end }}
-        {{- end }}
-    }
-
-    params.Option(opts...)
-
     {{- $parseModeName := "" }}
     {{- $entitiesName := "" }}
     {{- $inputMediaName := "" }}
@@ -160,10 +133,38 @@ func (ctx *Context) {{ $method }}(
         {{- end }}
     {{- end }}
 
-    {{ if or $parseModeName $entitiesName $inputMediaName $inputMediasName }}
-        defaultParseMode := ctx.client.defaultParseMode()
+// New{{ $params }} builds {{ $params }} with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.{{ $method }} is needed:
+//
+//	ret, err := ctx.Client().{{ $method }}(ctx.Detached(), ctx.New{{ $params }}(...))
+func (ctx *Context) New{{ $params }}(
+    {{- range .Params }}
+        {{- if .AutoFillCode $root.Types }}
+            {{- continue }}
+        {{- end }}
+        {{- if .IsRequired }}
+            {{ toTitle .Name | toLowerFirst }} {{ toType .Type .IsRequired }},
+        {{- end }}
+    {{- end }}
+    opts ...{{ $option }},
+) *{{ $params }} {
+    params := &{{ $params }}{
+        {{- range .Params }}
+            {{- if $code := .AutoFillCode $root.Types }}
+                {{ toTitle .Name }}: {{ $code }},
+                {{- continue }}
+            {{- end }}
+            {{- if .IsRequired  }}
+                {{ toTitle .Name }}: {{ toTitle .Name | toLowerFirst }},
+            {{- end }}
+        {{- end }}
+    }
 
-        if defaultParseMode != "" {
+    params.Option(opts...)
+
+    {{ if or $parseModeName $entitiesName $inputMediaName $inputMediasName }}
+        if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
             {{- if $parseModeName }}
                 if params.{{ $parseModeName }} == "" && len(params.{{ $entitiesName }}) == 0 {
                     params.{{ $parseModeName }} = defaultParseMode
@@ -180,7 +181,35 @@ func (ctx *Context) {{ $method }}(
         }
     {{ end }}
 
-    _, err := ctx.client.{{ $method }}(ctx.detached(), params)
+    return params
+}
+
+// {{ $method }} calls Client.{{ $method }} with context-derived defaults.
+// {{ .Desc }}
+func (ctx *Context) {{ $method }}(
+    {{- range .Params }}
+        {{- if .AutoFillCode $root.Types }}
+            {{- continue }}
+        {{- end }}
+        {{- if .IsRequired }}
+            {{ toTitle .Name | toLowerFirst }} {{ toType .Type .IsRequired }},
+        {{- end }}
+    {{- end }}
+    opts ...{{ $option }},
+) error {
+    params := ctx.New{{ $params }}(
+        {{- range .Params }}
+            {{- if .AutoFillCode $root.Types }}
+                {{- continue }}
+            {{- end }}
+            {{- if .IsRequired }}
+                {{ toTitle .Name | toLowerFirst }},
+            {{- end }}
+        {{- end }}
+        opts...,
+    )
+
+    _, err := ctx.client.{{ $method }}(ctx.Detached(), params)
 
     return err
 }

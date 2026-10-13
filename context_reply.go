@@ -4,10 +4,13 @@ package gogram
 // If the context has a message, it is quoted via ReplyParameters.
 // Additional options (e.g. parse mode, inline keyboard) can be passed as opts.
 func (ctx *Context) Reply(text string, opts ...SendMessageOption) error {
-	m := ctx.Message()
-	if m != nil && m.MessageID != 0 {
-		reply := WithSendMessageReplyParameters(&ReplyParameters{MessageID: m.MessageID})
-		opts = append([]SendMessageOption{reply}, opts...)
+	params := ctx.NewSendMessageParams(text, opts...)
+
+	if m := ctx.Message(); m != nil && m.MessageID != 0 && params.ReplyParameters == nil {
+		params.ReplyParameters = &ReplyParameters{MessageID: m.MessageID}
 	}
-	return ctx.SendMessage(text, opts...)
+
+	_, err := ctx.client.SendMessage(ctx.Detached(), params)
+
+	return err
 }
