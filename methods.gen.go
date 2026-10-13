@@ -730,7 +730,7 @@ func (c *Client) AnswerWebAppQuery(ctx context.Context, params *AnswerWebAppQuer
 // ApproveChatJoinRequestParams contains parameters for Client.ApproveChatJoinRequest.
 type ApproveChatJoinRequestParams struct {
 	// Unique identifier for the target chat or username of the target channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier of the target user
 	UserID int64 `json:"user_id"`
@@ -747,15 +747,15 @@ func (r *ApproveChatJoinRequestParams) Option(opts ...ApproveChatJoinRequestOpti
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *ApproveChatJoinRequestParams) ChatTarget() string {
+func (r *ApproveChatJoinRequestParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithApproveChatJoinRequestChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
-func WithApproveChatJoinRequestChatID(value string) ApproveChatJoinRequestOption {
-	return fieldOption(value, func(params *ApproveChatJoinRequestParams) *string {
+func WithApproveChatJoinRequestChatID(value ChatID) ApproveChatJoinRequestOption {
+	return fieldOption(value, func(params *ApproveChatJoinRequestParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -814,8 +814,8 @@ func (r *ApproveSuggestedPostParams) Option(opts ...ApproveSuggestedPostOption) 
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *ApproveSuggestedPostParams) ChatTarget() string {
-	return strconv.FormatInt(r.ChatID, 10)
+func (r *ApproveSuggestedPostParams) ChatTarget() ChatID {
+	return ChatID{ID: r.ChatID}
 }
 
 // WithApproveSuggestedPostChatID sets the ChatID field.
@@ -870,7 +870,7 @@ func (c *Client) ApproveSuggestedPost(ctx context.Context, params *ApproveSugges
 // BanChatMemberParams contains parameters for Client.BanChatMember.
 type BanChatMemberParams struct {
 	// Unique identifier for the target group or username of the target supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier of the target user
 	UserID int64 `json:"user_id"`
@@ -897,15 +897,15 @@ func (r *BanChatMemberParams) Option(opts ...BanChatMemberOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *BanChatMemberParams) ChatTarget() string {
+func (r *BanChatMemberParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithBanChatMemberChatID sets the ChatID field.
 //
 // Unique identifier for the target group or username of the target supergroup or channel in the format @username
-func WithBanChatMemberChatID(value string) BanChatMemberOption {
-	return fieldOption(value, func(params *BanChatMemberParams) *string {
+func WithBanChatMemberChatID(value ChatID) BanChatMemberOption {
+	return fieldOption(value, func(params *BanChatMemberParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -968,7 +968,7 @@ func (c *Client) BanChatMember(ctx context.Context, params *BanChatMemberParams)
 // BanChatSenderChatParams contains parameters for Client.BanChatSenderChat.
 type BanChatSenderChatParams struct {
 	// Unique identifier for the target chat or username of the target channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier of the target sender chat
 	SenderChatID int64 `json:"sender_chat_id"`
@@ -985,15 +985,15 @@ func (r *BanChatSenderChatParams) Option(opts ...BanChatSenderChatOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *BanChatSenderChatParams) ChatTarget() string {
+func (r *BanChatSenderChatParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithBanChatSenderChatChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
-func WithBanChatSenderChatChatID(value string) BanChatSenderChatOption {
-	return fieldOption(value, func(params *BanChatSenderChatParams) *string {
+func WithBanChatSenderChatChatID(value ChatID) BanChatSenderChatOption {
+	return fieldOption(value, func(params *BanChatSenderChatParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -1071,7 +1071,7 @@ func (c *Client) Close(ctx context.Context, params *CloseParams) (ret bool, err 
 // CloseForumTopicParams contains parameters for Client.CloseForumTopic.
 type CloseForumTopicParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread of the forum topic
 	MessageThreadID int64 `json:"message_thread_id"`
@@ -1088,15 +1088,15 @@ func (r *CloseForumTopicParams) Option(opts ...CloseForumTopicOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *CloseForumTopicParams) ChatTarget() string {
+func (r *CloseForumTopicParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithCloseForumTopicChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithCloseForumTopicChatID(value string) CloseForumTopicOption {
-	return fieldOption(value, func(params *CloseForumTopicParams) *string {
+func WithCloseForumTopicChatID(value ChatID) CloseForumTopicOption {
+	return fieldOption(value, func(params *CloseForumTopicParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -1134,7 +1134,7 @@ func (c *Client) CloseForumTopic(ctx context.Context, params *CloseForumTopicPar
 // CloseGeneralForumTopicParams contains parameters for Client.CloseGeneralForumTopic.
 type CloseGeneralForumTopicParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 }
 
 // CloseGeneralForumTopicOption configures CloseGeneralForumTopicParams.
@@ -1148,15 +1148,15 @@ func (r *CloseGeneralForumTopicParams) Option(opts ...CloseGeneralForumTopicOpti
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *CloseGeneralForumTopicParams) ChatTarget() string {
+func (r *CloseGeneralForumTopicParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithCloseGeneralForumTopicChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithCloseGeneralForumTopicChatID(value string) CloseGeneralForumTopicOption {
-	return fieldOption(value, func(params *CloseGeneralForumTopicParams) *string {
+func WithCloseGeneralForumTopicChatID(value ChatID) CloseGeneralForumTopicOption {
+	return fieldOption(value, func(params *CloseGeneralForumTopicParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -1243,7 +1243,7 @@ func (c *Client) ConvertGiftToStars(ctx context.Context, params *ConvertGiftToSt
 // CopyMessageParams contains parameters for Client.CopyMessage.
 type CopyMessageParams struct {
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -1252,7 +1252,7 @@ type CopyMessageParams struct {
 	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
 
 	// Unique identifier for the chat where the original message was sent (or username of the target bot, supergroup or channel in the format @username)
-	FromChatID string `json:"from_chat_id"`
+	FromChatID ChatID `json:"from_chat_id"`
 
 	// Message identifier in the chat specified in from_chat_id
 	MessageID int64 `json:"message_id"`
@@ -1321,15 +1321,15 @@ func (r *CopyMessageParams) Option(opts ...CopyMessageOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *CopyMessageParams) ChatTarget() string {
+func (r *CopyMessageParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithCopyMessageChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithCopyMessageChatID(value string) CopyMessageOption {
-	return fieldOption(value, func(params *CopyMessageParams) *string {
+func WithCopyMessageChatID(value ChatID) CopyMessageOption {
+	return fieldOption(value, func(params *CopyMessageParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -1355,8 +1355,8 @@ func WithCopyMessageDirectMessagesTopicID(value int64) CopyMessageOption {
 // WithCopyMessageFromChatID sets the FromChatID field.
 //
 // Unique identifier for the chat where the original message was sent (or username of the target bot, supergroup or channel in the format @username)
-func WithCopyMessageFromChatID(value string) CopyMessageOption {
-	return fieldOption(value, func(params *CopyMessageParams) *string {
+func WithCopyMessageFromChatID(value ChatID) CopyMessageOption {
+	return fieldOption(value, func(params *CopyMessageParams) *ChatID {
 		return &params.FromChatID
 	})
 }
@@ -1524,7 +1524,7 @@ func (c *Client) CopyMessage(ctx context.Context, params *CopyMessageParams) (re
 // CopyMessagesParams contains parameters for Client.CopyMessages.
 type CopyMessagesParams struct {
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -1533,7 +1533,7 @@ type CopyMessagesParams struct {
 	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
 
 	// Unique identifier for the chat where the original messages were sent (or username of the target bot, supergroup or channel in the format @username)
-	FromChatID string `json:"from_chat_id"`
+	FromChatID ChatID `json:"from_chat_id"`
 
 	// A JSON-serialized list of 1-100 identifiers of messages in the chat from_chat_id to copy.
 	// The identifiers must be specified in a strictly increasing order.
@@ -1563,15 +1563,15 @@ func (r *CopyMessagesParams) Option(opts ...CopyMessagesOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *CopyMessagesParams) ChatTarget() string {
+func (r *CopyMessagesParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithCopyMessagesChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithCopyMessagesChatID(value string) CopyMessagesOption {
-	return fieldOption(value, func(params *CopyMessagesParams) *string {
+func WithCopyMessagesChatID(value ChatID) CopyMessagesOption {
+	return fieldOption(value, func(params *CopyMessagesParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -1597,8 +1597,8 @@ func WithCopyMessagesDirectMessagesTopicID(value int64) CopyMessagesOption {
 // WithCopyMessagesFromChatID sets the FromChatID field.
 //
 // Unique identifier for the chat where the original messages were sent (or username of the target bot, supergroup or channel in the format @username)
-func WithCopyMessagesFromChatID(value string) CopyMessagesOption {
-	return fieldOption(value, func(params *CopyMessagesParams) *string {
+func WithCopyMessagesFromChatID(value ChatID) CopyMessagesOption {
+	return fieldOption(value, func(params *CopyMessagesParams) *ChatID {
 		return &params.FromChatID
 	})
 }
@@ -1675,7 +1675,7 @@ func (c *Client) CopyMessages(ctx context.Context, params *CopyMessagesParams) (
 // CreateChatInviteLinkParams contains parameters for Client.CreateChatInviteLink.
 type CreateChatInviteLinkParams struct {
 	// Unique identifier for the target chat or username of the target channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Invite link name; 0-32 characters
 	Name string `json:"name,omitempty"`
@@ -1702,15 +1702,15 @@ func (r *CreateChatInviteLinkParams) Option(opts ...CreateChatInviteLinkOption) 
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *CreateChatInviteLinkParams) ChatTarget() string {
+func (r *CreateChatInviteLinkParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithCreateChatInviteLinkChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
-func WithCreateChatInviteLinkChatID(value string) CreateChatInviteLinkOption {
-	return fieldOption(value, func(params *CreateChatInviteLinkParams) *string {
+func WithCreateChatInviteLinkChatID(value ChatID) CreateChatInviteLinkOption {
+	return fieldOption(value, func(params *CreateChatInviteLinkParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -1780,7 +1780,7 @@ func (c *Client) CreateChatInviteLink(ctx context.Context, params *CreateChatInv
 // CreateChatSubscriptionInviteLinkParams contains parameters for Client.CreateChatSubscriptionInviteLink.
 type CreateChatSubscriptionInviteLinkParams struct {
 	// Unique identifier for the target channel chat or username of the target channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Invite link name; 0-32 characters
 	Name string `json:"name,omitempty"`
@@ -1804,15 +1804,15 @@ func (r *CreateChatSubscriptionInviteLinkParams) Option(opts ...CreateChatSubscr
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *CreateChatSubscriptionInviteLinkParams) ChatTarget() string {
+func (r *CreateChatSubscriptionInviteLinkParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithCreateChatSubscriptionInviteLinkChatID sets the ChatID field.
 //
 // Unique identifier for the target channel chat or username of the target channel in the format @username
-func WithCreateChatSubscriptionInviteLinkChatID(value string) CreateChatSubscriptionInviteLinkOption {
-	return fieldOption(value, func(params *CreateChatSubscriptionInviteLinkParams) *string {
+func WithCreateChatSubscriptionInviteLinkChatID(value ChatID) CreateChatSubscriptionInviteLinkOption {
+	return fieldOption(value, func(params *CreateChatSubscriptionInviteLinkParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -1875,7 +1875,7 @@ func (c *Client) CreateChatSubscriptionInviteLink(ctx context.Context, params *C
 // CreateForumTopicParams contains parameters for Client.CreateForumTopic.
 type CreateForumTopicParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Topic name, 1-128 characters
 	Name string `json:"name"`
@@ -1902,15 +1902,15 @@ func (r *CreateForumTopicParams) Option(opts ...CreateForumTopicOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *CreateForumTopicParams) ChatTarget() string {
+func (r *CreateForumTopicParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithCreateForumTopicChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithCreateForumTopicChatID(value string) CreateForumTopicOption {
-	return fieldOption(value, func(params *CreateForumTopicParams) *string {
+func WithCreateForumTopicChatID(value ChatID) CreateForumTopicOption {
+	return fieldOption(value, func(params *CreateForumTopicParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -2575,7 +2575,7 @@ func (c *Client) CreateNewStickerSet(ctx context.Context, params *CreateNewStick
 // DeclineChatJoinRequestParams contains parameters for Client.DeclineChatJoinRequest.
 type DeclineChatJoinRequestParams struct {
 	// Unique identifier for the target chat or username of the target channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier of the target user
 	UserID int64 `json:"user_id"`
@@ -2592,15 +2592,15 @@ func (r *DeclineChatJoinRequestParams) Option(opts ...DeclineChatJoinRequestOpti
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *DeclineChatJoinRequestParams) ChatTarget() string {
+func (r *DeclineChatJoinRequestParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithDeclineChatJoinRequestChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
-func WithDeclineChatJoinRequestChatID(value string) DeclineChatJoinRequestOption {
-	return fieldOption(value, func(params *DeclineChatJoinRequestParams) *string {
+func WithDeclineChatJoinRequestChatID(value ChatID) DeclineChatJoinRequestOption {
+	return fieldOption(value, func(params *DeclineChatJoinRequestParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -2658,8 +2658,8 @@ func (r *DeclineSuggestedPostParams) Option(opts ...DeclineSuggestedPostOption) 
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *DeclineSuggestedPostParams) ChatTarget() string {
-	return strconv.FormatInt(r.ChatID, 10)
+func (r *DeclineSuggestedPostParams) ChatTarget() ChatID {
+	return ChatID{ID: r.ChatID}
 }
 
 // WithDeclineSuggestedPostChatID sets the ChatID field.
@@ -2713,7 +2713,7 @@ func (c *Client) DeclineSuggestedPost(ctx context.Context, params *DeclineSugges
 // DeleteAllMessageReactionsParams contains parameters for Client.DeleteAllMessageReactions.
 type DeleteAllMessageReactionsParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Identifier of the user whose reactions will be removed, if the reactions were added by a user
 	UserID int64 `json:"user_id,omitempty"`
@@ -2733,15 +2733,15 @@ func (r *DeleteAllMessageReactionsParams) Option(opts ...DeleteAllMessageReactio
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *DeleteAllMessageReactionsParams) ChatTarget() string {
+func (r *DeleteAllMessageReactionsParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithDeleteAllMessageReactionsChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithDeleteAllMessageReactionsChatID(value string) DeleteAllMessageReactionsOption {
-	return fieldOption(value, func(params *DeleteAllMessageReactionsParams) *string {
+func WithDeleteAllMessageReactionsChatID(value ChatID) DeleteAllMessageReactionsOption {
+	return fieldOption(value, func(params *DeleteAllMessageReactionsParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -2854,7 +2854,7 @@ func (c *Client) DeleteBusinessMessages(ctx context.Context, params *DeleteBusin
 // DeleteChatPhotoParams contains parameters for Client.DeleteChatPhoto.
 type DeleteChatPhotoParams struct {
 	// Unique identifier for the target chat or username of the target channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 }
 
 // DeleteChatPhotoOption configures DeleteChatPhotoParams.
@@ -2868,15 +2868,15 @@ func (r *DeleteChatPhotoParams) Option(opts ...DeleteChatPhotoOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *DeleteChatPhotoParams) ChatTarget() string {
+func (r *DeleteChatPhotoParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithDeleteChatPhotoChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
-func WithDeleteChatPhotoChatID(value string) DeleteChatPhotoOption {
-	return fieldOption(value, func(params *DeleteChatPhotoParams) *string {
+func WithDeleteChatPhotoChatID(value ChatID) DeleteChatPhotoOption {
+	return fieldOption(value, func(params *DeleteChatPhotoParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -2906,7 +2906,7 @@ func (c *Client) DeleteChatPhoto(ctx context.Context, params *DeleteChatPhotoPar
 // DeleteChatStickerSetParams contains parameters for Client.DeleteChatStickerSet.
 type DeleteChatStickerSetParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 }
 
 // DeleteChatStickerSetOption configures DeleteChatStickerSetParams.
@@ -2920,15 +2920,15 @@ func (r *DeleteChatStickerSetParams) Option(opts ...DeleteChatStickerSetOption) 
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *DeleteChatStickerSetParams) ChatTarget() string {
+func (r *DeleteChatStickerSetParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithDeleteChatStickerSetChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithDeleteChatStickerSetChatID(value string) DeleteChatStickerSetOption {
-	return fieldOption(value, func(params *DeleteChatStickerSetParams) *string {
+func WithDeleteChatStickerSetChatID(value ChatID) DeleteChatStickerSetOption {
+	return fieldOption(value, func(params *DeleteChatStickerSetParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -2960,7 +2960,7 @@ func (c *Client) DeleteChatStickerSet(ctx context.Context, params *DeleteChatSti
 // DeleteEphemeralMessageParams contains parameters for Client.DeleteEphemeralMessage.
 type DeleteEphemeralMessageParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Identifier of the user who received the message
 	ReceiverUserID int64 `json:"receiver_user_id"`
@@ -2980,15 +2980,15 @@ func (r *DeleteEphemeralMessageParams) Option(opts ...DeleteEphemeralMessageOpti
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *DeleteEphemeralMessageParams) ChatTarget() string {
+func (r *DeleteEphemeralMessageParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithDeleteEphemeralMessageChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithDeleteEphemeralMessageChatID(value string) DeleteEphemeralMessageOption {
-	return fieldOption(value, func(params *DeleteEphemeralMessageParams) *string {
+func WithDeleteEphemeralMessageChatID(value ChatID) DeleteEphemeralMessageOption {
+	return fieldOption(value, func(params *DeleteEphemeralMessageParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -3035,7 +3035,7 @@ func (c *Client) DeleteEphemeralMessage(ctx context.Context, params *DeleteEphem
 // DeleteForumTopicParams contains parameters for Client.DeleteForumTopic.
 type DeleteForumTopicParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread of the forum topic
 	MessageThreadID int64 `json:"message_thread_id"`
@@ -3052,15 +3052,15 @@ func (r *DeleteForumTopicParams) Option(opts ...DeleteForumTopicOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *DeleteForumTopicParams) ChatTarget() string {
+func (r *DeleteForumTopicParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithDeleteForumTopicChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithDeleteForumTopicChatID(value string) DeleteForumTopicOption {
-	return fieldOption(value, func(params *DeleteForumTopicParams) *string {
+func WithDeleteForumTopicChatID(value ChatID) DeleteForumTopicOption {
+	return fieldOption(value, func(params *DeleteForumTopicParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -3098,7 +3098,7 @@ func (c *Client) DeleteForumTopic(ctx context.Context, params *DeleteForumTopicP
 // DeleteMessageParams contains parameters for Client.DeleteMessage.
 type DeleteMessageParams struct {
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Identifier of the message to delete
 	MessageID int64 `json:"message_id"`
@@ -3115,15 +3115,15 @@ func (r *DeleteMessageParams) Option(opts ...DeleteMessageOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *DeleteMessageParams) ChatTarget() string {
+func (r *DeleteMessageParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithDeleteMessageChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithDeleteMessageChatID(value string) DeleteMessageOption {
-	return fieldOption(value, func(params *DeleteMessageParams) *string {
+func WithDeleteMessageChatID(value ChatID) DeleteMessageOption {
+	return fieldOption(value, func(params *DeleteMessageParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -3169,7 +3169,7 @@ func (c *Client) DeleteMessage(ctx context.Context, params *DeleteMessageParams)
 // DeleteMessageReactionParams contains parameters for Client.DeleteMessageReaction.
 type DeleteMessageReactionParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Identifier of the target message
 	MessageID int64 `json:"message_id"`
@@ -3192,15 +3192,15 @@ func (r *DeleteMessageReactionParams) Option(opts ...DeleteMessageReactionOption
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *DeleteMessageReactionParams) ChatTarget() string {
+func (r *DeleteMessageReactionParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithDeleteMessageReactionChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithDeleteMessageReactionChatID(value string) DeleteMessageReactionOption {
-	return fieldOption(value, func(params *DeleteMessageReactionParams) *string {
+func WithDeleteMessageReactionChatID(value ChatID) DeleteMessageReactionOption {
+	return fieldOption(value, func(params *DeleteMessageReactionParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -3256,7 +3256,7 @@ func (c *Client) DeleteMessageReaction(ctx context.Context, params *DeleteMessag
 // DeleteMessagesParams contains parameters for Client.DeleteMessages.
 type DeleteMessagesParams struct {
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// A JSON-serialized list of 1-100 identifiers of messages to delete.
 	// See [deleteMessage] for limitations on which messages can be deleted.
@@ -3276,15 +3276,15 @@ func (r *DeleteMessagesParams) Option(opts ...DeleteMessagesOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *DeleteMessagesParams) ChatTarget() string {
+func (r *DeleteMessagesParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithDeleteMessagesChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithDeleteMessagesChatID(value string) DeleteMessagesOption {
-	return fieldOption(value, func(params *DeleteMessagesParams) *string {
+func WithDeleteMessagesChatID(value ChatID) DeleteMessagesOption {
+	return fieldOption(value, func(params *DeleteMessagesParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -3588,7 +3588,7 @@ func (c *Client) DeleteWebhook(ctx context.Context, params *DeleteWebhookParams)
 // EditChatInviteLinkParams contains parameters for Client.EditChatInviteLink.
 type EditChatInviteLinkParams struct {
 	// Unique identifier for the target chat or username of the target channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// The invite link to edit
 	InviteLink string `json:"invite_link"`
@@ -3618,15 +3618,15 @@ func (r *EditChatInviteLinkParams) Option(opts ...EditChatInviteLinkOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *EditChatInviteLinkParams) ChatTarget() string {
+func (r *EditChatInviteLinkParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithEditChatInviteLinkChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
-func WithEditChatInviteLinkChatID(value string) EditChatInviteLinkOption {
-	return fieldOption(value, func(params *EditChatInviteLinkParams) *string {
+func WithEditChatInviteLinkChatID(value ChatID) EditChatInviteLinkOption {
+	return fieldOption(value, func(params *EditChatInviteLinkParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -3703,7 +3703,7 @@ func (c *Client) EditChatInviteLink(ctx context.Context, params *EditChatInviteL
 // EditChatSubscriptionInviteLinkParams contains parameters for Client.EditChatSubscriptionInviteLink.
 type EditChatSubscriptionInviteLinkParams struct {
 	// Unique identifier for the target chat or username of the target channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// The invite link to edit
 	InviteLink string `json:"invite_link"`
@@ -3723,15 +3723,15 @@ func (r *EditChatSubscriptionInviteLinkParams) Option(opts ...EditChatSubscripti
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *EditChatSubscriptionInviteLinkParams) ChatTarget() string {
+func (r *EditChatSubscriptionInviteLinkParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithEditChatSubscriptionInviteLinkChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
-func WithEditChatSubscriptionInviteLinkChatID(value string) EditChatSubscriptionInviteLinkOption {
-	return fieldOption(value, func(params *EditChatSubscriptionInviteLinkParams) *string {
+func WithEditChatSubscriptionInviteLinkChatID(value ChatID) EditChatSubscriptionInviteLinkOption {
+	return fieldOption(value, func(params *EditChatSubscriptionInviteLinkParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -3780,7 +3780,7 @@ func (c *Client) EditChatSubscriptionInviteLink(ctx context.Context, params *Edi
 // EditEphemeralMessageCaptionParams contains parameters for Client.EditEphemeralMessageCaption.
 type EditEphemeralMessageCaptionParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Identifier of the user who received the message
 	ReceiverUserID int64 `json:"receiver_user_id"`
@@ -3821,15 +3821,15 @@ func (r *EditEphemeralMessageCaptionParams) Option(opts ...EditEphemeralMessageC
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *EditEphemeralMessageCaptionParams) ChatTarget() string {
+func (r *EditEphemeralMessageCaptionParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithEditEphemeralMessageCaptionChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithEditEphemeralMessageCaptionChatID(value string) EditEphemeralMessageCaptionOption {
-	return fieldOption(value, func(params *EditEphemeralMessageCaptionParams) *string {
+func WithEditEphemeralMessageCaptionChatID(value ChatID) EditEphemeralMessageCaptionOption {
+	return fieldOption(value, func(params *EditEphemeralMessageCaptionParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -3927,7 +3927,7 @@ func (c *Client) EditEphemeralMessageCaption(ctx context.Context, params *EditEp
 // EditEphemeralMessageMediaParams contains parameters for Client.EditEphemeralMessageMedia.
 type EditEphemeralMessageMediaParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Identifier of the user who received the message
 	ReceiverUserID int64 `json:"receiver_user_id"`
@@ -3955,15 +3955,15 @@ func (r *EditEphemeralMessageMediaParams) Option(opts ...EditEphemeralMessageMed
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *EditEphemeralMessageMediaParams) ChatTarget() string {
+func (r *EditEphemeralMessageMediaParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithEditEphemeralMessageMediaChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithEditEphemeralMessageMediaChatID(value string) EditEphemeralMessageMediaOption {
-	return fieldOption(value, func(params *EditEphemeralMessageMediaParams) *string {
+func WithEditEphemeralMessageMediaChatID(value ChatID) EditEphemeralMessageMediaOption {
+	return fieldOption(value, func(params *EditEphemeralMessageMediaParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -4037,7 +4037,7 @@ func (c *Client) EditEphemeralMessageMedia(ctx context.Context, params *EditEphe
 		}()
 
 		{
-			v := params.ChatID
+			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
 				return
@@ -4216,7 +4216,7 @@ func (c *Client) EditEphemeralMessageMedia(ctx context.Context, params *EditEphe
 // EditEphemeralMessageReplyMarkupParams contains parameters for Client.EditEphemeralMessageReplyMarkup.
 type EditEphemeralMessageReplyMarkupParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Identifier of the user who received the message
 	ReceiverUserID int64 `json:"receiver_user_id"`
@@ -4241,15 +4241,15 @@ func (r *EditEphemeralMessageReplyMarkupParams) Option(opts ...EditEphemeralMess
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *EditEphemeralMessageReplyMarkupParams) ChatTarget() string {
+func (r *EditEphemeralMessageReplyMarkupParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithEditEphemeralMessageReplyMarkupChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithEditEphemeralMessageReplyMarkupChatID(value string) EditEphemeralMessageReplyMarkupOption {
-	return fieldOption(value, func(params *EditEphemeralMessageReplyMarkupParams) *string {
+func WithEditEphemeralMessageReplyMarkupChatID(value ChatID) EditEphemeralMessageReplyMarkupOption {
+	return fieldOption(value, func(params *EditEphemeralMessageReplyMarkupParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -4307,7 +4307,7 @@ func (c *Client) EditEphemeralMessageReplyMarkup(ctx context.Context, params *Ed
 // EditEphemeralMessageTextParams contains parameters for Client.EditEphemeralMessageText.
 type EditEphemeralMessageTextParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Identifier of the user who received the message
 	ReceiverUserID int64 `json:"receiver_user_id"`
@@ -4350,15 +4350,15 @@ func (r *EditEphemeralMessageTextParams) Option(opts ...EditEphemeralMessageText
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *EditEphemeralMessageTextParams) ChatTarget() string {
+func (r *EditEphemeralMessageTextParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithEditEphemeralMessageTextChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithEditEphemeralMessageTextChatID(value string) EditEphemeralMessageTextOption {
-	return fieldOption(value, func(params *EditEphemeralMessageTextParams) *string {
+func WithEditEphemeralMessageTextChatID(value ChatID) EditEphemeralMessageTextOption {
+	return fieldOption(value, func(params *EditEphemeralMessageTextParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -4464,7 +4464,7 @@ func (c *Client) EditEphemeralMessageText(ctx context.Context, params *EditEphem
 // EditForumTopicParams contains parameters for Client.EditForumTopic.
 type EditForumTopicParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread of the forum topic
 	MessageThreadID int64 `json:"message_thread_id"`
@@ -4493,15 +4493,15 @@ func (r *EditForumTopicParams) Option(opts ...EditForumTopicOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *EditForumTopicParams) ChatTarget() string {
+func (r *EditForumTopicParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithEditForumTopicChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithEditForumTopicChatID(value string) EditForumTopicOption {
-	return fieldOption(value, func(params *EditForumTopicParams) *string {
+func WithEditForumTopicChatID(value ChatID) EditForumTopicOption {
+	return fieldOption(value, func(params *EditForumTopicParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -4563,7 +4563,7 @@ func (c *Client) EditForumTopic(ctx context.Context, params *EditForumTopicParam
 // EditGeneralForumTopicParams contains parameters for Client.EditGeneralForumTopic.
 type EditGeneralForumTopicParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// New topic name, 1-128 characters
 	Name string `json:"name"`
@@ -4580,15 +4580,15 @@ func (r *EditGeneralForumTopicParams) Option(opts ...EditGeneralForumTopicOption
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *EditGeneralForumTopicParams) ChatTarget() string {
+func (r *EditGeneralForumTopicParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithEditGeneralForumTopicChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithEditGeneralForumTopicChatID(value string) EditGeneralForumTopicOption {
-	return fieldOption(value, func(params *EditGeneralForumTopicParams) *string {
+func WithEditGeneralForumTopicChatID(value ChatID) EditGeneralForumTopicOption {
+	return fieldOption(value, func(params *EditGeneralForumTopicParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -4630,7 +4630,7 @@ type EditMessageCaptionParams struct {
 
 	// Required if inline_message_id is not specified.
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
-	ChatID string `json:"chat_id,omitempty"`
+	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Required if inline_message_id is not specified.
 	// Identifier of the message to edit.
@@ -4673,7 +4673,7 @@ func (r *EditMessageCaptionParams) Option(opts ...EditMessageCaptionOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *EditMessageCaptionParams) ChatTarget() string {
+func (r *EditMessageCaptionParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -4690,8 +4690,8 @@ func WithEditMessageCaptionBusinessConnectionID(value string) EditMessageCaption
 //
 // Required if inline_message_id is not specified.
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
-func WithEditMessageCaptionChatID(value string) EditMessageCaptionOption {
-	return fieldOption(value, func(params *EditMessageCaptionParams) *string {
+func WithEditMessageCaptionChatID(value ChatID) EditMessageCaptionOption {
+	return fieldOption(value, func(params *EditMessageCaptionParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -4796,7 +4796,7 @@ type EditMessageChecklistParams struct {
 	BusinessConnectionID string `json:"business_connection_id"`
 
 	// Unique identifier for the target chat or username of the target bot in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message
 	MessageID int64 `json:"message_id"`
@@ -4821,7 +4821,7 @@ func (r *EditMessageChecklistParams) Option(opts ...EditMessageChecklistOption) 
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *EditMessageChecklistParams) ChatTarget() string {
+func (r *EditMessageChecklistParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -4837,8 +4837,8 @@ func WithEditMessageChecklistBusinessConnectionID(value string) EditMessageCheck
 // WithEditMessageChecklistChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot in the format @username
-func WithEditMessageChecklistChatID(value string) EditMessageChecklistOption {
-	return fieldOption(value, func(params *EditMessageChecklistParams) *string {
+func WithEditMessageChecklistChatID(value ChatID) EditMessageChecklistOption {
+	return fieldOption(value, func(params *EditMessageChecklistParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -4901,7 +4901,7 @@ type EditMessageLiveLocationParams struct {
 
 	// Required if inline_message_id is not specified.
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
-	ChatID string `json:"chat_id,omitempty"`
+	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Required if inline_message_id is not specified.
 	// Identifier of the message to edit.
@@ -4951,7 +4951,7 @@ func (r *EditMessageLiveLocationParams) Option(opts ...EditMessageLiveLocationOp
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *EditMessageLiveLocationParams) ChatTarget() string {
+func (r *EditMessageLiveLocationParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -4968,8 +4968,8 @@ func WithEditMessageLiveLocationBusinessConnectionID(value string) EditMessageLi
 //
 // Required if inline_message_id is not specified.
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
-func WithEditMessageLiveLocationChatID(value string) EditMessageLiveLocationOption {
-	return fieldOption(value, func(params *EditMessageLiveLocationParams) *string {
+func WithEditMessageLiveLocationChatID(value ChatID) EditMessageLiveLocationOption {
+	return fieldOption(value, func(params *EditMessageLiveLocationParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -5095,7 +5095,7 @@ type EditMessageMediaParams struct {
 
 	// Required if inline_message_id is not specified.
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
-	ChatID string `json:"chat_id,omitempty"`
+	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Required if inline_message_id is not specified.
 	// Identifier of the message to edit.
@@ -5125,7 +5125,7 @@ func (r *EditMessageMediaParams) Option(opts ...EditMessageMediaOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *EditMessageMediaParams) ChatTarget() string {
+func (r *EditMessageMediaParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -5142,8 +5142,8 @@ func WithEditMessageMediaBusinessConnectionID(value string) EditMessageMediaOpti
 //
 // Required if inline_message_id is not specified.
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
-func WithEditMessageMediaChatID(value string) EditMessageMediaOption {
-	return fieldOption(value, func(params *EditMessageMediaParams) *string {
+func WithEditMessageMediaChatID(value ChatID) EditMessageMediaOption {
+	return fieldOption(value, func(params *EditMessageMediaParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -5230,8 +5230,8 @@ func (c *Client) EditMessageMedia(ctx context.Context, params *EditMessageMediaP
 			}
 		}
 
-		if params.ChatID != "" {
-			v := params.ChatID
+		if !params.ChatID.IsZero() {
+			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
 				return
@@ -5414,7 +5414,7 @@ type EditMessageReplyMarkupParams struct {
 
 	// Required if inline_message_id is not specified.
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
-	ChatID string `json:"chat_id,omitempty"`
+	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Required if inline_message_id is not specified.
 	// Identifier of the message to edit.
@@ -5441,7 +5441,7 @@ func (r *EditMessageReplyMarkupParams) Option(opts ...EditMessageReplyMarkupOpti
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *EditMessageReplyMarkupParams) ChatTarget() string {
+func (r *EditMessageReplyMarkupParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -5458,8 +5458,8 @@ func WithEditMessageReplyMarkupBusinessConnectionID(value string) EditMessageRep
 //
 // Required if inline_message_id is not specified.
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
-func WithEditMessageReplyMarkupChatID(value string) EditMessageReplyMarkupOption {
-	return fieldOption(value, func(params *EditMessageReplyMarkupParams) *string {
+func WithEditMessageReplyMarkupChatID(value ChatID) EditMessageReplyMarkupOption {
+	return fieldOption(value, func(params *EditMessageReplyMarkupParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -5525,7 +5525,7 @@ type EditMessageTextParams struct {
 
 	// Required if inline_message_id is not specified.
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
-	ChatID string `json:"chat_id,omitempty"`
+	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Required if inline_message_id is not specified.
 	// Identifier of the message to edit.
@@ -5571,7 +5571,7 @@ func (r *EditMessageTextParams) Option(opts ...EditMessageTextOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *EditMessageTextParams) ChatTarget() string {
+func (r *EditMessageTextParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -5588,8 +5588,8 @@ func WithEditMessageTextBusinessConnectionID(value string) EditMessageTextOption
 //
 // Required if inline_message_id is not specified.
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
-func WithEditMessageTextChatID(value string) EditMessageTextOption {
-	return fieldOption(value, func(params *EditMessageTextParams) *string {
+func WithEditMessageTextChatID(value ChatID) EditMessageTextOption {
+	return fieldOption(value, func(params *EditMessageTextParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -6010,7 +6010,7 @@ func (c *Client) EditUserStarSubscription(ctx context.Context, params *EditUserS
 // ExportChatInviteLinkParams contains parameters for Client.ExportChatInviteLink.
 type ExportChatInviteLinkParams struct {
 	// Unique identifier for the target chat or username of the target channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 }
 
 // ExportChatInviteLinkOption configures ExportChatInviteLinkParams.
@@ -6024,15 +6024,15 @@ func (r *ExportChatInviteLinkParams) Option(opts ...ExportChatInviteLinkOption) 
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *ExportChatInviteLinkParams) ChatTarget() string {
+func (r *ExportChatInviteLinkParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithExportChatInviteLinkChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
-func WithExportChatInviteLinkChatID(value string) ExportChatInviteLinkOption {
-	return fieldOption(value, func(params *ExportChatInviteLinkParams) *string {
+func WithExportChatInviteLinkChatID(value ChatID) ExportChatInviteLinkOption {
+	return fieldOption(value, func(params *ExportChatInviteLinkParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -6061,7 +6061,7 @@ func (c *Client) ExportChatInviteLink(ctx context.Context, params *ExportChatInv
 // ForwardMessageParams contains parameters for Client.ForwardMessage.
 type ForwardMessageParams struct {
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -6070,7 +6070,7 @@ type ForwardMessageParams struct {
 	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
 
 	// Unique identifier for the chat where the original message was sent (or username of the target bot, supergroup or channel in the format @username)
-	FromChatID string `json:"from_chat_id"`
+	FromChatID ChatID `json:"from_chat_id"`
 
 	// New start timestamp for the forwarded video in the message
 	VideoStartTimestamp int64 `json:"video_start_timestamp,omitempty"`
@@ -6105,15 +6105,15 @@ func (r *ForwardMessageParams) Option(opts ...ForwardMessageOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *ForwardMessageParams) ChatTarget() string {
+func (r *ForwardMessageParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithForwardMessageChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithForwardMessageChatID(value string) ForwardMessageOption {
-	return fieldOption(value, func(params *ForwardMessageParams) *string {
+func WithForwardMessageChatID(value ChatID) ForwardMessageOption {
+	return fieldOption(value, func(params *ForwardMessageParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -6139,8 +6139,8 @@ func WithForwardMessageDirectMessagesTopicID(value int64) ForwardMessageOption {
 // WithForwardMessageFromChatID sets the FromChatID field.
 //
 // Unique identifier for the chat where the original message was sent (or username of the target bot, supergroup or channel in the format @username)
-func WithForwardMessageFromChatID(value string) ForwardMessageOption {
-	return fieldOption(value, func(params *ForwardMessageParams) *string {
+func WithForwardMessageFromChatID(value ChatID) ForwardMessageOption {
+	return fieldOption(value, func(params *ForwardMessageParams) *ChatID {
 		return &params.FromChatID
 	})
 }
@@ -6228,7 +6228,7 @@ func (c *Client) ForwardMessage(ctx context.Context, params *ForwardMessageParam
 // ForwardMessagesParams contains parameters for Client.ForwardMessages.
 type ForwardMessagesParams struct {
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -6237,7 +6237,7 @@ type ForwardMessagesParams struct {
 	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
 
 	// Unique identifier for the chat where the original messages were sent (or username of the target bot, supergroup or channel in the format @username)
-	FromChatID string `json:"from_chat_id"`
+	FromChatID ChatID `json:"from_chat_id"`
 
 	// A JSON-serialized list of 1-100 identifiers of messages in the chat from_chat_id to forward.
 	// The identifiers must be specified in a strictly increasing order.
@@ -6264,15 +6264,15 @@ func (r *ForwardMessagesParams) Option(opts ...ForwardMessagesOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *ForwardMessagesParams) ChatTarget() string {
+func (r *ForwardMessagesParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithForwardMessagesChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithForwardMessagesChatID(value string) ForwardMessagesOption {
-	return fieldOption(value, func(params *ForwardMessagesParams) *string {
+func WithForwardMessagesChatID(value ChatID) ForwardMessagesOption {
+	return fieldOption(value, func(params *ForwardMessagesParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -6298,8 +6298,8 @@ func WithForwardMessagesDirectMessagesTopicID(value int64) ForwardMessagesOption
 // WithForwardMessagesFromChatID sets the FromChatID field.
 //
 // Unique identifier for the chat where the original messages were sent (or username of the target bot, supergroup or channel in the format @username)
-func WithForwardMessagesFromChatID(value string) ForwardMessagesOption {
-	return fieldOption(value, func(params *ForwardMessagesParams) *string {
+func WithForwardMessagesFromChatID(value ChatID) ForwardMessagesOption {
+	return fieldOption(value, func(params *ForwardMessagesParams) *ChatID {
 		return &params.FromChatID
 	})
 }
@@ -6667,7 +6667,7 @@ func (c *Client) GetBusinessConnection(ctx context.Context, params *GetBusinessC
 // GetChatParams contains parameters for Client.GetChat.
 type GetChatParams struct {
 	// Unique identifier for the target chat or username of the target supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 }
 
 // GetChatOption configures GetChatParams.
@@ -6681,15 +6681,15 @@ func (r *GetChatParams) Option(opts ...GetChatOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *GetChatParams) ChatTarget() string {
+func (r *GetChatParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithGetChatChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup or channel in the format @username
-func WithGetChatChatID(value string) GetChatOption {
-	return fieldOption(value, func(params *GetChatParams) *string {
+func WithGetChatChatID(value ChatID) GetChatOption {
+	return fieldOption(value, func(params *GetChatParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -6719,7 +6719,7 @@ func (c *Client) GetChat(ctx context.Context, params *GetChatParams) (ret *ChatF
 // GetChatAdministratorsParams contains parameters for Client.GetChatAdministrators.
 type GetChatAdministratorsParams struct {
 	// Unique identifier for the target chat or username of the target supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Pass True to additionally receive all bots that are administrators of the chat.
 	// By default, bots other than the current bot are omitted.
@@ -6737,15 +6737,15 @@ func (r *GetChatAdministratorsParams) Option(opts ...GetChatAdministratorsOption
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *GetChatAdministratorsParams) ChatTarget() string {
+func (r *GetChatAdministratorsParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithGetChatAdministratorsChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup or channel in the format @username
-func WithGetChatAdministratorsChatID(value string) GetChatAdministratorsOption {
-	return fieldOption(value, func(params *GetChatAdministratorsParams) *string {
+func WithGetChatAdministratorsChatID(value ChatID) GetChatAdministratorsOption {
+	return fieldOption(value, func(params *GetChatAdministratorsParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -6785,7 +6785,7 @@ func (c *Client) GetChatAdministrators(ctx context.Context, params *GetChatAdmin
 // GetChatGiftsParams contains parameters for Client.GetChatGifts.
 type GetChatGiftsParams struct {
 	// Unique identifier for the target chat or username of the target channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Pass True to exclude gifts that aren't saved to the chat's profile page.
 	// Always True, unless the bot has the can_post_messages administrator right in the channel.
@@ -6833,15 +6833,15 @@ func (r *GetChatGiftsParams) Option(opts ...GetChatGiftsOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *GetChatGiftsParams) ChatTarget() string {
+func (r *GetChatGiftsParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithGetChatGiftsChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
-func WithGetChatGiftsChatID(value string) GetChatGiftsOption {
-	return fieldOption(value, func(params *GetChatGiftsParams) *string {
+func WithGetChatGiftsChatID(value ChatID) GetChatGiftsOption {
+	return fieldOption(value, func(params *GetChatGiftsParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -6965,7 +6965,7 @@ func (c *Client) GetChatGifts(ctx context.Context, params *GetChatGiftsParams) (
 // GetChatMemberParams contains parameters for Client.GetChatMember.
 type GetChatMemberParams struct {
 	// Unique identifier for the target chat or username of the target supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier of the target user
 	UserID int64 `json:"user_id"`
@@ -6982,15 +6982,15 @@ func (r *GetChatMemberParams) Option(opts ...GetChatMemberOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *GetChatMemberParams) ChatTarget() string {
+func (r *GetChatMemberParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithGetChatMemberChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup or channel in the format @username
-func WithGetChatMemberChatID(value string) GetChatMemberOption {
-	return fieldOption(value, func(params *GetChatMemberParams) *string {
+func WithGetChatMemberChatID(value ChatID) GetChatMemberOption {
+	return fieldOption(value, func(params *GetChatMemberParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -7030,7 +7030,7 @@ func (c *Client) GetChatMember(ctx context.Context, params *GetChatMemberParams)
 // GetChatMemberCountParams contains parameters for Client.GetChatMemberCount.
 type GetChatMemberCountParams struct {
 	// Unique identifier for the target chat or username of the target supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 }
 
 // GetChatMemberCountOption configures GetChatMemberCountParams.
@@ -7044,15 +7044,15 @@ func (r *GetChatMemberCountParams) Option(opts ...GetChatMemberCountOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *GetChatMemberCountParams) ChatTarget() string {
+func (r *GetChatMemberCountParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithGetChatMemberCountChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup or channel in the format @username
-func WithGetChatMemberCountChatID(value string) GetChatMemberCountOption {
-	return fieldOption(value, func(params *GetChatMemberCountParams) *string {
+func WithGetChatMemberCountChatID(value ChatID) GetChatMemberCountOption {
+	return fieldOption(value, func(params *GetChatMemberCountParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -7095,8 +7095,8 @@ func (r *GetChatMenuButtonParams) Option(opts ...GetChatMenuButtonOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *GetChatMenuButtonParams) ChatTarget() string {
-	return strconv.FormatInt(r.ChatID, 10)
+func (r *GetChatMenuButtonParams) ChatTarget() ChatID {
+	return ChatID{ID: r.ChatID}
 }
 
 // WithGetChatMenuButtonChatID sets the ChatID field.
@@ -7300,8 +7300,8 @@ func (r *GetGameHighScoresParams) Option(opts ...GetGameHighScoresOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *GetGameHighScoresParams) ChatTarget() string {
-	return strconv.FormatInt(r.ChatID, 10)
+func (r *GetGameHighScoresParams) ChatTarget() ChatID {
+	return ChatID{ID: r.ChatID}
 }
 
 // WithGetGameHighScoresUserID sets the UserID field.
@@ -8025,7 +8025,7 @@ func (c *Client) GetUpdates(ctx context.Context, params *GetUpdatesParams) (ret 
 // GetUserChatBoostsParams contains parameters for Client.GetUserChatBoosts.
 type GetUserChatBoostsParams struct {
 	// Unique identifier for the chat or username of the channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier of the target user
 	UserID int64 `json:"user_id"`
@@ -8042,15 +8042,15 @@ func (r *GetUserChatBoostsParams) Option(opts ...GetUserChatBoostsOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *GetUserChatBoostsParams) ChatTarget() string {
+func (r *GetUserChatBoostsParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithGetUserChatBoostsChatID sets the ChatID field.
 //
 // Unique identifier for the chat or username of the channel in the format @username
-func WithGetUserChatBoostsChatID(value string) GetUserChatBoostsOption {
-	return fieldOption(value, func(params *GetUserChatBoostsParams) *string {
+func WithGetUserChatBoostsChatID(value ChatID) GetUserChatBoostsOption {
+	return fieldOption(value, func(params *GetUserChatBoostsParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -8606,7 +8606,7 @@ func (c *Client) GiftPremiumSubscription(ctx context.Context, params *GiftPremiu
 // HideGeneralForumTopicParams contains parameters for Client.HideGeneralForumTopic.
 type HideGeneralForumTopicParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 }
 
 // HideGeneralForumTopicOption configures HideGeneralForumTopicParams.
@@ -8620,15 +8620,15 @@ func (r *HideGeneralForumTopicParams) Option(opts ...HideGeneralForumTopicOption
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *HideGeneralForumTopicParams) ChatTarget() string {
+func (r *HideGeneralForumTopicParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithHideGeneralForumTopicChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithHideGeneralForumTopicChatID(value string) HideGeneralForumTopicOption {
-	return fieldOption(value, func(params *HideGeneralForumTopicParams) *string {
+func WithHideGeneralForumTopicChatID(value ChatID) HideGeneralForumTopicOption {
+	return fieldOption(value, func(params *HideGeneralForumTopicParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -8659,7 +8659,7 @@ func (c *Client) HideGeneralForumTopic(ctx context.Context, params *HideGeneralF
 type LeaveChatParams struct {
 	// Unique identifier for the target chat or username of the target supergroup or channel in the format @username.
 	// Channel direct messages chats aren't supported; leave the corresponding channel instead.
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 }
 
 // LeaveChatOption configures LeaveChatParams.
@@ -8673,7 +8673,7 @@ func (r *LeaveChatParams) Option(opts ...LeaveChatOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *LeaveChatParams) ChatTarget() string {
+func (r *LeaveChatParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -8681,8 +8681,8 @@ func (r *LeaveChatParams) ChatTarget() string {
 //
 // Unique identifier for the target chat or username of the target supergroup or channel in the format @username.
 // Channel direct messages chats aren't supported; leave the corresponding channel instead.
-func WithLeaveChatChatID(value string) LeaveChatOption {
-	return fieldOption(value, func(params *LeaveChatParams) *string {
+func WithLeaveChatChatID(value ChatID) LeaveChatOption {
+	return fieldOption(value, func(params *LeaveChatParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -8750,7 +8750,7 @@ type PinChatMessageParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Unique identifier for the target chat or username of the target channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Identifier of a message to pin
 	MessageID int64 `json:"message_id"`
@@ -8771,7 +8771,7 @@ func (r *PinChatMessageParams) Option(opts ...PinChatMessageOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *PinChatMessageParams) ChatTarget() string {
+func (r *PinChatMessageParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -8787,8 +8787,8 @@ func WithPinChatMessageBusinessConnectionID(value string) PinChatMessageOption {
 // WithPinChatMessageChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
-func WithPinChatMessageChatID(value string) PinChatMessageOption {
-	return fieldOption(value, func(params *PinChatMessageParams) *string {
+func WithPinChatMessageChatID(value ChatID) PinChatMessageOption {
+	return fieldOption(value, func(params *PinChatMessageParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -9115,7 +9115,7 @@ func (c *Client) PostStory(ctx context.Context, params *PostStoryParams) (ret *S
 // PromoteChatMemberParams contains parameters for Client.PromoteChatMember.
 type PromoteChatMemberParams struct {
 	// Unique identifier for the target chat or username of the target channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier of the target user
 	UserID int64 `json:"user_id"`
@@ -9188,15 +9188,15 @@ func (r *PromoteChatMemberParams) Option(opts ...PromoteChatMemberOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *PromoteChatMemberParams) ChatTarget() string {
+func (r *PromoteChatMemberParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithPromoteChatMemberChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
-func WithPromoteChatMemberChatID(value string) PromoteChatMemberOption {
-	return fieldOption(value, func(params *PromoteChatMemberParams) *string {
+func WithPromoteChatMemberChatID(value ChatID) PromoteChatMemberOption {
+	return fieldOption(value, func(params *PromoteChatMemberParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -9420,8 +9420,8 @@ func (r *ReadBusinessMessageParams) Option(opts ...ReadBusinessMessageOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *ReadBusinessMessageParams) ChatTarget() string {
-	return strconv.FormatInt(r.ChatID, 10)
+func (r *ReadBusinessMessageParams) ChatTarget() ChatID {
+	return ChatID{ID: r.ChatID}
 }
 
 // WithReadBusinessMessageBusinessConnectionID sets the BusinessConnectionID field.
@@ -9595,7 +9595,7 @@ func (c *Client) RemoveBusinessAccountProfilePhoto(ctx context.Context, params *
 // RemoveChatVerificationParams contains parameters for Client.RemoveChatVerification.
 type RemoveChatVerificationParams struct {
 	// Unique identifier for the target chat or username of the target bot or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 }
 
 // RemoveChatVerificationOption configures RemoveChatVerificationParams.
@@ -9609,15 +9609,15 @@ func (r *RemoveChatVerificationParams) Option(opts ...RemoveChatVerificationOpti
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *RemoveChatVerificationParams) ChatTarget() string {
+func (r *RemoveChatVerificationParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithRemoveChatVerificationChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot or channel in the format @username
-func WithRemoveChatVerificationChatID(value string) RemoveChatVerificationOption {
-	return fieldOption(value, func(params *RemoveChatVerificationParams) *string {
+func WithRemoveChatVerificationChatID(value ChatID) RemoveChatVerificationOption {
+	return fieldOption(value, func(params *RemoveChatVerificationParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -9729,7 +9729,7 @@ func (c *Client) RemoveUserVerification(ctx context.Context, params *RemoveUserV
 // ReopenForumTopicParams contains parameters for Client.ReopenForumTopic.
 type ReopenForumTopicParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread of the forum topic
 	MessageThreadID int64 `json:"message_thread_id"`
@@ -9746,15 +9746,15 @@ func (r *ReopenForumTopicParams) Option(opts ...ReopenForumTopicOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *ReopenForumTopicParams) ChatTarget() string {
+func (r *ReopenForumTopicParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithReopenForumTopicChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithReopenForumTopicChatID(value string) ReopenForumTopicOption {
-	return fieldOption(value, func(params *ReopenForumTopicParams) *string {
+func WithReopenForumTopicChatID(value ChatID) ReopenForumTopicOption {
+	return fieldOption(value, func(params *ReopenForumTopicParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -9792,7 +9792,7 @@ func (c *Client) ReopenForumTopic(ctx context.Context, params *ReopenForumTopicP
 // ReopenGeneralForumTopicParams contains parameters for Client.ReopenGeneralForumTopic.
 type ReopenGeneralForumTopicParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 }
 
 // ReopenGeneralForumTopicOption configures ReopenGeneralForumTopicParams.
@@ -9806,15 +9806,15 @@ func (r *ReopenGeneralForumTopicParams) Option(opts ...ReopenGeneralForumTopicOp
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *ReopenGeneralForumTopicParams) ChatTarget() string {
+func (r *ReopenGeneralForumTopicParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithReopenGeneralForumTopicChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithReopenGeneralForumTopicChatID(value string) ReopenGeneralForumTopicOption {
-	return fieldOption(value, func(params *ReopenGeneralForumTopicParams) *string {
+func WithReopenGeneralForumTopicChatID(value ChatID) ReopenGeneralForumTopicOption {
+	return fieldOption(value, func(params *ReopenGeneralForumTopicParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -10154,7 +10154,7 @@ func (c *Client) RepostStory(ctx context.Context, params *RepostStoryParams) (re
 // RestrictChatMemberParams contains parameters for Client.RestrictChatMember.
 type RestrictChatMemberParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier of the target user
 	UserID int64 `json:"user_id"`
@@ -10182,15 +10182,15 @@ func (r *RestrictChatMemberParams) Option(opts ...RestrictChatMemberOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *RestrictChatMemberParams) ChatTarget() string {
+func (r *RestrictChatMemberParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithRestrictChatMemberChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithRestrictChatMemberChatID(value string) RestrictChatMemberOption {
-	return fieldOption(value, func(params *RestrictChatMemberParams) *string {
+func WithRestrictChatMemberChatID(value ChatID) RestrictChatMemberOption {
+	return fieldOption(value, func(params *RestrictChatMemberParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -10258,7 +10258,7 @@ func (c *Client) RestrictChatMember(ctx context.Context, params *RestrictChatMem
 // RevokeChatInviteLinkParams contains parameters for Client.RevokeChatInviteLink.
 type RevokeChatInviteLinkParams struct {
 	// Unique identifier of the target chat or username of the target channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// The invite link to revoke
 	InviteLink string `json:"invite_link"`
@@ -10275,15 +10275,15 @@ func (r *RevokeChatInviteLinkParams) Option(opts ...RevokeChatInviteLinkOption) 
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *RevokeChatInviteLinkParams) ChatTarget() string {
+func (r *RevokeChatInviteLinkParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithRevokeChatInviteLinkChatID sets the ChatID field.
 //
 // Unique identifier of the target chat or username of the target channel in the format @username
-func WithRevokeChatInviteLinkChatID(value string) RevokeChatInviteLinkOption {
-	return fieldOption(value, func(params *RevokeChatInviteLinkParams) *string {
+func WithRevokeChatInviteLinkChatID(value ChatID) RevokeChatInviteLinkOption {
+	return fieldOption(value, func(params *RevokeChatInviteLinkParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -10495,7 +10495,7 @@ type SendAnimationParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -10594,7 +10594,7 @@ func (r *SendAnimationParams) Option(opts ...SendAnimationOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendAnimationParams) ChatTarget() string {
+func (r *SendAnimationParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -10610,8 +10610,8 @@ func WithSendAnimationBusinessConnectionID(value string) SendAnimationOption {
 // WithSendAnimationChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithSendAnimationChatID(value string) SendAnimationOption {
-	return fieldOption(value, func(params *SendAnimationParams) *string {
+func WithSendAnimationChatID(value ChatID) SendAnimationOption {
+	return fieldOption(value, func(params *SendAnimationParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -10862,7 +10862,7 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 		}
 
 		{
-			v := params.ChatID
+			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
 				return
@@ -11079,7 +11079,7 @@ type SendAudioParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -11172,7 +11172,7 @@ func (r *SendAudioParams) Option(opts ...SendAudioOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendAudioParams) ChatTarget() string {
+func (r *SendAudioParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -11188,8 +11188,8 @@ func WithSendAudioBusinessConnectionID(value string) SendAudioOption {
 // WithSendAudioChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithSendAudioChatID(value string) SendAudioOption {
-	return fieldOption(value, func(params *SendAudioParams) *string {
+func WithSendAudioChatID(value ChatID) SendAudioOption {
+	return fieldOption(value, func(params *SendAudioParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -11425,7 +11425,7 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 		}
 
 		{
-			v := params.ChatID
+			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
 				return
@@ -11627,7 +11627,7 @@ type SendChatActionParams struct {
 
 	// Unique identifier for the target chat or username of the target bot or supergroup in the format @username.
 	// Channel chats and channel direct messages chats aren't supported.
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread or topic of a forum; for supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -11657,7 +11657,7 @@ func (r *SendChatActionParams) Option(opts ...SendChatActionOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendChatActionParams) ChatTarget() string {
+func (r *SendChatActionParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -11674,8 +11674,8 @@ func WithSendChatActionBusinessConnectionID(value string) SendChatActionOption {
 //
 // Unique identifier for the target chat or username of the target bot or supergroup in the format @username.
 // Channel chats and channel direct messages chats aren't supported.
-func WithSendChatActionChatID(value string) SendChatActionOption {
-	return fieldOption(value, func(params *SendChatActionParams) *string {
+func WithSendChatActionChatID(value ChatID) SendChatActionOption {
+	return fieldOption(value, func(params *SendChatActionParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -11800,7 +11800,7 @@ type SendChecklistParams struct {
 	BusinessConnectionID string `json:"business_connection_id"`
 
 	// Unique identifier for the target chat or username of the target bot in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// A JSON-serialized object for the checklist to send
 	Checklist InputChecklist `json:"checklist"`
@@ -11835,7 +11835,7 @@ func (r *SendChecklistParams) Option(opts ...SendChecklistOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendChecklistParams) ChatTarget() string {
+func (r *SendChecklistParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -11851,8 +11851,8 @@ func WithSendChecklistBusinessConnectionID(value string) SendChecklistOption {
 // WithSendChecklistChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot in the format @username
-func WithSendChecklistChatID(value string) SendChecklistOption {
-	return fieldOption(value, func(params *SendChecklistParams) *string {
+func WithSendChecklistChatID(value ChatID) SendChecklistOption {
+	return fieldOption(value, func(params *SendChecklistParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -11942,7 +11942,7 @@ type SendContactParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -12011,7 +12011,7 @@ func (r *SendContactParams) Option(opts ...SendContactOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendContactParams) ChatTarget() string {
+func (r *SendContactParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -12027,8 +12027,8 @@ func WithSendContactBusinessConnectionID(value string) SendContactOption {
 // WithSendContactChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithSendContactChatID(value string) SendContactOption {
-	return fieldOption(value, func(params *SendContactParams) *string {
+func WithSendContactChatID(value ChatID) SendContactOption {
+	return fieldOption(value, func(params *SendContactParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -12200,7 +12200,7 @@ type SendDiceParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -12258,7 +12258,7 @@ func (r *SendDiceParams) Option(opts ...SendDiceOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendDiceParams) ChatTarget() string {
+func (r *SendDiceParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -12274,8 +12274,8 @@ func WithSendDiceBusinessConnectionID(value string) SendDiceOption {
 // WithSendDiceChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithSendDiceChatID(value string) SendDiceOption {
-	return fieldOption(value, func(params *SendDiceParams) *string {
+func WithSendDiceChatID(value ChatID) SendDiceOption {
+	return fieldOption(value, func(params *SendDiceParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -12412,7 +12412,7 @@ type SendDocumentParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -12499,7 +12499,7 @@ func (r *SendDocumentParams) Option(opts ...SendDocumentOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendDocumentParams) ChatTarget() string {
+func (r *SendDocumentParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -12515,8 +12515,8 @@ func WithSendDocumentBusinessConnectionID(value string) SendDocumentOption {
 // WithSendDocumentChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithSendDocumentChatID(value string) SendDocumentOption {
-	return fieldOption(value, func(params *SendDocumentParams) *string {
+func WithSendDocumentChatID(value ChatID) SendDocumentOption {
+	return fieldOption(value, func(params *SendDocumentParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -12731,7 +12731,7 @@ func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (
 		}
 
 		{
-			v := params.ChatID
+			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
 				return
@@ -12917,7 +12917,7 @@ type SendGameParams struct {
 
 	// Unique identifier for the target chat or username of the target bot in the format @username.
 	// Games can't be sent to channel direct messages chats and channel chats.
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -12968,7 +12968,7 @@ func (r *SendGameParams) Option(opts ...SendGameOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendGameParams) ChatTarget() string {
+func (r *SendGameParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -12985,8 +12985,8 @@ func WithSendGameBusinessConnectionID(value string) SendGameOption {
 //
 // Unique identifier for the target chat or username of the target bot in the format @username.
 // Games can't be sent to channel direct messages chats and channel chats.
-func WithSendGameChatID(value string) SendGameOption {
-	return fieldOption(value, func(params *SendGameParams) *string {
+func WithSendGameChatID(value ChatID) SendGameOption {
+	return fieldOption(value, func(params *SendGameParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -13106,7 +13106,7 @@ type SendGiftParams struct {
 
 	// Required if user_id is not specified.
 	// Unique identifier for the chat or username of the channel (in the format @username) that will receive the gift.
-	ChatID string `json:"chat_id,omitempty"`
+	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Identifier of the gift; limited gifts can't be sent to channel chats
 	GiftID string `json:"gift_id"`
@@ -13141,7 +13141,7 @@ func (r *SendGiftParams) Option(opts ...SendGiftOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendGiftParams) ChatTarget() string {
+func (r *SendGiftParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -13159,8 +13159,8 @@ func WithSendGiftUserID(value int64) SendGiftOption {
 //
 // Required if user_id is not specified.
 // Unique identifier for the chat or username of the channel (in the format @username) that will receive the gift.
-func WithSendGiftChatID(value string) SendGiftOption {
-	return fieldOption(value, func(params *SendGiftParams) *string {
+func WithSendGiftChatID(value ChatID) SendGiftOption {
+	return fieldOption(value, func(params *SendGiftParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -13240,7 +13240,7 @@ func (c *Client) SendGift(ctx context.Context, params *SendGiftParams) (ret bool
 // SendInvoiceParams contains parameters for Client.SendInvoice.
 type SendInvoiceParams struct {
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -13403,15 +13403,15 @@ func (r *SendInvoiceParams) Option(opts ...SendInvoiceOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendInvoiceParams) ChatTarget() string {
+func (r *SendInvoiceParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithSendInvoiceChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithSendInvoiceChatID(value string) SendInvoiceOption {
-	return fieldOption(value, func(params *SendInvoiceParams) *string {
+func WithSendInvoiceChatID(value ChatID) SendInvoiceOption {
+	return fieldOption(value, func(params *SendInvoiceParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -13773,7 +13773,7 @@ type SendLivePhotoParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Unique identifier for the target chat or username of the target channel (in the format @channelusername)
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -13863,7 +13863,7 @@ func (r *SendLivePhotoParams) Option(opts ...SendLivePhotoOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendLivePhotoParams) ChatTarget() string {
+func (r *SendLivePhotoParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -13879,8 +13879,8 @@ func WithSendLivePhotoBusinessConnectionID(value string) SendLivePhotoOption {
 // WithSendLivePhotoChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel (in the format @channelusername)
-func WithSendLivePhotoChatID(value string) SendLivePhotoOption {
-	return fieldOption(value, func(params *SendLivePhotoParams) *string {
+func WithSendLivePhotoChatID(value ChatID) SendLivePhotoOption {
+	return fieldOption(value, func(params *SendLivePhotoParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -14103,7 +14103,7 @@ func (c *Client) SendLivePhoto(ctx context.Context, params *SendLivePhotoParams)
 		}
 
 		{
-			v := params.ChatID
+			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
 				return
@@ -14294,7 +14294,7 @@ type SendLocationParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -14372,7 +14372,7 @@ func (r *SendLocationParams) Option(opts ...SendLocationOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendLocationParams) ChatTarget() string {
+func (r *SendLocationParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -14388,8 +14388,8 @@ func WithSendLocationBusinessConnectionID(value string) SendLocationOption {
 // WithSendLocationChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithSendLocationChatID(value string) SendLocationOption {
-	return fieldOption(value, func(params *SendLocationParams) *string {
+func WithSendLocationChatID(value ChatID) SendLocationOption {
+	return fieldOption(value, func(params *SendLocationParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -14582,7 +14582,7 @@ type SendMediaGroupParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -14626,7 +14626,7 @@ func (r *SendMediaGroupParams) Option(opts ...SendMediaGroupOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendMediaGroupParams) ChatTarget() string {
+func (r *SendMediaGroupParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -14642,8 +14642,8 @@ func WithSendMediaGroupBusinessConnectionID(value string) SendMediaGroupOption {
 // WithSendMediaGroupChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithSendMediaGroupChatID(value string) SendMediaGroupOption {
-	return fieldOption(value, func(params *SendMediaGroupParams) *string {
+func WithSendMediaGroupChatID(value ChatID) SendMediaGroupOption {
+	return fieldOption(value, func(params *SendMediaGroupParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -14767,7 +14767,7 @@ func (c *Client) SendMediaGroup(ctx context.Context, params *SendMediaGroupParam
 		}
 
 		{
-			v := params.ChatID
+			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
 				return
@@ -14983,7 +14983,7 @@ type SendMessageParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -15053,7 +15053,7 @@ func (r *SendMessageParams) Option(opts ...SendMessageOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendMessageParams) ChatTarget() string {
+func (r *SendMessageParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -15069,8 +15069,8 @@ func WithSendMessageBusinessConnectionID(value string) SendMessageOption {
 // WithSendMessageChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithSendMessageChatID(value string) SendMessageOption {
-	return fieldOption(value, func(params *SendMessageParams) *string {
+func WithSendMessageChatID(value ChatID) SendMessageOption {
+	return fieldOption(value, func(params *SendMessageParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -15286,8 +15286,8 @@ func (r *SendMessageDraftParams) Option(opts ...SendMessageDraftOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendMessageDraftParams) ChatTarget() string {
-	return strconv.FormatInt(r.ChatID, 10)
+func (r *SendMessageDraftParams) ChatTarget() ChatID {
+	return ChatID{ID: r.ChatID}
 }
 
 // WithSendMessageDraftChatID sets the ChatID field.
@@ -15404,7 +15404,7 @@ type SendPaidMediaParams struct {
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
 	// If the chat is a channel, all Telegram Star proceeds from this media will be credited to the chat's balance.
 	// Otherwise, they will be credited to the bot's balance.
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -15478,7 +15478,7 @@ func (r *SendPaidMediaParams) Option(opts ...SendPaidMediaOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendPaidMediaParams) ChatTarget() string {
+func (r *SendPaidMediaParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -15496,8 +15496,8 @@ func WithSendPaidMediaBusinessConnectionID(value string) SendPaidMediaOption {
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
 // If the chat is a channel, all Telegram Star proceeds from this media will be credited to the chat's balance.
 // Otherwise, they will be credited to the bot's balance.
-func WithSendPaidMediaChatID(value string) SendPaidMediaOption {
-	return fieldOption(value, func(params *SendPaidMediaParams) *string {
+func WithSendPaidMediaChatID(value ChatID) SendPaidMediaOption {
+	return fieldOption(value, func(params *SendPaidMediaParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -15692,7 +15692,7 @@ func (c *Client) SendPaidMedia(ctx context.Context, params *SendPaidMediaParams)
 		}
 
 		{
-			v := params.ChatID
+			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
 				return
@@ -15919,7 +15919,7 @@ type SendPhotoParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -16002,7 +16002,7 @@ func (r *SendPhotoParams) Option(opts ...SendPhotoOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendPhotoParams) ChatTarget() string {
+func (r *SendPhotoParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -16018,8 +16018,8 @@ func WithSendPhotoBusinessConnectionID(value string) SendPhotoOption {
 // WithSendPhotoChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithSendPhotoChatID(value string) SendPhotoOption {
-	return fieldOption(value, func(params *SendPhotoParams) *string {
+func WithSendPhotoChatID(value ChatID) SendPhotoOption {
+	return fieldOption(value, func(params *SendPhotoParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -16229,7 +16229,7 @@ func (c *Client) SendPhoto(ctx context.Context, params *SendPhotoParams) (ret *M
 		}
 
 		{
-			v := params.ChatID
+			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
 				return
@@ -16409,7 +16409,7 @@ type SendPollParams struct {
 
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
 	// Polls can't be sent to channel direct messages chats.
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -16549,7 +16549,7 @@ func (r *SendPollParams) Option(opts ...SendPollOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendPollParams) ChatTarget() string {
+func (r *SendPollParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -16566,8 +16566,8 @@ func WithSendPollBusinessConnectionID(value string) SendPollOption {
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
 // Polls can't be sent to channel direct messages chats.
-func WithSendPollChatID(value string) SendPollOption {
-	return fieldOption(value, func(params *SendPollParams) *string {
+func WithSendPollChatID(value ChatID) SendPollOption {
+	return fieldOption(value, func(params *SendPollParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -16930,7 +16930,7 @@ func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Mes
 		}
 
 		{
-			v := params.ChatID
+			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
 				return
@@ -17488,7 +17488,7 @@ type SendRichMessageParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -17546,7 +17546,7 @@ func (r *SendRichMessageParams) Option(opts ...SendRichMessageOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendRichMessageParams) ChatTarget() string {
+func (r *SendRichMessageParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -17563,8 +17563,8 @@ func WithSendRichMessageBusinessConnectionID(value string) SendRichMessageOption
 // WithSendRichMessageChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithSendRichMessageChatID(value string) SendRichMessageOption {
-	return fieldOption(value, func(params *SendRichMessageParams) *string {
+func WithSendRichMessageChatID(value ChatID) SendRichMessageOption {
+	return fieldOption(value, func(params *SendRichMessageParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -17742,8 +17742,8 @@ func (r *SendRichMessageDraftParams) Option(opts ...SendRichMessageDraftOption) 
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendRichMessageDraftParams) ChatTarget() string {
-	return strconv.FormatInt(r.ChatID, 10)
+func (r *SendRichMessageDraftParams) ChatTarget() ChatID {
+	return ChatID{ID: r.ChatID}
 }
 
 // WithSendRichMessageDraftChatID sets the ChatID field.
@@ -17837,7 +17837,7 @@ type SendStickerParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -17903,7 +17903,7 @@ func (r *SendStickerParams) Option(opts ...SendStickerOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendStickerParams) ChatTarget() string {
+func (r *SendStickerParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -17919,8 +17919,8 @@ func WithSendStickerBusinessConnectionID(value string) SendStickerOption {
 // WithSendStickerChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithSendStickerChatID(value string) SendStickerOption {
-	return fieldOption(value, func(params *SendStickerParams) *string {
+func WithSendStickerChatID(value ChatID) SendStickerOption {
+	return fieldOption(value, func(params *SendStickerParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -18091,7 +18091,7 @@ func (c *Client) SendSticker(ctx context.Context, params *SendStickerParams) (re
 		}
 
 		{
-			v := params.ChatID
+			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
 				return
@@ -18234,7 +18234,7 @@ type SendVenueParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -18317,7 +18317,7 @@ func (r *SendVenueParams) Option(opts ...SendVenueOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendVenueParams) ChatTarget() string {
+func (r *SendVenueParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -18333,8 +18333,8 @@ func WithSendVenueBusinessConnectionID(value string) SendVenueOption {
 // WithSendVenueChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithSendVenueChatID(value string) SendVenueOption {
-	return fieldOption(value, func(params *SendVenueParams) *string {
+func WithSendVenueChatID(value ChatID) SendVenueOption {
+	return fieldOption(value, func(params *SendVenueParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -18544,7 +18544,7 @@ type SendVideoParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -18656,7 +18656,7 @@ func (r *SendVideoParams) Option(opts ...SendVideoOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendVideoParams) ChatTarget() string {
+func (r *SendVideoParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -18672,8 +18672,8 @@ func WithSendVideoBusinessConnectionID(value string) SendVideoOption {
 // WithSendVideoChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithSendVideoChatID(value string) SendVideoOption {
-	return fieldOption(value, func(params *SendVideoParams) *string {
+func WithSendVideoChatID(value ChatID) SendVideoOption {
+	return fieldOption(value, func(params *SendVideoParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -18956,7 +18956,7 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 		}
 
 		{
-			v := params.ChatID
+			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
 				return
@@ -19203,7 +19203,7 @@ type SendVideoNoteParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -19283,7 +19283,7 @@ func (r *SendVideoNoteParams) Option(opts ...SendVideoNoteOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendVideoNoteParams) ChatTarget() string {
+func (r *SendVideoNoteParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -19299,8 +19299,8 @@ func WithSendVideoNoteBusinessConnectionID(value string) SendVideoNoteOption {
 // WithSendVideoNoteChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithSendVideoNoteChatID(value string) SendVideoNoteOption {
-	return fieldOption(value, func(params *SendVideoNoteParams) *string {
+func WithSendVideoNoteChatID(value ChatID) SendVideoNoteOption {
+	return fieldOption(value, func(params *SendVideoNoteParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -19495,7 +19495,7 @@ func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams)
 		}
 
 		{
-			v := params.ChatID
+			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
 				return
@@ -19660,7 +19660,7 @@ type SendVoiceParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -19737,7 +19737,7 @@ func (r *SendVoiceParams) Option(opts ...SendVoiceOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SendVoiceParams) ChatTarget() string {
+func (r *SendVoiceParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -19753,8 +19753,8 @@ func WithSendVoiceBusinessConnectionID(value string) SendVoiceOption {
 // WithSendVoiceChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithSendVoiceChatID(value string) SendVoiceOption {
-	return fieldOption(value, func(params *SendVoiceParams) *string {
+func WithSendVoiceChatID(value ChatID) SendVoiceOption {
+	return fieldOption(value, func(params *SendVoiceParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -19956,7 +19956,7 @@ func (c *Client) SendVoice(ctx context.Context, params *SendVoiceParams) (ret *M
 		}
 
 		{
-			v := params.ChatID
+			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
 				return
@@ -20524,7 +20524,7 @@ func (c *Client) SetBusinessAccountUsername(ctx context.Context, params *SetBusi
 // SetChatAdministratorCustomTitleParams contains parameters for Client.SetChatAdministratorCustomTitle.
 type SetChatAdministratorCustomTitleParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier of the target user
 	UserID int64 `json:"user_id"`
@@ -20544,15 +20544,15 @@ func (r *SetChatAdministratorCustomTitleParams) Option(opts ...SetChatAdministra
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SetChatAdministratorCustomTitleParams) ChatTarget() string {
+func (r *SetChatAdministratorCustomTitleParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithSetChatAdministratorCustomTitleChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithSetChatAdministratorCustomTitleChatID(value string) SetChatAdministratorCustomTitleOption {
-	return fieldOption(value, func(params *SetChatAdministratorCustomTitleParams) *string {
+func WithSetChatAdministratorCustomTitleChatID(value ChatID) SetChatAdministratorCustomTitleOption {
+	return fieldOption(value, func(params *SetChatAdministratorCustomTitleParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -20598,7 +20598,7 @@ func (c *Client) SetChatAdministratorCustomTitle(ctx context.Context, params *Se
 // SetChatDescriptionParams contains parameters for Client.SetChatDescription.
 type SetChatDescriptionParams struct {
 	// Unique identifier for the target chat or username of the target channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// New chat description, 0-255 characters
 	Description string `json:"description,omitempty"`
@@ -20615,15 +20615,15 @@ func (r *SetChatDescriptionParams) Option(opts ...SetChatDescriptionOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SetChatDescriptionParams) ChatTarget() string {
+func (r *SetChatDescriptionParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithSetChatDescriptionChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
-func WithSetChatDescriptionChatID(value string) SetChatDescriptionOption {
-	return fieldOption(value, func(params *SetChatDescriptionParams) *string {
+func WithSetChatDescriptionChatID(value ChatID) SetChatDescriptionOption {
+	return fieldOption(value, func(params *SetChatDescriptionParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -20661,7 +20661,7 @@ func (c *Client) SetChatDescription(ctx context.Context, params *SetChatDescript
 // SetChatMemberTagParams contains parameters for Client.SetChatMemberTag.
 type SetChatMemberTagParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier of the target user
 	UserID int64 `json:"user_id"`
@@ -20681,15 +20681,15 @@ func (r *SetChatMemberTagParams) Option(opts ...SetChatMemberTagOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SetChatMemberTagParams) ChatTarget() string {
+func (r *SetChatMemberTagParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithSetChatMemberTagChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithSetChatMemberTagChatID(value string) SetChatMemberTagOption {
-	return fieldOption(value, func(params *SetChatMemberTagParams) *string {
+func WithSetChatMemberTagChatID(value ChatID) SetChatMemberTagOption {
+	return fieldOption(value, func(params *SetChatMemberTagParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -20757,8 +20757,8 @@ func (r *SetChatMenuButtonParams) Option(opts ...SetChatMenuButtonOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SetChatMenuButtonParams) ChatTarget() string {
-	return strconv.FormatInt(r.ChatID, 10)
+func (r *SetChatMenuButtonParams) ChatTarget() ChatID {
+	return ChatID{ID: r.ChatID}
 }
 
 // WithSetChatMenuButtonChatID sets the ChatID field.
@@ -20806,7 +20806,7 @@ func (c *Client) SetChatMenuButton(ctx context.Context, params *SetChatMenuButto
 // SetChatPermissionsParams contains parameters for Client.SetChatPermissions.
 type SetChatPermissionsParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// A JSON-serialized object for new default chat permissions
 	Permissions ChatPermissions `json:"permissions"`
@@ -20827,15 +20827,15 @@ func (r *SetChatPermissionsParams) Option(opts ...SetChatPermissionsOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SetChatPermissionsParams) ChatTarget() string {
+func (r *SetChatPermissionsParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithSetChatPermissionsChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithSetChatPermissionsChatID(value string) SetChatPermissionsOption {
-	return fieldOption(value, func(params *SetChatPermissionsParams) *string {
+func WithSetChatPermissionsChatID(value ChatID) SetChatPermissionsOption {
+	return fieldOption(value, func(params *SetChatPermissionsParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -20883,7 +20883,7 @@ func (c *Client) SetChatPermissions(ctx context.Context, params *SetChatPermissi
 // SetChatPhotoParams contains parameters for Client.SetChatPhoto.
 type SetChatPhotoParams struct {
 	// Unique identifier for the target chat or username of the target channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// New chat photo, uploaded using multipart/form-data
 	Photo InputFile `json:"photo"`
@@ -20900,15 +20900,15 @@ func (r *SetChatPhotoParams) Option(opts ...SetChatPhotoOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SetChatPhotoParams) ChatTarget() string {
+func (r *SetChatPhotoParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithSetChatPhotoChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
-func WithSetChatPhotoChatID(value string) SetChatPhotoOption {
-	return fieldOption(value, func(params *SetChatPhotoParams) *string {
+func WithSetChatPhotoChatID(value ChatID) SetChatPhotoOption {
+	return fieldOption(value, func(params *SetChatPhotoParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -20954,7 +20954,7 @@ func (c *Client) SetChatPhoto(ctx context.Context, params *SetChatPhotoParams) (
 		}()
 
 		{
-			v := params.ChatID
+			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
 				return
@@ -20990,7 +20990,7 @@ func (c *Client) SetChatPhoto(ctx context.Context, params *SetChatPhotoParams) (
 // SetChatStickerSetParams contains parameters for Client.SetChatStickerSet.
 type SetChatStickerSetParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Name of the sticker set to be set as the group sticker set
 	StickerSetName string `json:"sticker_set_name"`
@@ -21007,15 +21007,15 @@ func (r *SetChatStickerSetParams) Option(opts ...SetChatStickerSetOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SetChatStickerSetParams) ChatTarget() string {
+func (r *SetChatStickerSetParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithSetChatStickerSetChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithSetChatStickerSetChatID(value string) SetChatStickerSetOption {
-	return fieldOption(value, func(params *SetChatStickerSetParams) *string {
+func WithSetChatStickerSetChatID(value ChatID) SetChatStickerSetOption {
+	return fieldOption(value, func(params *SetChatStickerSetParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -21056,7 +21056,7 @@ func (c *Client) SetChatStickerSet(ctx context.Context, params *SetChatStickerSe
 // SetChatTitleParams contains parameters for Client.SetChatTitle.
 type SetChatTitleParams struct {
 	// Unique identifier for the target chat or username of the target channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// New chat title, 1-128 characters
 	Title string `json:"title"`
@@ -21073,15 +21073,15 @@ func (r *SetChatTitleParams) Option(opts ...SetChatTitleOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SetChatTitleParams) ChatTarget() string {
+func (r *SetChatTitleParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithSetChatTitleChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
-func WithSetChatTitleChatID(value string) SetChatTitleOption {
-	return fieldOption(value, func(params *SetChatTitleParams) *string {
+func WithSetChatTitleChatID(value ChatID) SetChatTitleOption {
+	return fieldOption(value, func(params *SetChatTitleParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -21213,8 +21213,8 @@ func (r *SetGameScoreParams) Option(opts ...SetGameScoreOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SetGameScoreParams) ChatTarget() string {
-	return strconv.FormatInt(r.ChatID, 10)
+func (r *SetGameScoreParams) ChatTarget() ChatID {
+	return ChatID{ID: r.ChatID}
 }
 
 // WithSetGameScoreUserID sets the UserID field.
@@ -21383,7 +21383,7 @@ func (c *Client) SetManagedBotAccessSettings(ctx context.Context, params *SetMan
 // SetMessageReactionParams contains parameters for Client.SetMessageReaction.
 type SetMessageReactionParams struct {
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Identifier of the target message.
 	// If the message belongs to a media group, the reaction is set to the first non-deleted message in the group instead.
@@ -21410,15 +21410,15 @@ func (r *SetMessageReactionParams) Option(opts ...SetMessageReactionOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *SetMessageReactionParams) ChatTarget() string {
+func (r *SetMessageReactionParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithSetMessageReactionChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithSetMessageReactionChatID(value string) SetMessageReactionOption {
-	return fieldOption(value, func(params *SetMessageReactionParams) *string {
+func WithSetMessageReactionChatID(value ChatID) SetMessageReactionOption {
+	return fieldOption(value, func(params *SetMessageReactionParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -22740,7 +22740,7 @@ type StopMessageLiveLocationParams struct {
 
 	// Required if inline_message_id is not specified.
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
-	ChatID string `json:"chat_id,omitempty"`
+	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Required if inline_message_id is not specified.
 	// Identifier of the message with live location to stop.
@@ -22767,7 +22767,7 @@ func (r *StopMessageLiveLocationParams) Option(opts ...StopMessageLiveLocationOp
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *StopMessageLiveLocationParams) ChatTarget() string {
+func (r *StopMessageLiveLocationParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -22784,8 +22784,8 @@ func WithStopMessageLiveLocationBusinessConnectionID(value string) StopMessageLi
 //
 // Required if inline_message_id is not specified.
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
-func WithStopMessageLiveLocationChatID(value string) StopMessageLiveLocationOption {
-	return fieldOption(value, func(params *StopMessageLiveLocationParams) *string {
+func WithStopMessageLiveLocationChatID(value ChatID) StopMessageLiveLocationOption {
+	return fieldOption(value, func(params *StopMessageLiveLocationParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -22849,7 +22849,7 @@ type StopPollParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Identifier of the original message with the poll
 	MessageID int64 `json:"message_id"`
@@ -22871,7 +22871,7 @@ func (r *StopPollParams) Option(opts ...StopPollOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *StopPollParams) ChatTarget() string {
+func (r *StopPollParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -22887,8 +22887,8 @@ func WithStopPollBusinessConnectionID(value string) StopPollOption {
 // WithStopPollChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-func WithStopPollChatID(value string) StopPollOption {
-	return fieldOption(value, func(params *StopPollParams) *string {
+func WithStopPollChatID(value ChatID) StopPollOption {
+	return fieldOption(value, func(params *StopPollParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -23083,7 +23083,7 @@ func (c *Client) TransferGift(ctx context.Context, params *TransferGiftParams) (
 // UnbanChatMemberParams contains parameters for Client.UnbanChatMember.
 type UnbanChatMemberParams struct {
 	// Unique identifier for the target group or username of the target supergroup or channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier of the target user
 	UserID int64 `json:"user_id"`
@@ -23103,15 +23103,15 @@ func (r *UnbanChatMemberParams) Option(opts ...UnbanChatMemberOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *UnbanChatMemberParams) ChatTarget() string {
+func (r *UnbanChatMemberParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithUnbanChatMemberChatID sets the ChatID field.
 //
 // Unique identifier for the target group or username of the target supergroup or channel in the format @username
-func WithUnbanChatMemberChatID(value string) UnbanChatMemberOption {
-	return fieldOption(value, func(params *UnbanChatMemberParams) *string {
+func WithUnbanChatMemberChatID(value ChatID) UnbanChatMemberOption {
+	return fieldOption(value, func(params *UnbanChatMemberParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -23162,7 +23162,7 @@ func (c *Client) UnbanChatMember(ctx context.Context, params *UnbanChatMemberPar
 // UnbanChatSenderChatParams contains parameters for Client.UnbanChatSenderChat.
 type UnbanChatSenderChatParams struct {
 	// Unique identifier for the target chat or username of the target channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier of the target sender chat
 	SenderChatID int64 `json:"sender_chat_id"`
@@ -23179,15 +23179,15 @@ func (r *UnbanChatSenderChatParams) Option(opts ...UnbanChatSenderChatOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *UnbanChatSenderChatParams) ChatTarget() string {
+func (r *UnbanChatSenderChatParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithUnbanChatSenderChatChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
-func WithUnbanChatSenderChatChatID(value string) UnbanChatSenderChatOption {
-	return fieldOption(value, func(params *UnbanChatSenderChatParams) *string {
+func WithUnbanChatSenderChatChatID(value ChatID) UnbanChatSenderChatOption {
+	return fieldOption(value, func(params *UnbanChatSenderChatParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -23225,7 +23225,7 @@ func (c *Client) UnbanChatSenderChat(ctx context.Context, params *UnbanChatSende
 // UnhideGeneralForumTopicParams contains parameters for Client.UnhideGeneralForumTopic.
 type UnhideGeneralForumTopicParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 }
 
 // UnhideGeneralForumTopicOption configures UnhideGeneralForumTopicParams.
@@ -23239,15 +23239,15 @@ func (r *UnhideGeneralForumTopicParams) Option(opts ...UnhideGeneralForumTopicOp
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *UnhideGeneralForumTopicParams) ChatTarget() string {
+func (r *UnhideGeneralForumTopicParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithUnhideGeneralForumTopicChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithUnhideGeneralForumTopicChatID(value string) UnhideGeneralForumTopicOption {
-	return fieldOption(value, func(params *UnhideGeneralForumTopicParams) *string {
+func WithUnhideGeneralForumTopicChatID(value ChatID) UnhideGeneralForumTopicOption {
+	return fieldOption(value, func(params *UnhideGeneralForumTopicParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -23276,7 +23276,7 @@ func (c *Client) UnhideGeneralForumTopic(ctx context.Context, params *UnhideGene
 // UnpinAllChatMessagesParams contains parameters for Client.UnpinAllChatMessages.
 type UnpinAllChatMessagesParams struct {
 	// Unique identifier for the target chat or username of the target channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 }
 
 // UnpinAllChatMessagesOption configures UnpinAllChatMessagesParams.
@@ -23290,15 +23290,15 @@ func (r *UnpinAllChatMessagesParams) Option(opts ...UnpinAllChatMessagesOption) 
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *UnpinAllChatMessagesParams) ChatTarget() string {
+func (r *UnpinAllChatMessagesParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithUnpinAllChatMessagesChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
-func WithUnpinAllChatMessagesChatID(value string) UnpinAllChatMessagesOption {
-	return fieldOption(value, func(params *UnpinAllChatMessagesParams) *string {
+func WithUnpinAllChatMessagesChatID(value ChatID) UnpinAllChatMessagesOption {
+	return fieldOption(value, func(params *UnpinAllChatMessagesParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -23328,7 +23328,7 @@ func (c *Client) UnpinAllChatMessages(ctx context.Context, params *UnpinAllChatM
 // UnpinAllForumTopicMessagesParams contains parameters for Client.UnpinAllForumTopicMessages.
 type UnpinAllForumTopicMessagesParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread of the forum topic
 	MessageThreadID int64 `json:"message_thread_id"`
@@ -23345,15 +23345,15 @@ func (r *UnpinAllForumTopicMessagesParams) Option(opts ...UnpinAllForumTopicMess
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *UnpinAllForumTopicMessagesParams) ChatTarget() string {
+func (r *UnpinAllForumTopicMessagesParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithUnpinAllForumTopicMessagesChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithUnpinAllForumTopicMessagesChatID(value string) UnpinAllForumTopicMessagesOption {
-	return fieldOption(value, func(params *UnpinAllForumTopicMessagesParams) *string {
+func WithUnpinAllForumTopicMessagesChatID(value ChatID) UnpinAllForumTopicMessagesOption {
+	return fieldOption(value, func(params *UnpinAllForumTopicMessagesParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -23391,7 +23391,7 @@ func (c *Client) UnpinAllForumTopicMessages(ctx context.Context, params *UnpinAl
 // UnpinAllGeneralForumTopicMessagesParams contains parameters for Client.UnpinAllGeneralForumTopicMessages.
 type UnpinAllGeneralForumTopicMessagesParams struct {
 	// Unique identifier for the target chat or username of the target supergroup in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 }
 
 // UnpinAllGeneralForumTopicMessagesOption configures UnpinAllGeneralForumTopicMessagesParams.
@@ -23405,15 +23405,15 @@ func (r *UnpinAllGeneralForumTopicMessagesParams) Option(opts ...UnpinAllGeneral
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *UnpinAllGeneralForumTopicMessagesParams) ChatTarget() string {
+func (r *UnpinAllGeneralForumTopicMessagesParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
 // WithUnpinAllGeneralForumTopicMessagesChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target supergroup in the format @username
-func WithUnpinAllGeneralForumTopicMessagesChatID(value string) UnpinAllGeneralForumTopicMessagesOption {
-	return fieldOption(value, func(params *UnpinAllGeneralForumTopicMessagesParams) *string {
+func WithUnpinAllGeneralForumTopicMessagesChatID(value ChatID) UnpinAllGeneralForumTopicMessagesOption {
+	return fieldOption(value, func(params *UnpinAllGeneralForumTopicMessagesParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -23445,7 +23445,7 @@ type UnpinChatMessageParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Unique identifier for the target chat or username of the target channel in the format @username
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Identifier of the message to unpin.
 	// Required if business_connection_id is specified.
@@ -23464,7 +23464,7 @@ func (r *UnpinChatMessageParams) Option(opts ...UnpinChatMessageOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *UnpinChatMessageParams) ChatTarget() string {
+func (r *UnpinChatMessageParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -23480,8 +23480,8 @@ func WithUnpinChatMessageBusinessConnectionID(value string) UnpinChatMessageOpti
 // WithUnpinChatMessageChatID sets the ChatID field.
 //
 // Unique identifier for the target chat or username of the target channel in the format @username
-func WithUnpinChatMessageChatID(value string) UnpinChatMessageOption {
-	return fieldOption(value, func(params *UnpinChatMessageParams) *string {
+func WithUnpinChatMessageChatID(value ChatID) UnpinChatMessageOption {
+	return fieldOption(value, func(params *UnpinChatMessageParams) *ChatID {
 		return &params.ChatID
 	})
 }
@@ -23743,7 +23743,7 @@ func (c *Client) UploadStickerFile(ctx context.Context, params *UploadStickerFil
 type VerifyChatParams struct {
 	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
 	// Channel direct messages chats can't be verified.
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Custom description for the verification; 0-70 characters.
 	// Must be empty if the organization isn't allowed to provide a custom verification description.
@@ -23761,7 +23761,7 @@ func (r *VerifyChatParams) Option(opts ...VerifyChatOption) {
 }
 
 // ChatTarget implements [ChatTargeter].
-func (r *VerifyChatParams) ChatTarget() string {
+func (r *VerifyChatParams) ChatTarget() ChatID {
 	return r.ChatID
 }
 
@@ -23769,8 +23769,8 @@ func (r *VerifyChatParams) ChatTarget() string {
 //
 // Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
 // Channel direct messages chats can't be verified.
-func WithVerifyChatChatID(value string) VerifyChatOption {
-	return fieldOption(value, func(params *VerifyChatParams) *string {
+func WithVerifyChatChatID(value ChatID) VerifyChatOption {
+	return fieldOption(value, func(params *VerifyChatParams) *ChatID {
 		return &params.ChatID
 	})
 }

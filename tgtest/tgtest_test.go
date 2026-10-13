@@ -37,7 +37,7 @@ func TestRecorder(t *testing.T) {
 
 	rec.AssertSequence(t, "sendChatAction", "sendMessage")
 	rec.AssertCalled(t, "sendMessage", tgtest.Match(func(p *gogram.SendMessageParams) bool {
-		return p.ChatID == "7" && p.Text == "Hello" && p.ReplyParameters != nil
+		return p.ChatID.ID == 7 && p.Text == "Hello" && p.ReplyParameters != nil
 	}))
 	rec.AssertNotCalled(t, "answerCallbackQuery")
 

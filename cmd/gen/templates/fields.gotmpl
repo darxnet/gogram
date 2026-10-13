@@ -1,4 +1,4 @@
 {{- range . }}
     {{- .Desc }}
-    {{ toTitle .Name }} {{ toType .Type .IsRequired }} `json:"{{ .Name }}{{ if not .IsRequired }},omitempty{{ end }}"`
+    {{ toTitle .Name }} {{ toType .Type .IsRequired }} `json:"{{ .Name }}{{ if not .IsRequired }}{{ if toType .Type .IsRequired | eq "ChatID" }},omitzero{{ else }},omitempty{{ end }}{{ end }}"`
 {{ end }}

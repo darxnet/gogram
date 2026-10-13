@@ -201,7 +201,7 @@ file, _ := client.GetFile(ctx, &gogram.GetFileParams{FileID: id})
 err := client.DownloadFile(ctx, file, "/tmp/photo.jpg")
 
 _, err = client.SendDocument(ctx, &gogram.SendDocumentParams{
-	ChatID:   "7",
+	ChatID:   gogram.ChatID{ID: 7},
 	Document: gogram.InputFile{File: f, FileName: "report.pdf"}, // streamed, not buffered
 })
 ```

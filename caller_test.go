@@ -35,7 +35,7 @@ func TestWithCaller_ReplacesTransport(t *testing.T) {
 		t.Fatalf("NewClient: %v", err)
 	}
 
-	msg, err := client.SendMessage(t.Context(), &gogram.SendMessageParams{ChatID: "7", Text: "hi"})
+	msg, err := client.SendMessage(t.Context(), &gogram.SendMessageParams{ChatID: gogram.ChatID{ID: 7}, Text: "hi"})
 	if err != nil {
 		t.Fatalf("SendMessage: %v", err)
 	}
@@ -54,7 +54,7 @@ func TestWithCaller_ReplacesTransport(t *testing.T) {
 	}
 
 	// Bool results decode into the typed pointer too.
-	ok, err = client.DeleteMessage(t.Context(), &gogram.DeleteMessageParams{ChatID: "7", MessageID: 9})
+	ok, err = client.DeleteMessage(t.Context(), &gogram.DeleteMessageParams{ChatID: gogram.ChatID{ID: 7}, MessageID: 9})
 	if err == nil && ok {
 		t.Fatal("canned message body must not decode as true")
 	}
@@ -84,7 +84,7 @@ func TestWithTransformers_Order(t *testing.T) {
 		t.Fatalf("NewClient: %v", err)
 	}
 
-	ok, err := client.DeleteMessage(t.Context(), &gogram.DeleteMessageParams{ChatID: "7", MessageID: 1})
+	ok, err := client.DeleteMessage(t.Context(), &gogram.DeleteMessageParams{ChatID: gogram.ChatID{ID: 7}, MessageID: 1})
 	if err != nil || !ok {
 		t.Fatalf("DeleteMessage = %v, %v", ok, err)
 	}

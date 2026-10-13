@@ -98,7 +98,7 @@ func (field Field) AutoFillCode(types map[string]Type) string {
 	switch field.Name {
 	case "chat_id":
 		switch toType(field.Type, field.IsRequired) {
-		case "string":
+		case "ChatID":
 			return "ctx.chatTarget()"
 
 		case "int64":

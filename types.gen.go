@@ -623,7 +623,7 @@ type BotCommandScopeChat struct {
 
 	// Unique identifier for the target chat or username of the target supergroup in the format @username.
 	// Channel direct messages chats and channel chats aren't supported.
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 }
 
 // BotCommandScopeChatAdministrators
@@ -637,7 +637,7 @@ type BotCommandScopeChatAdministrators struct {
 
 	// Unique identifier for the target chat or username of the target supergroup in the format @username.
 	// Channel direct messages chats and channel chats aren't supported.
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 }
 
 // BotCommandScopeChatMember
@@ -651,7 +651,7 @@ type BotCommandScopeChatMember struct {
 
 	// Unique identifier for the target chat or username of the target supergroup in the format @username.
 	// Channel direct messages chats and channel chats aren't supported.
-	ChatID string `json:"chat_id"`
+	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier of the target user
 	UserID int64 `json:"user_id"`
@@ -9554,7 +9554,7 @@ type ReplyParameters struct {
 	// Optional.
 	// If the message to be replied to is from a different chat, unique identifier for the chat or username of the bot, supergroup or channel in the format @username.
 	// Not supported for messages sent on behalf of a business account, messages from channel direct messages chats and ephemeral messages.
-	ChatID string `json:"chat_id,omitempty"`
+	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Optional.
 	// Identifier of the incoming ephemeral message that will be replied to in the current chat.

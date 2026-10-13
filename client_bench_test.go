@@ -43,7 +43,7 @@ func BenchmarkSendMessage(b *testing.B) {
 	client := newStubClient(b,
 		`{"ok":true,"result":{"message_id":1,"date":1700000000,"chat":{"id":7,"type":"private"},"text":"hi"}}`)
 
-	params := &gogram.SendMessageParams{ChatID: "7", Text: "hi"}
+	params := &gogram.SendMessageParams{ChatID: gogram.ChatID{ID: 7}, Text: "hi"}
 	ctx := b.Context()
 
 	b.ReportAllocs()

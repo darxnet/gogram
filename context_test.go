@@ -61,7 +61,7 @@ func TestContext_NewParamsBuilder(t *testing.T) {
 	ctx := gogram.NewTestContext(t.Context(), client, update)
 
 	params := ctx.NewSendMessageParams("hi", gogram.WithSendMessageDisableNotification(true))
-	if params.ChatID != "7" || params.Text != "hi" || !params.DisableNotification {
+	if params.ChatID.ID != 7 || params.Text != "hi" || !params.DisableNotification {
 		t.Fatalf("params = %+v", params)
 	}
 

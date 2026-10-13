@@ -854,7 +854,7 @@ func (ctx *Context) ConvertGiftToStars(
 //
 //	ret, err := ctx.Client().CopyMessage(ctx.Detached(), ctx.NewCopyMessageParams(...))
 func (ctx *Context) NewCopyMessageParams(
-	fromChatID string,
+	fromChatID ChatID,
 	opts ...CopyMessageOption,
 ) *CopyMessageParams {
 	params := &CopyMessageParams{
@@ -888,7 +888,7 @@ func (ctx *Context) NewCopyMessageParams(
 // [forwardMessage]: https://core.telegram.org/bots/api#forwardmessage
 // [MessageId]: https://core.telegram.org/bots/api#messageid
 func (ctx *Context) CopyMessage(
-	fromChatID string,
+	fromChatID ChatID,
 	opts ...CopyMessageOption,
 ) error {
 	params := ctx.NewCopyMessageParams(
@@ -907,7 +907,7 @@ func (ctx *Context) CopyMessage(
 //
 //	ret, err := ctx.Client().CopyMessages(ctx.Detached(), ctx.NewCopyMessagesParams(...))
 func (ctx *Context) NewCopyMessagesParams(
-	fromChatID string,
+	fromChatID ChatID,
 	messageIDs []int64,
 	opts ...CopyMessagesOption,
 ) *CopyMessagesParams {
@@ -938,7 +938,7 @@ func (ctx *Context) NewCopyMessagesParams(
 // [forwardMessages]: https://core.telegram.org/bots/api#forwardmessages
 // [MessageId]: https://core.telegram.org/bots/api#messageid
 func (ctx *Context) CopyMessages(
-	fromChatID string,
+	fromChatID ChatID,
 	messageIDs []int64,
 	opts ...CopyMessagesOption,
 ) error {
@@ -2489,7 +2489,7 @@ func (ctx *Context) ExportChatInviteLink(
 //
 //	ret, err := ctx.Client().ForwardMessage(ctx.Detached(), ctx.NewForwardMessageParams(...))
 func (ctx *Context) NewForwardMessageParams(
-	fromChatID string,
+	fromChatID ChatID,
 	opts ...ForwardMessageOption,
 ) *ForwardMessageParams {
 	params := &ForwardMessageParams{
@@ -2513,7 +2513,7 @@ func (ctx *Context) NewForwardMessageParams(
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) ForwardMessage(
-	fromChatID string,
+	fromChatID ChatID,
 	opts ...ForwardMessageOption,
 ) error {
 	params := ctx.NewForwardMessageParams(
@@ -2532,7 +2532,7 @@ func (ctx *Context) ForwardMessage(
 //
 //	ret, err := ctx.Client().ForwardMessages(ctx.Detached(), ctx.NewForwardMessagesParams(...))
 func (ctx *Context) NewForwardMessagesParams(
-	fromChatID string,
+	fromChatID ChatID,
 	messageIDs []int64,
 	opts ...ForwardMessagesOption,
 ) *ForwardMessagesParams {
@@ -2559,7 +2559,7 @@ func (ctx *Context) NewForwardMessagesParams(
 //
 // [MessageId]: https://core.telegram.org/bots/api#messageid
 func (ctx *Context) ForwardMessages(
-	fromChatID string,
+	fromChatID ChatID,
 	messageIDs []int64,
 	opts ...ForwardMessagesOption,
 ) error {

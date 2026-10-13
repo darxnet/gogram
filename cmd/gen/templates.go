@@ -78,7 +78,7 @@ var typeMapping = map[string]string{
 
 	"Integer":           "int64",
 	"String":            "string",
-	"Integer or String": "string",
+	"Integer or String": "ChatID",
 	"Boolean":           "bool",
 	"True":              "bool",
 	"Float":             "float64",
@@ -105,7 +105,9 @@ func toType(s string, required bool) string {
 		s = "InputMedia"
 	}
 
-	if isTitle(s[0]) && !required && arrayDepth == 0 {
+	// Optional object fields are pointers; ChatID is a small value type
+	// with IsZero, omitted through omitzero instead.
+	if isTitle(s[0]) && !required && arrayDepth == 0 && s != "ChatID" {
 		s = "*" + s
 	}
 

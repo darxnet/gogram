@@ -1,13 +1,10 @@
 package gogram
 
-import "strconv"
-
-// Target returns the value for a chat_id parameter: the user ID in decimal,
-// or the username with an '@' prefix when the ID is unknown.
-func (u *User) Target() string {
+// Target returns the value for a chat_id parameter.
+func (u *User) Target() ChatID {
 	if u.ID != 0 {
-		return strconv.FormatInt(u.ID, 10)
+		return ChatID{ID: u.ID}
 	}
 
-	return "@" + u.Username
+	return ChatID{Username: u.Username}
 }

@@ -24,7 +24,8 @@ func TestLogging(t *testing.T) {
 		t.Fatalf("NewClient: %v", err)
 	}
 
-	if _, err = client.DeleteMessage(t.Context(), &gogram.DeleteMessageParams{ChatID: "7", MessageID: 1}); err != nil {
+	params := &gogram.DeleteMessageParams{ChatID: gogram.ChatID{ID: 7}, MessageID: 1}
+	if _, err = client.DeleteMessage(t.Context(), params); err != nil {
 		t.Fatal(err)
 	}
 

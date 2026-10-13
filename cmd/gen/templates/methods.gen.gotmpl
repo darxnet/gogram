@@ -37,9 +37,9 @@ import (
         {{- if eq .Name "chat_id" }}
             {{- $goType := toType .Type .IsRequired }}
     // ChatTarget implements [ChatTargeter].
-    func (r *{{ $params }}) ChatTarget() string {
+    func (r *{{ $params }}) ChatTarget() ChatID {
             {{- if eq $goType "int64" }}
-        return strconv.FormatInt(r.ChatID, 10)
+        return ChatID{ID: r.ChatID}
             {{- else }}
         return r.ChatID
             {{- end }}
@@ -101,6 +101,14 @@ import (
                 {{- else if eq $goType "string" }}
                     {{ if not .IsRequired }} if params.{{ $goTitle }} != "" {{ end }} {
                         v := params.{{ $goTitle }}
+                        err = writer.WriteField("{{ .Name }}", v)
+                        if err != nil {
+                            return
+                        }
+                    }
+                {{- else if eq $goType "ChatID" }}
+                    {{ if not .IsRequired }} if !params.{{ $goTitle }}.IsZero() {{ end }} {
+                        v := params.{{ $goTitle }}.String()
                         err = writer.WriteField("{{ .Name }}", v)
                         if err != nil {
                             return

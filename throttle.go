@@ -10,10 +10,9 @@ import (
 	"golang.org/x/time/rate"
 )
 
-// ChatTargeter is implemented by every generated params type with a chat_id
-// field. The target is the chat id in decimal or "@username".
+// ChatTargeter is implemented by every generated params type with a chat_id field.
 type ChatTargeter interface {
-	ChatTarget() string
+	ChatTarget() ChatID
 }
 
 // Telegram's per-chat flood limits, see https://core.telegram.org/bots/faq#my-bot-is-hitting-limits-how-do-i-avoid-this
@@ -50,7 +49,7 @@ type chatLimiter struct {
 
 type throttler struct {
 	cfg   ThrottleConfig
-	chats goshard.ComparableMap[string, *chatLimiter]
+	chats goshard.ComparableMap[ChatID, *chatLimiter]
 
 	lastSweep atomic.Int64 // unix nanoseconds
 	next      Caller
@@ -118,13 +117,13 @@ func (t *throttler) Call(ctx context.Context, req Request, result any) error {
 	}
 
 	chat := target.ChatTarget()
-	if chat == "" {
+	if chat.IsZero() {
 		return t.next.Call(ctx, req, result)
 	}
 
 	now := time.Now()
 
-	limiter, _ := t.chats.Compute(chat, func(_ string, current *chatLimiter, loaded bool) (*chatLimiter, bool) {
+	limiter, _ := t.chats.Compute(chat, func(_ ChatID, current *chatLimiter, loaded bool) (*chatLimiter, bool) {
 		if !loaded {
 			current = t.newLimiter(chat)
 		}
@@ -144,9 +143,9 @@ func (t *throttler) Call(ctx context.Context, req Request, result any) error {
 }
 
 // newLimiter picks the limit by chat kind: private chats have positive ids,
-// groups, supergroups and channels negative ones or a public "@username".
-func (t *throttler) newLimiter(chat string) *chatLimiter {
-	if chat[0] == '-' || chat[0] == '@' {
+// groups, supergroups and channels negative ones or a public username.
+func (t *throttler) newLimiter(chat ChatID) *chatLimiter {
+	if chat.ID < 0 || chat.Username != "" {
 		return &chatLimiter{limiter: rate.NewLimiter(t.cfg.GroupRate, t.cfg.GroupBurst)}
 	}
 

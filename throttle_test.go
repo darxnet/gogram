@@ -21,7 +21,7 @@ func TestThrottle_PerChat(t *testing.T) {
 	record := gogram.CallerFunc(func(_ context.Context, req gogram.Request, _ any) error {
 		chat := ""
 		if ct, ok := req.Params.(gogram.ChatTargeter); ok {
-			chat = ct.ChatTarget()
+			chat = ct.ChatTarget().String()
 		}
 
 		mu.Lock()
@@ -61,10 +61,12 @@ func TestThrottle_PerChat(t *testing.T) {
 	}
 
 	for range 3 {
-		run(func() { _, _ = client.SendMessage(ctx, &gogram.SendMessageParams{ChatID: "7", Text: "x"}) })
-		run(func() { _, _ = client.SendMessage(ctx, &gogram.SendMessageParams{ChatID: "-100", Text: "x"}) })
-		run(func() { _, _ = client.SendMessage(ctx, &gogram.SendMessageParams{ChatID: "8", Text: "x"}) })
-		run(func() { _, _ = client.SendChatAction(ctx, &gogram.SendChatActionParams{ChatID: "7", Action: "typing"}) })
+		run(func() { _, _ = client.SendMessage(ctx, &gogram.SendMessageParams{ChatID: gogram.ChatID{ID: 7}, Text: "x"}) })
+		run(func() { _, _ = client.SendMessage(ctx, &gogram.SendMessageParams{ChatID: gogram.ChatID{ID: -100}, Text: "x"}) })
+		run(func() { _, _ = client.SendMessage(ctx, &gogram.SendMessageParams{ChatID: gogram.ChatID{ID: 8}, Text: "x"}) })
+		run(func() {
+			_, _ = client.SendChatAction(ctx, &gogram.SendChatActionParams{ChatID: gogram.ChatID{ID: 7}, Action: "typing"})
+		})
 		run(func() { _, _ = client.GetMe(ctx, nil) })
 	}
 
@@ -113,20 +115,21 @@ func TestThrottle_ContextDeadline(t *testing.T) {
 		t.Fatalf("NewClient: %v", err)
 	}
 
-	params := &gogram.DeleteMessageParams{ChatID: "7", MessageID: 1}
+	params := &gogram.DeleteMessageParams{ChatID: gogram.ChatID{ID: 7}, MessageID: 1}
 
 	if _, err = client.DeleteMessage(t.Context(), params); err != nil {
 		t.Fatalf("delete must not be throttled: %v", err)
 	}
 
-	if _, err = client.SendMessage(t.Context(), &gogram.SendMessageParams{ChatID: "7", Text: "a"}); err != nil {
+	first := &gogram.SendMessageParams{ChatID: gogram.ChatID{ID: 7}, Text: "a"}
+	if _, err = client.SendMessage(t.Context(), first); err != nil {
 		t.Fatalf("first send: %v", err)
 	}
 
 	ctx, cancel := context.WithTimeout(t.Context(), 20*time.Millisecond)
 	defer cancel()
 
-	if _, err = client.SendMessage(ctx, &gogram.SendMessageParams{ChatID: "7", Text: "b"}); err == nil {
+	if _, err = client.SendMessage(ctx, &gogram.SendMessageParams{ChatID: gogram.ChatID{ID: 7}, Text: "b"}); err == nil {
 		t.Fatal("second send within the hour must fail on the context deadline")
 	}
 }
