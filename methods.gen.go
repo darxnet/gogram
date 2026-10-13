@@ -132,7 +132,7 @@ func (c *Client) AddStickerToSet(ctx context.Context, params *AddStickerToSetPar
 
 	}()
 
-	ret, err = call[bool](ctx, c, "addStickerToSet", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "addStickerToSet", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -255,7 +255,7 @@ func (c *Client) AnswerCallbackQuery(ctx context.Context, params *AnswerCallback
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "answerCallbackQuery", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "answerCallbackQuery", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -314,7 +314,7 @@ func (c *Client) AnswerChatJoinRequestQuery(ctx context.Context, params *AnswerC
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "answerChatJoinRequestQuery", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "answerChatJoinRequestQuery", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -373,7 +373,7 @@ func (c *Client) AnswerGuestQuery(ctx context.Context, params *AnswerGuestQueryP
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*SentGuestMessage](ctx, c, "answerGuestQuery", reader, contentType, c.cfg.timeout)
+	ret, err = call[*SentGuestMessage](ctx, c, "answerGuestQuery", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -487,7 +487,7 @@ func (c *Client) AnswerInlineQuery(ctx context.Context, params *AnswerInlineQuer
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "answerInlineQuery", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "answerInlineQuery", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -570,7 +570,7 @@ func (c *Client) AnswerPreCheckoutQuery(ctx context.Context, params *AnswerPreCh
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "answerPreCheckoutQuery", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "answerPreCheckoutQuery", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -662,7 +662,7 @@ func (c *Client) AnswerShippingQuery(ctx context.Context, params *AnswerShipping
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "answerShippingQuery", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "answerShippingQuery", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -722,7 +722,7 @@ func (c *Client) AnswerWebAppQuery(ctx context.Context, params *AnswerWebAppQuer
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*SentWebAppMessage](ctx, c, "answerWebAppQuery", reader, contentType, c.cfg.timeout)
+	ret, err = call[*SentWebAppMessage](ctx, c, "answerWebAppQuery", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -780,7 +780,7 @@ func (c *Client) ApproveChatJoinRequest(ctx context.Context, params *ApproveChat
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "approveChatJoinRequest", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "approveChatJoinRequest", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -852,7 +852,7 @@ func (c *Client) ApproveSuggestedPost(ctx context.Context, params *ApproveSugges
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "approveSuggestedPost", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "approveSuggestedPost", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -945,7 +945,7 @@ func (c *Client) BanChatMember(ctx context.Context, params *BanChatMemberParams)
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "banChatMember", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "banChatMember", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -1006,7 +1006,7 @@ func (c *Client) BanChatSenderChat(ctx context.Context, params *BanChatSenderCha
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "banChatSenderChat", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "banChatSenderChat", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -1043,7 +1043,7 @@ func (c *Client) Close(ctx context.Context, params *CloseParams) (ret bool, err 
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "close", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "close", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -1101,7 +1101,7 @@ func (c *Client) CloseForumTopic(ctx context.Context, params *CloseForumTopicPar
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "closeForumTopic", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "closeForumTopic", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -1147,7 +1147,7 @@ func (c *Client) CloseGeneralForumTopic(ctx context.Context, params *CloseGenera
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "closeGeneralForumTopic", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "closeGeneralForumTopic", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -1205,7 +1205,7 @@ func (c *Client) ConvertGiftToStars(ctx context.Context, params *ConvertGiftToSt
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "convertGiftToStars", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "convertGiftToStars", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -1481,7 +1481,7 @@ func (c *Client) CopyMessage(ctx context.Context, params *CopyMessageParams) (re
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*MessageId](ctx, c, "copyMessage", reader, contentType, c.cfg.timeout)
+	ret, err = call[*MessageId](ctx, c, "copyMessage", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -1627,7 +1627,7 @@ func (c *Client) CopyMessages(ctx context.Context, params *CopyMessagesParams) (
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[[]MessageId](ctx, c, "copyMessages", reader, contentType, c.cfg.timeout)
+	ret, err = call[[]MessageId](ctx, c, "copyMessages", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -1727,7 +1727,7 @@ func (c *Client) CreateChatInviteLink(ctx context.Context, params *CreateChatInv
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*ChatInviteLink](ctx, c, "createChatInviteLink", reader, contentType, c.cfg.timeout)
+	ret, err = call[*ChatInviteLink](ctx, c, "createChatInviteLink", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -1817,7 +1817,7 @@ func (c *Client) CreateChatSubscriptionInviteLink(ctx context.Context, params *C
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*ChatInviteLink](ctx, c, "createChatSubscriptionInviteLink", reader, contentType, c.cfg.timeout)
+	ret, err = call[*ChatInviteLink](ctx, c, "createChatSubscriptionInviteLink", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -1909,7 +1909,7 @@ func (c *Client) CreateForumTopic(ctx context.Context, params *CreateForumTopicP
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*ForumTopic](ctx, c, "createForumTopic", reader, contentType, c.cfg.timeout)
+	ret, err = call[*ForumTopic](ctx, c, "createForumTopic", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -2310,7 +2310,7 @@ func (c *Client) CreateInvoiceLink(ctx context.Context, params *CreateInvoiceLin
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[string](ctx, c, "createInvoiceLink", reader, contentType, c.cfg.timeout)
+	ret, err = call[string](ctx, c, "createInvoiceLink", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -2505,7 +2505,7 @@ func (c *Client) CreateNewStickerSet(ctx context.Context, params *CreateNewStick
 
 	}()
 
-	ret, err = call[bool](ctx, c, "createNewStickerSet", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "createNewStickerSet", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -2570,7 +2570,7 @@ func (c *Client) DeclineChatJoinRequest(ctx context.Context, params *DeclineChat
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "declineChatJoinRequest", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "declineChatJoinRequest", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -2640,7 +2640,7 @@ func (c *Client) DeclineSuggestedPost(ctx context.Context, params *DeclineSugges
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "declineSuggestedPost", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "declineSuggestedPost", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -2710,7 +2710,7 @@ func (c *Client) DeleteAllMessageReactions(ctx context.Context, params *DeleteAl
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "deleteAllMessageReactions", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "deleteAllMessageReactions", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -2776,7 +2776,7 @@ func (c *Client) DeleteBusinessMessages(ctx context.Context, params *DeleteBusin
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "deleteBusinessMessages", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "deleteBusinessMessages", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -2823,7 +2823,7 @@ func (c *Client) DeleteChatPhoto(ctx context.Context, params *DeleteChatPhotoPar
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "deleteChatPhoto", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "deleteChatPhoto", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -2872,7 +2872,7 @@ func (c *Client) DeleteChatStickerSet(ctx context.Context, params *DeleteChatSti
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "deleteChatStickerSet", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "deleteChatStickerSet", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -2942,7 +2942,7 @@ func (c *Client) DeleteEphemeralMessage(ctx context.Context, params *DeleteEphem
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "deleteEphemeralMessage", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "deleteEphemeralMessage", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3000,7 +3000,7 @@ func (c *Client) DeleteForumTopic(ctx context.Context, params *DeleteForumTopicP
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "deleteForumTopic", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "deleteForumTopic", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3066,7 +3066,7 @@ func (c *Client) DeleteMessage(ctx context.Context, params *DeleteMessageParams)
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "deleteMessage", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "deleteMessage", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3148,7 +3148,7 @@ func (c *Client) DeleteMessageReaction(ctx context.Context, params *DeleteMessag
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "deleteMessageReaction", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "deleteMessageReaction", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3212,7 +3212,7 @@ func (c *Client) DeleteMessages(ctx context.Context, params *DeleteMessagesParam
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "deleteMessages", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "deleteMessages", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3280,7 +3280,7 @@ func (c *Client) DeleteMyCommands(ctx context.Context, params *DeleteMyCommandsP
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "deleteMyCommands", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "deleteMyCommands", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3325,7 +3325,7 @@ func (c *Client) DeleteStickerFromSet(ctx context.Context, params *DeleteSticker
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "deleteStickerFromSet", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "deleteStickerFromSet", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3370,7 +3370,7 @@ func (c *Client) DeleteStickerSet(ctx context.Context, params *DeleteStickerSetP
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "deleteStickerSet", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "deleteStickerSet", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3428,7 +3428,7 @@ func (c *Client) DeleteStory(ctx context.Context, params *DeleteStoryParams) (re
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "deleteStory", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "deleteStory", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3475,7 +3475,7 @@ func (c *Client) DeleteWebhook(ctx context.Context, params *DeleteWebhookParams)
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "deleteWebhook", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "deleteWebhook", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3585,7 +3585,7 @@ func (c *Client) EditChatInviteLink(ctx context.Context, params *EditChatInviteL
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*ChatInviteLink](ctx, c, "editChatInviteLink", reader, contentType, c.cfg.timeout)
+	ret, err = call[*ChatInviteLink](ctx, c, "editChatInviteLink", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3657,7 +3657,7 @@ func (c *Client) EditChatSubscriptionInviteLink(ctx context.Context, params *Edi
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*ChatInviteLink](ctx, c, "editChatSubscriptionInviteLink", reader, contentType, c.cfg.timeout)
+	ret, err = call[*ChatInviteLink](ctx, c, "editChatSubscriptionInviteLink", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -3799,7 +3799,7 @@ func (c *Client) EditEphemeralMessageCaption(ctx context.Context, params *EditEp
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "editEphemeralMessageCaption", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "editEphemeralMessageCaption", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -4076,7 +4076,7 @@ func (c *Client) EditEphemeralMessageMedia(ctx context.Context, params *EditEphe
 
 	}()
 
-	ret, err = call[bool](ctx, c, "editEphemeralMessageMedia", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "editEphemeralMessageMedia", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -4169,7 +4169,7 @@ func (c *Client) EditEphemeralMessageReplyMarkup(ctx context.Context, params *Ed
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "editEphemeralMessageReplyMarkup", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "editEphemeralMessageReplyMarkup", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -4321,7 +4321,7 @@ func (c *Client) EditEphemeralMessageText(ctx context.Context, params *EditEphem
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "editEphemeralMessageText", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "editEphemeralMessageText", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -4415,7 +4415,7 @@ func (c *Client) EditForumTopic(ctx context.Context, params *EditForumTopicParam
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "editForumTopic", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "editForumTopic", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -4473,7 +4473,7 @@ func (c *Client) EditGeneralForumTopic(ctx context.Context, params *EditGeneralF
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "editGeneralForumTopic", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "editGeneralForumTopic", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -4635,7 +4635,7 @@ func (c *Client) EditMessageCaption(ctx context.Context, params *EditMessageCapt
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*Message](ctx, c, "editMessageCaption", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "editMessageCaption", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -4734,7 +4734,7 @@ func (c *Client) EditMessageChecklist(ctx context.Context, params *EditMessageCh
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*Message](ctx, c, "editMessageChecklist", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "editMessageChecklist", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -4923,7 +4923,7 @@ func (c *Client) EditMessageLiveLocation(ctx context.Context, params *EditMessag
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*Message](ctx, c, "editMessageLiveLocation", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "editMessageLiveLocation", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -5230,7 +5230,7 @@ func (c *Client) EditMessageMedia(ctx context.Context, params *EditMessageMediaP
 
 	}()
 
-	ret, err = call[*Message](ctx, c, "editMessageMedia", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "editMessageMedia", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -5343,7 +5343,7 @@ func (c *Client) EditMessageReplyMarkup(ctx context.Context, params *EditMessage
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*Message](ctx, c, "editMessageReplyMarkup", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "editMessageReplyMarkup", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -5518,7 +5518,7 @@ func (c *Client) EditMessageText(ctx context.Context, params *EditMessageTextPar
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*Message](ctx, c, "editMessageText", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "editMessageText", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -5749,7 +5749,7 @@ func (c *Client) EditStory(ctx context.Context, params *EditStoryParams) (ret *S
 
 	}()
 
-	ret, err = call[*Story](ctx, c, "editStory", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Story](ctx, c, "editStory", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -5827,7 +5827,7 @@ func (c *Client) EditUserStarSubscription(ctx context.Context, params *EditUserS
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "editUserStarSubscription", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "editUserStarSubscription", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -5873,7 +5873,7 @@ func (c *Client) ExportChatInviteLink(ctx context.Context, params *ExportChatInv
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[string](ctx, c, "exportChatInviteLink", reader, contentType, c.cfg.timeout)
+	ret, err = call[string](ctx, c, "exportChatInviteLink", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -6035,7 +6035,7 @@ func (c *Client) ForwardMessage(ctx context.Context, params *ForwardMessageParam
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*Message](ctx, c, "forwardMessage", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "forwardMessage", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -6165,7 +6165,7 @@ func (c *Client) ForwardMessages(ctx context.Context, params *ForwardMessagesPar
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[[]MessageId](ctx, c, "forwardMessages", reader, contentType, c.cfg.timeout)
+	ret, err = call[[]MessageId](ctx, c, "forwardMessages", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -6202,7 +6202,7 @@ func (c *Client) GetAvailableGifts(ctx context.Context, params *GetAvailableGift
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*Gifts](ctx, c, "getAvailableGifts", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Gifts](ctx, c, "getAvailableGifts", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -6374,7 +6374,7 @@ func (c *Client) GetBusinessAccountGifts(ctx context.Context, params *GetBusines
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*OwnedGifts](ctx, c, "getBusinessAccountGifts", reader, contentType, c.cfg.timeout)
+	ret, err = call[*OwnedGifts](ctx, c, "getBusinessAccountGifts", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -6422,7 +6422,7 @@ func (c *Client) GetBusinessAccountStarBalance(ctx context.Context, params *GetB
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*StarAmount](ctx, c, "getBusinessAccountStarBalance", reader, contentType, c.cfg.timeout)
+	ret, err = call[*StarAmount](ctx, c, "getBusinessAccountStarBalance", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -6469,7 +6469,7 @@ func (c *Client) GetBusinessConnection(ctx context.Context, params *GetBusinessC
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*BusinessConnection](ctx, c, "getBusinessConnection", reader, contentType, c.cfg.timeout)
+	ret, err = call[*BusinessConnection](ctx, c, "getBusinessConnection", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -6516,7 +6516,7 @@ func (c *Client) GetChat(ctx context.Context, params *GetChatParams) (ret *ChatF
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*ChatFullInfo](ctx, c, "getChat", reader, contentType, c.cfg.timeout)
+	ret, err = call[*ChatFullInfo](ctx, c, "getChat", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -6577,7 +6577,7 @@ func (c *Client) GetChatAdministrators(ctx context.Context, params *GetChatAdmin
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[[]ChatMember](ctx, c, "getChatAdministrators", reader, contentType, c.cfg.timeout)
+	ret, err = call[[]ChatMember](ctx, c, "getChatAdministrators", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -6752,7 +6752,7 @@ func (c *Client) GetChatGifts(ctx context.Context, params *GetChatGiftsParams) (
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*OwnedGifts](ctx, c, "getChatGifts", reader, contentType, c.cfg.timeout)
+	ret, err = call[*OwnedGifts](ctx, c, "getChatGifts", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -6812,7 +6812,7 @@ func (c *Client) GetChatMember(ctx context.Context, params *GetChatMemberParams)
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*ChatMember](ctx, c, "getChatMember", reader, contentType, c.cfg.timeout)
+	ret, err = call[*ChatMember](ctx, c, "getChatMember", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -6857,7 +6857,7 @@ func (c *Client) GetChatMemberCount(ctx context.Context, params *GetChatMemberCo
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[int64](ctx, c, "getChatMemberCount", reader, contentType, c.cfg.timeout)
+	ret, err = call[int64](ctx, c, "getChatMemberCount", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -6906,7 +6906,7 @@ func (c *Client) GetChatMenuButton(ctx context.Context, params *GetChatMenuButto
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*MenuButton](ctx, c, "getChatMenuButton", reader, contentType, c.cfg.timeout)
+	ret, err = call[*MenuButton](ctx, c, "getChatMenuButton", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -6955,7 +6955,7 @@ func (c *Client) GetCustomEmojiStickers(ctx context.Context, params *GetCustomEm
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[[]Sticker](ctx, c, "getCustomEmojiStickers", reader, contentType, c.cfg.timeout)
+	ret, err = call[[]Sticker](ctx, c, "getCustomEmojiStickers", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7009,7 +7009,7 @@ func (c *Client) GetFile(ctx context.Context, params *GetFileParams) (ret *File,
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*File](ctx, c, "getFile", reader, contentType, c.cfg.timeout)
+	ret, err = call[*File](ctx, c, "getFile", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7046,7 +7046,7 @@ func (c *Client) GetForumTopicIconStickers(ctx context.Context, params *GetForum
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[[]Sticker](ctx, c, "getForumTopicIconStickers", reader, contentType, c.cfg.timeout)
+	ret, err = call[[]Sticker](ctx, c, "getForumTopicIconStickers", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7136,7 +7136,7 @@ func (c *Client) GetGameHighScores(ctx context.Context, params *GetGameHighScore
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[[]GameHighScore](ctx, c, "getGameHighScores", reader, contentType, c.cfg.timeout)
+	ret, err = call[[]GameHighScore](ctx, c, "getGameHighScores", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7183,7 +7183,7 @@ func (c *Client) GetManagedBotAccessSettings(ctx context.Context, params *GetMan
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*BotAccessSettings](ctx, c, "getManagedBotAccessSettings", reader, contentType, c.cfg.timeout)
+	ret, err = call[*BotAccessSettings](ctx, c, "getManagedBotAccessSettings", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7228,7 +7228,7 @@ func (c *Client) GetManagedBotToken(ctx context.Context, params *GetManagedBotTo
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[string](ctx, c, "getManagedBotToken", reader, contentType, c.cfg.timeout)
+	ret, err = call[string](ctx, c, "getManagedBotToken", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7265,7 +7265,7 @@ func (c *Client) GetMe(ctx context.Context, params *GetMeParams) (ret *User, err
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*User](ctx, c, "getMe", reader, contentType, c.cfg.timeout)
+	ret, err = call[*User](ctx, c, "getMe", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7331,7 +7331,7 @@ func (c *Client) GetMyCommands(ctx context.Context, params *GetMyCommandsParams)
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[[]BotCommand](ctx, c, "getMyCommands", reader, contentType, c.cfg.timeout)
+	ret, err = call[[]BotCommand](ctx, c, "getMyCommands", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7380,7 +7380,7 @@ func (c *Client) GetMyDefaultAdministratorRights(ctx context.Context, params *Ge
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*ChatAdministratorRights](ctx, c, "getMyDefaultAdministratorRights", reader, contentType, c.cfg.timeout)
+	ret, err = call[*ChatAdministratorRights](ctx, c, "getMyDefaultAdministratorRights", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7427,7 +7427,7 @@ func (c *Client) GetMyDescription(ctx context.Context, params *GetMyDescriptionP
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*BotDescription](ctx, c, "getMyDescription", reader, contentType, c.cfg.timeout)
+	ret, err = call[*BotDescription](ctx, c, "getMyDescription", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7474,7 +7474,7 @@ func (c *Client) GetMyName(ctx context.Context, params *GetMyNameParams) (ret *B
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*BotName](ctx, c, "getMyName", reader, contentType, c.cfg.timeout)
+	ret, err = call[*BotName](ctx, c, "getMyName", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7521,7 +7521,7 @@ func (c *Client) GetMyShortDescription(ctx context.Context, params *GetMyShortDe
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*BotShortDescription](ctx, c, "getMyShortDescription", reader, contentType, c.cfg.timeout)
+	ret, err = call[*BotShortDescription](ctx, c, "getMyShortDescription", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7558,7 +7558,7 @@ func (c *Client) GetMyStarBalance(ctx context.Context, params *GetMyStarBalanceP
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*StarAmount](ctx, c, "getMyStarBalance", reader, contentType, c.cfg.timeout)
+	ret, err = call[*StarAmount](ctx, c, "getMyStarBalance", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7621,7 +7621,7 @@ func (c *Client) GetStarTransactions(ctx context.Context, params *GetStarTransac
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*StarTransactions](ctx, c, "getStarTransactions", reader, contentType, c.cfg.timeout)
+	ret, err = call[*StarTransactions](ctx, c, "getStarTransactions", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7668,7 +7668,7 @@ func (c *Client) GetStickerSet(ctx context.Context, params *GetStickerSetParams)
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*StickerSet](ctx, c, "getStickerSet", reader, contentType, c.cfg.timeout)
+	ret, err = call[*StickerSet](ctx, c, "getStickerSet", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7792,7 +7792,7 @@ func (c *Client) GetUpdates(ctx context.Context, params *GetUpdatesParams) (ret 
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[[]Update](ctx, c, "getUpdates", reader, contentType, c.cfg.timeout)
+	ret, err = call[[]Update](ctx, c, "getUpdates", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7852,7 +7852,7 @@ func (c *Client) GetUserChatBoosts(ctx context.Context, params *GetUserChatBoost
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*UserChatBoosts](ctx, c, "getUserChatBoosts", reader, contentType, c.cfg.timeout)
+	ret, err = call[*UserChatBoosts](ctx, c, "getUserChatBoosts", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7999,7 +7999,7 @@ func (c *Client) GetUserGifts(ctx context.Context, params *GetUserGiftsParams) (
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*OwnedGifts](ctx, c, "getUserGifts", reader, contentType, c.cfg.timeout)
+	ret, err = call[*OwnedGifts](ctx, c, "getUserGifts", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8058,7 +8058,7 @@ func (c *Client) GetUserPersonalChatMessages(ctx context.Context, params *GetUse
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[[]Message](ctx, c, "getUserPersonalChatMessages", reader, contentType, c.cfg.timeout)
+	ret, err = call[[]Message](ctx, c, "getUserPersonalChatMessages", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8135,7 +8135,7 @@ func (c *Client) GetUserProfileAudios(ctx context.Context, params *GetUserProfil
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*UserProfileAudios](ctx, c, "getUserProfileAudios", reader, contentType, c.cfg.timeout)
+	ret, err = call[*UserProfileAudios](ctx, c, "getUserProfileAudios", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8212,7 +8212,7 @@ func (c *Client) GetUserProfilePhotos(ctx context.Context, params *GetUserProfil
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*UserProfilePhotos](ctx, c, "getUserProfilePhotos", reader, contentType, c.cfg.timeout)
+	ret, err = call[*UserProfilePhotos](ctx, c, "getUserProfilePhotos", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8251,7 +8251,7 @@ func (c *Client) GetWebhookInfo(ctx context.Context, params *GetWebhookInfoParam
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*WebhookInfo](ctx, c, "getWebhookInfo", reader, contentType, c.cfg.timeout)
+	ret, err = call[*WebhookInfo](ctx, c, "getWebhookInfo", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8368,7 +8368,7 @@ func (c *Client) GiftPremiumSubscription(ctx context.Context, params *GiftPremiu
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "giftPremiumSubscription", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "giftPremiumSubscription", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8415,7 +8415,7 @@ func (c *Client) HideGeneralForumTopic(ctx context.Context, params *HideGeneralF
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "hideGeneralForumTopic", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "hideGeneralForumTopic", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8462,7 +8462,7 @@ func (c *Client) LeaveChat(ctx context.Context, params *LeaveChatParams) (ret bo
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "leaveChat", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "leaveChat", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8499,7 +8499,7 @@ func (c *Client) LogOut(ctx context.Context, params *LogOutParams) (ret bool, er
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "logOut", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "logOut", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8584,7 +8584,7 @@ func (c *Client) PinChatMessage(ctx context.Context, params *PinChatMessageParam
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "pinChatMessage", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "pinChatMessage", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -8855,7 +8855,7 @@ func (c *Client) PostStory(ctx context.Context, params *PostStoryParams) (ret *S
 
 	}()
 
-	ret, err = call[*Story](ctx, c, "postStory", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Story](ctx, c, "postStory", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -9141,7 +9141,7 @@ func (c *Client) PromoteChatMember(ctx context.Context, params *PromoteChatMembe
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "promoteChatMember", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "promoteChatMember", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -9213,7 +9213,7 @@ func (c *Client) ReadBusinessMessage(ctx context.Context, params *ReadBusinessMe
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "readBusinessMessage", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "readBusinessMessage", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -9272,7 +9272,7 @@ func (c *Client) RefundStarPayment(ctx context.Context, params *RefundStarPaymen
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "refundStarPayment", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "refundStarPayment", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -9332,7 +9332,7 @@ func (c *Client) RemoveBusinessAccountProfilePhoto(ctx context.Context, params *
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "removeBusinessAccountProfilePhoto", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "removeBusinessAccountProfilePhoto", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -9379,7 +9379,7 @@ func (c *Client) RemoveChatVerification(ctx context.Context, params *RemoveChatV
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "removeChatVerification", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "removeChatVerification", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -9414,7 +9414,7 @@ func (c *Client) RemoveMyProfilePhoto(ctx context.Context, params *RemoveMyProfi
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "removeMyProfilePhoto", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "removeMyProfilePhoto", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -9461,7 +9461,7 @@ func (c *Client) RemoveUserVerification(ctx context.Context, params *RemoveUserV
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "removeUserVerification", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "removeUserVerification", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -9519,7 +9519,7 @@ func (c *Client) ReopenForumTopic(ctx context.Context, params *ReopenForumTopicP
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "reopenForumTopic", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "reopenForumTopic", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -9566,7 +9566,7 @@ func (c *Client) ReopenGeneralForumTopic(ctx context.Context, params *ReopenGene
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "reopenGeneralForumTopic", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "reopenGeneralForumTopic", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -9611,7 +9611,7 @@ func (c *Client) ReplaceManagedBotToken(ctx context.Context, params *ReplaceMana
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[string](ctx, c, "replaceManagedBotToken", reader, contentType, c.cfg.timeout)
+	ret, err = call[string](ctx, c, "replaceManagedBotToken", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -9760,7 +9760,7 @@ func (c *Client) ReplaceStickerInSet(ctx context.Context, params *ReplaceSticker
 
 	}()
 
-	ret, err = call[bool](ctx, c, "replaceStickerInSet", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "replaceStickerInSet", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -9876,7 +9876,7 @@ func (c *Client) RepostStory(ctx context.Context, params *RepostStoryParams) (re
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*Story](ctx, c, "repostStory", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Story](ctx, c, "repostStory", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -9975,7 +9975,7 @@ func (c *Client) RestrictChatMember(ctx context.Context, params *RestrictChatMem
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "restrictChatMember", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "restrictChatMember", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -10036,7 +10036,7 @@ func (c *Client) RevokeChatInviteLink(ctx context.Context, params *RevokeChatInv
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*ChatInviteLink](ctx, c, "revokeChatInviteLink", reader, contentType, c.cfg.timeout)
+	ret, err = call[*ChatInviteLink](ctx, c, "revokeChatInviteLink", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -10143,7 +10143,7 @@ func (c *Client) SavePreparedInlineMessage(ctx context.Context, params *SavePrep
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*PreparedInlineMessage](ctx, c, "savePreparedInlineMessage", reader, contentType, c.cfg.timeout)
+	ret, err = call[*PreparedInlineMessage](ctx, c, "savePreparedInlineMessage", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -10204,7 +10204,7 @@ func (c *Client) SavePreparedKeyboardButton(ctx context.Context, params *SavePre
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*PreparedKeyboardButton](ctx, c, "savePreparedKeyboardButton", reader, contentType, c.cfg.timeout)
+	ret, err = call[*PreparedKeyboardButton](ctx, c, "savePreparedKeyboardButton", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -10776,7 +10776,7 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 
 	}()
 
-	ret, err = call[*Message](ctx, c, "sendAnimation", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "sendAnimation", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -11318,7 +11318,7 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 
 	}()
 
-	ret, err = call[*Message](ctx, c, "sendAudio", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "sendAudio", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -11430,7 +11430,7 @@ func (c *Client) SendChatAction(ctx context.Context, params *SendChatActionParam
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "sendChatAction", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "sendChatAction", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -11494,7 +11494,7 @@ func (c *Client) SendChatJoinRequestWebApp(ctx context.Context, params *SendChat
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "sendChatJoinRequestWebApp", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "sendChatJoinRequestWebApp", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -11631,7 +11631,7 @@ func (c *Client) SendChecklist(ctx context.Context, params *SendChecklistParams)
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*Message](ctx, c, "sendChecklist", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "sendChecklist", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -11884,7 +11884,7 @@ func (c *Client) SendContact(ctx context.Context, params *SendContactParams) (re
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*Message](ctx, c, "sendContact", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "sendContact", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -12091,7 +12091,7 @@ func (c *Client) SendDice(ctx context.Context, params *SendDiceParams) (ret *Mes
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*Message](ctx, c, "sendDice", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "sendDice", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -12583,7 +12583,7 @@ func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (
 
 	}()
 
-	ret, err = call[*Message](ctx, c, "sendDocument", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "sendDocument", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -12773,7 +12773,7 @@ func (c *Client) SendGame(ctx context.Context, params *SendGameParams) (ret *Mes
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*Message](ctx, c, "sendGame", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "sendGame", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -12907,7 +12907,7 @@ func (c *Client) SendGift(ctx context.Context, params *SendGiftParams) (ret bool
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "sendGift", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "sendGift", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -13432,7 +13432,7 @@ func (c *Client) SendInvoice(ctx context.Context, params *SendInvoiceParams) (re
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*Message](ctx, c, "sendInvoice", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "sendInvoice", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -13941,7 +13941,7 @@ func (c *Client) SendLivePhoto(ctx context.Context, params *SendLivePhotoParams)
 
 	}()
 
-	ret, err = call[*Message](ctx, c, "sendLivePhoto", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "sendLivePhoto", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -14231,7 +14231,7 @@ func (c *Client) SendLocation(ctx context.Context, params *SendLocationParams) (
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*Message](ctx, c, "sendLocation", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "sendLocation", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -14620,7 +14620,7 @@ func (c *Client) SendMediaGroup(ctx context.Context, params *SendMediaGroupParam
 
 	}()
 
-	ret, err = call[[]Message](ctx, c, "sendMediaGroup", reader, contentType, c.cfg.timeout)
+	ret, err = call[[]Message](ctx, c, "sendMediaGroup", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -14882,7 +14882,7 @@ func (c *Client) SendMessage(ctx context.Context, params *SendMessageParams) (re
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*Message](ctx, c, "sendMessage", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "sendMessage", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -15036,7 +15036,7 @@ func (c *Client) SendMessageDraft(ctx context.Context, params *SendMessageDraftP
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "sendMessageDraft", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "sendMessageDraft", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -15541,7 +15541,7 @@ func (c *Client) SendPaidMedia(ctx context.Context, params *SendPaidMediaParams)
 
 	}()
 
-	ret, err = call[*Message](ctx, c, "sendPaidMedia", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "sendPaidMedia", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -16025,7 +16025,7 @@ func (c *Client) SendPhoto(ctx context.Context, params *SendPhotoParams) (ret *M
 
 	}()
 
-	ret, err = call[*Message](ctx, c, "sendPhoto", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "sendPhoto", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -17099,7 +17099,7 @@ func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Mes
 
 	}()
 
-	ret, err = call[*Message](ctx, c, "sendPoll", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "sendPoll", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -17322,7 +17322,7 @@ func (c *Client) SendRichMessage(ctx context.Context, params *SendRichMessagePar
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*Message](ctx, c, "sendRichMessage", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "sendRichMessage", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -17446,7 +17446,7 @@ func (c *Client) SendRichMessageDraft(ctx context.Context, params *SendRichMessa
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "sendRichMessageDraft", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "sendRichMessageDraft", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -17831,7 +17831,7 @@ func (c *Client) SendSticker(ctx context.Context, params *SendStickerParams) (re
 
 	}()
 
-	ret, err = call[*Message](ctx, c, "sendSticker", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "sendSticker", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -18143,7 +18143,7 @@ func (c *Client) SendVenue(ctx context.Context, params *SendVenueParams) (ret *M
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*Message](ctx, c, "sendVenue", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "sendVenue", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -18790,7 +18790,7 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 
 	}()
 
-	ret, err = call[*Message](ctx, c, "sendVideo", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "sendVideo", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -19242,7 +19242,7 @@ func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams)
 
 	}()
 
-	ret, err = call[*Message](ctx, c, "sendVideoNote", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "sendVideoNote", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -19704,7 +19704,7 @@ func (c *Client) SendVoice(ctx context.Context, params *SendVoiceParams) (ret *M
 
 	}()
 
-	ret, err = call[*Message](ctx, c, "sendVoice", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "sendVoice", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -19769,7 +19769,7 @@ func (c *Client) SetBusinessAccountBio(ctx context.Context, params *SetBusinessA
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setBusinessAccountBio", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setBusinessAccountBio", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -19839,7 +19839,7 @@ func (c *Client) SetBusinessAccountGiftSettings(ctx context.Context, params *Set
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setBusinessAccountGiftSettings", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setBusinessAccountGiftSettings", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -19909,7 +19909,7 @@ func (c *Client) SetBusinessAccountName(ctx context.Context, params *SetBusiness
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setBusinessAccountName", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setBusinessAccountName", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -20046,7 +20046,7 @@ func (c *Client) SetBusinessAccountProfilePhoto(ctx context.Context, params *Set
 
 	}()
 
-	ret, err = call[bool](ctx, c, "setBusinessAccountProfilePhoto", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setBusinessAccountProfilePhoto", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -20111,7 +20111,7 @@ func (c *Client) SetBusinessAccountUsername(ctx context.Context, params *SetBusi
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setBusinessAccountUsername", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setBusinessAccountUsername", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -20180,7 +20180,7 @@ func (c *Client) SetChatAdministratorCustomTitle(ctx context.Context, params *Se
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setChatAdministratorCustomTitle", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setChatAdministratorCustomTitle", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -20238,7 +20238,7 @@ func (c *Client) SetChatDescription(ctx context.Context, params *SetChatDescript
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setChatDescription", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setChatDescription", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -20308,7 +20308,7 @@ func (c *Client) SetChatMemberTag(ctx context.Context, params *SetChatMemberTagP
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setChatMemberTag", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setChatMemberTag", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -20373,7 +20373,7 @@ func (c *Client) SetChatMenuButton(ctx context.Context, params *SetChatMenuButto
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setChatMenuButton", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setChatMenuButton", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -20445,7 +20445,7 @@ func (c *Client) SetChatPermissions(ctx context.Context, params *SetChatPermissi
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setChatPermissions", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setChatPermissions", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -20540,7 +20540,7 @@ func (c *Client) SetChatPhoto(ctx context.Context, params *SetChatPhotoParams) (
 
 	}()
 
-	ret, err = call[bool](ctx, c, "setChatPhoto", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setChatPhoto", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -20608,7 +20608,7 @@ func (c *Client) SetChatStickerSet(ctx context.Context, params *SetChatStickerSe
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setChatStickerSet", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setChatStickerSet", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -20667,7 +20667,7 @@ func (c *Client) SetChatTitle(ctx context.Context, params *SetChatTitleParams) (
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setChatTitle", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setChatTitle", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -20724,7 +20724,7 @@ func (c *Client) SetCustomEmojiStickerSetThumbnail(ctx context.Context, params *
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setCustomEmojiStickerSetThumbnail", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setCustomEmojiStickerSetThumbnail", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -20852,7 +20852,7 @@ func (c *Client) SetGameScore(ctx context.Context, params *SetGameScoreParams) (
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*Message](ctx, c, "setGameScore", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "setGameScore", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -20925,7 +20925,7 @@ func (c *Client) SetManagedBotAccessSettings(ctx context.Context, params *SetMan
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setManagedBotAccessSettings", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setManagedBotAccessSettings", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -21017,7 +21017,7 @@ func (c *Client) SetMessageReaction(ctx context.Context, params *SetMessageReact
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setMessageReaction", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setMessageReaction", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -21099,7 +21099,7 @@ func (c *Client) SetMyCommands(ctx context.Context, params *SetMyCommandsParams)
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setMyCommands", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setMyCommands", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -21161,7 +21161,7 @@ func (c *Client) SetMyDefaultAdministratorRights(ctx context.Context, params *Se
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setMyDefaultAdministratorRights", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setMyDefaultAdministratorRights", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -21222,7 +21222,7 @@ func (c *Client) SetMyDescription(ctx context.Context, params *SetMyDescriptionP
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setMyDescription", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setMyDescription", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -21283,7 +21283,7 @@ func (c *Client) SetMyName(ctx context.Context, params *SetMyNameParams) (ret bo
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setMyName", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setMyName", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -21377,7 +21377,7 @@ func (c *Client) SetMyProfilePhoto(ctx context.Context, params *SetMyProfilePhot
 
 	}()
 
-	ret, err = call[bool](ctx, c, "setMyProfilePhoto", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setMyProfilePhoto", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -21445,7 +21445,7 @@ func (c *Client) SetMyShortDescription(ctx context.Context, params *SetMyShortDe
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setMyShortDescription", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setMyShortDescription", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -21506,7 +21506,7 @@ func (c *Client) SetPassportDataErrors(ctx context.Context, params *SetPassportD
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setPassportDataErrors", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setPassportDataErrors", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -21564,7 +21564,7 @@ func (c *Client) SetStickerEmojiList(ctx context.Context, params *SetStickerEmoj
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setStickerEmojiList", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setStickerEmojiList", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -21622,7 +21622,7 @@ func (c *Client) SetStickerKeywords(ctx context.Context, params *SetStickerKeywo
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setStickerKeywords", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setStickerKeywords", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -21684,7 +21684,7 @@ func (c *Client) SetStickerMaskPosition(ctx context.Context, params *SetStickerM
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setStickerMaskPosition", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setStickerMaskPosition", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -21741,7 +21741,7 @@ func (c *Client) SetStickerPositionInSet(ctx context.Context, params *SetSticker
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setStickerPositionInSet", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setStickerPositionInSet", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -21893,7 +21893,7 @@ func (c *Client) SetStickerSetThumbnail(ctx context.Context, params *SetStickerS
 
 	}()
 
-	ret, err = call[bool](ctx, c, "setStickerSetThumbnail", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setStickerSetThumbnail", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -21957,7 +21957,7 @@ func (c *Client) SetStickerSetTitle(ctx context.Context, params *SetStickerSetTi
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setStickerSetTitle", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setStickerSetTitle", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -22030,7 +22030,7 @@ func (c *Client) SetUserEmojiStatus(ctx context.Context, params *SetUserEmojiSta
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "setUserEmojiStatus", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setUserEmojiStatus", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -22266,7 +22266,7 @@ func (c *Client) SetWebhook(ctx context.Context, params *SetWebhookParams) (ret 
 
 	}()
 
-	ret, err = call[bool](ctx, c, "setWebhook", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "setWebhook", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -22378,7 +22378,7 @@ func (c *Client) StopMessageLiveLocation(ctx context.Context, params *StopMessag
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*Message](ctx, c, "stopMessageLiveLocation", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Message](ctx, c, "stopMessageLiveLocation", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -22465,7 +22465,7 @@ func (c *Client) StopPoll(ctx context.Context, params *StopPollParams) (ret *Pol
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*Poll](ctx, c, "stopPoll", reader, contentType, c.cfg.timeout)
+	ret, err = call[*Poll](ctx, c, "stopPoll", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -22523,7 +22523,7 @@ func (c *Client) TransferBusinessAccountStars(ctx context.Context, params *Trans
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "transferBusinessAccountStars", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "transferBusinessAccountStars", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -22610,7 +22610,7 @@ func (c *Client) TransferGift(ctx context.Context, params *TransferGiftParams) (
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "transferGift", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "transferGift", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -22684,7 +22684,7 @@ func (c *Client) UnbanChatMember(ctx context.Context, params *UnbanChatMemberPar
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "unbanChatMember", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "unbanChatMember", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -22742,7 +22742,7 @@ func (c *Client) UnbanChatSenderChat(ctx context.Context, params *UnbanChatSende
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "unbanChatSenderChat", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "unbanChatSenderChat", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -22788,7 +22788,7 @@ func (c *Client) UnhideGeneralForumTopic(ctx context.Context, params *UnhideGene
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "unhideGeneralForumTopic", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "unhideGeneralForumTopic", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -22835,7 +22835,7 @@ func (c *Client) UnpinAllChatMessages(ctx context.Context, params *UnpinAllChatM
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "unpinAllChatMessages", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "unpinAllChatMessages", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -22893,7 +22893,7 @@ func (c *Client) UnpinAllForumTopicMessages(ctx context.Context, params *UnpinAl
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "unpinAllForumTopicMessages", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "unpinAllForumTopicMessages", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -22939,7 +22939,7 @@ func (c *Client) UnpinAllGeneralForumTopicMessages(ctx context.Context, params *
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "unpinAllGeneralForumTopicMessages", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "unpinAllGeneralForumTopicMessages", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -23014,7 +23014,7 @@ func (c *Client) UnpinChatMessage(ctx context.Context, params *UnpinChatMessageP
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "unpinChatMessage", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "unpinChatMessage", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -23099,7 +23099,7 @@ func (c *Client) UpgradeGift(ctx context.Context, params *UpgradeGiftParams) (re
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "upgradeGift", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "upgradeGift", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -23227,7 +23227,7 @@ func (c *Client) UploadStickerFile(ctx context.Context, params *UploadStickerFil
 
 	}()
 
-	ret, err = call[*File](ctx, c, "uploadStickerFile", reader, contentType, c.cfg.timeout)
+	ret, err = call[*File](ctx, c, "uploadStickerFile", params, reader, contentType, c.cfg.timeout)
 	if err != nil {
 		_ = reader.CloseWithError(err)
 		<-writeErr
@@ -23297,7 +23297,7 @@ func (c *Client) VerifyChat(ctx context.Context, params *VerifyChatParams) (ret 
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "verifyChat", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "verifyChat", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -23358,7 +23358,7 @@ func (c *Client) VerifyUser(ctx context.Context, params *VerifyUserParams) (ret 
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[bool](ctx, c, "verifyUser", reader, contentType, c.cfg.timeout)
+	ret, err = call[bool](ctx, c, "verifyUser", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }

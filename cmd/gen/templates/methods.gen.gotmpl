@@ -150,7 +150,7 @@ import (
             contentType := contentTypeJSON
         {{ end }}
 
-        ret, err = call[{{ toType .Result false }}](ctx, c, "{{ .Name }}", reader, contentType, c.cfg.timeout)
+        ret, err = call[{{ toType .Result false }}](ctx, c, "{{ .Name }}", params, reader, contentType, c.cfg.timeout)
         {{- if $multipart }}
             if err != nil {
                 _ = reader.CloseWithError(err)

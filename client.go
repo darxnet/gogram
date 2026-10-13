@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptrace"
+	"slices"
 	"strconv"
 	"strings"
 	"sync/atomic"
@@ -38,10 +39,6 @@ const (
 	contentTypeJSON = "application/json"
 )
 
-// headerJSON is the shared Content-Type value for JSON requests: assigning it
-// to req.Header skips the per-request []string allocation of Header.Set.
-var headerJSON = []string{contentTypeJSON}
-
 // ClientOption is a function that configures a Client.
 type ClientOption func(client *Client)
 
@@ -58,6 +55,8 @@ type clientConfig struct {
 	router           Processor
 	defaultParseMode string
 	numWorkers       int
+	caller           Caller
+	transformers     []Transformer
 }
 
 // WithHost sets the host for the Client.
@@ -112,6 +111,24 @@ func WithRouter(router Processor) ClientOption {
 	}
 }
 
+// WithCaller replaces the HTTP transport of the client with caller: every
+// API call ends in it. Transformers registered with [WithTransformers]
+// still wrap it. Meant for tests and alternative transports.
+func WithCaller(caller Caller) ClientOption {
+	return func(c *Client) {
+		c.cfg.caller = caller
+	}
+}
+
+// WithTransformers wraps the client's Caller: the first transformer is the
+// outermost, so it sees the request first and the result last. Use it for
+// logging, tracing, throttling, or mocking API calls.
+func WithTransformers(transformers ...Transformer) ClientOption {
+	return func(c *Client) {
+		c.cfg.transformers = append(c.cfg.transformers, transformers...)
+	}
+}
+
 // WithNumWorkers sets the number of concurrent update-processing goroutines.
 // By default equals to the GetUpdates Limit value.
 func WithNumWorkers(n int) ClientOption {
@@ -133,6 +150,8 @@ type Client struct {
 
 	trace *httptrace.ClientTrace
 	addrs atomic.Pointer[connAddrs]
+
+	caller Caller // transformer chain ending in cfg.caller or httpCaller
 
 	run atomic.Pointer[runState]
 }
@@ -237,6 +256,15 @@ func NewClient(token string, opts ...ClientOption) (*Client, error) {
 		opt(c)
 	}
 
+	c.caller = c.cfg.caller
+	if c.caller == nil {
+		c.caller = httpCaller{client: c}
+	}
+
+	for _, transform := range slices.Backward(c.cfg.transformers) {
+		c.caller = transform(c.caller)
+	}
+
 	return c, nil
 }
 
@@ -289,146 +317,6 @@ func (c *Client) Do(req *http.Request) (*http.Response, error) {
 	return c.cfg.httpClient.Do(req) //nolint:gosec // G107: client can send request to user-defined hosts
 }
 
-// envelope is the API response with Result decoded straight into T:
-// one JSON pass, no intermediate RawMessage copy.
-type envelope[T any] struct {
-	Result      T                   `json:"result"`
-	Parameters  *ResponseParameters `json:"parameters"`
-	Description string              `json:"description"`
-	ErrorCode   int                 `json:"error_code"`
-	OK          bool                `json:"ok"`
-}
-
-// call posts body to method and returns the decoded result. Retryable API
-// errors are retried up to retryLimit times when body can be rewound.
-// timeout bounds a single attempt; zero means no per-attempt deadline.
-func call[T any](
-	ctx context.Context,
-	c *Client,
-	method string,
-	body io.Reader,
-	contentType string,
-	timeout time.Duration,
-) (T, error) {
-	var zero T
-
-	for attempt := 0; ; attempt++ {
-		var env envelope[T]
-
-		status, err := c.roundTrip(ctx, method, body, contentType, timeout, &env)
-		if err == nil {
-			if env.OK {
-				return env.Result, nil
-			}
-
-			err = genError(env.ErrorCode, status, env.Description, env.Parameters)
-		}
-
-		// Both transport-level errors (empty body, HTML 5xx) and API errors
-		// go through the same retry classification.
-		retryErr, ok := errors.AsType[*RetryError](err)
-		if !ok || attempt >= retryLimit {
-			return zero, err
-		}
-
-		if rewindErr := rewind(body); rewindErr != nil {
-			return zero, errors.Join(retryErr, rewindErr)
-		}
-
-		if sleepErr := sleep(ctx, retryErr.RetryAfter); sleepErr != nil {
-			return zero, sleepErr
-		}
-	}
-}
-
-// roundTrip performs one HTTP attempt and decodes the body into dst.
-func (c *Client) roundTrip(
-	ctx context.Context,
-	method string,
-	body io.Reader,
-	contentType string,
-	timeout time.Duration,
-	dst any,
-) (status string, err error) {
-	ctx = httptrace.WithClientTrace(ctx, c.trace)
-
-	if timeout > 0 {
-		var cancel context.CancelFunc
-		ctx, cancel = context.WithTimeout(ctx, timeout)
-		defer cancel()
-	}
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.cfg.linkPrefix+method, body)
-	if err != nil {
-		return "", err
-	}
-
-	if contentType == contentTypeJSON {
-		req.Header["Content-Type"] = headerJSON
-	} else {
-		req.Header.Set("Content-Type", contentType)
-	}
-
-	resp, err := c.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close() //nolint:errcheck
-
-	buffer := acquireBuffer()
-	defer releaseBuffer(buffer)
-
-	if _, err = buffer.ReadFrom(resp.Body); err != nil {
-		return resp.Status, err
-	}
-
-	// Telegram occasionally answers with an empty body or the bare text
-	// "EOF", and proxies in front of it with an HTML error page: none of
-	// these is JSON, all are transient.
-	if body := bytes.TrimSpace(buffer.B); len(body) == 0 || string(body) == errTextEOF {
-		return resp.Status, &RetryError{Err: ErrEOF, RetryAfter: defaultTimeoutOnError}
-	}
-
-	if err = json.Unmarshal(buffer.B, dst); err != nil {
-		if resp.StatusCode >= http.StatusInternalServerError {
-			return resp.Status, genError(resp.StatusCode, resp.Status, "", nil)
-		}
-
-		return resp.Status, err
-	}
-
-	return resp.Status, nil
-}
-
-// rewind resets body to its start for a retry.
-func rewind(body io.Reader) error {
-	if body == nil {
-		return nil
-	}
-
-	seeker, ok := body.(io.Seeker)
-	if !ok {
-		return ErrBodyNotRewindable
-	}
-
-	_, err := seeker.Seek(0, io.SeekStart)
-
-	return err
-}
-
-// sleep waits d or until ctx is done.
-func sleep(ctx context.Context, d time.Duration) error {
-	timer := time.NewTimer(d)
-	defer timer.Stop()
-
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case <-timer.C:
-		return nil
-	}
-}
-
 // Call posts body to a Bot API method and decodes the result into T.
 // It is the typed escape hatch for methods without a generated wrapper:
 //
@@ -436,7 +324,29 @@ func sleep(ctx context.Context, d time.Duration) error {
 //
 // Retryable API errors are retried when body implements io.Seeker.
 func Call[T any](ctx context.Context, c *Client, method string, body io.Reader, contentType string) (T, error) {
-	return call[T](ctx, c, method, body, contentType, c.cfg.timeout)
+	return call[T](ctx, c, method, nil, body, contentType, c.cfg.timeout)
+}
+
+// call is the generated methods' entry point: it routes the request through
+// the client's Caller chain and decodes the result into T.
+func call[T any](
+	ctx context.Context,
+	c *Client,
+	method string,
+	params any,
+	body io.Reader,
+	contentType string,
+	timeout time.Duration,
+) (ret T, err error) {
+	err = c.caller.Call(ctx, Request{
+		Method:      method,
+		Params:      params,
+		Body:        body,
+		ContentType: contentType,
+		Timeout:     timeout,
+	}, &ret)
+
+	return ret, err
 }
 
 // Raw sends a raw request to the Telegram Bot API and returns the result
@@ -472,7 +382,7 @@ func (c *Client) getUpdates(ctx context.Context, params *GetUpdatesParams) ([]Up
 
 	timeout := time.Duration(params.Timeout)*time.Second + pollGrace
 
-	return call[[]Update](ctx, c, "getUpdates", bytes.NewReader(buffer.B), contentTypeJSON, timeout)
+	return call[[]Update](ctx, c, "getUpdates", params, bytes.NewReader(buffer.B), contentTypeJSON, timeout)
 }
 
 // poll runs the long-polling loop and returns ctx.Err() when ctx is done or
