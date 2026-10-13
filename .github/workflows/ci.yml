@@ -116,10 +116,12 @@ jobs:
           files: coverage.out
           use_oidc: true
 
-      - name: Verify coverage
+      - name: Verify coverage of hand-written code
         run: |
-          total=$(go tool cover -func=coverage.out | awk '/^total:/ { sub("%", "", $3); print $3 }')
-          echo "Total coverage: $total%"
+          # The generated API (*.gen.go) is exercised per method only by bots; it is excluded from the gate.
+          grep -v '\.gen\.go' coverage.out > coverage.handwritten.out
+          total=$(go tool cover -func=coverage.handwritten.out | awk '/^total:/ { sub("%", "", $3); print $3 }')
+          echo "Hand-written code coverage: $total%"
           if awk "BEGIN { exit !($total < 60) }"; then
             echo "Coverage is below 60%"
             exit 1

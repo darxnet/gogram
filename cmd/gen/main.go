@@ -28,6 +28,7 @@ type Field struct {
 	Alternative   string // "required if <Alternative> isn't specified": one of the two must be set
 }
 
+//nolint:gocritic // hugeParam: templates call methods on range values, which need value receivers
 func (field Field) FileUploadCode(types map[string]Type) string {
 	buffer := new(bytes.Buffer)
 
@@ -86,6 +87,8 @@ func (field Field) FileUploadCode(types map[string]Type) string {
 }
 
 // AutoFillCode returns generated code used to auto-populate a method field from Context.
+//
+//nolint:gocritic // hugeParam: templates call methods on range values, which need value receivers
 func (field Field) AutoFillCode(types map[string]Type) string {
 	skipList := []string{
 		"text",
