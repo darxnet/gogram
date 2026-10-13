@@ -53,7 +53,7 @@ type clientConfig struct {
 	timeout          time.Duration
 	httpClient       *http.Client
 	rateLimiter      *rate.Limiter
-	router           Processor
+	router           *Router
 	defaultParseMode string
 	numWorkers       int
 	caller           Caller
@@ -107,7 +107,7 @@ func WithDefaultParseMode(parseMode string) ClientOption {
 }
 
 // WithRouter sets the router for the Client.
-func WithRouter(router Processor) ClientOption {
+func WithRouter(router *Router) ClientOption {
 	return func(c *Client) {
 		c.cfg.router = router
 	}
@@ -488,14 +488,9 @@ func (c *Client) finishRun(state *runState) {
 
 // SyncCommands publishes the commands registered on the client's [Router]
 // with a description (see [RouterGroup.HandleCommand]) via setMyCommands.
-// It is a no-op when the router is not a [Router] or has no described commands.
+// It is a no-op when no command has a description.
 func (c *Client) SyncCommands(ctx context.Context) error {
-	router, ok := c.cfg.router.(*Router)
-	if !ok {
-		return nil
-	}
-
-	commands := router.BotCommands()
+	commands := c.cfg.router.BotCommands()
 	if len(commands) == 0 {
 		return nil
 	}

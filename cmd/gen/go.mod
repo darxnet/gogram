@@ -1,5 +1,5 @@
 module github.com/darxnet/gogram/cmd/gen
 
-go 1.26
+go 1.25.0
 
 require golang.org/x/net v0.58.0

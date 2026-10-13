@@ -123,7 +123,8 @@ func (c *Client) webhookHandler(secretToken string) http.HandlerFunc {
 
 		if _, copyErr := io.Copy(buffer, http.MaxBytesReader(w, r.Body, defaultWebhookMaxBodyBytes)); copyErr != nil {
 			status := http.StatusBadRequest
-			if _, ok := errors.AsType[*http.MaxBytesError](copyErr); ok {
+			var tooLarge *http.MaxBytesError
+			if errors.As(copyErr, &tooLarge) {
 				status = http.StatusRequestEntityTooLarge
 			}
 			http.Error(w, http.StatusText(status), status)

@@ -51,12 +51,21 @@ func TestThrottle_PerChat(t *testing.T) {
 
 	// Three sends to one private chat are spaced; a group and another
 	// private chat are independent; sendChatAction and getMe are free.
+	run := func(f func()) {
+		wg.Add(1)
+
+		go func() {
+			defer wg.Done()
+			f()
+		}()
+	}
+
 	for range 3 {
-		wg.Go(func() { _, _ = client.SendMessage(ctx, &gogram.SendMessageParams{ChatID: "7", Text: "x"}) })
-		wg.Go(func() { _, _ = client.SendMessage(ctx, &gogram.SendMessageParams{ChatID: "-100", Text: "x"}) })
-		wg.Go(func() { _, _ = client.SendMessage(ctx, &gogram.SendMessageParams{ChatID: "8", Text: "x"}) })
-		wg.Go(func() { _, _ = client.SendChatAction(ctx, &gogram.SendChatActionParams{ChatID: "7", Action: "typing"}) })
-		wg.Go(func() { _, _ = client.GetMe(ctx, nil) })
+		run(func() { _, _ = client.SendMessage(ctx, &gogram.SendMessageParams{ChatID: "7", Text: "x"}) })
+		run(func() { _, _ = client.SendMessage(ctx, &gogram.SendMessageParams{ChatID: "-100", Text: "x"}) })
+		run(func() { _, _ = client.SendMessage(ctx, &gogram.SendMessageParams{ChatID: "8", Text: "x"}) })
+		run(func() { _, _ = client.SendChatAction(ctx, &gogram.SendChatActionParams{ChatID: "7", Action: "typing"}) })
+		run(func() { _, _ = client.GetMe(ctx, nil) })
 	}
 
 	start := time.Now()

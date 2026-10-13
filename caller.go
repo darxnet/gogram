@@ -95,8 +95,8 @@ func (h httpCaller) Call(ctx context.Context, req Request, result any) error {
 
 		// Both transport-level errors (empty body, HTML 5xx) and API errors
 		// go through the same retry classification.
-		retryErr, ok := errors.AsType[*RetryError](err)
-		if !ok || attempt >= retryLimit {
+		var retryErr *RetryError
+		if !errors.As(err, &retryErr) || attempt >= retryLimit {
 			return err
 		}
 

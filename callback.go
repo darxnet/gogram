@@ -66,7 +66,8 @@ func NewCallback[T any](prefix string) *Callback[T] {
 
 	fields := make([]callbackField, 0, typ.NumField())
 
-	for f := range typ.Fields() {
+	for i := range typ.NumField() {
+		f := typ.Field(i)
 		if !f.IsExported() {
 			panic("gogram: callback field " + f.Name + " must be exported")
 		}

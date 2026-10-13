@@ -610,12 +610,7 @@ func TestNewClient_DefaultRouterNotShared(t *testing.T) {
 	ctxA := gogram.NewTestContext(t.Context(), a, &gogram.Update{Message: &gogram.Message{Text: "/x"}})
 	ctxB := gogram.NewTestContext(t.Context(), b, &gogram.Update{Message: &gogram.Message{Text: "/x"}})
 
-	routerA, ok := a.Router().(*gogram.Router)
-	if !ok {
-		t.Fatalf("Router() = %T, want *gogram.Router", a.Router())
-	}
-
-	routerA.HandleCommand("/x", func(*gogram.Context, *gogram.Message) error {
+	a.Router().HandleCommand("/x", func(*gogram.Context, *gogram.Message) error {
 		handledByA.Store(true)
 		return nil
 	})

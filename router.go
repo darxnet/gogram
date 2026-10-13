@@ -26,8 +26,6 @@ type route struct {
 	handler HandlerFunc
 }
 
-var _ Processor = (*Router)(nil)
-
 // Router dispatches updates to registered handlers.
 //
 // Command and callback routes take priority over routes
@@ -64,14 +62,14 @@ func NewRouter() *Router {
 	return r
 }
 
-// HandleErr implements [Processor].
+// HandleErr calls the error handler set with SetHandlerErr, if any.
 func (r *Router) HandleErr(ctx *Context, err error) {
 	if r.handlerErr != nil {
 		r.handlerErr(ctx, err)
 	}
 }
 
-// HandlePanic implements [Processor].
+// HandlePanic calls the panic handler set with SetHandlerPanic, if any.
 func (r *Router) HandlePanic(ctx *Context, v any) {
 	if r.handlerPanic != nil {
 		r.handlerPanic(ctx, v)

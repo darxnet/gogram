@@ -41,11 +41,15 @@ func (c *Client) Start(ctx context.Context, params *GetUpdatesParams) error {
 
 	var wg sync.WaitGroup
 	for _, ch := range workers {
-		wg.Go(func() {
+		wg.Add(1)
+
+		go func() {
+			defer wg.Done()
+
 			for gogramCtx := range ch {
 				c.processUpdate(gogramCtx)
 			}
-		})
+		}()
 	}
 
 	// The caller's goroutine polls; no extra goroutine, no close-on-defer dance.

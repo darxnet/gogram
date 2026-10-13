@@ -1,15 +1,8 @@
 package gogram
 
-// Processor is an interface for processing updates.
-type Processor interface {
-	Process(ctx *Context)
-	HandleErr(ctx *Context, err error)
-	HandlePanic(ctx *Context, v any)
-}
-
-// Router returns the update processor of the client: the one passed with
-// WithRouter, or the client's own default [Router].
-func (c *Client) Router() Processor {
+// Router returns the client's [Router]: the one passed with [WithRouter] or
+// the client's own default.
+func (c *Client) Router() *Router {
 	return c.cfg.router
 }
 
