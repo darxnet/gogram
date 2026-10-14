@@ -15,7 +15,6 @@ import (
 	"strings"
 	"sync/atomic"
 	"time"
-
 )
 
 // The generator is its own module so that golang.org/x/net stays out of the library's dependencies.
@@ -414,10 +413,7 @@ func (c *Client) poll(ctx context.Context, params *GetUpdatesParams, pool *worke
 
 		for i := range batch {
 			params.Offset = batch[i].UpdateID + 1
-
-			if !pool.dispatch(ctx, c.acquireContext(ctx, &batch[i])) {
-				return ctx.Err()
-			}
+			pool.dispatch(c.acquireContext(ctx, &batch[i]))
 		}
 	}
 

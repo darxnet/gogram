@@ -1,7 +1,6 @@
 package gogram
 
 import (
-	"context"
 	"sync"
 )
 
@@ -36,9 +35,10 @@ func (c *Client) startWorkers(n, queue int64) *workerPool {
 }
 
 // dispatch queues gogramCtx on the worker of its chat. It blocks while the
-// queue is full (back-pressure) and releases the context when ctx is done
-// first, reporting false.
-func (p *workerPool) dispatch(ctx context.Context, gogramCtx *Context) bool {
+// queue is full and never drops: an update fetched from Telegram is
+// processed even after Stop, since the workers drain their queues before
+// the run returns. Only fetching new updates observes cancellation.
+func (p *workerPool) dispatch(gogramCtx *Context) {
 	key := gogramCtx.update.UpdateID
 	if chat := gogramCtx.Chat(); chat != nil {
 		key = chat.ID
@@ -49,13 +49,7 @@ func (p *workerPool) dispatch(ctx context.Context, gogramCtx *Context) bool {
 		idx = -idx
 	}
 
-	select {
-	case p.queues[idx] <- gogramCtx:
-		return true
-	case <-ctx.Done():
-		gogramCtx.client.releaseContext(gogramCtx)
-		return false
-	}
+	p.queues[idx] <- gogramCtx
 }
 
 // stop closes the queues and waits for the workers to drain them.

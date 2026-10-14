@@ -69,8 +69,7 @@ func TestRouter_HandleCallback_FilterRunsOnceWithoutPayload(t *testing.T) {
 		filterCalls++
 		return false
 	})
-	group.HandleCallback("action", func(*gogram.Context, *gogram.CallbackQuery) error { return nil },
-	)
+	group.HandleCallback("action", func(*gogram.Context, *gogram.CallbackQuery) error { return nil })
 
 	client, err := gogram.NewClient(testToken)
 	if err != nil {
@@ -90,9 +89,9 @@ func TestRouter_HandleCallback_PrefixWithPayload(t *testing.T) {
 	r := gogram.NewRouter()
 	handled := false
 	r.HandleCallback("action", func(_ *gogram.Context, callback *gogram.CallbackQuery) error {
-			handled = callback.Data == "action payload"
-			return nil
-		},
+		handled = callback.Data == "action payload"
+		return nil
+	},
 	)
 
 	client, err := gogram.NewClient(testToken)
