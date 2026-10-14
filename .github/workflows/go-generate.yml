@@ -1,5 +1,16 @@
 name: Go generate
 
+# Regenerates the Bot API bindings from https://core.telegram.org/bots/api
+# once a day and opens a PR when they changed. The PR is created with a
+# GitHub App token so that CI runs on it (events from GITHUB_TOKEN do not
+# trigger workflows); auto-merge lands it once "CI passed" is green and the
+# release workflow then tags the new minor version.
+#
+# Setup: a GitHub App with Contents (read/write) and Pull requests
+# (read/write) permissions installed on this repository; its id in the
+# repository variable APP_ID and its private key in the secret
+# APP_PRIVATE_KEY.
+
 on:
   schedule:
     - cron: '4 15 * * *'
@@ -10,54 +21,67 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   go-gen:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
 
       - uses: actions/setup-go@v7
         with:
-          go-version-file: 'go.mod'
+          go-version: stable # the generator module may need a newer Go than the library
           cache: true
 
-      - name: Generate Code
+      - name: Generate code
         run: |
-          go mod download
           go generate ./...
           go mod tidy
+          go mod tidy -C cmd/gen
 
-      - name: Verify Changes
+      - name: Detect changes in generated code
         id: check
         run: |
-          if [[ -n $(git status --porcelain) ]]; then
-            echo "has_changes=true" >> $GITHUB_OUTPUT
+          if [[ -n $(git status --porcelain -- '*.gen.go') ]]; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+            git status --porcelain
           else
-            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            git checkout -- . # drop incidental go.mod/go.sum noise
           fi
 
-      - name: Safety Check
+      - name: Build and test the generated code
         if: steps.check.outputs.has_changes == 'true'
         run: |
-          if go test -race ./...; then
-            echo "Tests passed, proceeding to PR"
-          else
-            echo "::error::Generated code broke tests"
-            exit 1
-          fi
+          go build ./...
+          go test -race -failfast -count=1 ./...
 
-      - name: Create Pull Request
+      - uses: actions/create-github-app-token@v2
         if: steps.check.outputs.has_changes == 'true'
+        id: app-token
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Create pull request
+        if: steps.check.outputs.has_changes == 'true'
+        id: cpr
         uses: peter-evans/create-pull-request@v8
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
           commit-message: "feat(api): update generated code from latest docs"
           title: "feat(api): update generated code from latest docs"
-          body: Automated changes triggered by `go generate`.
+          body: |
+            Automated regeneration from https://core.telegram.org/bots/api.
+            Auto-merges once CI passes; the release workflow tags the next version.
           branch: create-pull-request/go-generate
           delete-branch: true
           labels: go-generate
+
+      - name: Enable auto-merge
+        if: steps.cpr.outputs.pull-request-number != ''
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: gh pr merge --squash --auto "${{ steps.cpr.outputs.pull-request-number }}"
