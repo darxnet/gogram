@@ -31,3 +31,6 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
+      # x/time v0.15+ requires Go 1.25/1.26; gogram supports Go 1.24.
+      - dependency-name: "golang.org/x/time"
+        versions: [">= 0.15.0"]
