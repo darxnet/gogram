@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/darxnet/gogram"
-	"golang.org/x/time/rate"
 )
 
 func TestThrottle_PerChat(t *testing.T) {
@@ -36,9 +35,9 @@ func TestThrottle_PerChat(t *testing.T) {
 	client, err := gogram.NewClient(testToken,
 		gogram.WithCaller(record),
 		gogram.WithTransformers(gogram.Throttle(gogram.ThrottleConfig{
-			PrivateRate: rate.Every(spacing),
-			GroupRate:   rate.Every(spacing),
-			GroupBurst:  1,
+			PrivateEvery: spacing,
+			GroupEvery:   spacing,
+			GroupBurst:   1,
 		})),
 	)
 	if err != nil {
@@ -109,7 +108,7 @@ func TestThrottle_ContextDeadline(t *testing.T) {
 
 	client, err := gogram.NewClient(testToken,
 		gogram.WithCaller(noop),
-		gogram.WithTransformers(gogram.Throttle(gogram.ThrottleConfig{PrivateRate: rate.Every(time.Hour)})),
+		gogram.WithTransformers(gogram.Throttle(gogram.ThrottleConfig{PrivateEvery: time.Hour})),
 	)
 	if err != nil {
 		t.Fatalf("NewClient: %v", err)

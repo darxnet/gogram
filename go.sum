@@ -1,6 +1,2 @@
 github.com/darxnet/goshard v1.2.0 h1:YAhAsxaCLJvwcu7Sdpm4zDhUmcUlOKhzLMR7xeWzRB4=
 github.com/darxnet/goshard v1.2.0/go.mod h1:uGuP3Hayn1lJFRghdJo/u+ezNgHDmO1fR6ySUhR4nVM=
-github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=
-github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyCJ6HpOuEn7z0Csc=
-golang.org/x/time v0.14.0 h1:MRx4UaLrDotUKUdCIqzPC48t1Y9hANFKIRpNx+Te8PI=
-golang.org/x/time v0.14.0/go.mod h1:eL/Oa2bBBK0TkX57Fyni+NgnyQQN4LitPmob2Hjnqw4=
