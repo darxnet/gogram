@@ -60,9 +60,15 @@ func TestThrottle_PerChat(t *testing.T) {
 	}
 
 	for range 3 {
-		run(func() { _, _ = client.SendMessage(ctx, &gogram.SendMessageParams{ChatID: gogram.ChatID{ID: 7}, Text: "x"}) })
-		run(func() { _, _ = client.SendMessage(ctx, &gogram.SendMessageParams{ChatID: gogram.ChatID{ID: -100}, Text: "x"}) })
-		run(func() { _, _ = client.SendMessage(ctx, &gogram.SendMessageParams{ChatID: gogram.ChatID{ID: 8}, Text: "x"}) })
+		run(func() {
+			_, _ = client.SendMessage(ctx, &gogram.SendMessageParams{ChatID: gogram.ChatID{ID: 7}, Text: "x"})
+		})
+		run(func() {
+			_, _ = client.SendMessage(ctx, &gogram.SendMessageParams{ChatID: gogram.ChatID{ID: -100}, Text: "x"})
+		})
+		run(func() {
+			_, _ = client.SendMessage(ctx, &gogram.SendMessageParams{ChatID: gogram.ChatID{ID: 8}, Text: "x"})
+		})
 		run(func() {
 			_, _ = client.SendChatAction(ctx, &gogram.SendChatActionParams{ChatID: gogram.ChatID{ID: 7}, Action: "typing"})
 		})

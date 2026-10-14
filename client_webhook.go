@@ -147,11 +147,9 @@ func (c *Client) webhookHandler(ctx context.Context, pool *workerPool, secretTok
 			return
 		}
 
-		// The handler runs after this request ends, under the run's context.
-		if !pool.dispatch(ctx, c.acquireContext(ctx, update)) {
-			http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
-			return
-		}
+		// The handler runs after this request ends, under the run's context;
+		// a full queue holds the request back (back-pressure on Telegram).
+		pool.dispatch(c.acquireContext(ctx, update))
 
 		w.WriteHeader(http.StatusOK)
 	}
