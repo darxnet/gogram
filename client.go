@@ -16,7 +16,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"golang.org/x/time/rate"
 )
 
 // The generator is its own module so that golang.org/x/net stays out of the library's dependencies.
@@ -52,7 +51,7 @@ type clientConfig struct {
 	rps              int
 	timeout          time.Duration
 	httpClient       *http.Client
-	rateLimiter      *rate.Limiter
+	rateLimiter      *limiter
 	router           *Router
 	defaultParseMode string
 	numWorkers       int
@@ -193,13 +192,12 @@ func (c *Client) setLinkPrefix() {
 }
 
 func (c *Client) setRateLimiter() {
-	limit, burst := rate.Inf, 0
-	if c.cfg.rps > 0 {
-		limit = rate.Every(time.Second / time.Duration(c.cfg.rps))
-		burst = c.cfg.rps
+	if c.cfg.rps <= 0 {
+		c.cfg.rateLimiter = nil // unlimited
+		return
 	}
 
-	c.cfg.rateLimiter = rate.NewLimiter(limit, burst)
+	c.cfg.rateLimiter = newLimiter(time.Second/time.Duration(c.cfg.rps), c.cfg.rps)
 }
 
 // defaultParseMode returns the current default parse mode.

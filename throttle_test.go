@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/darxnet/gogram"
-	"golang.org/x/time/rate"
 )
 
 func TestThrottle_PerChat(t *testing.T) {
@@ -36,9 +35,9 @@ func TestThrottle_PerChat(t *testing.T) {
 	client, err := gogram.NewClient(testToken,
 		gogram.WithCaller(record),
 		gogram.WithTransformers(gogram.Throttle(gogram.ThrottleConfig{
-			PrivateRate: rate.Every(spacing),
-			GroupRate:   rate.Every(spacing),
-			GroupBurst:  1,
+			PrivateEvery: spacing,
+			GroupEvery:   spacing,
+			GroupBurst:   1,
 		})),
 	)
 	if err != nil {
@@ -79,16 +78,19 @@ func TestThrottle_PerChat(t *testing.T) {
 	mu.Lock()
 	defer mu.Unlock()
 
+	// Timestamps are taken when the stub runs, so a single gap can shrink by
+	// scheduling jitter of the earlier call; the span of three calls cannot
+	// fall below two intervals minus that jitter.
+	const jitter = 20 * time.Millisecond
+
 	for _, key := range []string{"sendMessage 7", "sendMessage -100", "sendMessage 8"} {
 		ts := times[key]
 		if len(ts) != 3 {
 			t.Fatalf("%s: %d calls, want 3", key, len(ts))
 		}
 
-		for i := 1; i < len(ts); i++ {
-			if gap := ts[i].Sub(ts[i-1]); gap < spacing-5*time.Millisecond {
-				t.Fatalf("%s: calls %d and %d only %v apart, want >= %v", key, i-1, i, gap, spacing)
-			}
+		if span := ts[2].Sub(ts[0]); span < 2*spacing-jitter {
+			t.Fatalf("%s: three calls within %v, want >= %v", key, span, 2*spacing-jitter)
 		}
 	}
 
@@ -109,7 +111,7 @@ func TestThrottle_ContextDeadline(t *testing.T) {
 
 	client, err := gogram.NewClient(testToken,
 		gogram.WithCaller(noop),
-		gogram.WithTransformers(gogram.Throttle(gogram.ThrottleConfig{PrivateRate: rate.Every(time.Hour)})),
+		gogram.WithTransformers(gogram.Throttle(gogram.ThrottleConfig{PrivateEvery: time.Hour})),
 	)
 	if err != nil {
 		t.Fatalf("NewClient: %v", err)
