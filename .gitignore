@@ -1,5 +1,6 @@
 *.out
 *.test
 bin/
+/cmd/gen/gen
 vendor/
 testdata/
