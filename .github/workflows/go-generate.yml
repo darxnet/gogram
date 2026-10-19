@@ -58,7 +58,7 @@ jobs:
           go build ./...
           go test -race -failfast -count=1 ./...
 
-      - uses: actions/create-github-app-token@v2
+      - uses: actions/create-github-app-token@v3
         if: steps.check.outputs.has_changes == 'true'
         id: app-token
         with:
