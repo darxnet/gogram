@@ -19,11 +19,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
-        go: ['1.24', '1.25', '1.26']
-        include:
-          - os: macos-latest # arm64
-            go: '1.26'
+        os: [ubuntu-latest, macos-latest] # amd64, arm64
+        go: [stable, oldstable]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 15
     steps:
@@ -46,7 +43,7 @@ jobs:
         run: go test -race -failfast -count=1 ./...
 
       - name: Test sqlstore against SQLite
-        if: matrix.go == '1.26' # the test-only module needs the SQLite driver's Go version
+        if: matrix.go == 'stable' # the test-only module needs the SQLite driver's Go version
         run: go test -C sqlstore/sqlitetest -race -failfast -count=1 ./...
 
       - name: Benchmarks compile and run once
