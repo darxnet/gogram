@@ -1,7 +1,10 @@
 # Codecov measures the hand-written code: the generated Bot API bindings and
 # the generator are excluded, matching the gate in .github/workflows/ci.yml.
 ignore:
-  - "**/*.gen.go"
+  # "**.gen.go", not "**/*.gen.go": Codecov turns the latter into a regex that
+  # needs a "/" before the file name and so misses the generated files in the
+  # repository root (which made the badge show 14% instead of the real value).
+  - "**.gen.go"
   - "cmd/gen"
   - "sqlstore/sqlitetest"
 
