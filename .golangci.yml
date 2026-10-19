@@ -1,3 +1,6 @@
+# The same config as the other darxnet libraries, except that err113, predeclared
+# and gocritic builtinShadow stay on: gogram is a public API client whose errors
+# users match with errors.Is, and it does not shadow builtins.
 version: "2"
 
 linters:
@@ -16,6 +19,13 @@ linters:
       enable-all: true
       disable:
         - fieldalignment
+    gosec:
+      excludes:
+        - G404
+    revive:
+      rules:
+        - name: redefines-builtin-id
+          disabled: true
   disable:
     - containedctx
     - cyclop
@@ -25,11 +35,10 @@ linters:
     - forcetypeassert
     - funcorder
     - funlen
-    - gocheckcompilerdirectives
     - gochecknoglobals
     - goconst
     - godox
-    - gomodguard # deprecated
+    - gomodguard
     - ireturn
     - mnd
     - nestif

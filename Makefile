@@ -1,4 +1,4 @@
-.PHONY: all generate lint test bench update deps
+.PHONY: all generate lint test
 
 all: generate lint test
 
@@ -15,15 +15,3 @@ lint:
 test:
 	go test -race -failfast -cover ./...
 	cd sqlstore/sqlitetest && go test -race ./...
-
-## bench: run benchmarks with allocation stats
-bench:
-	go test -run '^$$' -bench . -benchmem ./...
-
-## update: bump dependencies (explicit, never part of `all`)
-update:
-	go get -u ./... && go mod tidy
-
-## deps: install golangci-lint (the script verifies the archive checksum)
-deps:
-	curl -sSfL https://golangci-lint.run/install.sh | sh -s -- -b $$(go env GOPATH)/bin
