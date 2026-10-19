@@ -1,36 +1,42 @@
 version: 2
 updates:
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 5
-    commit-message:
-      prefix: "ci"
-    groups:
-      github-actions:
-        patterns:
-          - "*"
-    labels:
-      - "dependencies"
-
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 5
     commit-message:
-      prefix: "chore"
+      prefix: "chore(deps)"
     groups:
-      go-mod:
+      go-modules:
         patterns:
           - "*"
-    labels:
-      - "dependencies"
-      - "go"
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
-      # x/time v0.15+ requires Go 1.25/1.26; gogram supports Go 1.24.
-      - dependency-name: "golang.org/x/time"
-        versions: [">= 0.15.0"]
+  - package-ecosystem: "gomod"
+    directory: "/cmd/gen"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      go-modules:
+        patterns:
+          - "*"
+  - package-ecosystem: "gomod"
+    directory: "/sqlstore/sqlitetest"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      go-modules:
+        patterns:
+          - "*"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(ci)"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
