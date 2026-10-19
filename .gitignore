@@ -4,4 +4,3 @@ bin/
 /cmd/gen/gen
 vendor/
 testdata/
-ROADMAP.md
