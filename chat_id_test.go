@@ -52,8 +52,14 @@ func TestChatID_OmitZero(t *testing.T) {
 	t.Parallel()
 
 	// Required chat_id is always present; optional ones only when set.
-	b, err := json.Marshal(gogram.SendMessageParams{Text: "x"})
+	b, err := json.Marshal(gogram.BanChatMemberParams{UserID: 1})
 	if err != nil || !strings.Contains(string(b), `"chat_id":0`) {
+		t.Fatalf("banChatMember: %s, %v", b, err)
+	}
+
+	// Optional since Bot API 10.4 (ephemeral replies to callback queries).
+	b, err = json.Marshal(gogram.SendMessageParams{Text: "x"})
+	if err != nil || strings.Contains(string(b), "chat_id") {
 		t.Fatalf("sendMessage: %s, %v", b, err)
 	}
 

@@ -305,17 +305,26 @@ func (r *Router) BotCommands() []BotCommand {
 	return slices.Clone(r.commands)
 }
 
-// AutoAnswer returns a middleware that answers a callback query after its
-// handler returns, unless the handler already answered it through
-// [Context.AnswerCallbackQuery]. Without an answer Telegram keeps the
-// button's loading spinner for up to a minute.
+// AutoAnswer returns a middleware that answers a callback or widget query
+// after its handler returns, unless the handler already answered it through
+// [Context.AnswerCallbackQuery] or [Context.AnswerWidgetQuery]. Without an
+// answer Telegram keeps the button's loading spinner for up to a minute;
+// a widget query must be answered within 15 seconds. An ephemeral reply
+// ([Context.ReplyEphemeral]) does not answer the callback query.
 func AutoAnswer() MiddlewareFunc {
 	return func(next HandlerFunc) HandlerFunc {
 		return func(ctx *Context) error {
 			err := next(ctx)
 
-			if ctx.update != nil && ctx.update.CallbackQuery != nil && !ctx.answered {
+			if ctx.update == nil || ctx.answered {
+				return err
+			}
+
+			switch {
+			case ctx.update.CallbackQuery != nil:
 				err = errors.Join(err, ctx.AnswerCallbackQuery())
+			case ctx.update.WidgetQuery != nil:
+				err = errors.Join(err, ctx.AnswerWidgetQuery())
 			}
 
 			return err

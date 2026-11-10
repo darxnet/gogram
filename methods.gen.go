@@ -701,6 +701,68 @@ func (c *Client) AnswerWebAppQuery(ctx context.Context, params *AnswerWebAppQuer
 	return ret, err
 }
 
+// AnswerWidgetQueryParams contains parameters for Client.AnswerWidgetQuery.
+type AnswerWidgetQueryParams struct {
+	// Unique identifier for the query to be answered
+	WidgetQueryID string `json:"widget_query_id"`
+
+	// Data to be returned to the widget, 0-1024 bytes
+	Data string `json:"data,omitempty"`
+}
+
+// AnswerWidgetQueryOption configures AnswerWidgetQueryParams.
+type AnswerWidgetQueryOption = Option[AnswerWidgetQueryParams]
+
+// Option applies opts to r in order.
+func (r *AnswerWidgetQueryParams) Option(opts ...AnswerWidgetQueryOption) {
+	for _, opt := range opts {
+		opt(r)
+	}
+}
+
+// WithAnswerWidgetQueryWidgetQueryID sets the WidgetQueryID field.
+//
+// Unique identifier for the query to be answered
+func WithAnswerWidgetQueryWidgetQueryID(value string) AnswerWidgetQueryOption {
+	return fieldOption(value, func(params *AnswerWidgetQueryParams) *string {
+		return &params.WidgetQueryID
+	})
+}
+
+// WithAnswerWidgetQueryData sets the Data field.
+//
+// Data to be returned to the widget, 0-1024 bytes
+func WithAnswerWidgetQueryData(value string) AnswerWidgetQueryOption {
+	return fieldOption(value, func(params *AnswerWidgetQueryParams) *string {
+		return &params.Data
+	})
+}
+
+// AnswerWidgetQuery calls the answerWidgetQuery Telegram Bot API method.
+//
+// Use this method to send an answer to a query from a widget.
+// The query must be answered within 15 seconds.
+// The answer is received only by the widget that sent the query and doesn't change data of the widget; use [editMessageWidgetData] or [editSharedWidgetData] to change it.
+// On success, True is returned.
+//
+// [editMessageWidgetData]: https://core.telegram.org/bots/api#editmessagewidgetdata
+// [editSharedWidgetData]: https://core.telegram.org/bots/api#editsharedwidgetdata
+func (c *Client) AnswerWidgetQuery(ctx context.Context, params *AnswerWidgetQueryParams) (ret bool, err error) {
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
+		return
+	}
+
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
+
+	ret, err = call[bool](ctx, c, "answerWidgetQuery", params, reader, contentType, c.cfg.timeout)
+
+	return ret, err
+}
+
 // ApproveChatJoinRequestParams contains parameters for Client.ApproveChatJoinRequest.
 type ApproveChatJoinRequestParams struct {
 	// Unique identifier for the target chat or username of the target channel in the format @username
@@ -1216,7 +1278,7 @@ func (c *Client) ConvertGiftToStars(ctx context.Context, params *ConvertGiftToSt
 
 // CopyMessageParams contains parameters for Client.CopyMessage.
 type CopyMessageParams struct {
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
@@ -1225,7 +1287,7 @@ type CopyMessageParams struct {
 	// Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat
 	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
 
-	// Unique identifier for the chat where the original message was sent (or username of the target bot, supergroup or channel in the format @username)
+	// Unique identifier for the chat where the original message was sent (or username of the target bot, supergroup, or channel in the format @username)
 	FromChatID ChatID `json:"from_chat_id"`
 
 	// Message identifier in the chat specified in from_chat_id
@@ -1301,7 +1363,7 @@ func (r *CopyMessageParams) ChatTarget() ChatID {
 
 // WithCopyMessageChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 func WithCopyMessageChatID(value ChatID) CopyMessageOption {
 	return fieldOption(value, func(params *CopyMessageParams) *ChatID {
 		return &params.ChatID
@@ -1328,7 +1390,7 @@ func WithCopyMessageDirectMessagesTopicID(value int64) CopyMessageOption {
 
 // WithCopyMessageFromChatID sets the FromChatID field.
 //
-// Unique identifier for the chat where the original message was sent (or username of the target bot, supergroup or channel in the format @username)
+// Unique identifier for the chat where the original message was sent (or username of the target bot, supergroup, or channel in the format @username)
 func WithCopyMessageFromChatID(value ChatID) CopyMessageOption {
 	return fieldOption(value, func(params *CopyMessageParams) *ChatID {
 		return &params.FromChatID
@@ -1471,7 +1533,7 @@ func WithCopyMessageReplyMarkup(value *ReplyMarkup) CopyMessageOption {
 // CopyMessage calls the copyMessage Telegram Bot API method.
 //
 // Use this method to copy messages of any kind.
-// Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied.
+// Service messages, paid media messages, giveaway messages, giveaway winners messages, invoice messages, and widget messages can't be copied.
 // A quiz [poll] can be copied only if the value of the field correct_option_ids is known to the bot.
 // The method is analogous to the method [forwardMessage], but the copied message doesn't have a link to the original message.
 // Returns the [MessageId] of the sent message on success.
@@ -1497,7 +1559,7 @@ func (c *Client) CopyMessage(ctx context.Context, params *CopyMessageParams) (re
 
 // CopyMessagesParams contains parameters for Client.CopyMessages.
 type CopyMessagesParams struct {
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
@@ -1506,7 +1568,7 @@ type CopyMessagesParams struct {
 	// Identifier of the direct messages topic to which the messages will be sent; required if the messages are sent to a direct messages chat
 	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
 
-	// Unique identifier for the chat where the original messages were sent (or username of the target bot, supergroup or channel in the format @username)
+	// Unique identifier for the chat where the original messages were sent (or username of the target bot, supergroup, or channel in the format @username)
 	FromChatID ChatID `json:"from_chat_id"`
 
 	// A JSON-serialized list of 1-100 identifiers of messages in the chat from_chat_id to copy.
@@ -1543,7 +1605,7 @@ func (r *CopyMessagesParams) ChatTarget() ChatID {
 
 // WithCopyMessagesChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 func WithCopyMessagesChatID(value ChatID) CopyMessagesOption {
 	return fieldOption(value, func(params *CopyMessagesParams) *ChatID {
 		return &params.ChatID
@@ -1570,7 +1632,7 @@ func WithCopyMessagesDirectMessagesTopicID(value int64) CopyMessagesOption {
 
 // WithCopyMessagesFromChatID sets the FromChatID field.
 //
-// Unique identifier for the chat where the original messages were sent (or username of the target bot, supergroup or channel in the format @username)
+// Unique identifier for the chat where the original messages were sent (or username of the target bot, supergroup, or channel in the format @username)
 func WithCopyMessagesFromChatID(value ChatID) CopyMessagesOption {
 	return fieldOption(value, func(params *CopyMessagesParams) *ChatID {
 		return &params.FromChatID
@@ -1621,7 +1683,7 @@ func WithCopyMessagesRemoveCaption(value bool) CopyMessagesOption {
 //
 // Use this method to copy messages of any kind.
 // If some of the specified messages can't be found or copied, they are skipped.
-// Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied.
+// Service messages, paid media messages, giveaway messages, giveaway winners messages, invoice messages, and widget messages can't be copied.
 // A quiz [poll] can be copied only if the value of the field correct_option_ids is known to the bot.
 // The method is analogous to the method [forwardMessages], but the copied messages don't have a link to the original message.
 // Album grouping is kept for copied messages.
@@ -1924,6 +1986,7 @@ func WithCreateForumTopicIconCustomEmojiID(value string) CreateForumTopicOption 
 //
 // Use this method to create a topic in a forum supergroup chat or a private chat with a user.
 // In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator right.
+// In the case of a private chat, a link to the topic can be created in the format https://t.me/<bot_username>/<message_thread_id>; the link opens the topic only for the user.
 // Returns information about the created topic as a [ForumTopic] object.
 //
 // [ForumTopic]: https://core.telegram.org/bots/api#forumtopic
@@ -2733,6 +2796,67 @@ func (c *Client) DeleteAllMessageReactions(ctx context.Context, params *DeleteAl
 	return ret, err
 }
 
+// DeleteBusinessAccountGiftParams contains parameters for Client.DeleteBusinessAccountGift.
+type DeleteBusinessAccountGiftParams struct {
+	// Unique identifier of the business connection
+	BusinessConnectionID string `json:"business_connection_id"`
+
+	// Unique identifier of the regular gift that should be deleted
+	OwnedGiftID string `json:"owned_gift_id"`
+}
+
+// DeleteBusinessAccountGiftOption configures DeleteBusinessAccountGiftParams.
+type DeleteBusinessAccountGiftOption = Option[DeleteBusinessAccountGiftParams]
+
+// Option applies opts to r in order.
+func (r *DeleteBusinessAccountGiftParams) Option(opts ...DeleteBusinessAccountGiftOption) {
+	for _, opt := range opts {
+		opt(r)
+	}
+}
+
+// WithDeleteBusinessAccountGiftBusinessConnectionID sets the BusinessConnectionID field.
+//
+// Unique identifier of the business connection
+func WithDeleteBusinessAccountGiftBusinessConnectionID(value string) DeleteBusinessAccountGiftOption {
+	return fieldOption(value, func(params *DeleteBusinessAccountGiftParams) *string {
+		return &params.BusinessConnectionID
+	})
+}
+
+// WithDeleteBusinessAccountGiftOwnedGiftID sets the OwnedGiftID field.
+//
+// Unique identifier of the regular gift that should be deleted
+func WithDeleteBusinessAccountGiftOwnedGiftID(value string) DeleteBusinessAccountGiftOption {
+	return fieldOption(value, func(params *DeleteBusinessAccountGiftParams) *string {
+		return &params.OwnedGiftID
+	})
+}
+
+// DeleteBusinessAccountGift calls the deleteBusinessAccountGift Telegram Bot API method.
+//
+// Deletes a regular gift owned by a managed business account without receiving Telegram Stars for it.
+// Requires the can_convert_gifts_to_stars business bot right.
+// The gift can be deleted only if it isn't limited (the field total_count of the [Gift] is omitted) and wasn't refunded.
+// Returns True on success.
+//
+// [Gift]: https://core.telegram.org/bots/api#gift
+func (c *Client) DeleteBusinessAccountGift(ctx context.Context, params *DeleteBusinessAccountGiftParams) (ret bool, err error) {
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
+		return
+	}
+
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
+
+	ret, err = call[bool](ctx, c, "deleteBusinessAccountGift", params, reader, contentType, c.cfg.timeout)
+
+	return ret, err
+}
+
 // DeleteBusinessMessagesParams contains parameters for Client.DeleteBusinessMessages.
 type DeleteBusinessMessagesParams struct {
 	// Unique identifier of the business connection on behalf of which to delete the messages
@@ -3045,7 +3169,7 @@ func (c *Client) DeleteForumTopic(ctx context.Context, params *DeleteForumTopicP
 
 // DeleteMessageParams contains parameters for Client.DeleteMessage.
 type DeleteMessageParams struct {
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 	ChatID ChatID `json:"chat_id"`
 
 	// Identifier of the message to delete
@@ -3069,7 +3193,7 @@ func (r *DeleteMessageParams) ChatTarget() ChatID {
 
 // WithDeleteMessageChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 func WithDeleteMessageChatID(value ChatID) DeleteMessageOption {
 	return fieldOption(value, func(params *DeleteMessageParams) *ChatID {
 		return &params.ChatID
@@ -3203,7 +3327,7 @@ func (c *Client) DeleteMessageReaction(ctx context.Context, params *DeleteMessag
 
 // DeleteMessagesParams contains parameters for Client.DeleteMessages.
 type DeleteMessagesParams struct {
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 	ChatID ChatID `json:"chat_id"`
 
 	// A JSON-serialized list of 1-100 identifiers of messages to delete.
@@ -3230,7 +3354,7 @@ func (r *DeleteMessagesParams) ChatTarget() ChatID {
 
 // WithDeleteMessagesChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 func WithDeleteMessagesChatID(value ChatID) DeleteMessagesOption {
 	return fieldOption(value, func(params *DeleteMessagesParams) *ChatID {
 		return &params.ChatID
@@ -4507,7 +4631,7 @@ type EditMessageCaptionParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Required if inline_message_id is not specified.
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username.
 	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Required if inline_message_id is not specified.
@@ -4567,7 +4691,7 @@ func WithEditMessageCaptionBusinessConnectionID(value string) EditMessageCaption
 // WithEditMessageCaptionChatID sets the ChatID field.
 //
 // Required if inline_message_id is not specified.
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username.
 func WithEditMessageCaptionChatID(value ChatID) EditMessageCaptionOption {
 	return fieldOption(value, func(params *EditMessageCaptionParams) *ChatID {
 		return &params.ChatID
@@ -4778,7 +4902,7 @@ type EditMessageLiveLocationParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Required if inline_message_id is not specified.
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username.
 	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Required if inline_message_id is not specified.
@@ -4845,7 +4969,7 @@ func WithEditMessageLiveLocationBusinessConnectionID(value string) EditMessageLi
 // WithEditMessageLiveLocationChatID sets the ChatID field.
 //
 // Required if inline_message_id is not specified.
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username.
 func WithEditMessageLiveLocationChatID(value ChatID) EditMessageLiveLocationOption {
 	return fieldOption(value, func(params *EditMessageLiveLocationParams) *ChatID {
 		return &params.ChatID
@@ -4972,7 +5096,7 @@ type EditMessageMediaParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Required if inline_message_id is not specified.
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username.
 	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Required if inline_message_id is not specified.
@@ -5019,7 +5143,7 @@ func WithEditMessageMediaBusinessConnectionID(value string) EditMessageMediaOpti
 // WithEditMessageMediaChatID sets the ChatID field.
 //
 // Required if inline_message_id is not specified.
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username.
 func WithEditMessageMediaChatID(value ChatID) EditMessageMediaOption {
 	return fieldOption(value, func(params *EditMessageMediaParams) *ChatID {
 		return &params.ChatID
@@ -5221,7 +5345,7 @@ type EditMessageReplyMarkupParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Required if inline_message_id is not specified.
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username.
 	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Required if inline_message_id is not specified.
@@ -5265,7 +5389,7 @@ func WithEditMessageReplyMarkupBusinessConnectionID(value string) EditMessageRep
 // WithEditMessageReplyMarkupChatID sets the ChatID field.
 //
 // Required if inline_message_id is not specified.
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username.
 func WithEditMessageReplyMarkupChatID(value ChatID) EditMessageReplyMarkupOption {
 	return fieldOption(value, func(params *EditMessageReplyMarkupParams) *ChatID {
 		return &params.ChatID
@@ -5332,7 +5456,7 @@ type EditMessageTextParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Required if inline_message_id is not specified.
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username.
 	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Required if inline_message_id is not specified.
@@ -5395,7 +5519,7 @@ func WithEditMessageTextBusinessConnectionID(value string) EditMessageTextOption
 // WithEditMessageTextChatID sets the ChatID field.
 //
 // Required if inline_message_id is not specified.
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username.
 func WithEditMessageTextChatID(value ChatID) EditMessageTextOption {
 	return fieldOption(value, func(params *EditMessageTextParams) *ChatID {
 		return &params.ChatID
@@ -5502,6 +5626,187 @@ func (c *Client) EditMessageText(ctx context.Context, params *EditMessageTextPar
 	contentType := contentTypeJSON
 
 	ret, err = call[*Message](ctx, c, "editMessageText", params, reader, contentType, c.cfg.timeout)
+
+	return ret, err
+}
+
+// EditMessageWidgetDataParams contains parameters for Client.EditMessageWidgetData.
+type EditMessageWidgetDataParams struct {
+	// Required if inline_message_id is not specified.
+	// Unique identifier for the target chat or username of the target supergroup in the format @username.
+	ChatID ChatID `json:"chat_id,omitzero"`
+
+	// Required if inline_message_id is not specified.
+	// Identifier of the message with the widget.
+	MessageID int64 `json:"message_id,omitempty"`
+
+	// Required if chat_id and message_id are not specified.
+	// Identifier of the inline message.
+	InlineMessageID string `json:"inline_message_id,omitempty"`
+
+	// New public data of the widget, 0-1024 bytes; pass an empty string to remove the public data.
+	// If omitted, then the public data isn't changed.
+	PublicData string `json:"public_data,omitempty"`
+
+	// New data of the widget, which is specific to the message, 0-1024 bytes; pass an empty string to remove the data.
+	// If omitted, then the data isn't changed.
+	ChatData string `json:"chat_data,omitempty"`
+}
+
+// EditMessageWidgetDataOption configures EditMessageWidgetDataParams.
+type EditMessageWidgetDataOption = Option[EditMessageWidgetDataParams]
+
+// Option applies opts to r in order.
+func (r *EditMessageWidgetDataParams) Option(opts ...EditMessageWidgetDataOption) {
+	for _, opt := range opts {
+		opt(r)
+	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *EditMessageWidgetDataParams) ChatTarget() ChatID {
+	return r.ChatID
+}
+
+// WithEditMessageWidgetDataChatID sets the ChatID field.
+//
+// Required if inline_message_id is not specified.
+// Unique identifier for the target chat or username of the target supergroup in the format @username.
+func WithEditMessageWidgetDataChatID(value ChatID) EditMessageWidgetDataOption {
+	return fieldOption(value, func(params *EditMessageWidgetDataParams) *ChatID {
+		return &params.ChatID
+	})
+}
+
+// WithEditMessageWidgetDataMessageID sets the MessageID field.
+//
+// Required if inline_message_id is not specified.
+// Identifier of the message with the widget.
+func WithEditMessageWidgetDataMessageID(value int64) EditMessageWidgetDataOption {
+	return fieldOption(value, func(params *EditMessageWidgetDataParams) *int64 {
+		return &params.MessageID
+	})
+}
+
+// WithEditMessageWidgetDataInlineMessageID sets the InlineMessageID field.
+//
+// Required if chat_id and message_id are not specified.
+// Identifier of the inline message.
+func WithEditMessageWidgetDataInlineMessageID(value string) EditMessageWidgetDataOption {
+	return fieldOption(value, func(params *EditMessageWidgetDataParams) *string {
+		return &params.InlineMessageID
+	})
+}
+
+// WithEditMessageWidgetDataPublicData sets the PublicData field.
+//
+// New public data of the widget, 0-1024 bytes; pass an empty string to remove the public data.
+// If omitted, then the public data isn't changed.
+func WithEditMessageWidgetDataPublicData(value string) EditMessageWidgetDataOption {
+	return fieldOption(value, func(params *EditMessageWidgetDataParams) *string {
+		return &params.PublicData
+	})
+}
+
+// WithEditMessageWidgetDataChatData sets the ChatData field.
+//
+// New data of the widget, which is specific to the message, 0-1024 bytes; pass an empty string to remove the data.
+// If omitted, then the data isn't changed.
+func WithEditMessageWidgetDataChatData(value string) EditMessageWidgetDataOption {
+	return fieldOption(value, func(params *EditMessageWidgetDataParams) *string {
+		return &params.ChatData
+	})
+}
+
+// EditMessageWidgetData calls the editMessageWidgetData Telegram Bot API method.
+//
+// Use this method to edit data of a widget in a message sent by the bot or via the bot (for inline bots).
+// Public data of a shared widget can be changed at most once per second.
+// On success, True is returned.
+func (c *Client) EditMessageWidgetData(ctx context.Context, params *EditMessageWidgetDataParams) (ret bool, err error) {
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
+		return
+	}
+
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
+
+	ret, err = call[bool](ctx, c, "editMessageWidgetData", params, reader, contentType, c.cfg.timeout)
+
+	return ret, err
+}
+
+// EditSharedWidgetDataParams contains parameters for Client.EditSharedWidgetData.
+type EditSharedWidgetDataParams struct {
+	// Unique identifier of the shared widget
+	WidgetID string `json:"widget_id"`
+
+	// New public data of the widget, 0-1024 bytes; pass an empty string to remove the public data
+	PublicData string `json:"public_data"`
+
+	// The maximum amount of time in seconds that the public data of the widget may be cached client-side; 5-3600.
+	// If omitted, then the current value is kept, which is 30 by default.
+	CacheTime int64 `json:"cache_time,omitempty"`
+}
+
+// EditSharedWidgetDataOption configures EditSharedWidgetDataParams.
+type EditSharedWidgetDataOption = Option[EditSharedWidgetDataParams]
+
+// Option applies opts to r in order.
+func (r *EditSharedWidgetDataParams) Option(opts ...EditSharedWidgetDataOption) {
+	for _, opt := range opts {
+		opt(r)
+	}
+}
+
+// WithEditSharedWidgetDataWidgetID sets the WidgetID field.
+//
+// Unique identifier of the shared widget
+func WithEditSharedWidgetDataWidgetID(value string) EditSharedWidgetDataOption {
+	return fieldOption(value, func(params *EditSharedWidgetDataParams) *string {
+		return &params.WidgetID
+	})
+}
+
+// WithEditSharedWidgetDataPublicData sets the PublicData field.
+//
+// New public data of the widget, 0-1024 bytes; pass an empty string to remove the public data
+func WithEditSharedWidgetDataPublicData(value string) EditSharedWidgetDataOption {
+	return fieldOption(value, func(params *EditSharedWidgetDataParams) *string {
+		return &params.PublicData
+	})
+}
+
+// WithEditSharedWidgetDataCacheTime sets the CacheTime field.
+//
+// The maximum amount of time in seconds that the public data of the widget may be cached client-side; 5-3600.
+// If omitted, then the current value is kept, which is 30 by default.
+func WithEditSharedWidgetDataCacheTime(value int64) EditSharedWidgetDataOption {
+	return fieldOption(value, func(params *EditSharedWidgetDataParams) *int64 {
+		return &params.CacheTime
+	})
+}
+
+// EditSharedWidgetData calls the editSharedWidgetData Telegram Bot API method.
+//
+// Use this method to edit public data of a shared widget created by the bot.
+// A shared widget can be edited at most once per second.
+// On success, True is returned.
+func (c *Client) EditSharedWidgetData(ctx context.Context, params *EditSharedWidgetDataParams) (ret bool, err error) {
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
+		return
+	}
+
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
+
+	ret, err = call[bool](ctx, c, "editSharedWidgetData", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -5838,7 +6143,7 @@ func (c *Client) ExportChatInviteLink(ctx context.Context, params *ExportChatInv
 
 // ForwardMessageParams contains parameters for Client.ForwardMessage.
 type ForwardMessageParams struct {
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
@@ -5847,7 +6152,7 @@ type ForwardMessageParams struct {
 	// Identifier of the direct messages topic to which the message will be forwarded; required if the message is forwarded to a direct messages chat
 	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
 
-	// Unique identifier for the chat where the original message was sent (or username of the target bot, supergroup or channel in the format @username)
+	// Unique identifier for the chat where the original message was sent (or username of the target bot, supergroup, or channel in the format @username)
 	FromChatID ChatID `json:"from_chat_id"`
 
 	// New start timestamp for the forwarded video in the message
@@ -5889,7 +6194,7 @@ func (r *ForwardMessageParams) ChatTarget() ChatID {
 
 // WithForwardMessageChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 func WithForwardMessageChatID(value ChatID) ForwardMessageOption {
 	return fieldOption(value, func(params *ForwardMessageParams) *ChatID {
 		return &params.ChatID
@@ -5916,7 +6221,7 @@ func WithForwardMessageDirectMessagesTopicID(value int64) ForwardMessageOption {
 
 // WithForwardMessageFromChatID sets the FromChatID field.
 //
-// Unique identifier for the chat where the original message was sent (or username of the target bot, supergroup or channel in the format @username)
+// Unique identifier for the chat where the original message was sent (or username of the target bot, supergroup, or channel in the format @username)
 func WithForwardMessageFromChatID(value ChatID) ForwardMessageOption {
 	return fieldOption(value, func(params *ForwardMessageParams) *ChatID {
 		return &params.FromChatID
@@ -6005,7 +6310,7 @@ func (c *Client) ForwardMessage(ctx context.Context, params *ForwardMessageParam
 
 // ForwardMessagesParams contains parameters for Client.ForwardMessages.
 type ForwardMessagesParams struct {
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
@@ -6014,7 +6319,7 @@ type ForwardMessagesParams struct {
 	// Identifier of the direct messages topic to which the messages will be forwarded; required if the messages are forwarded to a direct messages chat
 	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
 
-	// Unique identifier for the chat where the original messages were sent (or username of the target bot, supergroup or channel in the format @username)
+	// Unique identifier for the chat where the original messages were sent (or username of the target bot, supergroup, or channel in the format @username)
 	FromChatID ChatID `json:"from_chat_id"`
 
 	// A JSON-serialized list of 1-100 identifiers of messages in the chat from_chat_id to forward.
@@ -6048,7 +6353,7 @@ func (r *ForwardMessagesParams) ChatTarget() ChatID {
 
 // WithForwardMessagesChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 func WithForwardMessagesChatID(value ChatID) ForwardMessagesOption {
 	return fieldOption(value, func(params *ForwardMessagesParams) *ChatID {
 		return &params.ChatID
@@ -6075,7 +6380,7 @@ func WithForwardMessagesDirectMessagesTopicID(value int64) ForwardMessagesOption
 
 // WithForwardMessagesFromChatID sets the FromChatID field.
 //
-// Unique identifier for the chat where the original messages were sent (or username of the target bot, supergroup or channel in the format @username)
+// Unique identifier for the chat where the original messages were sent (or username of the target bot, supergroup, or channel in the format @username)
 func WithForwardMessagesFromChatID(value ChatID) ForwardMessagesOption {
 	return fieldOption(value, func(params *ForwardMessagesParams) *ChatID {
 		return &params.FromChatID
@@ -6909,6 +7214,43 @@ func (c *Client) GetChatMenuButton(ctx context.Context, params *GetChatMenuButto
 	return ret, err
 }
 
+// GetChatShareThemeBackdropsParams contains parameters for Client.GetChatShareThemeBackdrops.
+type GetChatShareThemeBackdropsParams struct {
+}
+
+// GetChatShareThemeBackdropsOption configures GetChatShareThemeBackdropsParams.
+type GetChatShareThemeBackdropsOption = Option[GetChatShareThemeBackdropsParams]
+
+// Option applies opts to r in order.
+func (r *GetChatShareThemeBackdropsParams) Option(opts ...GetChatShareThemeBackdropsOption) {
+	for _, opt := range opts {
+		opt(r)
+	}
+}
+
+// GetChatShareThemeBackdrops calls the getChatShareThemeBackdrops Telegram Bot API method.
+//
+// Use this method to get the list of backdrops, which can be used as the background of a theme of the screen for sharing a link to a user or a chat.
+// Requires no parameters.
+// Returns a [ChatShareThemeBackdrops] object.
+//
+// [ChatShareThemeBackdrops]: https://core.telegram.org/bots/api#chatsharethemebackdrops
+func (c *Client) GetChatShareThemeBackdrops(ctx context.Context, params *GetChatShareThemeBackdropsParams) (ret *ChatShareThemeBackdrops, err error) {
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
+		return
+	}
+
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
+
+	ret, err = call[*ChatShareThemeBackdrops](ctx, c, "getChatShareThemeBackdrops", params, reader, contentType, c.cfg.timeout)
+
+	return ret, err
+}
+
 // GetCustomEmojiStickersParams contains parameters for Client.GetCustomEmojiStickers.
 type GetCustomEmojiStickersParams struct {
 	// A JSON-serialized list of custom emoji identifiers.
@@ -7672,6 +8014,53 @@ func (c *Client) GetStickerSet(ctx context.Context, params *GetStickerSetParams)
 	contentType := contentTypeJSON
 
 	ret, err = call[*StickerSet](ctx, c, "getStickerSet", params, reader, contentType, c.cfg.timeout)
+
+	return ret, err
+}
+
+// GetUniqueGiftParams contains parameters for Client.GetUniqueGift.
+type GetUniqueGiftParams struct {
+	// Unique name of the gift
+	Name string `json:"name"`
+}
+
+// GetUniqueGiftOption configures GetUniqueGiftParams.
+type GetUniqueGiftOption = Option[GetUniqueGiftParams]
+
+// Option applies opts to r in order.
+func (r *GetUniqueGiftParams) Option(opts ...GetUniqueGiftOption) {
+	for _, opt := range opts {
+		opt(r)
+	}
+}
+
+// WithGetUniqueGiftName sets the Name field.
+//
+// Unique name of the gift
+func WithGetUniqueGiftName(value string) GetUniqueGiftOption {
+	return fieldOption(value, func(params *GetUniqueGiftParams) *string {
+		return &params.Name
+	})
+}
+
+// GetUniqueGift calls the getUniqueGift Telegram Bot API method.
+//
+// Use this method to get information about a unique gift by its name.
+// Returns a [UniqueGift] object on success.
+//
+// [UniqueGift]: https://core.telegram.org/bots/api#uniquegift
+func (c *Client) GetUniqueGift(ctx context.Context, params *GetUniqueGiftParams) (ret *UniqueGift, err error) {
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
+		return
+	}
+
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
+
+	ret, err = call[*UniqueGift](ctx, c, "getUniqueGift", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -10216,8 +10605,8 @@ type SendAnimationParams struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID ChatID `json:"chat_id"`
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
+	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -10331,7 +10720,7 @@ func WithSendAnimationBusinessConnectionID(value string) SendAnimationOption {
 
 // WithSendAnimationChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
 func WithSendAnimationChatID(value ChatID) SendAnimationOption {
 	return fieldOption(value, func(params *SendAnimationParams) *ChatID {
 		return &params.ChatID
@@ -10561,7 +10950,7 @@ func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams)
 			}
 		}
 
-		{
+		if !params.ChatID.IsZero() {
 			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
@@ -10770,8 +11159,8 @@ type SendAudioParams struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID ChatID `json:"chat_id"`
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
+	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -10879,7 +11268,7 @@ func WithSendAudioBusinessConnectionID(value string) SendAudioOption {
 
 // WithSendAudioChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
 func WithSendAudioChatID(value ChatID) SendAudioOption {
 	return fieldOption(value, func(params *SendAudioParams) *ChatID {
 		return &params.ChatID
@@ -11094,7 +11483,7 @@ func (c *Client) SendAudio(ctx context.Context, params *SendAudioParams) (ret *M
 			}
 		}
 
-		{
+		if !params.ChatID.IsZero() {
 			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
@@ -11603,8 +11992,8 @@ type SendContactParams struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID ChatID `json:"chat_id"`
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
+	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -11688,7 +12077,7 @@ func WithSendContactBusinessConnectionID(value string) SendContactOption {
 
 // WithSendContactChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
 func WithSendContactChatID(value ChatID) SendContactOption {
 	return fieldOption(value, func(params *SendContactParams) *ChatID {
 		return &params.ChatID
@@ -11861,7 +12250,7 @@ type SendDiceParams struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
@@ -11935,7 +12324,7 @@ func WithSendDiceBusinessConnectionID(value string) SendDiceOption {
 
 // WithSendDiceChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 func WithSendDiceChatID(value ChatID) SendDiceOption {
 	return fieldOption(value, func(params *SendDiceParams) *ChatID {
 		return &params.ChatID
@@ -12073,8 +12462,8 @@ type SendDocumentParams struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID ChatID `json:"chat_id"`
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
+	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -12176,7 +12565,7 @@ func WithSendDocumentBusinessConnectionID(value string) SendDocumentOption {
 
 // WithSendDocumentChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
 func WithSendDocumentChatID(value ChatID) SendDocumentOption {
 	return fieldOption(value, func(params *SendDocumentParams) *ChatID {
 		return &params.ChatID
@@ -12370,7 +12759,7 @@ func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (
 			}
 		}
 
-		{
+		if !params.ChatID.IsZero() {
 			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
@@ -12737,7 +13126,7 @@ type SendGiftParams struct {
 	UserID int64 `json:"user_id,omitempty"`
 
 	// Required if user_id is not specified.
-	// Unique identifier for the chat or username of the channel (in the format @username) that will receive the gift.
+	// Unique identifier for the chat that will receive the gift or username of the channel in the format @username.
 	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Identifier of the gift; limited gifts can't be sent to channel chats
@@ -12790,7 +13179,7 @@ func WithSendGiftUserID(value int64) SendGiftOption {
 // WithSendGiftChatID sets the ChatID field.
 //
 // Required if user_id is not specified.
-// Unique identifier for the chat or username of the channel (in the format @username) that will receive the gift.
+// Unique identifier for the chat that will receive the gift or username of the channel in the format @username.
 func WithSendGiftChatID(value ChatID) SendGiftOption {
 	return fieldOption(value, func(params *SendGiftParams) *ChatID {
 		return &params.ChatID
@@ -12871,7 +13260,7 @@ func (c *Client) SendGift(ctx context.Context, params *SendGiftParams) (ret bool
 
 // SendInvoiceParams contains parameters for Client.SendInvoice.
 type SendInvoiceParams struct {
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
@@ -13041,7 +13430,7 @@ func (r *SendInvoiceParams) ChatTarget() ChatID {
 
 // WithSendInvoiceChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 func WithSendInvoiceChatID(value ChatID) SendInvoiceOption {
 	return fieldOption(value, func(params *SendInvoiceParams) *ChatID {
 		return &params.ChatID
@@ -13404,8 +13793,8 @@ type SendLivePhotoParams struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
-	// Unique identifier for the target chat or username of the target channel (in the format @channelusername)
-	ChatID ChatID `json:"chat_id"`
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
+	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -13510,7 +13899,7 @@ func WithSendLivePhotoBusinessConnectionID(value string) SendLivePhotoOption {
 
 // WithSendLivePhotoChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
 func WithSendLivePhotoChatID(value ChatID) SendLivePhotoOption {
 	return fieldOption(value, func(params *SendLivePhotoParams) *ChatID {
 		return &params.ChatID
@@ -13712,7 +14101,7 @@ func (c *Client) SendLivePhoto(ctx context.Context, params *SendLivePhotoParams)
 			}
 		}
 
-		{
+		if !params.ChatID.IsZero() {
 			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
@@ -13895,8 +14284,8 @@ type SendLocationParams struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID ChatID `json:"chat_id"`
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
+	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -13989,7 +14378,7 @@ func WithSendLocationBusinessConnectionID(value string) SendLocationOption {
 
 // WithSendLocationChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
 func WithSendLocationChatID(value ChatID) SendLocationOption {
 	return fieldOption(value, func(params *SendLocationParams) *ChatID {
 		return &params.ChatID
@@ -14183,7 +14572,7 @@ type SendMediaGroupParams struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 	ChatID ChatID `json:"chat_id"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
@@ -14243,7 +14632,7 @@ func WithSendMediaGroupBusinessConnectionID(value string) SendMediaGroupOption {
 
 // WithSendMediaGroupChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 func WithSendMediaGroupChatID(value ChatID) SendMediaGroupOption {
 	return fieldOption(value, func(params *SendMediaGroupParams) *ChatID {
 		return &params.ChatID
@@ -14514,8 +14903,8 @@ type SendMessageParams struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID ChatID `json:"chat_id"`
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
+	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -14600,7 +14989,7 @@ func WithSendMessageBusinessConnectionID(value string) SendMessageOption {
 
 // WithSendMessageChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
 func WithSendMessageChatID(value ChatID) SendMessageOption {
 	return fieldOption(value, func(params *SendMessageParams) *ChatID {
 		return &params.ChatID
@@ -14933,7 +15322,7 @@ type SendPaidMediaParams struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username.
 	// If the chat is a channel, all Telegram Star proceeds from this media will be credited to the chat's balance.
 	// Otherwise, they will be credited to the bot's balance.
 	ChatID ChatID `json:"chat_id"`
@@ -15025,7 +15414,7 @@ func WithSendPaidMediaBusinessConnectionID(value string) SendPaidMediaOption {
 
 // WithSendPaidMediaChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username.
 // If the chat is a channel, all Telegram Star proceeds from this media will be credited to the chat's balance.
 // Otherwise, they will be credited to the bot's balance.
 func WithSendPaidMediaChatID(value ChatID) SendPaidMediaOption {
@@ -15404,8 +15793,8 @@ type SendPhotoParams struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID ChatID `json:"chat_id"`
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
+	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -15503,7 +15892,7 @@ func WithSendPhotoBusinessConnectionID(value string) SendPhotoOption {
 
 // WithSendPhotoChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
 func WithSendPhotoChatID(value ChatID) SendPhotoOption {
 	return fieldOption(value, func(params *SendPhotoParams) *ChatID {
 		return &params.ChatID
@@ -15692,7 +16081,7 @@ func (c *Client) SendPhoto(ctx context.Context, params *SendPhotoParams) (ret *M
 			}
 		}
 
-		{
+		if !params.ChatID.IsZero() {
 			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
@@ -15867,7 +16256,7 @@ type SendPollParams struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username.
 	// Polls can't be sent to channel direct messages chats.
 	ChatID ChatID `json:"chat_id"`
 
@@ -16024,7 +16413,7 @@ func WithSendPollBusinessConnectionID(value string) SendPollOption {
 
 // WithSendPollChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username.
 // Polls can't be sent to channel direct messages chats.
 func WithSendPollChatID(value ChatID) SendPollOption {
 	return fieldOption(value, func(params *SendPollParams) *ChatID {
@@ -16829,8 +17218,8 @@ type SendRichMessageParams struct {
 	// Bot can send rich messages on behalf of a business account only if the corresponding user can send rich messages.
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID ChatID `json:"chat_id"`
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
+	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -16904,7 +17293,7 @@ func WithSendRichMessageBusinessConnectionID(value string) SendRichMessageOption
 
 // WithSendRichMessageChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
 func WithSendRichMessageChatID(value ChatID) SendRichMessageOption {
 	return fieldOption(value, func(params *SendRichMessageParams) *ChatID {
 		return &params.ChatID
@@ -17173,13 +17562,248 @@ func (c *Client) SendRichMessageDraft(ctx context.Context, params *SendRichMessa
 	return ret, err
 }
 
+// SendSharedWidgetParams contains parameters for Client.SendSharedWidget.
+type SendSharedWidgetParams struct {
+	// Unique identifier for the target chat or username of the target supergroup in the format @username
+	ChatID ChatID `json:"chat_id"`
+
+	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
+	MessageThreadID int64 `json:"message_thread_id,omitempty"`
+
+	// Unique identifier of the shared widget
+	WidgetID string `json:"widget_id"`
+
+	// Data of the widget, which is specific to the message, 0-1024 bytes
+	ChatData string `json:"chat_data,omitempty"`
+
+	// Widget caption, 0-1024 characters after entities parsing
+	Caption string `json:"caption,omitempty"`
+
+	// Mode for parsing entities in the widget caption.
+	// See [formatting options] for more details.
+	//
+	// [formatting options]: https://core.telegram.org/bots/api#formatting-options
+	ParseMode string `json:"parse_mode,omitempty"`
+
+	// A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
+
+	// Pass True if the caption must be shown above the widget
+	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
+
+	// Sends the message [silently].
+	// Users will receive a notification with no sound.
+	//
+	// [silently]: https://telegram.org/blog/channels-2-0#silent-messages
+	DisableNotification bool `json:"disable_notification,omitempty"`
+
+	// Protects the contents of the sent message from forwarding and saving
+	ProtectContent bool `json:"protect_content,omitempty"`
+
+	// Pass True to allow up to 1000 messages per second, ignoring [broadcasting limits] for a fee of 0.1 Telegram Stars per message.
+	// The relevant Stars will be withdrawn from the bot's balance.
+	//
+	// [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
+	AllowPaidBroadcast bool `json:"allow_paid_broadcast,omitempty"`
+
+	// Unique identifier of the message effect to be added to the message; for private chats only
+	MessageEffectID string `json:"message_effect_id,omitempty"`
+
+	// Description of the message to reply to
+	ReplyParameters *ReplyParameters `json:"reply_parameters,omitempty"`
+
+	// Additional interface options.
+	// A JSON-serialized object for an [inline keyboard], [custom reply keyboard], instructions to remove a reply keyboard or to force a reply from the user.
+	//
+	// [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
+	// [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
+	ReplyMarkup *ReplyMarkup `json:"reply_markup,omitempty"`
+}
+
+// SendSharedWidgetOption configures SendSharedWidgetParams.
+type SendSharedWidgetOption = Option[SendSharedWidgetParams]
+
+// Option applies opts to r in order.
+func (r *SendSharedWidgetParams) Option(opts ...SendSharedWidgetOption) {
+	for _, opt := range opts {
+		opt(r)
+	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *SendSharedWidgetParams) ChatTarget() ChatID {
+	return r.ChatID
+}
+
+// WithSendSharedWidgetChatID sets the ChatID field.
+//
+// Unique identifier for the target chat or username of the target supergroup in the format @username
+func WithSendSharedWidgetChatID(value ChatID) SendSharedWidgetOption {
+	return fieldOption(value, func(params *SendSharedWidgetParams) *ChatID {
+		return &params.ChatID
+	})
+}
+
+// WithSendSharedWidgetMessageThreadID sets the MessageThreadID field.
+//
+// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
+func WithSendSharedWidgetMessageThreadID(value int64) SendSharedWidgetOption {
+	return fieldOption(value, func(params *SendSharedWidgetParams) *int64 {
+		return &params.MessageThreadID
+	})
+}
+
+// WithSendSharedWidgetWidgetID sets the WidgetID field.
+//
+// Unique identifier of the shared widget
+func WithSendSharedWidgetWidgetID(value string) SendSharedWidgetOption {
+	return fieldOption(value, func(params *SendSharedWidgetParams) *string {
+		return &params.WidgetID
+	})
+}
+
+// WithSendSharedWidgetChatData sets the ChatData field.
+//
+// Data of the widget, which is specific to the message, 0-1024 bytes
+func WithSendSharedWidgetChatData(value string) SendSharedWidgetOption {
+	return fieldOption(value, func(params *SendSharedWidgetParams) *string {
+		return &params.ChatData
+	})
+}
+
+// WithSendSharedWidgetCaption sets the Caption field.
+//
+// Widget caption, 0-1024 characters after entities parsing
+func WithSendSharedWidgetCaption(value string) SendSharedWidgetOption {
+	return fieldOption(value, func(params *SendSharedWidgetParams) *string {
+		return &params.Caption
+	})
+}
+
+// WithSendSharedWidgetParseMode sets the ParseMode field.
+//
+// Mode for parsing entities in the widget caption.
+// See [formatting options] for more details.
+//
+// [formatting options]: https://core.telegram.org/bots/api#formatting-options
+func WithSendSharedWidgetParseMode(value string) SendSharedWidgetOption {
+	return fieldOption(value, func(params *SendSharedWidgetParams) *string {
+		return &params.ParseMode
+	})
+}
+
+// WithSendSharedWidgetCaptionEntities sets the CaptionEntities field.
+//
+// A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
+func WithSendSharedWidgetCaptionEntities(value []MessageEntity) SendSharedWidgetOption {
+	return fieldOption(value, func(params *SendSharedWidgetParams) *[]MessageEntity {
+		return &params.CaptionEntities
+	})
+}
+
+// WithSendSharedWidgetShowCaptionAboveMedia sets the ShowCaptionAboveMedia field.
+//
+// Pass True if the caption must be shown above the widget
+func WithSendSharedWidgetShowCaptionAboveMedia(value bool) SendSharedWidgetOption {
+	return fieldOption(value, func(params *SendSharedWidgetParams) *bool {
+		return &params.ShowCaptionAboveMedia
+	})
+}
+
+// WithSendSharedWidgetDisableNotification sets the DisableNotification field.
+//
+// Sends the message [silently].
+// Users will receive a notification with no sound.
+//
+// [silently]: https://telegram.org/blog/channels-2-0#silent-messages
+func WithSendSharedWidgetDisableNotification(value bool) SendSharedWidgetOption {
+	return fieldOption(value, func(params *SendSharedWidgetParams) *bool {
+		return &params.DisableNotification
+	})
+}
+
+// WithSendSharedWidgetProtectContent sets the ProtectContent field.
+//
+// Protects the contents of the sent message from forwarding and saving
+func WithSendSharedWidgetProtectContent(value bool) SendSharedWidgetOption {
+	return fieldOption(value, func(params *SendSharedWidgetParams) *bool {
+		return &params.ProtectContent
+	})
+}
+
+// WithSendSharedWidgetAllowPaidBroadcast sets the AllowPaidBroadcast field.
+//
+// Pass True to allow up to 1000 messages per second, ignoring [broadcasting limits] for a fee of 0.1 Telegram Stars per message.
+// The relevant Stars will be withdrawn from the bot's balance.
+//
+// [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
+func WithSendSharedWidgetAllowPaidBroadcast(value bool) SendSharedWidgetOption {
+	return fieldOption(value, func(params *SendSharedWidgetParams) *bool {
+		return &params.AllowPaidBroadcast
+	})
+}
+
+// WithSendSharedWidgetMessageEffectID sets the MessageEffectID field.
+//
+// Unique identifier of the message effect to be added to the message; for private chats only
+func WithSendSharedWidgetMessageEffectID(value string) SendSharedWidgetOption {
+	return fieldOption(value, func(params *SendSharedWidgetParams) *string {
+		return &params.MessageEffectID
+	})
+}
+
+// WithSendSharedWidgetReplyParameters sets the ReplyParameters field.
+//
+// Description of the message to reply to
+func WithSendSharedWidgetReplyParameters(value *ReplyParameters) SendSharedWidgetOption {
+	return fieldOption(value, func(params *SendSharedWidgetParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
+}
+
+// WithSendSharedWidgetReplyMarkup sets the ReplyMarkup field.
+//
+// Additional interface options.
+// A JSON-serialized object for an [inline keyboard], [custom reply keyboard], instructions to remove a reply keyboard or to force a reply from the user.
+//
+// [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
+// [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
+func WithSendSharedWidgetReplyMarkup(value *ReplyMarkup) SendSharedWidgetOption {
+	return fieldOption(value, func(params *SendSharedWidgetParams) **ReplyMarkup {
+		return &params.ReplyMarkup
+	})
+}
+
+// SendSharedWidget calls the sendSharedWidget Telegram Bot API method.
+//
+// Use this method to send again a shared widget created by the bot.
+// Currently, in the production environment, widgets can be sent only to private chats, and sent widgets automatically have protected content and therefore can't be forwarded.
+// On success, the sent [Message] is returned.
+//
+// [Message]: https://core.telegram.org/bots/api#message
+func (c *Client) SendSharedWidget(ctx context.Context, params *SendSharedWidgetParams) (ret *Message, err error) {
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
+		return
+	}
+
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
+
+	ret, err = call[*Message](ctx, c, "sendSharedWidget", params, reader, contentType, c.cfg.timeout)
+
+	return ret, err
+}
+
 // SendStickerParams contains parameters for Client.SendSticker.
 type SendStickerParams struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID ChatID `json:"chat_id"`
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
+	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -17260,7 +17884,7 @@ func WithSendStickerBusinessConnectionID(value string) SendStickerOption {
 
 // WithSendStickerChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
 func WithSendStickerChatID(value ChatID) SendStickerOption {
 	return fieldOption(value, func(params *SendStickerParams) *ChatID {
 		return &params.ChatID
@@ -17410,7 +18034,7 @@ func (c *Client) SendSticker(ctx context.Context, params *SendStickerParams) (re
 			}
 		}
 
-		{
+		if !params.ChatID.IsZero() {
 			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
@@ -17549,8 +18173,8 @@ type SendVenueParams struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID ChatID `json:"chat_id"`
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
+	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -17648,7 +18272,7 @@ func WithSendVenueBusinessConnectionID(value string) SendVenueOption {
 
 // WithSendVenueChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
 func WithSendVenueChatID(value ChatID) SendVenueOption {
 	return fieldOption(value, func(params *SendVenueParams) *ChatID {
 		return &params.ChatID
@@ -17859,8 +18483,8 @@ type SendVideoParams struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID ChatID `json:"chat_id"`
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
+	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -17987,7 +18611,7 @@ func WithSendVideoBusinessConnectionID(value string) SendVideoOption {
 
 // WithSendVideoChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
 func WithSendVideoChatID(value ChatID) SendVideoOption {
 	return fieldOption(value, func(params *SendVideoParams) *ChatID {
 		return &params.ChatID
@@ -18249,7 +18873,7 @@ func (c *Client) SendVideo(ctx context.Context, params *SendVideoParams) (ret *M
 			}
 		}
 
-		{
+		if !params.ChatID.IsZero() {
 			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
@@ -18484,8 +19108,8 @@ type SendVideoNoteParams struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID ChatID `json:"chat_id"`
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
+	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -18580,7 +19204,7 @@ func WithSendVideoNoteBusinessConnectionID(value string) SendVideoNoteOption {
 
 // WithSendVideoNoteChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
 func WithSendVideoNoteChatID(value ChatID) SendVideoNoteOption {
 	return fieldOption(value, func(params *SendVideoNoteParams) *ChatID {
 		return &params.ChatID
@@ -18754,7 +19378,7 @@ func (c *Client) SendVideoNote(ctx context.Context, params *SendVideoNoteParams)
 			}
 		}
 
-		{
+		if !params.ChatID.IsZero() {
 			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
@@ -18911,8 +19535,8 @@ type SendVoiceParams struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
-	ChatID ChatID `json:"chat_id"`
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
+	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
 	MessageThreadID int64 `json:"message_thread_id,omitempty"`
@@ -19004,7 +19628,7 @@ func WithSendVoiceBusinessConnectionID(value string) SendVoiceOption {
 
 // WithSendVoiceChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
 func WithSendVoiceChatID(value ChatID) SendVoiceOption {
 	return fieldOption(value, func(params *SendVoiceParams) *ChatID {
 		return &params.ChatID
@@ -19185,7 +19809,7 @@ func (c *Client) SendVoice(ctx context.Context, params *SendVoiceParams) (ret *M
 			}
 		}
 
-		{
+		if !params.ChatID.IsZero() {
 			v := params.ChatID.String()
 			err = writer.WriteField("chat_id", v)
 			if err != nil {
@@ -19343,6 +19967,314 @@ func (c *Client) SendVoice(ctx context.Context, params *SendVoiceParams) (ret *M
 	if writeErr := body.Err(); writeErr != nil {
 		err = writeErr // the root cause behind a broken-body transport error
 	}
+
+	return ret, err
+}
+
+// SendWidgetParams contains parameters for Client.SendWidget.
+type SendWidgetParams struct {
+	// Unique identifier for the target chat or username of the target supergroup in the format @username
+	ChatID ChatID `json:"chat_id"`
+
+	// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
+	MessageThreadID int64 `json:"message_thread_id,omitempty"`
+
+	// HTML code of the widget, 1-32768 bytes.
+	// The code must not exceed 4096 bytes when compressed by zlib with the maximum compression level.
+	Html string `json:"html"`
+
+	// Width of the widget in logical pixels; omit if the widget must occupy the whole width of the message bubble.
+	// The width is clamped by the app to the range from 200 to the maximum width of the message bubble.
+	Width int64 `json:"width,omitempty"`
+
+	// Height of the widget in logical pixels; omit if the height of the widget isn't fixed.
+	// The height is clamped by the app to the range 50-600.
+	Height int64 `json:"height,omitempty"`
+
+	// Public data of the widget, 0-1024 bytes, which will be available wherever the widget is shown.
+	// If the widget is shared, then all messages with it will have the same public data.
+	PublicData string `json:"public_data,omitempty"`
+
+	// Data of the widget, which is specific to the message, 0-1024 bytes
+	ChatData string `json:"chat_data,omitempty"`
+
+	// Widget caption, 0-1024 characters after entities parsing
+	Caption string `json:"caption,omitempty"`
+
+	// Mode for parsing entities in the widget caption.
+	// See [formatting options] for more details.
+	//
+	// [formatting options]: https://core.telegram.org/bots/api#formatting-options
+	ParseMode string `json:"parse_mode,omitempty"`
+
+	// A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
+	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
+
+	// Pass True if the caption must be shown above the widget
+	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
+
+	// Pass True to allow the widget to send queries to the bot
+	AllowQueries bool `json:"allow_queries,omitempty"`
+
+	// Pass True to create a shared widget, which can be sent again using the method [sendSharedWidget]
+	//
+	// [sendSharedWidget]: https://core.telegram.org/bots/api#sendsharedwidget
+	IsShared bool `json:"is_shared,omitempty"`
+
+	// Sends the message [silently].
+	// Users will receive a notification with no sound.
+	//
+	// [silently]: https://telegram.org/blog/channels-2-0#silent-messages
+	DisableNotification bool `json:"disable_notification,omitempty"`
+
+	// Protects the contents of the sent message from forwarding and saving
+	ProtectContent bool `json:"protect_content,omitempty"`
+
+	// Pass True to allow up to 1000 messages per second, ignoring [broadcasting limits] for a fee of 0.1 Telegram Stars per message.
+	// The relevant Stars will be withdrawn from the bot's balance.
+	//
+	// [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
+	AllowPaidBroadcast bool `json:"allow_paid_broadcast,omitempty"`
+
+	// Unique identifier of the message effect to be added to the message; for private chats only
+	MessageEffectID string `json:"message_effect_id,omitempty"`
+
+	// Description of the message to reply to
+	ReplyParameters *ReplyParameters `json:"reply_parameters,omitempty"`
+
+	// Additional interface options.
+	// A JSON-serialized object for an [inline keyboard], [custom reply keyboard], instructions to remove a reply keyboard or to force a reply from the user.
+	//
+	// [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
+	// [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
+	ReplyMarkup *ReplyMarkup `json:"reply_markup,omitempty"`
+}
+
+// SendWidgetOption configures SendWidgetParams.
+type SendWidgetOption = Option[SendWidgetParams]
+
+// Option applies opts to r in order.
+func (r *SendWidgetParams) Option(opts ...SendWidgetOption) {
+	for _, opt := range opts {
+		opt(r)
+	}
+}
+
+// ChatTarget implements [ChatTargeter].
+func (r *SendWidgetParams) ChatTarget() ChatID {
+	return r.ChatID
+}
+
+// WithSendWidgetChatID sets the ChatID field.
+//
+// Unique identifier for the target chat or username of the target supergroup in the format @username
+func WithSendWidgetChatID(value ChatID) SendWidgetOption {
+	return fieldOption(value, func(params *SendWidgetParams) *ChatID {
+		return &params.ChatID
+	})
+}
+
+// WithSendWidgetMessageThreadID sets the MessageThreadID field.
+//
+// Unique identifier for the target message thread (topic) of a forum; for forum supergroups and private chats of bots with forum topic mode enabled only
+func WithSendWidgetMessageThreadID(value int64) SendWidgetOption {
+	return fieldOption(value, func(params *SendWidgetParams) *int64 {
+		return &params.MessageThreadID
+	})
+}
+
+// WithSendWidgetHtml sets the Html field.
+//
+// HTML code of the widget, 1-32768 bytes.
+// The code must not exceed 4096 bytes when compressed by zlib with the maximum compression level.
+func WithSendWidgetHtml(value string) SendWidgetOption {
+	return fieldOption(value, func(params *SendWidgetParams) *string {
+		return &params.Html
+	})
+}
+
+// WithSendWidgetWidth sets the Width field.
+//
+// Width of the widget in logical pixels; omit if the widget must occupy the whole width of the message bubble.
+// The width is clamped by the app to the range from 200 to the maximum width of the message bubble.
+func WithSendWidgetWidth(value int64) SendWidgetOption {
+	return fieldOption(value, func(params *SendWidgetParams) *int64 {
+		return &params.Width
+	})
+}
+
+// WithSendWidgetHeight sets the Height field.
+//
+// Height of the widget in logical pixels; omit if the height of the widget isn't fixed.
+// The height is clamped by the app to the range 50-600.
+func WithSendWidgetHeight(value int64) SendWidgetOption {
+	return fieldOption(value, func(params *SendWidgetParams) *int64 {
+		return &params.Height
+	})
+}
+
+// WithSendWidgetPublicData sets the PublicData field.
+//
+// Public data of the widget, 0-1024 bytes, which will be available wherever the widget is shown.
+// If the widget is shared, then all messages with it will have the same public data.
+func WithSendWidgetPublicData(value string) SendWidgetOption {
+	return fieldOption(value, func(params *SendWidgetParams) *string {
+		return &params.PublicData
+	})
+}
+
+// WithSendWidgetChatData sets the ChatData field.
+//
+// Data of the widget, which is specific to the message, 0-1024 bytes
+func WithSendWidgetChatData(value string) SendWidgetOption {
+	return fieldOption(value, func(params *SendWidgetParams) *string {
+		return &params.ChatData
+	})
+}
+
+// WithSendWidgetCaption sets the Caption field.
+//
+// Widget caption, 0-1024 characters after entities parsing
+func WithSendWidgetCaption(value string) SendWidgetOption {
+	return fieldOption(value, func(params *SendWidgetParams) *string {
+		return &params.Caption
+	})
+}
+
+// WithSendWidgetParseMode sets the ParseMode field.
+//
+// Mode for parsing entities in the widget caption.
+// See [formatting options] for more details.
+//
+// [formatting options]: https://core.telegram.org/bots/api#formatting-options
+func WithSendWidgetParseMode(value string) SendWidgetOption {
+	return fieldOption(value, func(params *SendWidgetParams) *string {
+		return &params.ParseMode
+	})
+}
+
+// WithSendWidgetCaptionEntities sets the CaptionEntities field.
+//
+// A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode
+func WithSendWidgetCaptionEntities(value []MessageEntity) SendWidgetOption {
+	return fieldOption(value, func(params *SendWidgetParams) *[]MessageEntity {
+		return &params.CaptionEntities
+	})
+}
+
+// WithSendWidgetShowCaptionAboveMedia sets the ShowCaptionAboveMedia field.
+//
+// Pass True if the caption must be shown above the widget
+func WithSendWidgetShowCaptionAboveMedia(value bool) SendWidgetOption {
+	return fieldOption(value, func(params *SendWidgetParams) *bool {
+		return &params.ShowCaptionAboveMedia
+	})
+}
+
+// WithSendWidgetAllowQueries sets the AllowQueries field.
+//
+// Pass True to allow the widget to send queries to the bot
+func WithSendWidgetAllowQueries(value bool) SendWidgetOption {
+	return fieldOption(value, func(params *SendWidgetParams) *bool {
+		return &params.AllowQueries
+	})
+}
+
+// WithSendWidgetIsShared sets the IsShared field.
+//
+// Pass True to create a shared widget, which can be sent again using the method [sendSharedWidget]
+//
+// [sendSharedWidget]: https://core.telegram.org/bots/api#sendsharedwidget
+func WithSendWidgetIsShared(value bool) SendWidgetOption {
+	return fieldOption(value, func(params *SendWidgetParams) *bool {
+		return &params.IsShared
+	})
+}
+
+// WithSendWidgetDisableNotification sets the DisableNotification field.
+//
+// Sends the message [silently].
+// Users will receive a notification with no sound.
+//
+// [silently]: https://telegram.org/blog/channels-2-0#silent-messages
+func WithSendWidgetDisableNotification(value bool) SendWidgetOption {
+	return fieldOption(value, func(params *SendWidgetParams) *bool {
+		return &params.DisableNotification
+	})
+}
+
+// WithSendWidgetProtectContent sets the ProtectContent field.
+//
+// Protects the contents of the sent message from forwarding and saving
+func WithSendWidgetProtectContent(value bool) SendWidgetOption {
+	return fieldOption(value, func(params *SendWidgetParams) *bool {
+		return &params.ProtectContent
+	})
+}
+
+// WithSendWidgetAllowPaidBroadcast sets the AllowPaidBroadcast field.
+//
+// Pass True to allow up to 1000 messages per second, ignoring [broadcasting limits] for a fee of 0.1 Telegram Stars per message.
+// The relevant Stars will be withdrawn from the bot's balance.
+//
+// [broadcasting limits]: https://core.telegram.org/bots/faq#how-can-i-message-all-of-my-bot-39s-subscribers-at-once
+func WithSendWidgetAllowPaidBroadcast(value bool) SendWidgetOption {
+	return fieldOption(value, func(params *SendWidgetParams) *bool {
+		return &params.AllowPaidBroadcast
+	})
+}
+
+// WithSendWidgetMessageEffectID sets the MessageEffectID field.
+//
+// Unique identifier of the message effect to be added to the message; for private chats only
+func WithSendWidgetMessageEffectID(value string) SendWidgetOption {
+	return fieldOption(value, func(params *SendWidgetParams) *string {
+		return &params.MessageEffectID
+	})
+}
+
+// WithSendWidgetReplyParameters sets the ReplyParameters field.
+//
+// Description of the message to reply to
+func WithSendWidgetReplyParameters(value *ReplyParameters) SendWidgetOption {
+	return fieldOption(value, func(params *SendWidgetParams) **ReplyParameters {
+		return &params.ReplyParameters
+	})
+}
+
+// WithSendWidgetReplyMarkup sets the ReplyMarkup field.
+//
+// Additional interface options.
+// A JSON-serialized object for an [inline keyboard], [custom reply keyboard], instructions to remove a reply keyboard or to force a reply from the user.
+//
+// [inline keyboard]: https://core.telegram.org/bots/features#inline-keyboards
+// [custom reply keyboard]: https://core.telegram.org/bots/features#keyboards
+func WithSendWidgetReplyMarkup(value *ReplyMarkup) SendWidgetOption {
+	return fieldOption(value, func(params *SendWidgetParams) **ReplyMarkup {
+		return &params.ReplyMarkup
+	})
+}
+
+// SendWidget calls the sendWidget Telegram Bot API method.
+//
+// Use this method to send a message with an [HTML widget].
+// Currently, in the production environment, widgets can be sent only to private chats, and sent widgets automatically have protected content and therefore can't be forwarded.
+// On success, the sent [Message] is returned.
+//
+// [HTML widget]: https://core.telegram.org/bots/widgets
+// [Message]: https://core.telegram.org/bots/api#message
+func (c *Client) SendWidget(ctx context.Context, params *SendWidgetParams) (ret *Message, err error) {
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
+		return
+	}
+
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
+
+	ret, err = call[*Message](ctx, c, "sendWidget", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -20552,7 +21484,7 @@ func (c *Client) SetManagedBotAccessSettings(ctx context.Context, params *SetMan
 
 // SetMessageReactionParams contains parameters for Client.SetMessageReaction.
 type SetMessageReactionParams struct {
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 	ChatID ChatID `json:"chat_id"`
 
 	// Identifier of the target message.
@@ -20586,7 +21518,7 @@ func (r *SetMessageReactionParams) ChatTarget() ChatID {
 
 // WithSetMessageReactionChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 func WithSetMessageReactionChatID(value ChatID) SetMessageReactionOption {
 	return fieldOption(value, func(params *SetMessageReactionParams) *ChatID {
 		return &params.ChatID
@@ -21827,7 +22759,7 @@ type StopMessageLiveLocationParams struct {
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Required if inline_message_id is not specified.
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username.
 	ChatID ChatID `json:"chat_id,omitzero"`
 
 	// Required if inline_message_id is not specified.
@@ -21871,7 +22803,7 @@ func WithStopMessageLiveLocationBusinessConnectionID(value string) StopMessageLi
 // WithStopMessageLiveLocationChatID sets the ChatID field.
 //
 // Required if inline_message_id is not specified.
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username.
 func WithStopMessageLiveLocationChatID(value ChatID) StopMessageLiveLocationOption {
 	return fieldOption(value, func(params *StopMessageLiveLocationParams) *ChatID {
 		return &params.ChatID
@@ -21936,7 +22868,7 @@ type StopPollParams struct {
 	// Unique identifier of the business connection on behalf of which the message to be edited was sent
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 	ChatID ChatID `json:"chat_id"`
 
 	// Identifier of the original message with the poll
@@ -21974,7 +22906,7 @@ func WithStopPollBusinessConnectionID(value string) StopPollOption {
 
 // WithStopPollChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 func WithStopPollChatID(value ChatID) StopPollOption {
 	return fieldOption(value, func(params *StopPollParams) *ChatID {
 		return &params.ChatID
@@ -22803,13 +23735,24 @@ func (c *Client) UploadStickerFile(ctx context.Context, params *UploadStickerFil
 
 // VerifyChatParams contains parameters for Client.VerifyChat.
 type VerifyChatParams struct {
-	// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username.
 	// Channel direct messages chats can't be verified.
 	ChatID ChatID `json:"chat_id"`
 
 	// Custom description for the verification; 0-70 characters.
 	// Must be empty if the organization isn't allowed to provide a custom verification description.
 	CustomDescription string `json:"custom_description,omitempty"`
+
+	// Mode for parsing entities in the custom description.
+	// See [formatting options] for more details.
+	// Only “text_link” entities are supported.
+	//
+	// [formatting options]: https://core.telegram.org/bots/api#formatting-options
+	CustomDescriptionParseMode string `json:"custom_description_parse_mode,omitempty"`
+
+	// A JSON-serialized list of special entities that appear in the custom description, which can be specified instead of custom_description_parse_mode.
+	// Only “text_link” entities are supported.
+	CustomDescriptionEntities []MessageEntity `json:"custom_description_entities,omitempty"`
 }
 
 // VerifyChatOption configures VerifyChatParams.
@@ -22829,7 +23772,7 @@ func (r *VerifyChatParams) ChatTarget() ChatID {
 
 // WithVerifyChatChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username.
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username.
 // Channel direct messages chats can't be verified.
 func WithVerifyChatChatID(value ChatID) VerifyChatOption {
 	return fieldOption(value, func(params *VerifyChatParams) *ChatID {
@@ -22844,6 +23787,29 @@ func WithVerifyChatChatID(value ChatID) VerifyChatOption {
 func WithVerifyChatCustomDescription(value string) VerifyChatOption {
 	return fieldOption(value, func(params *VerifyChatParams) *string {
 		return &params.CustomDescription
+	})
+}
+
+// WithVerifyChatCustomDescriptionParseMode sets the CustomDescriptionParseMode field.
+//
+// Mode for parsing entities in the custom description.
+// See [formatting options] for more details.
+// Only “text_link” entities are supported.
+//
+// [formatting options]: https://core.telegram.org/bots/api#formatting-options
+func WithVerifyChatCustomDescriptionParseMode(value string) VerifyChatOption {
+	return fieldOption(value, func(params *VerifyChatParams) *string {
+		return &params.CustomDescriptionParseMode
+	})
+}
+
+// WithVerifyChatCustomDescriptionEntities sets the CustomDescriptionEntities field.
+//
+// A JSON-serialized list of special entities that appear in the custom description, which can be specified instead of custom_description_parse_mode.
+// Only “text_link” entities are supported.
+func WithVerifyChatCustomDescriptionEntities(value []MessageEntity) VerifyChatOption {
+	return fieldOption(value, func(params *VerifyChatParams) *[]MessageEntity {
+		return &params.CustomDescriptionEntities
 	})
 }
 
@@ -22877,6 +23843,17 @@ type VerifyUserParams struct {
 	// Custom description for the verification; 0-70 characters.
 	// Must be empty if the organization isn't allowed to provide a custom verification description.
 	CustomDescription string `json:"custom_description,omitempty"`
+
+	// Mode for parsing entities in the custom description.
+	// See [formatting options] for more details.
+	// Only “text_link” entities are supported.
+	//
+	// [formatting options]: https://core.telegram.org/bots/api#formatting-options
+	CustomDescriptionParseMode string `json:"custom_description_parse_mode,omitempty"`
+
+	// A JSON-serialized list of special entities that appear in the custom description, which can be specified instead of custom_description_parse_mode.
+	// Only “text_link” entities are supported.
+	CustomDescriptionEntities []MessageEntity `json:"custom_description_entities,omitempty"`
 }
 
 // VerifyUserOption configures VerifyUserParams.
@@ -22905,6 +23882,29 @@ func WithVerifyUserUserID(value int64) VerifyUserOption {
 func WithVerifyUserCustomDescription(value string) VerifyUserOption {
 	return fieldOption(value, func(params *VerifyUserParams) *string {
 		return &params.CustomDescription
+	})
+}
+
+// WithVerifyUserCustomDescriptionParseMode sets the CustomDescriptionParseMode field.
+//
+// Mode for parsing entities in the custom description.
+// See [formatting options] for more details.
+// Only “text_link” entities are supported.
+//
+// [formatting options]: https://core.telegram.org/bots/api#formatting-options
+func WithVerifyUserCustomDescriptionParseMode(value string) VerifyUserOption {
+	return fieldOption(value, func(params *VerifyUserParams) *string {
+		return &params.CustomDescriptionParseMode
+	})
+}
+
+// WithVerifyUserCustomDescriptionEntities sets the CustomDescriptionEntities field.
+//
+// A JSON-serialized list of special entities that appear in the custom description, which can be specified instead of custom_description_parse_mode.
+// Only “text_link” entities are supported.
+func WithVerifyUserCustomDescriptionEntities(value []MessageEntity) VerifyUserOption {
+	return fieldOption(value, func(params *VerifyUserParams) *[]MessageEntity {
+		return &params.CustomDescriptionEntities
 	})
 }
 
