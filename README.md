@@ -108,7 +108,7 @@ admin.Use(audit)
 admin.HandleCommand("/stats", stats, "Usage statistics") // the description goes to setMyCommands
 
 router.HandleOnMessage(onDocument, gogram.FilterPrivate().And(gogram.FilterMessageDocument()))
-router.Use(gogram.AutoAnswer()) // answers callback queries the handler did not
+router.Use(gogram.AutoAnswer()) // answers callback and widget queries the handler did not
 router.SetHandlerErr(func(ctx *gogram.Context, err error) { log.Println(err) })
 
 client.SyncCommands(ctx) // publishes every described command
@@ -139,6 +139,32 @@ pageCB.Handle(router.RouterGroup, func(ctx *gogram.Context, cq *gogram.CallbackQ
 Fields are encoded positionally and checked against the 64-byte limit when
 the button is built; data from an older build fails with
 `ErrInvalidCallbackData` and goes to the error handler.
+
+## Ephemeral replies and widgets
+
+An ephemeral message is shown only to one member of a group, on the shared
+timeline. `ctx.ReplyEphemeral` answers the user who pressed a button (in any
+chat, the bot needs no admin rights), the sender of an ephemeral command, or,
+for a chat administrator bot, any sender; `ctx.Ephemeral()` gives the same
+parameters to the other send methods. The callback query still needs an
+answer, which `AutoAnswer` sends:
+
+```go
+router.HandleOnCallbackQuery(func(ctx *gogram.Context, _ *gogram.CallbackQuery) error {
+	return ctx.ReplyEphemeral("Only you can see this")
+})
+```
+
+Widget queries arrive in `HandleOnWidgetQuery` and `HandleOnSharedWidgetQuery`;
+`FilterWidgetQueryData`, `FilterWidgetQuerySignData` and
+`FilterWidgetQuerySentTransaction` select by query type, and the Context
+methods fill the query, chat and message ids:
+
+```go
+router.HandleOnWidgetQuery(func(ctx *gogram.Context, q *gogram.WidgetQuery) error {
+	return ctx.EditMessageWidgetData(gogram.WithEditMessageWidgetDataChatData(q.Data))
+}, gogram.FilterWidgetQueryData()) // AutoAnswer answers within the 15-second limit
+```
 
 ## State machine
 
@@ -216,6 +242,7 @@ rec := tgtest.NewRecorder()
 client, _ := gogram.NewClient("123:abc", gogram.WithCaller(rec))
 
 router.Process(tgtest.NewContext(t, client, tgtest.Text(7, "/start")))
+// also tgtest.Callback, tgtest.WidgetQuery and tgtest.SharedWidgetQuery
 
 rec.AssertSequence(t, "sendChatAction", "sendMessage")
 rec.AssertCalled(t, "sendMessage", tgtest.Match(func(p *gogram.SendMessageParams) bool {
@@ -226,8 +253,8 @@ rec.AssertCalled(t, "sendMessage", tgtest.Match(func(p *gogram.SendMessageParams
 ## Text and links
 
 `EscapeMarkdownV2`, `EscapeHTML`, `Message.EntityText(e)` (UTF-16 aware),
-`UTF16Len`, `client.StartLink(ctx, "ref")` and `client.StartGroupLink`
-(deep links built from `client.Me()`).
+`UTF16Len`, `client.StartLink(ctx, "ref")`, `client.StartGroupLink` and
+`client.TopicLink(ctx, threadID)` (links built from `client.Me()`).
 
 ## Files
 

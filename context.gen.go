@@ -36,6 +36,10 @@ func (ctx *Context) findHandlerOn() handleOn {
 		return handleOnChosenInlineResult
 	case ctx.update.CallbackQuery != nil:
 		return handleOnCallbackQuery
+	case ctx.update.WidgetQuery != nil:
+		return handleOnWidgetQuery
+	case ctx.update.SharedWidgetQuery != nil:
+		return handleOnSharedWidgetQuery
 	case ctx.update.ShippingQuery != nil:
 		return handleOnShippingQuery
 	case ctx.update.PreCheckoutQuery != nil:
@@ -98,6 +102,10 @@ func (ctx *Context) User() *User {
 		return &ctx.update.ChosenInlineResult.From
 	case ctx.update.CallbackQuery != nil:
 		return &ctx.update.CallbackQuery.From
+	case ctx.update.WidgetQuery != nil:
+		return &ctx.update.WidgetQuery.From
+	case ctx.update.SharedWidgetQuery != nil:
+		return &ctx.update.SharedWidgetQuery.From
 	case ctx.update.ShippingQuery != nil:
 		return &ctx.update.ShippingQuery.From
 	case ctx.update.PreCheckoutQuery != nil:
@@ -148,6 +156,8 @@ func (ctx *Context) Chat() *Chat {
 		return &ctx.update.MessageReaction.Chat
 	case ctx.update.MessageReactionCount != nil:
 		return &ctx.update.MessageReactionCount.Chat
+	case ctx.update.WidgetQuery != nil:
+		return ctx.update.WidgetQuery.Chat
 	case ctx.update.PollAnswer != nil:
 		return ctx.update.PollAnswer.VoterChat
 	case ctx.update.MyChatMember != nil:
@@ -558,6 +568,53 @@ func (ctx *Context) AnswerWebAppQuery(
 	return err
 }
 
+// NewAnswerWidgetQueryParams builds AnswerWidgetQueryParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.AnswerWidgetQuery is needed:
+//
+//	ret, err := ctx.Client().AnswerWidgetQuery(ctx.Detached(), ctx.NewAnswerWidgetQueryParams(...))
+func (ctx *Context) NewAnswerWidgetQueryParams(
+	opts ...AnswerWidgetQueryOption,
+) *AnswerWidgetQueryParams {
+	params := &AnswerWidgetQueryParams{
+		WidgetQueryID: updateField(ctx, func(u *Update) string {
+			if u.WidgetQuery == nil {
+				return ""
+			}
+
+			return u.WidgetQuery.ID
+		}),
+	}
+
+	params.Option(opts...)
+
+	return params
+}
+
+// AnswerWidgetQuery calls Client.AnswerWidgetQuery with context-derived defaults.
+//
+// Use this method to send an answer to a query from a widget.
+// The query must be answered within 15 seconds.
+// The answer is received only by the widget that sent the query and doesn't change data of the widget; use [editMessageWidgetData] or [editSharedWidgetData] to change it.
+// On success, True is returned.
+//
+// [editMessageWidgetData]: https://core.telegram.org/bots/api#editmessagewidgetdata
+// [editSharedWidgetData]: https://core.telegram.org/bots/api#editsharedwidgetdata
+func (ctx *Context) AnswerWidgetQuery(
+	opts ...AnswerWidgetQueryOption,
+) error {
+	params := ctx.NewAnswerWidgetQueryParams(
+		opts...,
+	)
+
+	_, err := ctx.client.AnswerWidgetQuery(ctx.Detached(), params)
+	if err == nil {
+		ctx.answered = true
+	}
+
+	return err
+}
+
 // NewApproveChatJoinRequestParams builds ApproveChatJoinRequestParams with context-derived defaults
 // (chat, thread, business connection, default parse mode) and applies opts.
 // Use it when the result of Client.ApproveChatJoinRequest is needed:
@@ -603,7 +660,7 @@ func (ctx *Context) NewApproveSuggestedPostParams(
 ) *ApproveSuggestedPostParams {
 	params := &ApproveSuggestedPostParams{
 		ChatID:    ctx.chatID(),
-		MessageID: messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		MessageID: ctx.messageID(),
 	}
 
 	params.Option(opts...)
@@ -861,7 +918,7 @@ func (ctx *Context) NewCopyMessageParams(
 		ChatID:                ctx.chatTarget(),
 		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
-		MessageID:             messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		MessageID:             ctx.messageID(),
 		FromChatID:            fromChatID,
 	}
 
@@ -879,7 +936,7 @@ func (ctx *Context) NewCopyMessageParams(
 // CopyMessage calls Client.CopyMessage with context-derived defaults.
 //
 // Use this method to copy messages of any kind.
-// Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied.
+// Service messages, paid media messages, giveaway messages, giveaway winners messages, invoice messages, and widget messages can't be copied.
 // A quiz [poll] can be copied only if the value of the field correct_option_ids is known to the bot.
 // The method is analogous to the method [forwardMessage], but the copied message doesn't have a link to the original message.
 // Returns the [MessageId] of the sent message on success.
@@ -928,7 +985,7 @@ func (ctx *Context) NewCopyMessagesParams(
 //
 // Use this method to copy messages of any kind.
 // If some of the specified messages can't be found or copied, they are skipped.
-// Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied.
+// Service messages, paid media messages, giveaway messages, giveaway winners messages, invoice messages, and widget messages can't be copied.
 // A quiz [poll] can be copied only if the value of the field correct_option_ids is known to the bot.
 // The method is analogous to the method [forwardMessages], but the copied messages don't have a link to the original message.
 // Album grouping is kept for copied messages.
@@ -1062,6 +1119,7 @@ func (ctx *Context) NewCreateForumTopicParams(
 //
 // Use this method to create a topic in a forum supergroup chat or a private chat with a user.
 // In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator right.
+// In the case of a private chat, a link to the topic can be created in the format https://t.me/<bot_username>/<message_thread_id>; the link opens the topic only for the user.
 // Returns information about the created topic as a [ForumTopic] object.
 //
 // [ForumTopic]: https://core.telegram.org/bots/api#forumtopic
@@ -1223,7 +1281,7 @@ func (ctx *Context) NewDeclineSuggestedPostParams(
 ) *DeclineSuggestedPostParams {
 	params := &DeclineSuggestedPostParams{
 		ChatID:    ctx.chatID(),
-		MessageID: messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		MessageID: ctx.messageID(),
 	}
 
 	params.Option(opts...)
@@ -1279,6 +1337,47 @@ func (ctx *Context) DeleteAllMessageReactions(
 	)
 
 	_, err := ctx.client.DeleteAllMessageReactions(ctx.Detached(), params)
+
+	return err
+}
+
+// NewDeleteBusinessAccountGiftParams builds DeleteBusinessAccountGiftParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.DeleteBusinessAccountGift is needed:
+//
+//	ret, err := ctx.Client().DeleteBusinessAccountGift(ctx.Detached(), ctx.NewDeleteBusinessAccountGiftParams(...))
+func (ctx *Context) NewDeleteBusinessAccountGiftParams(
+	ownedGiftID string,
+	opts ...DeleteBusinessAccountGiftOption,
+) *DeleteBusinessAccountGiftParams {
+	params := &DeleteBusinessAccountGiftParams{
+		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
+		OwnedGiftID:          ownedGiftID,
+	}
+
+	params.Option(opts...)
+
+	return params
+}
+
+// DeleteBusinessAccountGift calls Client.DeleteBusinessAccountGift with context-derived defaults.
+//
+// Deletes a regular gift owned by a managed business account without receiving Telegram Stars for it.
+// Requires the can_convert_gifts_to_stars business bot right.
+// The gift can be deleted only if it isn't limited (the field total_count of the [Gift] is omitted) and wasn't refunded.
+// Returns True on success.
+//
+// [Gift]: https://core.telegram.org/bots/api#gift
+func (ctx *Context) DeleteBusinessAccountGift(
+	ownedGiftID string,
+	opts ...DeleteBusinessAccountGiftOption,
+) error {
+	params := ctx.NewDeleteBusinessAccountGiftParams(
+		ownedGiftID,
+		opts...,
+	)
+
+	_, err := ctx.client.DeleteBusinessAccountGift(ctx.Detached(), params)
 
 	return err
 }
@@ -1477,7 +1576,7 @@ func (ctx *Context) NewDeleteMessageParams(
 ) *DeleteMessageParams {
 	params := &DeleteMessageParams{
 		ChatID:    ctx.chatTarget(),
-		MessageID: messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		MessageID: ctx.messageID(),
 	}
 
 	params.Option(opts...)
@@ -1520,7 +1619,7 @@ func (ctx *Context) NewDeleteMessageReactionParams(
 ) *DeleteMessageReactionParams {
 	params := &DeleteMessageReactionParams{
 		ChatID:    ctx.chatTarget(),
-		MessageID: messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		MessageID: ctx.messageID(),
 		UserID:    ctx.userID(),
 	}
 
@@ -2154,7 +2253,7 @@ func (ctx *Context) NewEditMessageCaptionParams(
 	params := &EditMessageCaptionParams{
 		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:               ctx.chatTarget(),
-		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		MessageID:            ctx.messageID(),
 		InlineMessageID:      ctx.inlineMessageID(),
 	}
 
@@ -2200,7 +2299,7 @@ func (ctx *Context) NewEditMessageChecklistParams(
 	params := &EditMessageChecklistParams{
 		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:               ctx.chatTarget(),
-		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		MessageID:            ctx.messageID(),
 		Checklist:            checklist,
 	}
 
@@ -2242,7 +2341,7 @@ func (ctx *Context) NewEditMessageLiveLocationParams(
 	params := &EditMessageLiveLocationParams{
 		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:               ctx.chatTarget(),
-		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		MessageID:            ctx.messageID(),
 		InlineMessageID:      ctx.inlineMessageID(),
 		Latitude:             latitude,
 		Longitude:            longitude,
@@ -2289,7 +2388,7 @@ func (ctx *Context) NewEditMessageMediaParams(
 	params := &EditMessageMediaParams{
 		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:               ctx.chatTarget(),
-		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		MessageID:            ctx.messageID(),
 		InlineMessageID:      ctx.inlineMessageID(),
 		Media:                media,
 	}
@@ -2337,7 +2436,7 @@ func (ctx *Context) NewEditMessageReplyMarkupParams(
 	params := &EditMessageReplyMarkupParams{
 		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:               ctx.chatTarget(),
-		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		MessageID:            ctx.messageID(),
 		InlineMessageID:      ctx.inlineMessageID(),
 	}
 
@@ -2377,7 +2476,7 @@ func (ctx *Context) NewEditMessageTextParams(
 	params := &EditMessageTextParams{
 		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:               ctx.chatTarget(),
-		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		MessageID:            ctx.messageID(),
 		InlineMessageID:      ctx.inlineMessageID(),
 		Text:                 text,
 	}
@@ -2427,7 +2526,7 @@ func (ctx *Context) NewEditMessageTextWithRichMessageParams(
 	params := &EditMessageTextParams{
 		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:               ctx.chatTarget(),
-		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		MessageID:            ctx.messageID(),
 		InlineMessageID:      ctx.inlineMessageID(),
 		RichMessage:          richMessage,
 	}
@@ -2461,6 +2560,83 @@ func (ctx *Context) EditMessageTextWithRichMessage(
 	)
 
 	_, err := ctx.client.EditMessageText(ctx.Detached(), params)
+
+	return err
+}
+
+// NewEditMessageWidgetDataParams builds EditMessageWidgetDataParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.EditMessageWidgetData is needed:
+//
+//	ret, err := ctx.Client().EditMessageWidgetData(ctx.Detached(), ctx.NewEditMessageWidgetDataParams(...))
+func (ctx *Context) NewEditMessageWidgetDataParams(
+	opts ...EditMessageWidgetDataOption,
+) *EditMessageWidgetDataParams {
+	params := &EditMessageWidgetDataParams{
+		ChatID:          ctx.chatTarget(),
+		MessageID:       ctx.messageID(),
+		InlineMessageID: ctx.inlineMessageID(),
+	}
+
+	params.Option(opts...)
+
+	return params
+}
+
+// EditMessageWidgetData calls Client.EditMessageWidgetData with context-derived defaults.
+//
+// Use this method to edit data of a widget in a message sent by the bot or via the bot (for inline bots).
+// Public data of a shared widget can be changed at most once per second.
+// On success, True is returned.
+func (ctx *Context) EditMessageWidgetData(
+	opts ...EditMessageWidgetDataOption,
+) error {
+	params := ctx.NewEditMessageWidgetDataParams(
+		opts...,
+	)
+
+	_, err := ctx.client.EditMessageWidgetData(ctx.Detached(), params)
+
+	return err
+}
+
+// NewEditSharedWidgetDataParams builds EditSharedWidgetDataParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.EditSharedWidgetData is needed:
+//
+//	ret, err := ctx.Client().EditSharedWidgetData(ctx.Detached(), ctx.NewEditSharedWidgetDataParams(...))
+func (ctx *Context) NewEditSharedWidgetDataParams(
+	widgetID string,
+	publicData string,
+	opts ...EditSharedWidgetDataOption,
+) *EditSharedWidgetDataParams {
+	params := &EditSharedWidgetDataParams{
+		WidgetID:   widgetID,
+		PublicData: publicData,
+	}
+
+	params.Option(opts...)
+
+	return params
+}
+
+// EditSharedWidgetData calls Client.EditSharedWidgetData with context-derived defaults.
+//
+// Use this method to edit public data of a shared widget created by the bot.
+// A shared widget can be edited at most once per second.
+// On success, True is returned.
+func (ctx *Context) EditSharedWidgetData(
+	widgetID string,
+	publicData string,
+	opts ...EditSharedWidgetDataOption,
+) error {
+	params := ctx.NewEditSharedWidgetDataParams(
+		widgetID,
+		publicData,
+		opts...,
+	)
+
+	_, err := ctx.client.EditSharedWidgetData(ctx.Detached(), params)
 
 	return err
 }
@@ -2603,7 +2779,7 @@ func (ctx *Context) NewForwardMessageParams(
 		ChatID:                ctx.chatTarget(),
 		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
-		MessageID:             messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		MessageID:             ctx.messageID(),
 		FromChatID:            fromChatID,
 	}
 
@@ -3032,6 +3208,40 @@ func (ctx *Context) GetChatMenuButton(
 	return err
 }
 
+// NewGetChatShareThemeBackdropsParams builds GetChatShareThemeBackdropsParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetChatShareThemeBackdrops is needed:
+//
+//	ret, err := ctx.Client().GetChatShareThemeBackdrops(ctx.Detached(), ctx.NewGetChatShareThemeBackdropsParams(...))
+func (ctx *Context) NewGetChatShareThemeBackdropsParams(
+	opts ...GetChatShareThemeBackdropsOption,
+) *GetChatShareThemeBackdropsParams {
+	params := &GetChatShareThemeBackdropsParams{}
+
+	params.Option(opts...)
+
+	return params
+}
+
+// GetChatShareThemeBackdrops calls Client.GetChatShareThemeBackdrops with context-derived defaults.
+//
+// Use this method to get the list of backdrops, which can be used as the background of a theme of the screen for sharing a link to a user or a chat.
+// Requires no parameters.
+// Returns a [ChatShareThemeBackdrops] object.
+//
+// [ChatShareThemeBackdrops]: https://core.telegram.org/bots/api#chatsharethemebackdrops
+func (ctx *Context) GetChatShareThemeBackdrops(
+	opts ...GetChatShareThemeBackdropsOption,
+) error {
+	params := ctx.NewGetChatShareThemeBackdropsParams(
+		opts...,
+	)
+
+	_, err := ctx.client.GetChatShareThemeBackdrops(ctx.Detached(), params)
+
+	return err
+}
+
 // NewGetCustomEmojiStickersParams builds GetCustomEmojiStickersParams with context-derived defaults
 // (chat, thread, business connection, default parse mode) and applies opts.
 // Use it when the result of Client.GetCustomEmojiStickers is needed:
@@ -3160,7 +3370,7 @@ func (ctx *Context) NewGetGameHighScoresParams(
 	params := &GetGameHighScoresParams{
 		UserID:          ctx.userID(),
 		ChatID:          ctx.chatID(),
-		MessageID:       messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		MessageID:       ctx.messageID(),
 		InlineMessageID: ctx.inlineMessageID(),
 	}
 
@@ -3557,6 +3767,44 @@ func (ctx *Context) GetStickerSet(
 	)
 
 	_, err := ctx.client.GetStickerSet(ctx.Detached(), params)
+
+	return err
+}
+
+// NewGetUniqueGiftParams builds GetUniqueGiftParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.GetUniqueGift is needed:
+//
+//	ret, err := ctx.Client().GetUniqueGift(ctx.Detached(), ctx.NewGetUniqueGiftParams(...))
+func (ctx *Context) NewGetUniqueGiftParams(
+	name string,
+	opts ...GetUniqueGiftOption,
+) *GetUniqueGiftParams {
+	params := &GetUniqueGiftParams{
+		Name: name,
+	}
+
+	params.Option(opts...)
+
+	return params
+}
+
+// GetUniqueGift calls Client.GetUniqueGift with context-derived defaults.
+//
+// Use this method to get information about a unique gift by its name.
+// Returns a [UniqueGift] object on success.
+//
+// [UniqueGift]: https://core.telegram.org/bots/api#uniquegift
+func (ctx *Context) GetUniqueGift(
+	name string,
+	opts ...GetUniqueGiftOption,
+) error {
+	params := ctx.NewGetUniqueGiftParams(
+		name,
+		opts...,
+	)
+
+	_, err := ctx.client.GetUniqueGift(ctx.Detached(), params)
 
 	return err
 }
@@ -3969,7 +4217,7 @@ func (ctx *Context) NewPinChatMessageParams(
 	params := &PinChatMessageParams{
 		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:               ctx.chatTarget(),
-		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		MessageID:            ctx.messageID(),
 	}
 
 	params.Option(opts...)
@@ -4092,7 +4340,7 @@ func (ctx *Context) NewReadBusinessMessageParams(
 	params := &ReadBusinessMessageParams{
 		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:               ctx.chatID(),
-		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		MessageID:            ctx.messageID(),
 	}
 
 	params.Option(opts...)
@@ -5629,6 +5877,53 @@ func (ctx *Context) SendRichMessageDraft(
 	return err
 }
 
+// NewSendSharedWidgetParams builds SendSharedWidgetParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendSharedWidget is needed:
+//
+//	ret, err := ctx.Client().SendSharedWidget(ctx.Detached(), ctx.NewSendSharedWidgetParams(...))
+func (ctx *Context) NewSendSharedWidgetParams(
+	widgetID string,
+	opts ...SendSharedWidgetOption,
+) *SendSharedWidgetParams {
+	params := &SendSharedWidgetParams{
+		ChatID:          ctx.chatTarget(),
+		MessageThreadID: messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		WidgetID:        widgetID,
+	}
+
+	params.Option(opts...)
+
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
+			params.ParseMode = defaultParseMode
+		}
+	}
+
+	return params
+}
+
+// SendSharedWidget calls Client.SendSharedWidget with context-derived defaults.
+//
+// Use this method to send again a shared widget created by the bot.
+// Currently, in the production environment, widgets can be sent only to private chats, and sent widgets automatically have protected content and therefore can't be forwarded.
+// On success, the sent [Message] is returned.
+//
+// [Message]: https://core.telegram.org/bots/api#message
+func (ctx *Context) SendSharedWidget(
+	widgetID string,
+	opts ...SendSharedWidgetOption,
+) error {
+	params := ctx.NewSendSharedWidgetParams(
+		widgetID,
+		opts...,
+	)
+
+	_, err := ctx.client.SendSharedWidget(ctx.Detached(), params)
+
+	return err
+}
+
 // NewSendStickerParams builds SendStickerParams with context-derived defaults
 // (chat, thread, business connection, default parse mode) and applies opts.
 // Use it when the result of Client.SendSticker is needed:
@@ -5867,6 +6162,54 @@ func (ctx *Context) SendVoice(
 	)
 
 	_, err := ctx.client.SendVoice(ctx.Detached(), params)
+
+	return err
+}
+
+// NewSendWidgetParams builds SendWidgetParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SendWidget is needed:
+//
+//	ret, err := ctx.Client().SendWidget(ctx.Detached(), ctx.NewSendWidgetParams(...))
+func (ctx *Context) NewSendWidgetParams(
+	html string,
+	opts ...SendWidgetOption,
+) *SendWidgetParams {
+	params := &SendWidgetParams{
+		ChatID:          ctx.chatTarget(),
+		MessageThreadID: messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		Html:            html,
+	}
+
+	params.Option(opts...)
+
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+		if params.ParseMode == "" && len(params.CaptionEntities) == 0 {
+			params.ParseMode = defaultParseMode
+		}
+	}
+
+	return params
+}
+
+// SendWidget calls Client.SendWidget with context-derived defaults.
+//
+// Use this method to send a message with an [HTML widget].
+// Currently, in the production environment, widgets can be sent only to private chats, and sent widgets automatically have protected content and therefore can't be forwarded.
+// On success, the sent [Message] is returned.
+//
+// [HTML widget]: https://core.telegram.org/bots/widgets
+// [Message]: https://core.telegram.org/bots/api#message
+func (ctx *Context) SendWidget(
+	html string,
+	opts ...SendWidgetOption,
+) error {
+	params := ctx.NewSendWidgetParams(
+		html,
+		opts...,
+	)
+
+	_, err := ctx.client.SendWidget(ctx.Detached(), params)
 
 	return err
 }
@@ -6402,7 +6745,7 @@ func (ctx *Context) NewSetGameScoreParams(
 	params := &SetGameScoreParams{
 		UserID:          ctx.userID(),
 		ChatID:          ctx.chatID(),
-		MessageID:       messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		MessageID:       ctx.messageID(),
 		InlineMessageID: ctx.inlineMessageID(),
 		Score:           score,
 	}
@@ -6480,7 +6823,7 @@ func (ctx *Context) NewSetMessageReactionParams(
 ) *SetMessageReactionParams {
 	params := &SetMessageReactionParams{
 		ChatID:    ctx.chatTarget(),
-		MessageID: messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		MessageID: ctx.messageID(),
 	}
 
 	params.Option(opts...)
@@ -7076,7 +7419,7 @@ func (ctx *Context) NewStopMessageLiveLocationParams(
 	params := &StopMessageLiveLocationParams{
 		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:               ctx.chatTarget(),
-		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		MessageID:            ctx.messageID(),
 		InlineMessageID:      ctx.inlineMessageID(),
 	}
 
@@ -7114,7 +7457,7 @@ func (ctx *Context) NewStopPollParams(
 	params := &StopPollParams{
 		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:               ctx.chatTarget(),
-		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		MessageID:            ctx.messageID(),
 	}
 
 	params.Option(opts...)
@@ -7447,7 +7790,7 @@ func (ctx *Context) NewUnpinChatMessageParams(
 	params := &UnpinChatMessageParams{
 		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:               ctx.chatTarget(),
-		MessageID:            messageField(ctx, func(m *Message) int64 { return m.MessageID }),
+		MessageID:            ctx.messageID(),
 	}
 
 	params.Option(opts...)
@@ -7572,6 +7915,9 @@ func (ctx *Context) NewVerifyChatParams(
 
 	params.Option(opts...)
 
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+	}
+
 	return params
 }
 
@@ -7606,6 +7952,9 @@ func (ctx *Context) NewVerifyUserParams(
 	}
 
 	params.Option(opts...)
+
+	if defaultParseMode := ctx.client.defaultParseMode(); defaultParseMode != "" {
+	}
 
 	return params
 }

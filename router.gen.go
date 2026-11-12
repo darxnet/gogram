@@ -20,6 +20,8 @@ const (
 	handleOnInlineQuery
 	handleOnChosenInlineResult
 	handleOnCallbackQuery
+	handleOnWidgetQuery
+	handleOnSharedWidgetQuery
 	handleOnShippingQuery
 	handleOnPreCheckoutQuery
 	handleOnPurchasedPaidMedia
@@ -160,6 +162,24 @@ func (rg *RouterGroup) HandleOnCallbackQuery(handler func(*Context, *CallbackQue
 	}
 
 	rg.handleOn(handleOnCallbackQuery, fn, filters...)
+}
+
+// HandleOnWidgetQuery registers a handler for updates containing WidgetQuery.
+func (rg *RouterGroup) HandleOnWidgetQuery(handler func(*Context, *WidgetQuery) error, filters ...Filter) {
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().WidgetQuery)
+	}
+
+	rg.handleOn(handleOnWidgetQuery, fn, filters...)
+}
+
+// HandleOnSharedWidgetQuery registers a handler for updates containing SharedWidgetQuery.
+func (rg *RouterGroup) HandleOnSharedWidgetQuery(handler func(*Context, *SharedWidgetQuery) error, filters ...Filter) {
+	fn := func(ctx *Context) error {
+		return handler(ctx, ctx.Update().SharedWidgetQuery)
+	}
+
+	rg.handleOn(handleOnSharedWidgetQuery, fn, filters...)
 }
 
 // HandleOnShippingQuery registers a handler for updates containing ShippingQuery.

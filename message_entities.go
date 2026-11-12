@@ -16,6 +16,10 @@ const (
 	MessageEntityEmail = "email"
 	// MessageEntityPhoneNumber represents a phone number (e.g., +1-212-555-0123).
 	MessageEntityPhoneNumber = "phone_number"
+	// MessageEntityBankCardNumber represents a bank card number.
+	MessageEntityBankCardNumber = "bank_card_number"
+	// MessageEntityTonAddress represents an address in the TON blockchain.
+	MessageEntityTonAddress = "ton_address"
 	// MessageEntityBold represents bold text.
 	MessageEntityBold = "bold"
 	// MessageEntityItalic represents italic text.
@@ -40,4 +44,6 @@ const (
 	MessageEntityTextMention = "text_mention"
 	// MessageEntityCustomEmoji represents an inline custom emoji sticker.
 	MessageEntityCustomEmoji = "custom_emoji"
+	// MessageEntityDateTime represents a formatted date and time.
+	MessageEntityDateTime = "date_time"
 )
