@@ -33,7 +33,7 @@ func (c *Client) ReceiveFileReader(ctx context.Context, file *File) (io.ReadClos
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, link, http.NoBody)
 	if err != nil {
-		return nil, fmt.Errorf("gogram: failed to create request: %w", err)
+		return nil, fmt.Errorf("gogram: failed to create request: %w", c.redact(err))
 	}
 
 	resp, err := c.do(req)

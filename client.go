@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptrace"
+	"net/url"
 	"slices"
 	"strconv"
 	"strings"
@@ -316,7 +317,32 @@ func (c *Client) do(req *http.Request) (*http.Response, error) {
 		return nil, err
 	}
 
-	return c.cfg.httpClient.Do(req) //nolint:gosec // G107: client can send request to user-defined hosts
+	resp, err := c.cfg.httpClient.Do(req) //nolint:gosec // G107: client can send request to user-defined hosts
+	if err != nil {
+		return nil, c.redact(err)
+	}
+
+	return resp, nil
+}
+
+// redactedToken replaces the bot token in errors that carry a request URL.
+const redactedToken = "<token>"
+
+// redact removes the bot token from the URL inside err: the token is part
+// of every request URL ("/bot<token>/method"), and *url.Error prints that
+// URL, so a network error would otherwise put the token into logs and
+// error handlers.
+func (c *Client) redact(err error) error {
+	if c.token == "" {
+		return err
+	}
+
+	var ue *url.Error
+	if errors.As(err, &ue) {
+		ue.URL = strings.ReplaceAll(ue.URL, c.token, redactedToken)
+	}
+
+	return err
 }
 
 // Call invokes a Bot API method with params encoded as JSON and decodes
