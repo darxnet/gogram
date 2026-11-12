@@ -116,7 +116,7 @@ func (ctx *Context) Payload() string {
     {{ $option := print $method "Option" }}
     {{- $allParams := .Params }}
     {{- $desc := .Desc }}
-    {{- $isAnswerCallback := eq .Name "answerCallbackQuery" }}
+    {{- $isAnswerCallback := or (eq .Name "answerCallbackQuery") (eq .Name "answerWidgetQuery") }}
     {{- $parseModeName := "" }}
     {{- $entitiesName := "" }}
     {{- $inputMediaName := "" }}

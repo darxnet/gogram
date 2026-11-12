@@ -3,11 +3,15 @@ package gogram
 import (
 	"context"
 	"errors"
+	"strconv"
 )
 
 // ErrInvalidStartParam indicates a deep-link parameter outside
 // 1–64 characters of A-Z, a-z, 0-9, _ and -.
 var ErrInvalidStartParam = errors.New("gogram: invalid start parameter")
+
+// ErrInvalidThreadID indicates a topic link requested for a thread id below 1.
+var ErrInvalidThreadID = errors.New("gogram: invalid message thread id")
 
 // StartLink returns a deep link that opens a private chat with the bot and
 // sends "/start param": https://t.me/<bot>?start=<param>. An empty param
@@ -22,6 +26,22 @@ func (c *Client) StartLink(ctx context.Context, param string) (string, error) {
 // to a group and sends "/start param" there: https://t.me/<bot>?startgroup=<param>.
 func (c *Client) StartGroupLink(ctx context.Context, param string) (string, error) {
 	return c.deepLink(ctx, "?startgroup=", param)
+}
+
+// TopicLink returns a link to a topic in a private chat with the bot:
+// https://t.me/<bot>/<threadID>. It opens the topic only for the user whose
+// private chat contains it. The bot's username comes from [Client.Me].
+func (c *Client) TopicLink(ctx context.Context, threadID int64) (string, error) {
+	if threadID < 1 {
+		return "", ErrInvalidThreadID
+	}
+
+	me, err := c.Me(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	return "https://t.me/" + me.Username + "/" + strconv.FormatInt(threadID, 10), nil
 }
 
 func (c *Client) deepLink(ctx context.Context, query, param string) (string, error) {

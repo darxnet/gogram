@@ -44,7 +44,7 @@ type Context struct {
 	// Per-update memos: computed on first use, dropped on release.
 	detachedCtx context.Context // context without cancellation for API calls
 	fsm         fsmMemo
-	answered    bool // AnswerCallbackQuery was called, see AutoAnswer
+	answered    bool // AnswerCallbackQuery or AnswerWidgetQuery was called, see AutoAnswer
 }
 
 // Detached returns ctx without cancellation but with its values, so API calls
@@ -96,10 +96,32 @@ func (ctx *Context) directMessagesTopicID() int64 {
 	return 0
 }
 
-// inlineMessageID returns the inline message the callback query refers to, or "".
+// messageID returns Message().MessageID or, for a widget query, the
+// message containing the widget; 0 when there is neither.
+func (ctx *Context) messageID() int64 {
+	if m := ctx.Message(); m != nil {
+		return m.MessageID
+	}
+
+	if ctx.update != nil && ctx.update.WidgetQuery != nil {
+		return ctx.update.WidgetQuery.MessageID
+	}
+
+	return 0
+}
+
+// inlineMessageID returns the inline message the callback or widget query
+// refers to, or "".
 func (ctx *Context) inlineMessageID() string {
-	if ctx.update != nil && ctx.update.CallbackQuery != nil {
+	if ctx.update == nil {
+		return ""
+	}
+
+	switch {
+	case ctx.update.CallbackQuery != nil:
 		return ctx.update.CallbackQuery.InlineMessageID
+	case ctx.update.WidgetQuery != nil:
+		return ctx.update.WidgetQuery.InlineMessageID
 	}
 
 	return ""

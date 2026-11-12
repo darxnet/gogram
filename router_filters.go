@@ -251,3 +251,48 @@ func FilterCallbackPrefix(prefix string) Filter {
 			len(cq.Data) > len(prefix) && cq.Data[len(prefix)] == ' ' && cq.Data[:len(prefix)] == prefix
 	}
 }
+
+// widgetQueryType returns the type of the widget or shared widget query, or nil.
+func widgetQueryType(ctx *Context) *WidgetQueryType {
+	switch u := ctx.Update(); {
+	case u == nil:
+		return nil
+	case u.WidgetQuery != nil:
+		return &u.WidgetQuery.Type
+	case u.SharedWidgetQuery != nil:
+		return &u.SharedWidgetQuery.Type
+	}
+
+	return nil
+}
+
+// FilterWidgetQueryData matches widget and shared widget queries carrying
+// data for the bot (WidgetQueryTypeData).
+func FilterWidgetQueryData() Filter {
+	return func(ctx *Context) bool {
+		t := widgetQueryType(ctx)
+
+		return t != nil && t.WidgetQueryTypeData != nil
+	}
+}
+
+// FilterWidgetQuerySignData matches widget and shared widget queries with
+// data signed by the user's TON wallet (WidgetQueryTypeSignData).
+func FilterWidgetQuerySignData() Filter {
+	return func(ctx *Context) bool {
+		t := widgetQueryType(ctx)
+
+		return t != nil && t.WidgetQueryTypeSignData != nil
+	}
+}
+
+// FilterWidgetQuerySentTransaction matches widget and shared widget queries
+// reporting a transaction sent from the user's TON wallet
+// (WidgetQueryTypeSentTransaction).
+func FilterWidgetQuerySentTransaction() Filter {
+	return func(ctx *Context) bool {
+		t := widgetQueryType(ctx)
+
+		return t != nil && t.WidgetQueryTypeSentTransaction != nil
+	}
+}
