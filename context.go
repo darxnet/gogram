@@ -87,6 +87,19 @@ func (ctx *Context) userID() int64 {
 	return 0
 }
 
+// messageThreadID returns the forum topic of the current message, or 0.
+// Telegram also sets message_thread_id on replies in groups without
+// topics (and keeps it after topics are turned off), but sending to such
+// a thread fails with "message thread not found", so only a message in a
+// topic (is_topic_message) passes its thread on.
+func (ctx *Context) messageThreadID() int64 {
+	if m := ctx.Message(); m != nil && m.IsTopicMessage {
+		return m.MessageThreadID
+	}
+
+	return 0
+}
+
 // directMessagesTopicID returns the direct messages topic of the current message, or 0.
 func (ctx *Context) directMessagesTopicID() int64 {
 	if m := ctx.Message(); m != nil && m.DirectMessagesTopic != nil {
