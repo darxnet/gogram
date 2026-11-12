@@ -2,7 +2,7 @@ package gogram
 
 import "time"
 
-// Payload extracts the payload from the message text (string after the first space).
+// Payload extracts the payload from the message text (string after the first space or line break).
 func (m *Message) Payload() string {
 	return extractPayload(m.Text)
 }

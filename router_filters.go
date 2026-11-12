@@ -97,14 +97,15 @@ func FilterPrefix(prefix string) Filter {
 }
 
 // FilterCommand creates a filter that matches a command.
-// It supports commands with arguments and bot mentions (e.g., /command, /command@bot, /command arg).
+// It supports commands with arguments and bot mentions (e.g., /command, /command@this_bot, /command arg);
+// a command addressed to another bot (/command@other_bot) does not match.
 func FilterCommand(s string) Filter {
 	if s != "" && s[0] != '/' {
 		s = "/" + s
 	}
 
 	return func(ctx *Context) bool {
-		return s != "" && retrieveCommand(ctx.Text()) == s
+		return s != "" && currentCommand(ctx) == s
 	}
 }
 

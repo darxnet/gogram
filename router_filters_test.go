@@ -9,7 +9,8 @@ import (
 func TestFilters(t *testing.T) {
 	t.Parallel()
 
-	client, err := gogram.NewClient(testToken)
+	client, err := gogram.NewClient(testToken,
+		gogram.WithCaller(cannedCaller(`{"id":1,"is_bot":true,"first_name":"b","username":"bot"}`)))
 	if err != nil {
 		t.Fatal(err)
 	}

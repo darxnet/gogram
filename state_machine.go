@@ -170,10 +170,22 @@ func invalidateState(ctx context.Context) {
 // FSM returns a state machine controller for the current context, backed
 // by the client's state store, see [WithStateStore].
 // The ok result is false when the update carries no user.
+//
+// The state belongs to the sender in the chat. For a message sent on behalf
+// of a chat (an anonymous group administrator, a user writing as a channel,
+// an automatic forward from a linked channel) the sender is that chat: all
+// such messages come from one service user (GroupAnonymousBot, Channel_Bot),
+// whose id would put every one of them in the same state. Callback queries
+// always come from the user who pressed the button.
 func (ctx *Context) FSM() (f FSM, ok bool) {
 	user := ctx.User()
 	if user == nil {
 		return FSM{}, false
+	}
+
+	senderID := user.ID
+	if id := ctx.senderChatID(); id != 0 {
+		senderID = id
 	}
 
 	// A chat is not always present (e.g., inline query), use 0 as a placeholder.
@@ -182,7 +194,21 @@ func (ctx *Context) FSM() (f FSM, ok bool) {
 		chatID = chat.ID
 	}
 
-	return FSM{store: ctx.client.cfg.store, userID: user.ID, chatID: chatID}, true
+	return FSM{store: ctx.client.cfg.store, userID: senderID, chatID: chatID}, true
+}
+
+// senderChatID returns the chat a message was sent on behalf of, or 0. The
+// message of a callback query is the bot's, not the presser's, so it is skipped.
+func (ctx *Context) senderChatID() int64 {
+	if ctx.update == nil || ctx.update.CallbackQuery != nil {
+		return 0
+	}
+
+	if m := ctx.Message(); m != nil && m.SenderChat != nil {
+		return m.SenderChat.ID
+	}
+
+	return 0
 }
 
 // fsmMemo caches the state looked up while routing one update, so N

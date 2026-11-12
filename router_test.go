@@ -258,7 +258,8 @@ func TestFilterComposition(t *testing.T) {
 // TestFilterCommand tests the command filter with various formats.
 func TestFilterCommand(t *testing.T) {
 	t.Parallel()
-	client, err := gogram.NewClient(testToken)
+	client, err := gogram.NewClient(testToken,
+		gogram.WithCaller(cannedCaller(`{"id":1,"is_bot":true,"first_name":"b","username":"my_bot"}`)))
 	if err != nil {
 		t.Fatalf("NewClient: %v", err)
 	}
@@ -272,6 +273,10 @@ func TestFilterCommand(t *testing.T) {
 		{"ExactMatch", "/start", true},
 		{"WithArgs", "/start payload", true},
 		{"WithBotName", "/start@my_bot payload", true},
+		{"WithBotNameOtherCase", "/start@My_Bot", true},
+		{"OtherBot", "/start@other_bot payload", false},
+		{"LineBreak", "/start\npayload", true},
+		{"Tab", "/start\tpayload", true},
 		{"WrongCommand", "/stop", false},
 		{"NotACommand", "start", false},
 		{"PrefixOfOther", "/startagain", false},
