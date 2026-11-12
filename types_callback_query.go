@@ -1,6 +1,6 @@
 package gogram
 
-// Payload extracts the payload from the callback data (string after the first space).
+// Payload extracts the payload from the callback data (string after the first space or line break).
 func (cq *CallbackQuery) Payload() string {
 	return extractPayload(cq.Data)
 }

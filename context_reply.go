@@ -16,9 +16,11 @@ func (ctx *Context) Reply(text string, opts ...SendMessageOption) error {
 }
 
 // Command returns the bot command of the current message ("/start" for
-// "/start@bot payload"), or "" when the message is not a command.
+// "/start@this_bot payload"), or "" when the message is not a command or
+// the command is addressed to another bot ("/start@other_bot"), as in a
+// group with several bots.
 func (ctx *Context) Command() string {
-	return retrieveCommand(ctx.Text())
+	return currentCommand(ctx)
 }
 
 // Args returns the space-separated arguments after the command or first
