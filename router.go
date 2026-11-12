@@ -76,23 +76,79 @@ func (r *Router) HandlePanic(ctx *Context, v any) {
 	}
 }
 
-// retrieveCommand extracts the command name from a message text.
+// splitCommand splits the leading bot command of a message text into its
+// name and the bot username it is addressed to ("" without a @suffix).
+// The command ends at the first whitespace, a line break included:
 //
-//	"/start"           → "/start"
-//	"/start payload"   → "/start"
-//	"/start@bot"       → "/start"
-func retrieveCommand(text string) string {
+//	"/start"              → "/start", ""
+//	"/start payload"      → "/start", ""
+//	"/start\npayload"     → "/start", ""
+//	"/start@bot payload"  → "/start", "bot"
+func splitCommand(text string) (command, bot string) {
 	if text == "" || text[0] != '/' {
-		return ""
+		return "", ""
 	}
 
+	end := len(text)
+
 	for i := 1; i < len(text); i++ {
-		if c := text[i]; c == ' ' || c == '@' {
-			return text[:i]
+		if isSpace(text[i]) {
+			end = i
+
+			break
 		}
 	}
 
-	return text
+	command = text[:end]
+
+	if at := strings.IndexByte(command, '@'); at >= 0 {
+		return command[:at], command[at+1:]
+	}
+
+	return command, ""
+}
+
+// retrieveCommand returns the command name of a message text, whoever it
+// is addressed to; see [Context.Command] for the routing rule.
+func retrieveCommand(text string) string {
+	command, _ := splitCommand(text)
+
+	return command
+}
+
+// isSpace reports whether b ends a command or its payload word.
+func isSpace(b byte) bool {
+	return b == ' ' || b == '\n' || b == '\t' || b == '\r'
+}
+
+// currentCommand returns the command of the current message, or "" when there is
+// none or it is addressed to another bot ("/start@other_bot").
+func currentCommand(ctx *Context) string {
+	command, bot := splitCommand(ctx.Text())
+	if bot != "" && !addressedToMe(ctx, bot) {
+		return ""
+	}
+
+	return command
+}
+
+// addressedToMe reports whether bot is this bot's username. The username
+// comes from [Client.Me], fetched once on the first @-addressed command;
+// when it cannot be fetched the command is accepted, as before the check.
+func addressedToMe(ctx *Context, bot string) bool {
+	if ctx.client == nil {
+		return true
+	}
+
+	me := ctx.client.info.me.Load()
+	if me == nil {
+		var err error
+		if me, err = ctx.client.Me(ctx.context); err != nil {
+			return true
+		}
+	}
+
+	return me.Username == "" || strings.EqualFold(bot, me.Username)
 }
 
 // Process processes an update.
@@ -105,7 +161,7 @@ func (r *Router) Process(ctx *Context) {
 
 	// fast path: command map lookup.
 	if len(r.handlersCommands) != 0 && (1<<on)&commandHandlersMask != 0 {
-		if command := retrieveCommand(ctx.Text()); command != "" {
+		if command := currentCommand(ctx); command != "" {
 			if routes, ok := r.handlersCommands[command]; ok {
 				for i := range routes {
 					if routes[i].filter(ctx) {
@@ -305,17 +361,26 @@ func (r *Router) BotCommands() []BotCommand {
 	return slices.Clone(r.commands)
 }
 
-// AutoAnswer returns a middleware that answers a callback query after its
-// handler returns, unless the handler already answered it through
-// [Context.AnswerCallbackQuery]. Without an answer Telegram keeps the
-// button's loading spinner for up to a minute.
+// AutoAnswer returns a middleware that answers a callback or widget query
+// after its handler returns, unless the handler already answered it through
+// [Context.AnswerCallbackQuery] or [Context.AnswerWidgetQuery]. Without an
+// answer Telegram keeps the button's loading spinner for up to a minute;
+// a widget query must be answered within 15 seconds. An ephemeral reply
+// ([Context.ReplyEphemeral]) does not answer the callback query.
 func AutoAnswer() MiddlewareFunc {
 	return func(next HandlerFunc) HandlerFunc {
 		return func(ctx *Context) error {
 			err := next(ctx)
 
-			if ctx.update != nil && ctx.update.CallbackQuery != nil && !ctx.answered {
+			if ctx.update == nil || ctx.answered {
+				return err
+			}
+
+			switch {
+			case ctx.update.CallbackQuery != nil:
 				err = errors.Join(err, ctx.AnswerCallbackQuery())
+			case ctx.update.WidgetQuery != nil:
+				err = errors.Join(err, ctx.AnswerWidgetQuery())
 			}
 
 			return err

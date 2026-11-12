@@ -12,10 +12,15 @@ func extractArgs(text string) []string {
 	return fields[1:]
 }
 
-// extractPayload returns the substring after the first space.
+// extractPayload returns the substring after the first space, tab or line break.
 func extractPayload(text string) string {
-	_, after, _ := strings.Cut(text, " ")
-	return after
+	for i := range len(text) {
+		if isSpace(text[i]) {
+			return text[i+1:]
+		}
+	}
+
+	return ""
 }
 
 // LargestPhoto returns the PhotoSize with the largest area, or nil for an

@@ -292,6 +292,44 @@ func Callback(chatID int64, data string) *gogram.Update {
 	}
 }
 
+// WidgetQuery returns an update with a data query from a widget in a
+// message in a private chat with chatID.
+func WidgetQuery(chatID int64, data string) *gogram.Update {
+	updateID, messageID := ids()
+	chat := PrivateChat
+	chat.ID = chatID
+
+	return &gogram.Update{
+		UpdateID: updateID,
+		WidgetQuery: &gogram.WidgetQuery{
+			ID:           fmt.Sprintf("wq%d", updateID),
+			From:         User,
+			Chat:         &chat,
+			MessageID:    messageID,
+			ChatInstance: fmt.Sprintf("ci%d", chatID),
+			Type:         gogram.WidgetQueryType{WidgetQueryTypeData: &gogram.WidgetQueryTypeData{Type: "data"}},
+			Data:         data,
+		},
+	}
+}
+
+// SharedWidgetQuery returns an update with a data query from a forwarded
+// message with the shared widget widgetID.
+func SharedWidgetQuery(widgetID, data string) *gogram.Update {
+	updateID, _ := ids()
+
+	return &gogram.Update{
+		UpdateID: updateID,
+		SharedWidgetQuery: &gogram.SharedWidgetQuery{
+			ID:       fmt.Sprintf("swq%d", updateID),
+			From:     User,
+			Type:     gogram.WidgetQueryType{WidgetQueryTypeData: &gogram.WidgetQueryTypeData{Type: "data"}},
+			Data:     data,
+			WidgetID: widgetID,
+		},
+	}
+}
+
 // commandEntities marks a leading "/command" as a bot_command entity, as Telegram does.
 func commandEntities(text string) []gogram.MessageEntity {
 	if text == "" || text[0] != '/' {

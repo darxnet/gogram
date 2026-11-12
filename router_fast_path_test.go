@@ -19,7 +19,8 @@ func TestRouter_HandleCommand_FastPath(t *testing.T) {
 		return nil
 	})
 
-	client, err := gogram.NewClient(testToken)
+	client, err := gogram.NewClient(testToken,
+		gogram.WithCaller(cannedCaller(`{"id":1,"is_bot":true,"first_name":"b","username":"bot"}`)))
 	if err != nil {
 		t.Fatalf("NewClient: %v", err)
 	}
