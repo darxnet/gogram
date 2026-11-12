@@ -2,6 +2,7 @@ package gogram
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -32,6 +33,14 @@ func TestWebhookHandler_QueuesAndAnswersImmediately(t *testing.T) {
 		return nil
 	})
 
+	reported := make(chan *UndecodableUpdateError, 1)
+	router.SetHandlerErr(func(_ *Context, err error) {
+		var skipped *UndecodableUpdateError
+		if errors.As(err, &skipped) {
+			reported <- skipped
+		}
+	})
+
 	client, err := NewClient("1:a", WithRouter(router))
 	if err != nil {
 		t.Fatal(err)
@@ -59,6 +68,16 @@ func TestWebhookHandler_QueuesAndAnswersImmediately(t *testing.T) {
 
 	if rec := post(`not json`, "secret"); rec.Code != http.StatusBadRequest {
 		t.Fatalf("bad json: %d", rec.Code)
+	}
+
+	// Valid JSON of an unexpected shape is reported and accepted, or
+	// Telegram would redeliver it forever.
+	if rec := post(`{"update_id":5,"message":{"message_id":"oops"}}`, "secret"); rec.Code != http.StatusOK {
+		t.Fatalf("undecodable update: %d", rec.Code)
+	}
+
+	if skipped := <-reported; skipped.UpdateID != 5 {
+		t.Fatalf("reported = %+v", skipped)
 	}
 
 	answered := time.Now()
