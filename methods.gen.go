@@ -16928,7 +16928,7 @@ func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Mes
 			}
 		}
 
-		{
+		if params.ExplanationMedia != nil {
 			switch {
 			case params.ExplanationMedia.InputMediaAnimation != nil:
 				err = createFormFileFromInputFile(ctx, writer, body, &params.ExplanationMedia.InputMediaAnimation.Media, "explanation_media_animation_media")
@@ -17061,7 +17061,7 @@ func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Mes
 			}
 		}
 
-		{
+		if params.Media != nil {
 			switch {
 			case params.Media.InputMediaAnimation != nil:
 				err = createFormFileFromInputFile(ctx, writer, body, &params.Media.InputMediaAnimation.Media, "media_animation_media")

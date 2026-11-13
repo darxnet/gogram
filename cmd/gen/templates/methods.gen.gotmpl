@@ -110,7 +110,7 @@ import (
                     }
                 {{- else }}
                     {{- $uploadCode := .FileUploadCode $root.Types }}
-                    {{ if and (not $uploadCode) (not .IsRequired) }}
+                    {{ if and (not .IsRequired) (ne $goType "InputFile") }}
                         {{- if eq (slice $goType 0 2) "[]" }}
                             if len(params.{{ $goTitle }}) != 0
                         {{- else }}
