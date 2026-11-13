@@ -1,6 +1,7 @@
 package gogram
 
 import (
+	"bytes"
 	"context"
 	"crypto/subtle"
 	"encoding/json"
@@ -143,7 +144,16 @@ func (c *Client) webhookHandler(ctx context.Context, pool *workerPool, secretTok
 
 		update := new(Update)
 		if unmarshalErr := json.Unmarshal(buffer.B, update); unmarshalErr != nil {
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			if !json.Valid(buffer.B) {
+				http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+				return
+			}
+
+			// Valid JSON of an unexpected shape: Telegram would redeliver it
+			// after an error status forever, so it is reported and accepted.
+			c.reportError(ctx, newUndecodableUpdateError(bytes.Clone(buffer.B), unmarshalErr))
+			w.WriteHeader(http.StatusOK)
+
 			return
 		}
 

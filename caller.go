@@ -124,7 +124,7 @@ func (h httpCaller) roundTrip(ctx context.Context, req Request, result any) erro
 
 	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, c.cfg.linkPrefix+req.Method, req.Body)
 	if err != nil {
-		return err
+		return c.redact(err)
 	}
 
 	if req.ContentType == contentTypeJSON {

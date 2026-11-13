@@ -808,7 +808,7 @@ func (ctx *Context) NewCloseForumTopicParams(
 ) *CloseForumTopicParams {
 	params := &CloseForumTopicParams{
 		ChatID:          ctx.chatTarget(),
-		MessageThreadID: messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID: ctx.messageThreadID(),
 	}
 
 	params.Option(opts...)
@@ -916,7 +916,7 @@ func (ctx *Context) NewCopyMessageParams(
 ) *CopyMessageParams {
 	params := &CopyMessageParams{
 		ChatID:                ctx.chatTarget(),
-		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:       ctx.messageThreadID(),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
 		MessageID:             ctx.messageID(),
 		FromChatID:            fromChatID,
@@ -970,7 +970,7 @@ func (ctx *Context) NewCopyMessagesParams(
 ) *CopyMessagesParams {
 	params := &CopyMessagesParams{
 		ChatID:                ctx.chatTarget(),
-		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:       ctx.messageThreadID(),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
 		FromChatID:            fromChatID,
 		MessageIDs:            messageIDs,
@@ -1541,7 +1541,7 @@ func (ctx *Context) NewDeleteForumTopicParams(
 ) *DeleteForumTopicParams {
 	params := &DeleteForumTopicParams{
 		ChatID:          ctx.chatTarget(),
-		MessageThreadID: messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID: ctx.messageThreadID(),
 	}
 
 	params.Option(opts...)
@@ -2179,7 +2179,7 @@ func (ctx *Context) NewEditForumTopicParams(
 ) *EditForumTopicParams {
 	params := &EditForumTopicParams{
 		ChatID:          ctx.chatTarget(),
-		MessageThreadID: messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID: ctx.messageThreadID(),
 	}
 
 	params.Option(opts...)
@@ -2777,7 +2777,7 @@ func (ctx *Context) NewForwardMessageParams(
 ) *ForwardMessageParams {
 	params := &ForwardMessageParams{
 		ChatID:                ctx.chatTarget(),
-		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:       ctx.messageThreadID(),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
 		MessageID:             ctx.messageID(),
 		FromChatID:            fromChatID,
@@ -2821,7 +2821,7 @@ func (ctx *Context) NewForwardMessagesParams(
 ) *ForwardMessagesParams {
 	params := &ForwardMessagesParams{
 		ChatID:                ctx.chatTarget(),
-		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:       ctx.messageThreadID(),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
 		FromChatID:            fromChatID,
 		MessageIDs:            messageIDs,
@@ -4550,7 +4550,7 @@ func (ctx *Context) NewReopenForumTopicParams(
 ) *ReopenForumTopicParams {
 	params := &ReopenForumTopicParams{
 		ChatID:          ctx.chatTarget(),
-		MessageThreadID: messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID: ctx.messageThreadID(),
 	}
 
 	params.Option(opts...)
@@ -4913,7 +4913,7 @@ func (ctx *Context) NewSendAnimationParams(
 	params := &SendAnimationParams{
 		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:                ctx.chatTarget(),
-		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:       ctx.messageThreadID(),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
 		Animation:             animation,
 	}
@@ -4962,7 +4962,7 @@ func (ctx *Context) NewSendAudioParams(
 	params := &SendAudioParams{
 		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:                ctx.chatTarget(),
-		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:       ctx.messageThreadID(),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
 		Audio:                 audio,
 	}
@@ -5014,7 +5014,7 @@ func (ctx *Context) NewSendChatActionParams(
 	params := &SendChatActionParams{
 		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:               ctx.chatTarget(),
-		MessageThreadID:      messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:      ctx.messageThreadID(),
 		Action:               action,
 	}
 
@@ -5139,7 +5139,7 @@ func (ctx *Context) NewSendContactParams(
 	params := &SendContactParams{
 		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:                ctx.chatTarget(),
-		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:       ctx.messageThreadID(),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
 		PhoneNumber:           phoneNumber,
 		FirstName:             firstName,
@@ -5183,7 +5183,7 @@ func (ctx *Context) NewSendDiceParams(
 	params := &SendDiceParams{
 		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:                ctx.chatTarget(),
-		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:       ctx.messageThreadID(),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
 	}
 
@@ -5222,7 +5222,7 @@ func (ctx *Context) NewSendDocumentParams(
 	params := &SendDocumentParams{
 		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:                ctx.chatTarget(),
-		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:       ctx.messageThreadID(),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
 		Document:              document,
 	}
@@ -5271,7 +5271,7 @@ func (ctx *Context) NewSendGameParams(
 	params := &SendGameParams{
 		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:               ctx.chatTarget(),
-		MessageThreadID:      messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:      ctx.messageThreadID(),
 		GameShortName:        gameShortName,
 	}
 
@@ -5357,7 +5357,7 @@ func (ctx *Context) NewSendInvoiceParams(
 ) *SendInvoiceParams {
 	params := &SendInvoiceParams{
 		ChatID:                ctx.chatTarget(),
-		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:       ctx.messageThreadID(),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
 		Title:                 title,
 		Description:           description,
@@ -5412,7 +5412,7 @@ func (ctx *Context) NewSendLivePhotoParams(
 	params := &SendLivePhotoParams{
 		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:                ctx.chatTarget(),
-		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:       ctx.messageThreadID(),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
 		LivePhoto:             livePhoto,
 		Photo:                 photo,
@@ -5464,7 +5464,7 @@ func (ctx *Context) NewSendLocationParams(
 	params := &SendLocationParams{
 		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:                ctx.chatTarget(),
-		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:       ctx.messageThreadID(),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
 		Latitude:              latitude,
 		Longitude:             longitude,
@@ -5509,7 +5509,7 @@ func (ctx *Context) NewSendMediaGroupParams(
 	params := &SendMediaGroupParams{
 		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:                ctx.chatTarget(),
-		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:       ctx.messageThreadID(),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
 		Media:                 media,
 	}
@@ -5558,7 +5558,7 @@ func (ctx *Context) NewSendMessageParams(
 	params := &SendMessageParams{
 		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:                ctx.chatTarget(),
-		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:       ctx.messageThreadID(),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
 		Text:                  text,
 	}
@@ -5605,7 +5605,7 @@ func (ctx *Context) NewSendMessageDraftParams(
 ) *SendMessageDraftParams {
 	params := &SendMessageDraftParams{
 		ChatID:          ctx.chatID(),
-		MessageThreadID: messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID: ctx.messageThreadID(),
 		DraftID:         draftID,
 	}
 
@@ -5654,7 +5654,7 @@ func (ctx *Context) NewSendPaidMediaParams(
 	params := &SendPaidMediaParams{
 		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:                ctx.chatTarget(),
-		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:       ctx.messageThreadID(),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
 		StarCount:             starCount,
 		Media:                 media,
@@ -5705,7 +5705,7 @@ func (ctx *Context) NewSendPhotoParams(
 	params := &SendPhotoParams{
 		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:                ctx.chatTarget(),
-		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:       ctx.messageThreadID(),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
 		Photo:                 photo,
 	}
@@ -5754,7 +5754,7 @@ func (ctx *Context) NewSendPollParams(
 	params := &SendPollParams{
 		BusinessConnectionID: messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:               ctx.chatTarget(),
-		MessageThreadID:      messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:      ctx.messageThreadID(),
 		Question:             question,
 		Options:              options,
 	}
@@ -5801,7 +5801,7 @@ func (ctx *Context) NewSendRichMessageParams(
 	params := &SendRichMessageParams{
 		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:                ctx.chatTarget(),
-		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:       ctx.messageThreadID(),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
 		RichMessage:           richMessage,
 	}
@@ -5844,7 +5844,7 @@ func (ctx *Context) NewSendRichMessageDraftParams(
 ) *SendRichMessageDraftParams {
 	params := &SendRichMessageDraftParams{
 		ChatID:          ctx.chatID(),
-		MessageThreadID: messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID: ctx.messageThreadID(),
 		DraftID:         draftID,
 		RichMessage:     richMessage,
 	}
@@ -5888,7 +5888,7 @@ func (ctx *Context) NewSendSharedWidgetParams(
 ) *SendSharedWidgetParams {
 	params := &SendSharedWidgetParams{
 		ChatID:          ctx.chatTarget(),
-		MessageThreadID: messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID: ctx.messageThreadID(),
 		WidgetID:        widgetID,
 	}
 
@@ -5936,7 +5936,7 @@ func (ctx *Context) NewSendStickerParams(
 	params := &SendStickerParams{
 		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:                ctx.chatTarget(),
-		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:       ctx.messageThreadID(),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
 		Sticker:               sticker,
 	}
@@ -5983,7 +5983,7 @@ func (ctx *Context) NewSendVenueParams(
 	params := &SendVenueParams{
 		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:                ctx.chatTarget(),
-		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:       ctx.messageThreadID(),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
 		Latitude:              latitude,
 		Longitude:             longitude,
@@ -6034,7 +6034,7 @@ func (ctx *Context) NewSendVideoParams(
 	params := &SendVideoParams{
 		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:                ctx.chatTarget(),
-		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:       ctx.messageThreadID(),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
 		Video:                 video,
 	}
@@ -6084,7 +6084,7 @@ func (ctx *Context) NewSendVideoNoteParams(
 	params := &SendVideoNoteParams{
 		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:                ctx.chatTarget(),
-		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:       ctx.messageThreadID(),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
 		VideoNote:             videoNote,
 	}
@@ -6126,7 +6126,7 @@ func (ctx *Context) NewSendVoiceParams(
 	params := &SendVoiceParams{
 		BusinessConnectionID:  messageField(ctx, func(m *Message) string { return m.BusinessConnectionID }),
 		ChatID:                ctx.chatTarget(),
-		MessageThreadID:       messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID:       ctx.messageThreadID(),
 		DirectMessagesTopicID: ctx.directMessagesTopicID(),
 		Voice:                 voice,
 	}
@@ -6177,7 +6177,7 @@ func (ctx *Context) NewSendWidgetParams(
 ) *SendWidgetParams {
 	params := &SendWidgetParams{
 		ChatID:          ctx.chatTarget(),
-		MessageThreadID: messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID: ctx.messageThreadID(),
 		Html:            html,
 	}
 
@@ -7720,7 +7720,7 @@ func (ctx *Context) NewUnpinAllForumTopicMessagesParams(
 ) *UnpinAllForumTopicMessagesParams {
 	params := &UnpinAllForumTopicMessagesParams{
 		ChatID:          ctx.chatTarget(),
-		MessageThreadID: messageField(ctx, func(m *Message) int64 { return m.MessageThreadID }),
+		MessageThreadID: ctx.messageThreadID(),
 	}
 
 	params.Option(opts...)

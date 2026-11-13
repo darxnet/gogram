@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptrace"
+	"net/url"
 	"slices"
 	"strconv"
 	"strings"
@@ -316,7 +317,32 @@ func (c *Client) do(req *http.Request) (*http.Response, error) {
 		return nil, err
 	}
 
-	return c.cfg.httpClient.Do(req) //nolint:gosec // G107: client can send request to user-defined hosts
+	resp, err := c.cfg.httpClient.Do(req) //nolint:gosec // G107: client can send request to user-defined hosts
+	if err != nil {
+		return nil, c.redact(err)
+	}
+
+	return resp, nil
+}
+
+// redactedToken replaces the bot token in errors that carry a request URL.
+const redactedToken = "<token>"
+
+// redact removes the bot token from the URL inside err: the token is part
+// of every request URL ("/bot<token>/method"), and *url.Error prints that
+// URL, so a network error would otherwise put the token into logs and
+// error handlers.
+func (c *Client) redact(err error) error {
+	if c.token == "" {
+		return err
+	}
+
+	var ue *url.Error
+	if errors.As(err, &ue) {
+		ue.URL = strings.ReplaceAll(ue.URL, c.token, redactedToken)
+	}
+
+	return err
 }
 
 // Call invokes a Bot API method with params encoded as JSON and decodes
@@ -383,17 +409,17 @@ func call[T any](
 
 // getUpdates is the polling-loop variant of GetUpdates: the HTTP deadline
 // is derived from the long-poll timeout instead of cfg.timeout, see pollGrace.
-func (c *Client) getUpdates(ctx context.Context, params *GetUpdatesParams) ([]Update, error) {
+func (c *Client) getUpdates(ctx context.Context, params *GetUpdatesParams) (updateBatch, error) {
 	buffer := acquireBuffer()
 	defer releaseBuffer(buffer)
 
 	if err := json.NewEncoder(buffer).Encode(params); err != nil {
-		return nil, err
+		return updateBatch{}, err
 	}
 
 	timeout := time.Duration(params.Timeout)*time.Second + pollGrace
 
-	return call[[]Update](ctx, c, "getUpdates", params, bytes.NewReader(buffer.B), contentTypeJSON, timeout)
+	return call[updateBatch](ctx, c, "getUpdates", params, bytes.NewReader(buffer.B), contentTypeJSON, timeout)
 }
 
 // poll runs the long-polling loop and returns ctx.Err() when ctx is done or
@@ -411,13 +437,27 @@ func (c *Client) poll(ctx context.Context, params *GetUpdatesParams, pool *worke
 			continue
 		}
 
-		for i := range batch {
-			params.Offset = batch[i].UpdateID + 1
-			pool.dispatch(c.acquireContext(ctx, &batch[i]))
+		// A skipped update still moves the offset, or getUpdates would
+		// return it again forever.
+		for _, skipped := range batch.skipped {
+			params.Offset = max(params.Offset, skipped.UpdateID+1)
+			c.reportError(ctx, skipped)
+		}
+
+		for i := range batch.updates {
+			params.Offset = max(params.Offset, batch.updates[i].UpdateID+1)
+			pool.dispatch(c.acquireContext(ctx, &batch.updates[i]))
 		}
 	}
 
 	return ctx.Err()
+}
+
+// reportError passes an error that belongs to no update to the router's error handler.
+func (c *Client) reportError(ctx context.Context, err error) {
+	gogramCtx := c.acquireContext(ctx, nil)
+	c.cfg.router.HandleErr(gogramCtx, err)
+	c.releaseContext(gogramCtx)
 }
 
 // handlePollError classifies a getUpdates error: nil means poll again now,
@@ -435,9 +475,7 @@ func (c *Client) handlePollError(ctx context.Context, err error) error {
 		}
 	}
 
-	gogramCtx := c.acquireContext(ctx, nil)
-	c.cfg.router.HandleErr(gogramCtx, err)
-	c.releaseContext(gogramCtx)
+	c.reportError(ctx, err)
 
 	if errors.Is(err, ErrUnauthorized) || errors.Is(err, ErrNotFoundBanned) {
 		return err

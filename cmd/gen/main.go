@@ -118,6 +118,11 @@ func (field Field) AutoFillCode(types map[string]Type) string {
 	case "inline_message_id":
 		return "ctx.inlineMessageID()"
 
+	case "message_thread_id":
+		if toType(field.Type, field.IsRequired) == "int64" {
+			return "ctx.messageThreadID()"
+		}
+
 	case "message_id":
 		if toType(field.Type, field.IsRequired) == "int64" {
 			return "ctx.messageID()"
