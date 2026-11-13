@@ -2000,12 +2000,12 @@ type ChatPermissions struct {
 	// Optional.
 	// True, if the user is allowed to react to messages.
 	// If omitted, defaults to the value of can_send_messages.
-	CanReactToMessages bool `json:"can_react_to_messages,omitempty"`
+	CanReactToMessages Optional[bool] `json:"can_react_to_messages,omitzero"`
 
 	// Optional.
 	// True, if the user is allowed to edit their own tag.
 	// If omitted, defaults to the value of can_pin_messages.
-	CanEditTag bool `json:"can_edit_tag,omitempty"`
+	CanEditTag Optional[bool] `json:"can_edit_tag,omitzero"`
 
 	// Optional.
 	// True, if the user is allowed to change the chat title, photo and other settings.
@@ -2024,7 +2024,7 @@ type ChatPermissions struct {
 	// Optional.
 	// True, if the user is allowed to create forum topics.
 	// If omitted, defaults to the value of can_pin_messages.
-	CanManageTopics bool `json:"can_manage_topics,omitempty"`
+	CanManageTopics Optional[bool] `json:"can_manage_topics,omitzero"`
 }
 
 // ChatPhoto
@@ -7317,12 +7317,12 @@ type KeyboardButtonRequestChat struct {
 	// Optional.
 	// Pass True to request a forum supergroup, pass False to request a non-forum chat.
 	// If not specified, no additional restrictions are applied.
-	ChatIsForum bool `json:"chat_is_forum,omitempty"`
+	ChatIsForum Optional[bool] `json:"chat_is_forum,omitzero"`
 
 	// Optional.
 	// Pass True to request a supergroup or a channel with a username, pass False to request a chat without a username.
 	// If not specified, no additional restrictions are applied.
-	ChatHasUsername bool `json:"chat_has_username,omitempty"`
+	ChatHasUsername Optional[bool] `json:"chat_has_username,omitzero"`
 
 	// Optional.
 	// Pass True to request a chat owned by the user.
@@ -7398,12 +7398,12 @@ type KeyboardButtonRequestUsers struct {
 	// Optional.
 	// Pass True to request bots, pass False to request regular users.
 	// If not specified, no additional restrictions are applied.
-	UserIsBot bool `json:"user_is_bot,omitempty"`
+	UserIsBot Optional[bool] `json:"user_is_bot,omitzero"`
 
 	// Optional.
 	// Pass True to request premium users, pass False to request non-premium users.
 	// If not specified, no additional restrictions are applied.
-	UserIsPremium bool `json:"user_is_premium,omitempty"`
+	UserIsPremium Optional[bool] `json:"user_is_premium,omitzero"`
 
 	// Optional.
 	// The maximum number of users to be selected; 1-10.

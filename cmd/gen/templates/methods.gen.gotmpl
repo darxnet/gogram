@@ -51,8 +51,8 @@ import (
         {{ $param := toTitle .Name }}
         // With{{ $method }}{{ $param }} sets the {{ $param }} field.
         // {{ .Desc }}
-        func With{{ $method }}{{ $param }} (value {{ toType .Type .IsRequired }}) {{ $option }} {
-            return fieldOption(value, func(params *{{ $params }}) *{{ toType .Type .IsRequired }} {
+        func With{{ $method }}{{ $param }} (value {{ if .Optional }}{{ toType .Type true }}{{ else }}{{ .GoType }}{{ end }}) {{ $option }} {
+            return fieldOption({{ if .Optional }}Some(value){{ else }}value{{ end }}, func(params *{{ $params }}) *{{ .GoType }} {
                 return &params.{{ $param }}
             })
         }
@@ -68,9 +68,12 @@ import (
                 {{- $goTitle := toTitle .Name }}
                 {{- $goType := toType .Type true }}
 
+                {{- $value := printf "params.%s" $goTitle }}
+                {{- if .Optional }}{{ $value = printf "params.%s.Value" $goTitle }}{{ end }}
+
                 {{ if eq $goType "int64" }}
-                    {{ if not .IsRequired }} if params.{{ $goTitle }} != 0 {{ end }} {
-                        v := strconv.FormatInt(params.{{ $goTitle }}, 10)
+                    {{ if .Optional }} if params.{{ $goTitle }}.Set {{ else if not .IsRequired }} if params.{{ $goTitle }} != 0 {{ end }} {
+                        v := strconv.FormatInt({{ $value }}, 10)
                         err = writer.WriteField("{{ .Name }}", v)
                         if err != nil {
                             return
@@ -93,8 +96,8 @@ import (
                         }
                     }
                 {{- else if eq $goType "bool" }}
-                    {{ if not .IsRequired }} if params.{{ $goTitle }} {{ end }} {
-                        v := strconv.FormatBool(params.{{ $goTitle }})
+                    {{ if .Optional }} if params.{{ $goTitle }}.Set {{ else if not .IsRequired }} if params.{{ $goTitle }} {{ end }} {
+                        v := strconv.FormatBool({{ $value }})
                         err = writer.WriteField("{{ .Name }}", v)
                         if err != nil {
                             return

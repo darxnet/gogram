@@ -126,6 +126,20 @@ ctx.SendMessage(text,
 )
 ```
 
+A few fields have a default on Telegram's side that is not Go's zero value:
+`is_anonymous` of a poll is true unless sent, `cache_time` of an inline
+answer is 300, `can_manage_topics` follows `can_pin_messages`, and
+`user_is_bot` of a request-users button restricts nothing unless sent. They
+are `gogram.Optional[T]`: the zero value is not sent and leaves the choice
+to Telegram, `gogram.Some(v)` sends v, false and 0 included. The options
+take the plain value:
+
+```go
+ctx.SendPoll(question, answers, gogram.WithSendPollIsAnonymous(false))
+
+perms := gogram.ChatPermissions{CanPinMessages: true, CanManageTopics: gogram.Some(false)}
+```
+
 ## Router
 
 Commands and callback buttons are dispatched with a map lookup, other
