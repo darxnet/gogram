@@ -78,6 +78,86 @@ func (ctx *Context) chatID() int64 {
 	return 0
 }
 
+// Sender is who performed an update: exactly one field is set, or none when
+// the update has no sender. Like the Bot API's union types (MessageOrigin,
+// ChatMember), it may gain a field when Telegram adds a kind of sender.
+type Sender struct {
+	*User // a user acting as themselves
+	*Chat // the chat a message, reaction or poll answer was sent on behalf of
+}
+
+// ID returns the id of the sender, or 0 when there is none. The ids of users
+// are positive and those of groups and channels negative, so it identifies a
+// sender whatever its kind: a key for rate limits or per-sender data.
+func (s Sender) ID() int64 {
+	switch {
+	case s.Chat != nil:
+		return s.Chat.ID
+	case s.User != nil:
+		return s.User.ID
+	}
+
+	return 0
+}
+
+// Sender returns who performed the current update: the chat it was sent on
+// behalf of, or else the user.
+//
+// [Context.User] and [Context.Chat] answer other questions:
+//
+//	                                   User()                   Chat()       Sender()
+//	a user in group G                  the user                 G            the user
+//	an anonymous admin of G            GroupAnonymousBot        G            chat G
+//	a user posting as channel C in G   Channel_Bot              G            chat C
+//	C's post forwarded to its group G  a service account        G            chat C
+//	a post in channel C                nil                      C            chat C
+//	an anonymous admin's reaction in G nil                      G            chat G (actor_chat)
+//	an anonymous poll answer by V      nil                      V            chat V (voter_chat)
+//	a callback query                   who pressed the button   the chat     who pressed the button
+//
+// For a message sent on behalf of a chat, Telegram puts a fake sender user
+// in from for backward compatibility, and User returns it. Code that asks
+// who did something (an admin check, a ban, a rate limit, per-sender state)
+// should use Sender: keyed by User, all anonymous admins and all channels
+// would look like one user.
+//
+//	switch s := ctx.Sender(); {
+//	case s.Chat != nil:
+//		err = ctx.BanChatSenderChat(s.Chat.ID)
+//	case s.User != nil:
+//		err = ctx.BanChatMember(gogram.WithBanChatMemberUserID(s.User.ID))
+//	}
+func (ctx *Context) Sender() Sender {
+	if ctx.update == nil {
+		return Sender{}
+	}
+
+	switch u := ctx.update; {
+	case u.CallbackQuery != nil:
+		// the message is the bot's; the sender is who pressed the button
+		return Sender{User: &u.CallbackQuery.From}
+	case u.MessageReaction != nil:
+		return Sender{User: u.MessageReaction.User, Chat: u.MessageReaction.ActorChat}.one()
+	case u.PollAnswer != nil:
+		return Sender{User: u.PollAnswer.User, Chat: u.PollAnswer.VoterChat}.one()
+	}
+
+	if m := ctx.Message(); m != nil {
+		return Sender{User: m.From, Chat: m.SenderChat}.one()
+	}
+
+	return Sender{User: ctx.User()}
+}
+
+// one keeps the chat when both are set: the user is then a placeholder.
+func (s Sender) one() Sender {
+	if s.Chat != nil {
+		s.User = nil
+	}
+
+	return s
+}
+
 // userID returns User().ID or 0.
 func (ctx *Context) userID() int64 {
 	if u := ctx.User(); u != nil {

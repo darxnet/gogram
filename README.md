@@ -73,6 +73,36 @@ ctx.AnswerCallbackQuery(gogram.WithAnswerCallbackQueryText("saved"))
 ctx.DeleteMessage()
 ```
 
+`User()`, `Chat()` and `Sender()` answer different questions: who the
+update's `from` is, where it happened, and who did it. They differ when a
+message is sent on behalf of a chat, where Telegram puts a fake user in
+`from` for backward compatibility:
+
+| Update | `User()` | `Chat()` | `Sender()` |
+|---|---|---|---|
+| a user writes in group G | the user | G | the user |
+| an anonymous admin of G writes | GroupAnonymousBot | G | chat G |
+| a user writes in G as channel C | Channel_Bot | G | chat C |
+| C's post is forwarded to its discussion group G | a service account | G | chat C |
+| a post in channel C | nil | C | chat C |
+| an anonymous admin reacts in G | nil | G | chat G (`actor_chat`) |
+| an anonymous poll answer by chat V | nil | V (`voter_chat`) | chat V |
+| a button is pressed | who pressed it | the message's chat | who pressed it |
+
+Use `Sender()` for admin checks, bans, rate limits and per-sender state:
+keyed by `User()`, every anonymous admin and every channel would be one
+user. Like the Bot API's union types, it is a struct with one field set,
+and `ID()` is a key for any kind of sender; the state machine keys by it.
+
+```go
+switch s := ctx.Sender(); {
+case s.Chat != nil:
+	err = ctx.BanChatSenderChat(s.Chat.ID)
+case s.User != nil:
+	err = ctx.BanChatMember(gogram.WithBanChatMemberUserID(s.User.ID))
+}
+```
+
 Chat ids are `gogram.ChatID{ID: 7}` or `gogram.Username("channel")`; methods
 without a generated wrapper go through `client.Call(ctx, "method", params, &result)`
 or `gogram.Call[*gogram.Message](ctx, client, "method", params)`.
