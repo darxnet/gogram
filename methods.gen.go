@@ -362,7 +362,7 @@ type AnswerInlineQueryParams struct {
 
 	// The maximum amount of time in seconds that the result of the inline query may be cached on the server.
 	// Defaults to 300.
-	CacheTime int64 `json:"cache_time,omitempty"`
+	CacheTime Optional[int64] `json:"cache_time,omitzero"`
 
 	// Pass True if results may be cached on the server side only for the user that sent the query.
 	// By default, results may be returned to any user who sends the same query.
@@ -410,7 +410,7 @@ func WithAnswerInlineQueryResults(value []InlineQueryResult) AnswerInlineQueryOp
 // The maximum amount of time in seconds that the result of the inline query may be cached on the server.
 // Defaults to 300.
 func WithAnswerInlineQueryCacheTime(value int64) AnswerInlineQueryOption {
-	return fieldOption(value, func(params *AnswerInlineQueryParams) *int64 {
+	return fieldOption(Some(value), func(params *AnswerInlineQueryParams) *Optional[int64] {
 		return &params.CacheTime
 	})
 }
@@ -9272,7 +9272,7 @@ type PromoteChatMemberParams struct {
 
 	// Pass True if the administrator can restrict, ban or unban chat members, or access supergroup statistics.
 	// For backward compatibility, defaults to True for promotions of channel administrators.
-	CanRestrictMembers bool `json:"can_restrict_members,omitempty"`
+	CanRestrictMembers Optional[bool] `json:"can_restrict_members,omitzero"`
 
 	// Pass True if the administrator can add new administrators with a subset of their own privileges or demote administrators that they have promoted, directly or indirectly (promoted by administrators that were appointed by him)
 	CanPromoteMembers bool `json:"can_promote_members,omitempty"`
@@ -9389,7 +9389,7 @@ func WithPromoteChatMemberCanManageVideoChats(value bool) PromoteChatMemberOptio
 // Pass True if the administrator can restrict, ban or unban chat members, or access supergroup statistics.
 // For backward compatibility, defaults to True for promotions of channel administrators.
 func WithPromoteChatMemberCanRestrictMembers(value bool) PromoteChatMemberOption {
-	return fieldOption(value, func(params *PromoteChatMemberParams) *bool {
+	return fieldOption(Some(value), func(params *PromoteChatMemberParams) *Optional[bool] {
 		return &params.CanRestrictMembers
 	})
 }
@@ -16281,7 +16281,7 @@ type SendPollParams struct {
 	Options []InputPollOption `json:"options"`
 
 	// True, if the poll needs to be anonymous, defaults to True
-	IsAnonymous bool `json:"is_anonymous,omitempty"`
+	IsAnonymous Optional[bool] `json:"is_anonymous,omitzero"`
 
 	// Poll type, “quiz” or “regular”, defaults to “regular”
 	Type string `json:"type,omitempty"`
@@ -16290,7 +16290,7 @@ type SendPollParams struct {
 	AllowsMultipleAnswers bool `json:"allows_multiple_answers,omitempty"`
 
 	// Pass True if the poll allows to change chosen answer options, defaults to False for quizzes and to True for regular polls
-	AllowsRevoting bool `json:"allows_revoting,omitempty"`
+	AllowsRevoting Optional[bool] `json:"allows_revoting,omitzero"`
 
 	// Pass True if the poll options must be shown in random order
 	ShuffleOptions bool `json:"shuffle_options,omitempty"`
@@ -16475,7 +16475,7 @@ func WithSendPollOptions(value []InputPollOption) SendPollOption {
 //
 // True, if the poll needs to be anonymous, defaults to True
 func WithSendPollIsAnonymous(value bool) SendPollOption {
-	return fieldOption(value, func(params *SendPollParams) *bool {
+	return fieldOption(Some(value), func(params *SendPollParams) *Optional[bool] {
 		return &params.IsAnonymous
 	})
 }
@@ -16502,7 +16502,7 @@ func WithSendPollAllowsMultipleAnswers(value bool) SendPollOption {
 //
 // Pass True if the poll allows to change chosen answer options, defaults to False for quizzes and to True for regular polls
 func WithSendPollAllowsRevoting(value bool) SendPollOption {
-	return fieldOption(value, func(params *SendPollParams) *bool {
+	return fieldOption(Some(value), func(params *SendPollParams) *Optional[bool] {
 		return &params.AllowsRevoting
 	})
 }
@@ -16812,8 +16812,8 @@ func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Mes
 			}
 		}
 
-		if params.IsAnonymous {
-			v := strconv.FormatBool(params.IsAnonymous)
+		if params.IsAnonymous.Set {
+			v := strconv.FormatBool(params.IsAnonymous.Value)
 			err = writer.WriteField("is_anonymous", v)
 			if err != nil {
 				return
@@ -16836,8 +16836,8 @@ func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Mes
 			}
 		}
 
-		if params.AllowsRevoting {
-			v := strconv.FormatBool(params.AllowsRevoting)
+		if params.AllowsRevoting.Set {
+			v := strconv.FormatBool(params.AllowsRevoting.Value)
 			err = writer.WriteField("allows_revoting", v)
 			if err != nil {
 				return

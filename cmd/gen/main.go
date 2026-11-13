@@ -26,6 +26,63 @@ type Field struct {
 	IsRequired    bool
 	Discriminator string // unique value for subtypes
 	Alternative   string // "required if <Alternative> isn't specified": one of the two must be set
+	Optional      bool   // generated as Optional[T], see optionalFields
+}
+
+// optionalFields are the optional fields whose default on Telegram's side is
+// not Go's zero value, so that omitting a zero value would not send it: a
+// default of true (is_anonymous), a non-zero number (cache_time 300), the
+// value of another field (can_manage_topics), or no restriction at all where
+// false is a restriction (user_is_bot). They are generated as Optional[T].
+// Keys are "<type or method>.<field>"; generation fails if one is missing.
+var optionalFields = []string{
+	"sendPoll.is_anonymous",                       // defaults to True
+	"sendPoll.allows_revoting",                    // defaults to True for regular polls
+	"answerInlineQuery.cache_time",                // defaults to 300
+	"promoteChatMember.can_restrict_members",      // defaults to True for channel admins
+	"ChatPermissions.can_react_to_messages",       // defaults to can_send_messages
+	"ChatPermissions.can_manage_topics",           // defaults to can_pin_messages
+	"ChatPermissions.can_edit_tag",                // defaults to can_pin_messages
+	"KeyboardButtonRequestUsers.user_is_bot",      // unset: no restriction
+	"KeyboardButtonRequestUsers.user_is_premium",  // unset: no restriction
+	"KeyboardButtonRequestChat.chat_is_forum",     // unset: no restriction
+	"KeyboardButtonRequestChat.chat_has_username", // unset: no restriction
+}
+
+// GoType is the Go type of the field: Optional[T] for an optional field.
+//
+//nolint:gocritic // hugeParam: templates call methods on range values, which need value receivers
+func (field Field) GoType() string {
+	if field.Optional {
+		return "Optional[" + toType(field.Type, true) + "]"
+	}
+
+	return toType(field.Type, field.IsRequired)
+}
+
+// markOptionalFields sets Field.Optional on the fields in optionalFields.
+func markOptionalFields(info *Info) {
+	for _, key := range optionalFields {
+		owner, name, _ := strings.Cut(key, ".")
+
+		var fields []Field
+		if t, ok := info.Types[owner]; ok {
+			fields = t.Fields
+		} else if m, ok := info.Methods[owner]; ok {
+			fields = m.Params
+		}
+
+		i := slices.IndexFunc(fields, func(f Field) bool { return f.Name == name })
+		if i < 0 {
+			log.Fatalf("optional field %s not found", key)
+		}
+
+		if fields[i].IsRequired {
+			log.Fatalf("optional field %s is required", key)
+		}
+
+		fields[i].Optional = true
+	}
 }
 
 //nolint:gocritic // hugeParam: templates call methods on range values, which need value receivers
@@ -270,6 +327,8 @@ func main() {
 	if len(info.Types)*len(info.Methods) == 0 {
 		log.Fatalln("cant find types/methods")
 	}
+
+	markOptionalFields(info)
 
 	outputs := []struct {
 		path     string
