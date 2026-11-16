@@ -46,15 +46,75 @@ func TestCommand_AddressedToOtherBot(t *testing.T) {
 		t.Fatalf("messages = %q, want %q", messages, want)
 	}
 
-	// getMe is fetched once, on the first @-addressed command.
-	if calls := rec.Calls(); len(calls) != 1 || calls[0].Method != "getMe" {
-		t.Fatalf("calls = %+v", calls)
-	}
+	// getMe is fetched once, on the first @-addressed command, and getChat
+	// once, on the first command addressed to another username.
+	rec.AssertSequence(t, "getMe", "getChat")
 
 	ctx := tgtest.NewContext(t, client, tgtest.Message(&group, "/start@other_bot"))
 	if ctx.Command() != "" || gogram.FilterCommand("start")(ctx) {
 		t.Fatalf("Command() = %q for another bot", ctx.Command())
 	}
+}
+
+func TestCommand_ActiveUsernames(t *testing.T) {
+	t.Parallel()
+
+	rec := tgtest.NewRecorder()
+	rec.WillReturn("getMe", &gogram.User{ID: 1, IsBot: true, Username: "my_bot"})
+	rec.WillReturn("getChat", &gogram.ChatFullInfo{
+		ID: 1, Type: gogram.ChatPrivate, ActiveUsernames: []string{"my_bot", "Collectible"},
+	})
+
+	client, err := gogram.NewClient(testToken, gogram.WithCaller(rec))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	group := gogram.Chat{ID: -5, Type: gogram.ChatSupergroup}
+
+	for text, want := range map[string]string{
+		"/start@my_bot":       "/start",
+		"/start@collectible":  "/start",
+		"/start@Collectible":  "/start",
+		"/start@other_bot":    "",
+		"/start@collectible2": "",
+	} {
+		if got := tgtest.NewContext(t, client, tgtest.Message(&group, text)).Command(); got != want {
+			t.Errorf("Command(%q) = %q, want %q", text, got, want)
+		}
+	}
+
+	rec.AssertSequence(t, "getMe", "getChat")
+	rec.AssertCalled(t, "getChat", tgtest.Match(func(p *gogram.GetChatParams) bool {
+		return p.ChatID.ID == 1
+	}))
+}
+
+func TestCommand_GetChatFails(t *testing.T) {
+	t.Parallel()
+
+	rec := tgtest.NewRecorder()
+	rec.WillReturn("getMe", &gogram.User{ID: 1, IsBot: true, Username: "my_bot"})
+	rec.WillFail("getChat", errDenied)
+
+	client, err := gogram.NewClient(testToken, gogram.WithCaller(rec))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Without the extra usernames only the main one addresses the bot,
+	// and the failed fetch is retried on the next foreign username.
+	for range 2 {
+		if ctx := tgtest.NewContext(t, client, tgtest.Text(1, "/start@other_bot")); ctx.Command() != "" {
+			t.Fatalf("Command() = %q, want none", ctx.Command())
+		}
+	}
+
+	if ctx := tgtest.NewContext(t, client, tgtest.Text(1, "/start@my_bot")); ctx.Command() != "/start" {
+		t.Fatalf("Command() = %q, want /start", ctx.Command())
+	}
+
+	rec.AssertSequence(t, "getMe", "getChat", "getChat")
 }
 
 func TestCommand_GetMeFails(t *testing.T) {

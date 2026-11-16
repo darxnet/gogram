@@ -132,9 +132,12 @@ func currentCommand(ctx *Context) string {
 	return command
 }
 
-// addressedToMe reports whether bot is this bot's username. The username
-// comes from [Client.Me], fetched once on the first @-addressed command;
-// when it cannot be fetched the command is accepted, as before the check.
+// addressedToMe reports whether bot is one of this bot's usernames. The
+// main username comes from [Client.Me], fetched once on the first
+// @-addressed command; when it cannot be fetched the command is accepted,
+// as before the check. Only a username that differs from it costs one
+// getChat, fetched once, for the bot's extra (collectible) usernames; when
+// that fails the command is treated as addressed to another bot.
 func addressedToMe(ctx *Context, bot string) bool {
 	if ctx.client == nil {
 		return true
@@ -148,7 +151,18 @@ func addressedToMe(ctx *Context, bot string) bool {
 		}
 	}
 
-	return me.Username == "" || strings.EqualFold(bot, me.Username)
+	if me.Username == "" || strings.EqualFold(bot, me.Username) {
+		return true
+	}
+
+	names, err := ctx.client.usernames(ctx.context, me)
+	if err != nil {
+		return false
+	}
+
+	return slices.ContainsFunc(names, func(name string) bool {
+		return strings.EqualFold(bot, name)
+	})
 }
 
 // Process processes an update.
