@@ -44,8 +44,8 @@ documentation changed; `make generate` does the same locally.
     go test -C sqlstore/sqlitetest -race -count=1 ./...   # SQLite integration tests
     (cd cmd/gen && golangci-lint run ./...)                # the generator module
 
-CI runs the same checks on the stable and oldstable Go releases, on Linux
-(amd64) and macOS (arm64), plus `govulncheck`, CodeQL and a coverage gate.
+CI runs the same checks on the stable and oldstable Go releases, on Linux (amd64 and arm64)
+and on macOS (arm64, stable Go only; it does not block merging), plus `govulncheck`, CodeQL and a coverage gate.
 Coverage is measured on hand-written code only; generated files are excluded.
 
 ## Changes on a hot path
