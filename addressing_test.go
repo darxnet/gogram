@@ -47,14 +47,42 @@ func TestCommand_AddressedToOtherBot(t *testing.T) {
 	}
 
 	// getMe is fetched once, on the first @-addressed command.
-	if calls := rec.Calls(); len(calls) != 1 || calls[0].Method != "getMe" {
-		t.Fatalf("calls = %+v", calls)
-	}
+	rec.AssertSequence(t, "getMe")
 
 	ctx := tgtest.NewContext(t, client, tgtest.Message(&group, "/start@other_bot"))
 	if ctx.Command() != "" || gogram.FilterCommand("start")(ctx) {
 		t.Fatalf("Command() = %q for another bot", ctx.Command())
 	}
+}
+
+func TestCommand_ActiveUsernames(t *testing.T) {
+	t.Parallel()
+
+	rec := tgtest.NewRecorder()
+	rec.WillReturn("getMe", &gogram.BotFullInfo{
+		ID: 1, IsBot: true, Username: "my_bot", ActiveUsernames: []string{"my_bot", "Collectible"},
+	})
+
+	client, err := gogram.NewClient(testToken, gogram.WithCaller(rec))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	group := gogram.Chat{ID: -5, Type: gogram.ChatSupergroup}
+
+	for text, want := range map[string]string{
+		"/start@my_bot":       "/start",
+		"/start@collectible":  "/start",
+		"/start@Collectible":  "/start",
+		"/start@other_bot":    "",
+		"/start@collectible2": "",
+	} {
+		if got := tgtest.NewContext(t, client, tgtest.Message(&group, text)).Command(); got != want {
+			t.Errorf("Command(%q) = %q, want %q", text, got, want)
+		}
+	}
+
+	rec.AssertSequence(t, "getMe")
 }
 
 func TestCommand_GetMeFails(t *testing.T) {

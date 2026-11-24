@@ -132,9 +132,10 @@ func currentCommand(ctx *Context) string {
 	return command
 }
 
-// addressedToMe reports whether bot is this bot's username. The username
-// comes from [Client.Me], fetched once on the first @-addressed command;
-// when it cannot be fetched the command is accepted, as before the check.
+// addressedToMe reports whether bot is one of this bot's usernames: the
+// main one or an extra (collectible) one from active_usernames. Both come
+// from [Client.Me], fetched once on the first @-addressed command; when it
+// cannot be fetched the command is accepted, as before the check.
 func addressedToMe(ctx *Context, bot string) bool {
 	if ctx.client == nil {
 		return true
@@ -148,7 +149,13 @@ func addressedToMe(ctx *Context, bot string) bool {
 		}
 	}
 
-	return me.Username == "" || strings.EqualFold(bot, me.Username)
+	if me.Username == "" || strings.EqualFold(bot, me.Username) {
+		return true
+	}
+
+	return slices.ContainsFunc(me.ActiveUsernames, func(name string) bool {
+		return strings.EqualFold(bot, name)
+	})
 }
 
 // Process processes an update.
