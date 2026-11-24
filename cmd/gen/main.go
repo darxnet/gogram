@@ -33,7 +33,8 @@ type Field struct {
 // not Go's zero value, so that omitting a zero value would not send it: a
 // default of true (is_anonymous), a non-zero number (cache_time 300), the
 // value of another field (can_manage_topics), or no restriction at all where
-// false is a restriction (user_is_bot). They are generated as Optional[T].
+// false is a restriction (user_is_bot), or leaving a setting unchanged where
+// false or "" changes it (setMySettings). They are generated as Optional[T].
 // Keys are "<type or method>.<field>"; generation fails if one is missing.
 var optionalFields = []string{
 	"sendPoll.is_anonymous",                       // defaults to True
@@ -47,6 +48,22 @@ var optionalFields = []string{
 	"KeyboardButtonRequestUsers.user_is_premium",  // unset: no restriction
 	"KeyboardButtonRequestChat.chat_is_forum",     // unset: no restriction
 	"KeyboardButtonRequestChat.chat_has_username", // unset: no restriction
+
+	// setMySettings: an omitted field keeps the current setting.
+	"setMySettings.supports_inline_queries",
+	"setMySettings.inline_query_placeholder", // "" restores the default placeholder
+	"setMySettings.needs_inline_query_location",
+	"setMySettings.inline_feedback_share_denominator", // 0 stops chosen inline results
+	"setMySettings.can_join_groups",
+	"setMySettings.can_read_all_group_messages",
+	"setMySettings.can_connect_to_business",
+	"setMySettings.can_manage_bots",
+	"setMySettings.supports_guest_queries",
+	"setMySettings.supports_join_request_queries",
+	"setMySettings.has_topics_enabled",
+	"setMySettings.allows_users_to_create_topics",
+	"setMySettings.has_topic_sidebar",
+	"setMySettings.can_communicate_with_bots",
 }
 
 // GoType is the Go type of the field: Optional[T] for an optional field.
