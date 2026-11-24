@@ -289,11 +289,12 @@ func (ctx *Context) NewAnswerCallbackQueryParams(
 
 // AnswerCallbackQuery calls Client.AnswerCallbackQuery with context-derived defaults.
 //
-// Use this method to send answers to callback queries sent from [inline keyboards].
+// Use this method to send answers to callback queries sent from [inline keyboards] or [rich messages].
 // The answer will be displayed to the user as a notification at the top of the chat screen or as an alert.
 // On success, True is returned.
 //
 // [inline keyboards]: https://core.telegram.org/bots/features#inline-keyboards
+// [rich messages]: https://core.telegram.org/bots/api#richmessage
 func (ctx *Context) AnswerCallbackQuery(
 	opts ...AnswerCallbackQueryOption,
 ) error {
@@ -819,7 +820,7 @@ func (ctx *Context) NewCloseForumTopicParams(
 // CloseForumTopic calls Client.CloseForumTopic with context-derived defaults.
 //
 // Use this method to close an open topic in a forum supergroup chat.
-// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights, unless it is the creator of the topic.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator right, unless it is the creator of the topic.
 // Returns True on success.
 func (ctx *Context) CloseForumTopic(
 	opts ...CloseForumTopicOption,
@@ -853,7 +854,7 @@ func (ctx *Context) NewCloseGeneralForumTopicParams(
 // CloseGeneralForumTopic calls Client.CloseGeneralForumTopic with context-derived defaults.
 //
 // Use this method to close an open 'General' topic in a forum supergroup chat.
-// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator right.
 // Returns True on success.
 func (ctx *Context) CloseGeneralForumTopic(
 	opts ...CloseGeneralForumTopicOption,
@@ -1032,7 +1033,7 @@ func (ctx *Context) NewCreateChatInviteLinkParams(
 // Use this method to create an additional invite link for a chat.
 // The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
 // The link can be revoked using the method [revokeChatInviteLink].
-// Returns the new invite link as [ChatInviteLink] object.
+// Returns the new invite link as a [ChatInviteLink] object.
 //
 // [revokeChatInviteLink]: https://core.telegram.org/bots/api#revokechatinvitelink
 // [ChatInviteLink]: https://core.telegram.org/bots/api#chatinvitelink
@@ -1072,7 +1073,7 @@ func (ctx *Context) NewCreateChatSubscriptionInviteLinkParams(
 // CreateChatSubscriptionInviteLink calls Client.CreateChatSubscriptionInviteLink with context-derived defaults.
 //
 // Use this method to create a [subscription invite link] for a channel chat.
-// The bot must have the can_invite_users administrator rights.
+// The bot must have the can_invite_users administrator right.
 // The link can be edited using the method [editChatSubscriptionInviteLink] or revoked using the method [revokeChatInviteLink].
 // Returns the new invite link as a [ChatInviteLink] object.
 //
@@ -1403,7 +1404,7 @@ func (ctx *Context) NewDeleteBusinessMessagesParams(
 
 // DeleteBusinessMessages calls Client.DeleteBusinessMessages with context-derived defaults.
 //
-// Delete messages on behalf of a business account.
+// Deletes messages on behalf of a business account.
 // Requires the can_delete_sent_messages business bot right to delete messages sent by the bot itself, or the can_delete_all_messages business bot right to delete any message.
 // Returns True on success.
 func (ctx *Context) DeleteBusinessMessages(
@@ -1552,7 +1553,7 @@ func (ctx *Context) NewDeleteForumTopicParams(
 // DeleteForumTopic calls Client.DeleteForumTopic with context-derived defaults.
 //
 // Use this method to delete a forum topic along with all its messages in a forum supergroup chat or a private chat with a user.
-// In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_delete_messages administrator rights.
+// In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_delete_messages administrator right.
 // Returns True on success.
 func (ctx *Context) DeleteForumTopic(
 	opts ...DeleteForumTopicOption,
@@ -1594,8 +1595,8 @@ func (ctx *Context) NewDeleteMessageParams(
 // - Bots can delete incoming messages in private chats.
 // - Bots granted can_post_messages permissions can delete outgoing messages in channels.
 // - If the bot is an administrator of a group, it can delete any message there.
-// - If the bot has can_delete_messages administrator right in a supergroup or a channel, it can delete any message there.
-// - If the bot has can_manage_direct_messages administrator right in a channel, it can delete any message in the corresponding direct messages chat.
+// - If the bot has the can_delete_messages administrator right in a supergroup or a channel, it can delete any message there.
+// - If the bot has the can_manage_direct_messages administrator right in a channel, it can delete any message in the corresponding direct messages chat.
 // Returns True on success.
 func (ctx *Context) DeleteMessage(
 	opts ...DeleteMessageOption,
@@ -1922,7 +1923,7 @@ func (ctx *Context) NewEditChatSubscriptionInviteLinkParams(
 // EditChatSubscriptionInviteLink calls Client.EditChatSubscriptionInviteLink with context-derived defaults.
 //
 // Use this method to edit a subscription invite link created by the bot.
-// The bot must have the can_invite_users administrator rights.
+// The bot must have the can_invite_users administrator right.
 // Returns the edited invite link as a [ChatInviteLink] object.
 //
 // [ChatInviteLink]: https://core.telegram.org/bots/api#chatinvitelink
@@ -2189,8 +2190,8 @@ func (ctx *Context) NewEditForumTopicParams(
 
 // EditForumTopic calls Client.EditForumTopic with context-derived defaults.
 //
-// Use this method to edit name and icon of a topic in a forum supergroup chat or a private chat with a user.
-// In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights, unless it is the creator of the topic.
+// Use this method to edit the name and icon of a topic in a forum supergroup chat or a private chat with a user.
+// In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator right, unless it is the creator of the topic.
 // Returns True on success.
 func (ctx *Context) EditForumTopic(
 	opts ...EditForumTopicOption,
@@ -2226,7 +2227,7 @@ func (ctx *Context) NewEditGeneralForumTopicParams(
 // EditGeneralForumTopic calls Client.EditGeneralForumTopic with context-derived defaults.
 //
 // Use this method to edit the name of the 'General' topic in a forum supergroup chat.
-// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator right.
 // Returns True on success.
 func (ctx *Context) EditGeneralForumTopic(
 	name string,
@@ -2271,7 +2272,7 @@ func (ctx *Context) NewEditMessageCaptionParams(
 // EditMessageCaption calls Client.EditMessageCaption with context-derived defaults.
 //
 // Use this method to edit captions of messages.
-// On success, if the edited message is not an inline message, the edited [Message] is returned, otherwise True is returned.
+// On success, if the edited message is not an inline message, the edited [Message] is returned; otherwise, True is returned.
 // Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within 48 hours from the time they were sent.
 //
 // [Message]: https://core.telegram.org/bots/api#message
@@ -2356,7 +2357,7 @@ func (ctx *Context) NewEditMessageLiveLocationParams(
 //
 // Use this method to edit live location messages.
 // A location can be edited until its live_period expires or editing is explicitly disabled by a call to [stopMessageLiveLocation].
-// On success, if the edited message is not an inline message, the edited [Message] is returned, otherwise True is returned.
+// On success, if the edited message is not an inline message, the edited [Message] is returned; otherwise, True is returned.
 //
 // [stopMessageLiveLocation]: https://core.telegram.org/bots/api#stopmessagelivelocation
 // [Message]: https://core.telegram.org/bots/api#message
@@ -2404,10 +2405,10 @@ func (ctx *Context) NewEditMessageMediaParams(
 
 // EditMessageMedia calls Client.EditMessageMedia with context-derived defaults.
 //
-// Use this method to edit animation, audio, document, live photo, photo, or video messages, or to replace a text or a rich message with a media.
+// Use this method to edit animation, audio, document, live photo, photo, or video messages, or to replace a text or a rich message with media.
 // If a message is part of a message album, then it can be edited only to an audio for audio albums, only to a document for document albums and to a photo, a live photo, or a video otherwise.
 // When an inline message is edited, a new file can't be uploaded; use a previously uploaded file via its file_id or specify a URL.
-// On success, if the edited message is not an inline message, the edited [Message] is returned, otherwise True is returned.
+// On success, if the edited message is not an inline message, the edited [Message] is returned; otherwise, True is returned.
 // Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within 48 hours from the time they were sent.
 //
 // [Message]: https://core.telegram.org/bots/api#message
@@ -2448,7 +2449,7 @@ func (ctx *Context) NewEditMessageReplyMarkupParams(
 // EditMessageReplyMarkup calls Client.EditMessageReplyMarkup with context-derived defaults.
 //
 // Use this method to edit only the reply markup of messages.
-// On success, if the edited message is not an inline message, the edited [Message] is returned, otherwise True is returned.
+// On success, if the edited message is not an inline message, the edited [Message] is returned; otherwise, True is returned.
 // Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within 48 hours from the time they were sent.
 //
 // [Message]: https://core.telegram.org/bots/api#message
@@ -2495,7 +2496,7 @@ func (ctx *Context) NewEditMessageTextParams(
 // EditMessageText calls Client.EditMessageText with context-derived defaults.
 //
 // Use this method to edit text, rich and [game] messages.
-// On success, if the edited message is not an inline message, the edited [Message] is returned, otherwise True is returned.
+// On success, if the edited message is not an inline message, the edited [Message] is returned; otherwise, True is returned.
 // Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within 48 hours from the time they were sent.
 //
 // [game]: https://core.telegram.org/bots/api#games
@@ -2545,7 +2546,7 @@ func (ctx *Context) NewEditMessageTextWithRichMessageParams(
 // EditMessageTextWithRichMessage calls Client.EditMessageText with context-derived defaults.
 //
 // Use this method to edit text, rich and [game] messages.
-// On success, if the edited message is not an inline message, the edited [Message] is returned, otherwise True is returned.
+// On success, if the edited message is not an inline message, the edited [Message] is returned; otherwise, True is returned.
 // Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within 48 hours from the time they were sent.
 //
 // [game]: https://core.telegram.org/bots/api#games
@@ -3485,9 +3486,9 @@ func (ctx *Context) NewGetMeParams(
 //
 // A simple method for testing your bot's authentication token.
 // Requires no parameters.
-// Returns basic information about the bot in form of a [User] object.
+// Returns information about the bot in the form of a [BotFullInfo] object.
 //
-// [User]: https://core.telegram.org/bots/api#user
+// [BotFullInfo]: https://core.telegram.org/bots/api#botfullinfo
 func (ctx *Context) GetMe(
 	opts ...GetMeOption,
 ) error {
@@ -4041,10 +4042,10 @@ func (ctx *Context) NewGetWebhookInfoParams(
 
 // GetWebhookInfo calls Client.GetWebhookInfo with context-derived defaults.
 //
-// Use this method to get current webhook status.
+// Use this method to get the current webhook status.
 // Requires no parameters.
 // On success, returns a [WebhookInfo] object.
-// If the bot is using [getUpdates], will return an object with the url field empty.
+// If the bot is using [getUpdates], it will return an object with the url field empty.
 //
 // [WebhookInfo]: https://core.telegram.org/bots/api#webhookinfo
 // [getUpdates]: https://core.telegram.org/bots/api#getupdates
@@ -4124,7 +4125,7 @@ func (ctx *Context) NewHideGeneralForumTopicParams(
 // HideGeneralForumTopic calls Client.HideGeneralForumTopic with context-derived defaults.
 //
 // Use this method to hide the 'General' topic in a forum supergroup chat.
-// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator right.
 // The topic will be automatically closed if it was open.
 // Returns True on success.
 func (ctx *Context) HideGeneralForumTopic(
@@ -4190,8 +4191,8 @@ func (ctx *Context) NewLogOutParams(
 // LogOut calls Client.LogOut with context-derived defaults.
 //
 // Use this method to log out from the cloud Bot API server before launching the bot locally.
-// You must log out the bot before running it locally, otherwise there is no guarantee that the bot will receive updates.
-// After a successful call, you can immediately log in on a local server, but will not be able to log in back to the cloud Bot API server for 10 minutes.
+// You must log out the bot before running it locally; otherwise, there is no guarantee that the bot will receive updates.
+// After a successful call, you can immediately log in on a local server, but will not be able to log back in to the cloud Bot API server for 10 minutes.
 // Returns True on success.
 // Requires no parameters.
 func (ctx *Context) LogOut(
@@ -4350,7 +4351,7 @@ func (ctx *Context) NewReadBusinessMessageParams(
 
 // ReadBusinessMessage calls Client.ReadBusinessMessage with context-derived defaults.
 //
-// Marks incoming message as read on behalf of a business account.
+// Marks an incoming message as read on behalf of a business account.
 // Requires the can_read_messages business bot right.
 // Returns True on success.
 func (ctx *Context) ReadBusinessMessage(
@@ -4561,7 +4562,7 @@ func (ctx *Context) NewReopenForumTopicParams(
 // ReopenForumTopic calls Client.ReopenForumTopic with context-derived defaults.
 //
 // Use this method to reopen a closed topic in a forum supergroup chat.
-// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights, unless it is the creator of the topic.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator right, unless it is the creator of the topic.
 // Returns True on success.
 func (ctx *Context) ReopenForumTopic(
 	opts ...ReopenForumTopicOption,
@@ -4595,7 +4596,7 @@ func (ctx *Context) NewReopenGeneralForumTopicParams(
 // ReopenGeneralForumTopic calls Client.ReopenGeneralForumTopic with context-derived defaults.
 //
 // Use this method to reopen a closed 'General' topic in a forum supergroup chat.
-// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator right.
 // The topic will be automatically unhidden if it was hidden.
 // Returns True on success.
 func (ctx *Context) ReopenGeneralForumTopic(
@@ -4806,7 +4807,7 @@ func (ctx *Context) NewRevokeChatInviteLinkParams(
 // Use this method to revoke an invite link created by the bot.
 // If the primary link is revoked, a new link is automatically generated.
 // The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
-// Returns the revoked invite link as [ChatInviteLink] object.
+// Returns the revoked invite link as a [ChatInviteLink] object.
 //
 // [ChatInviteLink]: https://core.telegram.org/bots/api#chatinvitelink
 func (ctx *Context) RevokeChatInviteLink(
@@ -4933,7 +4934,7 @@ func (ctx *Context) NewSendAnimationParams(
 //
 // Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
 // On success, the sent [Message] is returned.
-// Bots can currently send animation files of up to 50 MB in size, this limit may be changed in the future.
+// Bots can currently send animation files of up to 50 MB in size; this limit may be changed in the future.
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SendAnimation(
@@ -4983,7 +4984,7 @@ func (ctx *Context) NewSendAudioParams(
 // Use this method to send audio files, if you want Telegram clients to display them in the music player.
 // Your audio must be in the .MP3 or .M4A format.
 // On success, the sent [Message] is returned.
-// Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+// Bots can currently send audio files of up to 50 MB in size; this limit may be changed in the future.
 // For sending voice messages, use the [sendVoice] method instead.
 //
 // [Message]: https://core.telegram.org/bots/api#message
@@ -5242,7 +5243,7 @@ func (ctx *Context) NewSendDocumentParams(
 //
 // Use this method to send general files.
 // On success, the sent [Message] is returned.
-// Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+// Bots can currently send files of any type of up to 50 MB in size; this limit may be changed in the future.
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SendDocument(
@@ -5477,7 +5478,7 @@ func (ctx *Context) NewSendLocationParams(
 
 // SendLocation calls Client.SendLocation with context-derived defaults.
 //
-// Use this method to send point on the map.
+// Use this method to send a point on the map.
 // On success, the sent [Message] is returned.
 //
 // [Message]: https://core.telegram.org/bots/api#message
@@ -5528,7 +5529,7 @@ func (ctx *Context) NewSendMediaGroupParams(
 // SendMediaGroup calls Client.SendMediaGroup with context-derived defaults.
 //
 // Use this method to send a group of photos, live photos, videos, documents or audios as an album.
-// Documents and audio files can be only grouped in an album with messages of the same type.
+// Documents and audio files can only be grouped in an album with messages of the same type.
 // On success, an Array of [Message] objects that were sent is returned.
 //
 // [Message]: https://core.telegram.org/bots/api#message
@@ -5905,7 +5906,7 @@ func (ctx *Context) NewSendSharedWidgetParams(
 
 // SendSharedWidget calls Client.SendSharedWidget with context-derived defaults.
 //
-// Use this method to send again a shared widget created by the bot.
+// Use this method to resend a shared widget created by the bot.
 // Currently, in the production environment, widgets can be sent only to private chats, and sent widgets automatically have protected content and therefore can't be forwarded.
 // On success, the sent [Message] is returned.
 //
@@ -6052,9 +6053,9 @@ func (ctx *Context) NewSendVideoParams(
 
 // SendVideo calls Client.SendVideo with context-derived defaults.
 //
-// Use this method to send video files, Telegram clients support MPEG4 videos (other formats may be sent as [Document]).
+// Use this method to send video files; Telegram clients support MPEG4 videos (other formats may be sent as [Document]).
 // On success, the sent [Message] is returned.
-// Bots can currently send video files of up to 50 MB in size, this limit may be changed in the future.
+// Bots can currently send video files of up to 50 MB in size; this limit may be changed in the future.
 //
 // [Document]: https://core.telegram.org/bots/api#document
 // [Message]: https://core.telegram.org/bots/api#message
@@ -6096,7 +6097,7 @@ func (ctx *Context) NewSendVideoNoteParams(
 
 // SendVideoNote calls Client.SendVideoNote with context-derived defaults.
 //
-// Use this method to send a rounded square MPEG4 video of up to 1 minute long.
+// Use this method to send a rounded square MPEG4 video up to 1 minute long.
 // On success, the sent [Message] is returned.
 //
 // [Message]: https://core.telegram.org/bots/api#message
@@ -6147,7 +6148,7 @@ func (ctx *Context) NewSendVoiceParams(
 // Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message.
 // For this to work, your audio must be in an .OGG file encoded with OPUS, or in .MP3 format, or in .M4A format (other formats may be sent as [Audio] or [Document]).
 // On success, the sent [Message] is returned.
-// Bots can currently send voice messages of up to 50 MB in size, this limit may be changed in the future.
+// Bots can currently send voice messages of up to 50 MB in size; this limit may be changed in the future.
 //
 // [Audio]: https://core.telegram.org/bots/api#audio
 // [Document]: https://core.telegram.org/bots/api#document
@@ -6234,7 +6235,7 @@ func (ctx *Context) NewSetBusinessAccountBioParams(
 // SetBusinessAccountBio calls Client.SetBusinessAccountBio with context-derived defaults.
 //
 // Changes the bio of a managed business account.
-// Requires the can_change_bio business bot right.
+// Requires the can_edit_bio business bot right.
 // Returns True on success.
 func (ctx *Context) SetBusinessAccountBio(
 	opts ...SetBusinessAccountBioOption,
@@ -6312,7 +6313,7 @@ func (ctx *Context) NewSetBusinessAccountNameParams(
 // SetBusinessAccountName calls Client.SetBusinessAccountName with context-derived defaults.
 //
 // Changes the first and last name of a managed business account.
-// Requires the can_change_name business bot right.
+// Requires the can_edit_name business bot right.
 // Returns True on success.
 func (ctx *Context) SetBusinessAccountName(
 	firstName string,
@@ -6386,7 +6387,7 @@ func (ctx *Context) NewSetBusinessAccountUsernameParams(
 // SetBusinessAccountUsername calls Client.SetBusinessAccountUsername with context-derived defaults.
 //
 // Changes the username of a managed business account.
-// Requires the can_change_username business bot right.
+// Requires the can_edit_username business bot right.
 // Returns True on success.
 func (ctx *Context) SetBusinessAccountUsername(
 	opts ...SetBusinessAccountUsernameOption,
@@ -6562,7 +6563,7 @@ func (ctx *Context) NewSetChatPermissionsParams(
 // SetChatPermissions calls Client.SetChatPermissions with context-derived defaults.
 //
 // Use this method to set default chat permissions for all members.
-// The bot must be an administrator in the group or a supergroup for this to work and must have the can_restrict_members administrator rights.
+// The bot must be an administrator in the group or a supergroup for this to work and must have the can_restrict_members administrator right.
 // Returns True on success.
 func (ctx *Context) SetChatPermissions(
 	permissions ChatPermissions,
@@ -6758,8 +6759,8 @@ func (ctx *Context) NewSetGameScoreParams(
 // SetGameScore calls Client.SetGameScore with context-derived defaults.
 //
 // Use this method to set the score of the specified user in a game message.
-// On success, if the message is not an inline message, the [Message] is returned, otherwise True is returned.
-// Returns an error, if the new score is not greater than the user's current score in the chat and force is False.
+// On success, if the message is not an inline message, the [Message] is returned; otherwise, True is returned.
+// Returns an error if the new score is not greater than the user's current score in the chat and force is False.
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) SetGameScore(
@@ -7019,6 +7020,38 @@ func (ctx *Context) SetMyProfilePhoto(
 	return err
 }
 
+// NewSetMySettingsParams builds SetMySettingsParams with context-derived defaults
+// (chat, thread, business connection, default parse mode) and applies opts.
+// Use it when the result of Client.SetMySettings is needed:
+//
+//	ret, err := ctx.Client().SetMySettings(ctx.Detached(), ctx.NewSetMySettingsParams(...))
+func (ctx *Context) NewSetMySettingsParams(
+	opts ...SetMySettingsOption,
+) *SetMySettingsParams {
+	params := &SetMySettingsParams{}
+
+	params.Option(opts...)
+
+	return params
+}
+
+// SetMySettings calls Client.SetMySettings with context-derived defaults.
+//
+// Use this method to change the settings of the bot.
+// Settings that aren't specified remain unchanged.
+// Returns True on success.
+func (ctx *Context) SetMySettings(
+	opts ...SetMySettingsOption,
+) error {
+	params := ctx.NewSetMySettingsParams(
+		opts...,
+	)
+
+	_, err := ctx.client.SetMySettings(ctx.Detached(), params)
+
+	return err
+}
+
 // NewSetMyShortDescriptionParams builds SetMyShortDescriptionParams with context-derived defaults
 // (chat, thread, business connection, default parse mode) and applies opts.
 // Use it when the result of Client.SetMyShortDescription is needed:
@@ -7071,7 +7104,7 @@ func (ctx *Context) NewSetPassportDataErrorsParams(
 
 // SetPassportDataErrors calls Client.SetPassportDataErrors with context-derived defaults.
 //
-// Informs a user that some of the Telegram Passport elements they provided contains errors.
+// Informs a user that some of the Telegram Passport elements they provided contain errors.
 // The user will not be able to re-submit their Passport to you until the errors are fixed (the contents of the field for which you returned the error must change).
 // Returns True on success.
 // Use this if the data submitted by the user doesn't satisfy the standards your service requires for any reason.
@@ -7387,7 +7420,7 @@ func (ctx *Context) NewSetWebhookParams(
 //
 // Use this method to specify a URL and receive incoming updates via an outgoing webhook.
 // Whenever there is an update for the bot, we will send an HTTPS POST request to the specified URL, containing a JSON-serialized [Update].
-// In case of an unsuccessful request (a request with response [HTTP status code] different from 2XY), we will repeat the request and give up after a reasonable amount of attempts.
+// In case of an unsuccessful request (a request with response [HTTP status code] different from 2XY), we will repeat the request and give up after a reasonable number of attempts.
 // Returns True on success.
 // If you'd like to make sure that the webhook was set by you, you can specify secret data in the parameter secret_token.
 // If specified, the request will contain a header “X-Telegram-Bot-Api-Secret-Token” with the secret token as content.
@@ -7431,7 +7464,7 @@ func (ctx *Context) NewStopMessageLiveLocationParams(
 // StopMessageLiveLocation calls Client.StopMessageLiveLocation with context-derived defaults.
 //
 // Use this method to stop updating a live location message before live_period expires.
-// On success, if the message is not an inline message, the edited [Message] is returned, otherwise True is returned.
+// On success, if the message is not an inline message, the edited [Message] is returned; otherwise, True is returned.
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (ctx *Context) StopMessageLiveLocation(
@@ -7546,7 +7579,7 @@ func (ctx *Context) NewTransferGiftParams(
 //
 // Transfers an owned unique gift to another user.
 // Requires the can_transfer_and_upgrade_gifts business bot right.
-// Requires can_transfer_stars business bot right if the transfer is paid.
+// Requires the can_transfer_stars business bot right if the transfer is paid.
 // Returns True on success.
 func (ctx *Context) TransferGift(
 	ownedGiftID string,
@@ -7661,7 +7694,7 @@ func (ctx *Context) NewUnhideGeneralForumTopicParams(
 // UnhideGeneralForumTopic calls Client.UnhideGeneralForumTopic with context-derived defaults.
 //
 // Use this method to unhide the 'General' topic in a forum supergroup chat.
-// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator right.
 // Returns True on success.
 func (ctx *Context) UnhideGeneralForumTopic(
 	opts ...UnhideGeneralForumTopicOption,

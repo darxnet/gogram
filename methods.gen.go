@@ -213,11 +213,12 @@ func WithAnswerCallbackQueryCacheTime(value int64) AnswerCallbackQueryOption {
 
 // AnswerCallbackQuery calls the answerCallbackQuery Telegram Bot API method.
 //
-// Use this method to send answers to callback queries sent from [inline keyboards].
+// Use this method to send answers to callback queries sent from [inline keyboards] or [rich messages].
 // The answer will be displayed to the user as a notification at the top of the chat screen or as an alert.
 // On success, True is returned.
 //
 // [inline keyboards]: https://core.telegram.org/bots/features#inline-keyboards
+// [rich messages]: https://core.telegram.org/bots/api#richmessage
 func (c *Client) AnswerCallbackQuery(ctx context.Context, params *AnswerCallbackQueryParams) (ret bool, err error) {
 	buffer := acquireBuffer()
 	defer releaseBuffer(buffer)
@@ -476,7 +477,7 @@ type AnswerPreCheckoutQueryParams struct {
 	Ok bool `json:"ok"`
 
 	// Required if ok is False.
-	// Error message in human readable form that explains the reason for failure to proceed with the checkout (e.g.
+	// Error message in human-readable form that explains the reason for failure to proceed with the checkout (e.g.
 	// "Sorry, somebody just bought the last of our amazing black T-shirts while you were busy filling out your payment details.
 	// Please choose a different color or garment!").
 	// Telegram will display this message to the user.
@@ -515,7 +516,7 @@ func WithAnswerPreCheckoutQueryOk(value bool) AnswerPreCheckoutQueryOption {
 // WithAnswerPreCheckoutQueryErrorMessage sets the ErrorMessage field.
 //
 // Required if ok is False.
-// Error message in human readable form that explains the reason for failure to proceed with the checkout (e.g.
+// Error message in human-readable form that explains the reason for failure to proceed with the checkout (e.g.
 // "Sorry, somebody just bought the last of our amazing black T-shirts while you were busy filling out your payment details.
 // Please choose a different color or garment!").
 // Telegram will display this message to the user.
@@ -562,7 +563,7 @@ type AnswerShippingQueryParams struct {
 	ShippingOptions []ShippingOption `json:"shipping_options,omitempty"`
 
 	// Required if ok is False.
-	// Error message in human readable form that explains why it is impossible to complete the order (e.g.
+	// Error message in human-readable form that explains why it is impossible to complete the order (e.g.
 	// “Sorry, delivery to your desired address is unavailable”).
 	// Telegram will display this message to the user.
 	ErrorMessage string `json:"error_message,omitempty"`
@@ -609,7 +610,7 @@ func WithAnswerShippingQueryShippingOptions(value []ShippingOption) AnswerShippi
 // WithAnswerShippingQueryErrorMessage sets the ErrorMessage field.
 //
 // Required if ok is False.
-// Error message in human readable form that explains why it is impossible to complete the order (e.g.
+// Error message in human-readable form that explains why it is impossible to complete the order (e.g.
 // “Sorry, delivery to your desired address is unavailable”).
 // Telegram will display this message to the user.
 func WithAnswerShippingQueryErrorMessage(value string) AnswerShippingQueryOption {
@@ -835,7 +836,7 @@ type ApproveSuggestedPostParams struct {
 	MessageID int64 `json:"message_id"`
 
 	// Point in time (Unix timestamp) when the post is expected to be published; omit if the date has already been specified when the suggested post was created.
-	// If specified, then the date must be not more than 2678400 seconds (30 days) in the future.
+	// If specified, then the date must not be more than 2678400 seconds (30 days) in the future.
 	SendDate int64 `json:"send_date,omitempty"`
 }
 
@@ -875,7 +876,7 @@ func WithApproveSuggestedPostMessageID(value int64) ApproveSuggestedPostOption {
 // WithApproveSuggestedPostSendDate sets the SendDate field.
 //
 // Point in time (Unix timestamp) when the post is expected to be published; omit if the date has already been specified when the suggested post was created.
-// If specified, then the date must be not more than 2678400 seconds (30 days) in the future.
+// If specified, then the date must not be more than 2678400 seconds (30 days) in the future.
 func WithApproveSuggestedPostSendDate(value int64) ApproveSuggestedPostOption {
 	return fieldOption(value, func(params *ApproveSuggestedPostParams) *int64 {
 		return &params.SendDate
@@ -912,7 +913,7 @@ type BanChatMemberParams struct {
 	UserID int64 `json:"user_id"`
 
 	// Date when the user will be unbanned; Unix time.
-	// If user is banned for more than 366 days or less than 30 seconds from the current time they are considered to be banned forever.
+	// If the user is banned for more than 366 days or less than 30 seconds from the current time, they are considered to be banned forever.
 	// Applied for supergroups and channels only.
 	UntilDate int64 `json:"until_date,omitempty"`
 
@@ -958,7 +959,7 @@ func WithBanChatMemberUserID(value int64) BanChatMemberOption {
 // WithBanChatMemberUntilDate sets the UntilDate field.
 //
 // Date when the user will be unbanned; Unix time.
-// If user is banned for more than 366 days or less than 30 seconds from the current time they are considered to be banned forever.
+// If the user is banned for more than 366 days or less than 30 seconds from the current time, they are considered to be banned forever.
 // Applied for supergroups and channels only.
 func WithBanChatMemberUntilDate(value int64) BanChatMemberOption {
 	return fieldOption(value, func(params *BanChatMemberParams) *int64 {
@@ -1149,7 +1150,7 @@ func WithCloseForumTopicMessageThreadID(value int64) CloseForumTopicOption {
 // CloseForumTopic calls the closeForumTopic Telegram Bot API method.
 //
 // Use this method to close an open topic in a forum supergroup chat.
-// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights, unless it is the creator of the topic.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator right, unless it is the creator of the topic.
 // Returns True on success.
 func (c *Client) CloseForumTopic(ctx context.Context, params *CloseForumTopicParams) (ret bool, err error) {
 	buffer := acquireBuffer()
@@ -1200,7 +1201,7 @@ func WithCloseGeneralForumTopicChatID(value ChatID) CloseGeneralForumTopicOption
 // CloseGeneralForumTopic calls the closeGeneralForumTopic Telegram Bot API method.
 //
 // Use this method to close an open 'General' topic in a forum supergroup chat.
-// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator right.
 // Returns True on success.
 func (c *Client) CloseGeneralForumTopic(ctx context.Context, params *CloseGeneralForumTopicParams) (ret bool, err error) {
 	buffer := acquireBuffer()
@@ -1793,7 +1794,7 @@ func WithCreateChatInviteLinkCreatesJoinRequest(value bool) CreateChatInviteLink
 // Use this method to create an additional invite link for a chat.
 // The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
 // The link can be revoked using the method [revokeChatInviteLink].
-// Returns the new invite link as [ChatInviteLink] object.
+// Returns the new invite link as a [ChatInviteLink] object.
 //
 // [revokeChatInviteLink]: https://core.telegram.org/bots/api#revokechatinvitelink
 // [ChatInviteLink]: https://core.telegram.org/bots/api#chatinvitelink
@@ -1884,7 +1885,7 @@ func WithCreateChatSubscriptionInviteLinkSubscriptionPrice(value int64) CreateCh
 // CreateChatSubscriptionInviteLink calls the createChatSubscriptionInviteLink Telegram Bot API method.
 //
 // Use this method to create a [subscription invite link] for a channel chat.
-// The bot must have the can_invite_users administrator rights.
+// The bot must have the can_invite_users administrator right.
 // The link can be edited using the method [editChatSubscriptionInviteLink] or revoked using the method [revokeChatInviteLink].
 // Returns the new invite link as a [ChatInviteLink] object.
 //
@@ -2021,7 +2022,7 @@ type CreateInvoiceLinkParams struct {
 	Description string `json:"description"`
 
 	// Bot-defined invoice payload, 1-128 bytes.
-	// This will not be displayed to the user, use it for your internal processes.
+	// This will not be displayed to the user; use it for your internal processes.
 	Payload string `json:"payload"`
 
 	// Payment provider token, obtained via [@BotFather].
@@ -2049,12 +2050,12 @@ type CreateInvoiceLinkParams struct {
 	// The currency must be set to “XTR” (Telegram Stars) if the parameter is used.
 	// Currently, it must always be 2592000 (30 days) if specified.
 	// Any number of subscriptions can be active for a given bot at the same time, including multiple concurrent subscriptions from the same user.
-	// Subscription price must no exceed 10000 Telegram Stars.
+	// Subscription price must not exceed 10000 Telegram Stars.
 	SubscriptionPeriod int64 `json:"subscription_period,omitempty"`
 
 	// The maximum accepted amount for tips in the smallest units of the currency (integer, not float/double).
 	// For example, for a maximum tip of US$ 1.45 pass max_tip_amount = 145.
-	// See the exp parameter in [currencies.json], it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
+	// See the exp parameter in [currencies.json]; it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
 	// Defaults to 0.
 	// Not supported for payments in [Telegram Stars].
 	//
@@ -2064,11 +2065,11 @@ type CreateInvoiceLinkParams struct {
 
 	// A JSON-serialized Array of suggested amounts of tips in the smallest units of the currency (integer, not float/double).
 	// At most 4 suggested tip amounts can be specified.
-	// The suggested tip amounts must be positive, passed in a strictly increased order and must not exceed max_tip_amount.
+	// The suggested tip amounts must be positive, passed in a strictly increasing order and must not exceed max_tip_amount.
 	SuggestedTipAmounts []int64 `json:"suggested_tip_amounts,omitempty"`
 
 	// JSON-serialized data about the invoice, which will be shared with the payment provider.
-	// A detailed description of required fields should be provided by the payment provider.
+	// A detailed description of the required fields should be provided by the payment provider.
 	ProviderData string `json:"provider_data,omitempty"`
 
 	// URL of the product photo for the invoice.
@@ -2170,7 +2171,7 @@ func WithCreateInvoiceLinkDescription(value string) CreateInvoiceLinkOption {
 // WithCreateInvoiceLinkPayload sets the Payload field.
 //
 // Bot-defined invoice payload, 1-128 bytes.
-// This will not be displayed to the user, use it for your internal processes.
+// This will not be displayed to the user; use it for your internal processes.
 func WithCreateInvoiceLinkPayload(value string) CreateInvoiceLinkOption {
 	return fieldOption(value, func(params *CreateInvoiceLinkParams) *string {
 		return &params.Payload
@@ -2222,7 +2223,7 @@ func WithCreateInvoiceLinkPrices(value []LabeledPrice) CreateInvoiceLinkOption {
 // The currency must be set to “XTR” (Telegram Stars) if the parameter is used.
 // Currently, it must always be 2592000 (30 days) if specified.
 // Any number of subscriptions can be active for a given bot at the same time, including multiple concurrent subscriptions from the same user.
-// Subscription price must no exceed 10000 Telegram Stars.
+// Subscription price must not exceed 10000 Telegram Stars.
 func WithCreateInvoiceLinkSubscriptionPeriod(value int64) CreateInvoiceLinkOption {
 	return fieldOption(value, func(params *CreateInvoiceLinkParams) *int64 {
 		return &params.SubscriptionPeriod
@@ -2233,7 +2234,7 @@ func WithCreateInvoiceLinkSubscriptionPeriod(value int64) CreateInvoiceLinkOptio
 //
 // The maximum accepted amount for tips in the smallest units of the currency (integer, not float/double).
 // For example, for a maximum tip of US$ 1.45 pass max_tip_amount = 145.
-// See the exp parameter in [currencies.json], it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
+// See the exp parameter in [currencies.json]; it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
 // Defaults to 0.
 // Not supported for payments in [Telegram Stars].
 //
@@ -2249,7 +2250,7 @@ func WithCreateInvoiceLinkMaxTipAmount(value int64) CreateInvoiceLinkOption {
 //
 // A JSON-serialized Array of suggested amounts of tips in the smallest units of the currency (integer, not float/double).
 // At most 4 suggested tip amounts can be specified.
-// The suggested tip amounts must be positive, passed in a strictly increased order and must not exceed max_tip_amount.
+// The suggested tip amounts must be positive, passed in a strictly increasing order and must not exceed max_tip_amount.
 func WithCreateInvoiceLinkSuggestedTipAmounts(value []int64) CreateInvoiceLinkOption {
 	return fieldOption(value, func(params *CreateInvoiceLinkParams) *[]int64 {
 		return &params.SuggestedTipAmounts
@@ -2259,7 +2260,7 @@ func WithCreateInvoiceLinkSuggestedTipAmounts(value []int64) CreateInvoiceLinkOp
 // WithCreateInvoiceLinkProviderData sets the ProviderData field.
 //
 // JSON-serialized data about the invoice, which will be shared with the payment provider.
-// A detailed description of required fields should be provided by the payment provider.
+// A detailed description of the required fields should be provided by the payment provider.
 func WithCreateInvoiceLinkProviderData(value string) CreateInvoiceLinkOption {
 	return fieldOption(value, func(params *CreateInvoiceLinkParams) *string {
 		return &params.ProviderData
@@ -2904,7 +2905,7 @@ func WithDeleteBusinessMessagesMessageIDs(value []int64) DeleteBusinessMessagesO
 
 // DeleteBusinessMessages calls the deleteBusinessMessages Telegram Bot API method.
 //
-// Delete messages on behalf of a business account.
+// Deletes messages on behalf of a business account.
 // Requires the can_delete_sent_messages business bot right to delete messages sent by the bot itself, or the can_delete_all_messages business bot right to delete any message.
 // Returns True on success.
 func (c *Client) DeleteBusinessMessages(ctx context.Context, params *DeleteBusinessMessagesParams) (ret bool, err error) {
@@ -3149,7 +3150,7 @@ func WithDeleteForumTopicMessageThreadID(value int64) DeleteForumTopicOption {
 // DeleteForumTopic calls the deleteForumTopic Telegram Bot API method.
 //
 // Use this method to delete a forum topic along with all its messages in a forum supergroup chat or a private chat with a user.
-// In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_delete_messages administrator rights.
+// In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_delete_messages administrator right.
 // Returns True on success.
 func (c *Client) DeleteForumTopic(ctx context.Context, params *DeleteForumTopicParams) (ret bool, err error) {
 	buffer := acquireBuffer()
@@ -3219,8 +3220,8 @@ func WithDeleteMessageMessageID(value int64) DeleteMessageOption {
 // - Bots can delete incoming messages in private chats.
 // - Bots granted can_post_messages permissions can delete outgoing messages in channels.
 // - If the bot is an administrator of a group, it can delete any message there.
-// - If the bot has can_delete_messages administrator right in a supergroup or a channel, it can delete any message there.
-// - If the bot has can_manage_direct_messages administrator right in a channel, it can delete any message in the corresponding direct messages chat.
+// - If the bot has the can_delete_messages administrator right in a supergroup or a channel, it can delete any message there.
+// - If the bot has the can_manage_direct_messages administrator right in a channel, it can delete any message in the corresponding direct messages chat.
 // Returns True on success.
 func (c *Client) DeleteMessage(ctx context.Context, params *DeleteMessageParams) (ret bool, err error) {
 	buffer := acquireBuffer()
@@ -3829,7 +3830,7 @@ func WithEditChatSubscriptionInviteLinkName(value string) EditChatSubscriptionIn
 // EditChatSubscriptionInviteLink calls the editChatSubscriptionInviteLink Telegram Bot API method.
 //
 // Use this method to edit a subscription invite link created by the bot.
-// The bot must have the can_invite_users administrator rights.
+// The bot must have the can_invite_users administrator right.
 // Returns the edited invite link as a [ChatInviteLink] object.
 //
 // [ChatInviteLink]: https://core.telegram.org/bots/api#chatinvitelink
@@ -3873,7 +3874,7 @@ type EditEphemeralMessageCaptionParams struct {
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 
 	// Pass True if the caption must be shown above the message media.
-	// Supported only for animation, photo and video messages.
+	// Supported only for animation, live photo, photo and video messages.
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 
 	// A JSON-serialized object for an [inline keyboard]
@@ -3957,7 +3958,7 @@ func WithEditEphemeralMessageCaptionCaptionEntities(value []MessageEntity) EditE
 // WithEditEphemeralMessageCaptionShowCaptionAboveMedia sets the ShowCaptionAboveMedia field.
 //
 // Pass True if the caption must be shown above the message media.
-// Supported only for animation, photo and video messages.
+// Supported only for animation, live photo, photo and video messages.
 func WithEditEphemeralMessageCaptionShowCaptionAboveMedia(value bool) EditEphemeralMessageCaptionOption {
 	return fieldOption(value, func(params *EditEphemeralMessageCaptionParams) *bool {
 		return &params.ShowCaptionAboveMedia
@@ -4543,8 +4544,8 @@ func WithEditForumTopicIconCustomEmojiID(value string) EditForumTopicOption {
 
 // EditForumTopic calls the editForumTopic Telegram Bot API method.
 //
-// Use this method to edit name and icon of a topic in a forum supergroup chat or a private chat with a user.
-// In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights, unless it is the creator of the topic.
+// Use this method to edit the name and icon of a topic in a forum supergroup chat or a private chat with a user.
+// In the case of a supergroup chat the bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator right, unless it is the creator of the topic.
 // Returns True on success.
 func (c *Client) EditForumTopic(ctx context.Context, params *EditForumTopicParams) (ret bool, err error) {
 	buffer := acquireBuffer()
@@ -4607,7 +4608,7 @@ func WithEditGeneralForumTopicName(value string) EditGeneralForumTopicOption {
 // EditGeneralForumTopic calls the editGeneralForumTopic Telegram Bot API method.
 //
 // Use this method to edit the name of the 'General' topic in a forum supergroup chat.
-// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator right.
 // Returns True on success.
 func (c *Client) EditGeneralForumTopic(ctx context.Context, params *EditGeneralForumTopicParams) (ret bool, err error) {
 	buffer := acquireBuffer()
@@ -4655,7 +4656,7 @@ type EditMessageCaptionParams struct {
 	CaptionEntities []MessageEntity `json:"caption_entities,omitempty"`
 
 	// Pass True if the caption must be shown above the message media.
-	// Supported only for animation, photo and video messages.
+	// Supported only for animation, live photo, paid media, photo, video and widget messages.
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 
 	// A JSON-serialized object for an [inline keyboard]
@@ -4751,7 +4752,7 @@ func WithEditMessageCaptionCaptionEntities(value []MessageEntity) EditMessageCap
 // WithEditMessageCaptionShowCaptionAboveMedia sets the ShowCaptionAboveMedia field.
 //
 // Pass True if the caption must be shown above the message media.
-// Supported only for animation, photo and video messages.
+// Supported only for animation, live photo, paid media, photo, video and widget messages.
 func WithEditMessageCaptionShowCaptionAboveMedia(value bool) EditMessageCaptionOption {
 	return fieldOption(value, func(params *EditMessageCaptionParams) *bool {
 		return &params.ShowCaptionAboveMedia
@@ -4772,7 +4773,7 @@ func WithEditMessageCaptionReplyMarkup(value *InlineKeyboardMarkup) EditMessageC
 // EditMessageCaption calls the editMessageCaption Telegram Bot API method.
 //
 // Use this method to edit captions of messages.
-// On success, if the edited message is not an inline message, the edited [Message] is returned, otherwise True is returned.
+// On success, if the edited message is not an inline message, the edited [Message] is returned; otherwise, True is returned.
 // Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within 48 hours from the time they were sent.
 //
 // [Message]: https://core.telegram.org/bots/api#message
@@ -4794,7 +4795,7 @@ func (c *Client) EditMessageCaption(ctx context.Context, params *EditMessageCapt
 
 // EditMessageChecklistParams contains parameters for Client.EditMessageChecklist.
 type EditMessageChecklistParams struct {
-	// Unique identifier of the business connection on behalf of which the message will be sent
+	// Unique identifier of the business connection on behalf of which the message to be edited was sent
 	BusinessConnectionID string `json:"business_connection_id"`
 
 	// Unique identifier for the target chat or username of the target bot in the format @username
@@ -4829,7 +4830,7 @@ func (r *EditMessageChecklistParams) ChatTarget() ChatID {
 
 // WithEditMessageChecklistBusinessConnectionID sets the BusinessConnectionID field.
 //
-// Unique identifier of the business connection on behalf of which the message will be sent
+// Unique identifier of the business connection on behalf of which the message to be edited was sent
 func WithEditMessageChecklistBusinessConnectionID(value string) EditMessageChecklistOption {
 	return fieldOption(value, func(params *EditMessageChecklistParams) *string {
 		return &params.BusinessConnectionID
@@ -5070,7 +5071,7 @@ func WithEditMessageLiveLocationReplyMarkup(value *InlineKeyboardMarkup) EditMes
 //
 // Use this method to edit live location messages.
 // A location can be edited until its live_period expires or editing is explicitly disabled by a call to [stopMessageLiveLocation].
-// On success, if the edited message is not an inline message, the edited [Message] is returned, otherwise True is returned.
+// On success, if the edited message is not an inline message, the edited [Message] is returned; otherwise, True is returned.
 //
 // [stopMessageLiveLocation]: https://core.telegram.org/bots/api#stopmessagelivelocation
 // [Message]: https://core.telegram.org/bots/api#message
@@ -5192,10 +5193,10 @@ func WithEditMessageMediaReplyMarkup(value *InlineKeyboardMarkup) EditMessageMed
 
 // EditMessageMedia calls the editMessageMedia Telegram Bot API method.
 //
-// Use this method to edit animation, audio, document, live photo, photo, or video messages, or to replace a text or a rich message with a media.
+// Use this method to edit animation, audio, document, live photo, photo, or video messages, or to replace a text or a rich message with media.
 // If a message is part of a message album, then it can be edited only to an audio for audio albums, only to a document for document albums and to a photo, a live photo, or a video otherwise.
 // When an inline message is edited, a new file can't be uploaded; use a previously uploaded file via its file_id or specify a URL.
-// On success, if the edited message is not an inline message, the edited [Message] is returned, otherwise True is returned.
+// On success, if the edited message is not an inline message, the edited [Message] is returned; otherwise, True is returned.
 // Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within 48 hours from the time they were sent.
 //
 // [Message]: https://core.telegram.org/bots/api#message
@@ -5430,7 +5431,7 @@ func WithEditMessageReplyMarkupReplyMarkup(value *InlineKeyboardMarkup) EditMess
 // EditMessageReplyMarkup calls the editMessageReplyMarkup Telegram Bot API method.
 //
 // Use this method to edit only the reply markup of messages.
-// On success, if the edited message is not an inline message, the edited [Message] is returned, otherwise True is returned.
+// On success, if the edited message is not an inline message, the edited [Message] is returned; otherwise, True is returned.
 // Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within 48 hours from the time they were sent.
 //
 // [Message]: https://core.telegram.org/bots/api#message
@@ -5483,7 +5484,7 @@ type EditMessageTextParams struct {
 	LinkPreviewOptions *LinkPreviewOptions `json:"link_preview_options,omitempty"`
 
 	// New rich content of the message; required if text isn't specified.
-	// Direct upload of new files and explicit upload of files by a URL isn't supported when an inline message is edited.
+	// Direct upload of new files and explicit upload of files by a URL aren't supported when an inline message is edited.
 	RichMessage *InputRichMessage `json:"rich_message,omitempty"`
 
 	// A JSON-serialized object for an [inline keyboard]
@@ -5588,7 +5589,7 @@ func WithEditMessageTextLinkPreviewOptions(value *LinkPreviewOptions) EditMessag
 // WithEditMessageTextRichMessage sets the RichMessage field.
 //
 // New rich content of the message; required if text isn't specified.
-// Direct upload of new files and explicit upload of files by a URL isn't supported when an inline message is edited.
+// Direct upload of new files and explicit upload of files by a URL aren't supported when an inline message is edited.
 func WithEditMessageTextRichMessage(value *InputRichMessage) EditMessageTextOption {
 	return fieldOption(value, func(params *EditMessageTextParams) **InputRichMessage {
 		return &params.RichMessage
@@ -5609,7 +5610,7 @@ func WithEditMessageTextReplyMarkup(value *InlineKeyboardMarkup) EditMessageText
 // EditMessageText calls the editMessageText Telegram Bot API method.
 //
 // Use this method to edit text, rich and [game] messages.
-// On success, if the edited message is not an inline message, the edited [Message] is returned, otherwise True is returned.
+// On success, if the edited message is not an inline message, the edited [Message] is returned; otherwise, True is returned.
 // Note that business messages that were not sent by the bot and do not contain an inline keyboard can only be edited within 48 hours from the time they were sent.
 //
 // [game]: https://core.telegram.org/bots/api#games
@@ -6510,7 +6511,7 @@ type GetBusinessAccountGiftsParams struct {
 	// Sorting is applied before pagination.
 	SortByPrice bool `json:"sort_by_price,omitempty"`
 
-	// Offset of the first entry to return as received from the previous request; use empty string to get the first chunk of results
+	// Offset of the first entry to return as received from the previous request; use an empty string to get the first chunk of results
 	Offset string `json:"offset,omitempty"`
 
 	// The maximum number of gifts to be returned; 1-100.
@@ -6612,7 +6613,7 @@ func WithGetBusinessAccountGiftsSortByPrice(value bool) GetBusinessAccountGiftsO
 
 // WithGetBusinessAccountGiftsOffset sets the Offset field.
 //
-// Offset of the first entry to return as received from the previous request; use empty string to get the first chunk of results
+// Offset of the first entry to return as received from the previous request; use an empty string to get the first chunk of results
 func WithGetBusinessAccountGiftsOffset(value string) GetBusinessAccountGiftsOption {
 	return fieldOption(value, func(params *GetBusinessAccountGiftsParams) *string {
 		return &params.Offset
@@ -7596,10 +7597,10 @@ func (r *GetMeParams) Option(opts ...GetMeOption) {
 //
 // A simple method for testing your bot's authentication token.
 // Requires no parameters.
-// Returns basic information about the bot in form of a [User] object.
+// Returns information about the bot in the form of a [BotFullInfo] object.
 //
-// [User]: https://core.telegram.org/bots/api#user
-func (c *Client) GetMe(ctx context.Context, params *GetMeParams) (ret *User, err error) {
+// [BotFullInfo]: https://core.telegram.org/bots/api#botfullinfo
+func (c *Client) GetMe(ctx context.Context, params *GetMeParams) (ret *BotFullInfo, err error) {
 	buffer := acquireBuffer()
 	defer releaseBuffer(buffer)
 
@@ -7610,7 +7611,7 @@ func (c *Client) GetMe(ctx context.Context, params *GetMeParams) (ret *User, err
 	reader := bytes.NewReader(buffer.B)
 	contentType := contentTypeJSON
 
-	ret, err = call[*User](ctx, c, "getMe", params, reader, contentType, c.cfg.timeout)
+	ret, err = call[*BotFullInfo](ctx, c, "getMe", params, reader, contentType, c.cfg.timeout)
 
 	return ret, err
 }
@@ -7683,8 +7684,8 @@ func (c *Client) GetMyCommands(ctx context.Context, params *GetMyCommandsParams)
 
 // GetMyDefaultAdministratorRightsParams contains parameters for Client.GetMyDefaultAdministratorRights.
 type GetMyDefaultAdministratorRightsParams struct {
-	// Pass True to get default administrator rights of the bot in channels.
-	// Otherwise, default administrator rights of the bot for groups and supergroups will be returned.
+	// Pass True to get the default administrator rights of the bot in channels.
+	// Otherwise, the default administrator rights of the bot for groups and supergroups will be returned.
 	ForChannels bool `json:"for_channels,omitempty"`
 }
 
@@ -7700,8 +7701,8 @@ func (r *GetMyDefaultAdministratorRightsParams) Option(opts ...GetMyDefaultAdmin
 
 // WithGetMyDefaultAdministratorRightsForChannels sets the ForChannels field.
 //
-// Pass True to get default administrator rights of the bot in channels.
-// Otherwise, default administrator rights of the bot for groups and supergroups will be returned.
+// Pass True to get the default administrator rights of the bot in channels.
+// Otherwise, the default administrator rights of the bot for groups and supergroups will be returned.
 func WithGetMyDefaultAdministratorRightsForChannels(value bool) GetMyDefaultAdministratorRightsOption {
 	return fieldOption(value, func(params *GetMyDefaultAdministratorRightsParams) *bool {
 		return &params.ForChannels
@@ -8085,7 +8086,7 @@ type GetUpdatesParams struct {
 	// Timeout in seconds for long polling.
 	// Defaults to 0, i.e.
 	// usual short polling.
-	// Should be positive, short polling should be used for testing purposes only.
+	// Should be positive; short polling should be used for testing purposes only.
 	Timeout int64 `json:"timeout,omitempty"`
 
 	// A JSON-serialized list of the update types you want your bot to receive.
@@ -8142,7 +8143,7 @@ func WithGetUpdatesLimit(value int64) GetUpdatesOption {
 // Timeout in seconds for long polling.
 // Defaults to 0, i.e.
 // usual short polling.
-// Should be positive, short polling should be used for testing purposes only.
+// Should be positive; short polling should be used for testing purposes only.
 func WithGetUpdatesTimeout(value int64) GetUpdatesOption {
 	return fieldOption(value, func(params *GetUpdatesParams) *int64 {
 		return &params.Timeout
@@ -8630,10 +8631,10 @@ func (r *GetWebhookInfoParams) Option(opts ...GetWebhookInfoOption) {
 
 // GetWebhookInfo calls the getWebhookInfo Telegram Bot API method.
 //
-// Use this method to get current webhook status.
+// Use this method to get the current webhook status.
 // Requires no parameters.
 // On success, returns a [WebhookInfo] object.
-// If the bot is using [getUpdates], will return an object with the url field empty.
+// If the bot is using [getUpdates], it will return an object with the url field empty.
 //
 // [WebhookInfo]: https://core.telegram.org/bots/api#webhookinfo
 // [getUpdates]: https://core.telegram.org/bots/api#getupdates
@@ -8803,7 +8804,7 @@ func WithHideGeneralForumTopicChatID(value ChatID) HideGeneralForumTopicOption {
 // HideGeneralForumTopic calls the hideGeneralForumTopic Telegram Bot API method.
 //
 // Use this method to hide the 'General' topic in a forum supergroup chat.
-// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator right.
 // The topic will be automatically closed if it was open.
 // Returns True on success.
 func (c *Client) HideGeneralForumTopic(ctx context.Context, params *HideGeneralForumTopicParams) (ret bool, err error) {
@@ -8891,8 +8892,8 @@ func (r *LogOutParams) Option(opts ...LogOutOption) {
 // LogOut calls the logOut Telegram Bot API method.
 //
 // Use this method to log out from the cloud Bot API server before launching the bot locally.
-// You must log out the bot before running it locally, otherwise there is no guarantee that the bot will receive updates.
-// After a successful call, you can immediately log in on a local server, but will not be able to log in back to the cloud Bot API server for 10 minutes.
+// You must log out the bot before running it locally; otherwise, there is no guarantee that the bot will receive updates.
+// After a successful call, you can immediately log in on a local server, but will not be able to log back in to the cloud Bot API server for 10 minutes.
 // Returns True on success.
 // Requires no parameters.
 func (c *Client) LogOut(ctx context.Context, params *LogOutParams) (ret bool, err error) {
@@ -9277,7 +9278,7 @@ type PromoteChatMemberParams struct {
 	// Pass True if the administrator can add new administrators with a subset of their own privileges or demote administrators that they have promoted, directly or indirectly (promoted by administrators that were appointed by him)
 	CanPromoteMembers bool `json:"can_promote_members,omitempty"`
 
-	// Pass True if the administrator can change chat title, photo and other settings
+	// Pass True if the administrator can change the chat title, photo and other settings
 	CanChangeInfo bool `json:"can_change_info,omitempty"`
 
 	// Pass True if the administrator can invite new users to the chat
@@ -9405,7 +9406,7 @@ func WithPromoteChatMemberCanPromoteMembers(value bool) PromoteChatMemberOption 
 
 // WithPromoteChatMemberCanChangeInfo sets the CanChangeInfo field.
 //
-// Pass True if the administrator can change chat title, photo and other settings
+// Pass True if the administrator can change the chat title, photo and other settings
 func WithPromoteChatMemberCanChangeInfo(value bool) PromoteChatMemberOption {
 	return fieldOption(value, func(params *PromoteChatMemberParams) *bool {
 		return &params.CanChangeInfo
@@ -9591,7 +9592,7 @@ func WithReadBusinessMessageMessageID(value int64) ReadBusinessMessageOption {
 
 // ReadBusinessMessage calls the readBusinessMessage Telegram Bot API method.
 //
-// Marks incoming message as read on behalf of a business account.
+// Marks an incoming message as read on behalf of a business account.
 // Requires the can_read_messages business bot right.
 // Returns True on success.
 func (c *Client) ReadBusinessMessage(ctx context.Context, params *ReadBusinessMessageParams) (ret bool, err error) {
@@ -9731,7 +9732,7 @@ func (c *Client) RemoveBusinessAccountProfilePhoto(ctx context.Context, params *
 
 // RemoveChatVerificationParams contains parameters for Client.RemoveChatVerification.
 type RemoveChatVerificationParams struct {
-	// Unique identifier for the target chat or username of the target bot or channel in the format @username
+	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 	ChatID ChatID `json:"chat_id"`
 }
 
@@ -9752,7 +9753,7 @@ func (r *RemoveChatVerificationParams) ChatTarget() ChatID {
 
 // WithRemoveChatVerificationChatID sets the ChatID field.
 //
-// Unique identifier for the target chat or username of the target bot or channel in the format @username
+// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username
 func WithRemoveChatVerificationChatID(value ChatID) RemoveChatVerificationOption {
 	return fieldOption(value, func(params *RemoveChatVerificationParams) *ChatID {
 		return &params.ChatID
@@ -9908,7 +9909,7 @@ func WithReopenForumTopicMessageThreadID(value int64) ReopenForumTopicOption {
 // ReopenForumTopic calls the reopenForumTopic Telegram Bot API method.
 //
 // Use this method to reopen a closed topic in a forum supergroup chat.
-// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights, unless it is the creator of the topic.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator right, unless it is the creator of the topic.
 // Returns True on success.
 func (c *Client) ReopenForumTopic(ctx context.Context, params *ReopenForumTopicParams) (ret bool, err error) {
 	buffer := acquireBuffer()
@@ -9959,7 +9960,7 @@ func WithReopenGeneralForumTopicChatID(value ChatID) ReopenGeneralForumTopicOpti
 // ReopenGeneralForumTopic calls the reopenGeneralForumTopic Telegram Bot API method.
 //
 // Use this method to reopen a closed 'General' topic in a forum supergroup chat.
-// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator right.
 // The topic will be automatically unhidden if it was hidden.
 // Returns True on success.
 func (c *Client) ReopenGeneralForumTopic(ctx context.Context, params *ReopenGeneralForumTopicParams) (ret bool, err error) {
@@ -10278,7 +10279,7 @@ type RestrictChatMemberParams struct {
 	UseIndependentChatPermissions bool `json:"use_independent_chat_permissions,omitempty"`
 
 	// Date when restrictions will be lifted for the user; Unix time.
-	// If user is restricted for more than 366 days or less than 30 seconds from the current time, they are considered to be restricted forever.
+	// If the user is restricted for more than 366 days or less than 30 seconds from the current time, they are considered to be restricted forever.
 	UntilDate int64 `json:"until_date,omitempty"`
 }
 
@@ -10337,7 +10338,7 @@ func WithRestrictChatMemberUseIndependentChatPermissions(value bool) RestrictCha
 // WithRestrictChatMemberUntilDate sets the UntilDate field.
 //
 // Date when restrictions will be lifted for the user; Unix time.
-// If user is restricted for more than 366 days or less than 30 seconds from the current time, they are considered to be restricted forever.
+// If the user is restricted for more than 366 days or less than 30 seconds from the current time, they are considered to be restricted forever.
 func WithRestrictChatMemberUntilDate(value int64) RestrictChatMemberOption {
 	return fieldOption(value, func(params *RestrictChatMemberParams) *int64 {
 		return &params.UntilDate
@@ -10413,7 +10414,7 @@ func WithRevokeChatInviteLinkInviteLink(value string) RevokeChatInviteLinkOption
 // Use this method to revoke an invite link created by the bot.
 // If the primary link is revoked, a new link is automatically generated.
 // The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights.
-// Returns the revoked invite link as [ChatInviteLink] object.
+// Returns the revoked invite link as a [ChatInviteLink] object.
 //
 // [ChatInviteLink]: https://core.telegram.org/bots/api#chatinvitelink
 func (c *Client) RevokeChatInviteLink(ctx context.Context, params *RevokeChatInviteLinkParams) (ret *ChatInviteLink, err error) {
@@ -10637,13 +10638,13 @@ type SendAnimationParams struct {
 	// The thumbnail should be in JPEG format and less than 200 kB in size.
 	// A thumbnail's width and height should not exceed 320.
 	// Ignored if the file is not uploaded using multipart/form-data.
-	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+	// Thumbnails can't be reused and can only be uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
 	Thumbnail *InputFile `json:"thumbnail,omitempty"`
 
-	// Animation caption (may also be used when resending animation by file_id), 0-1024 characters after entities parsing
+	// Animation caption (may also be used when resending animations by file_id), 0-1024 characters after entities parsing
 	Caption string `json:"caption,omitempty"`
 
 	// Mode for parsing entities in the animation caption.
@@ -10800,7 +10801,7 @@ func WithSendAnimationHeight(value int64) SendAnimationOption {
 // The thumbnail should be in JPEG format and less than 200 kB in size.
 // A thumbnail's width and height should not exceed 320.
 // Ignored if the file is not uploaded using multipart/form-data.
-// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+// Thumbnails can't be reused and can only be uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 // [More information on Sending Files »]
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -10812,7 +10813,7 @@ func WithSendAnimationThumbnail(value *InputFile) SendAnimationOption {
 
 // WithSendAnimationCaption sets the Caption field.
 //
-// Animation caption (may also be used when resending animation by file_id), 0-1024 characters after entities parsing
+// Animation caption (may also be used when resending animations by file_id), 0-1024 characters after entities parsing
 func WithSendAnimationCaption(value string) SendAnimationOption {
 	return fieldOption(value, func(params *SendAnimationParams) *string {
 		return &params.Caption
@@ -10936,7 +10937,7 @@ func WithSendAnimationReplyMarkup(value *ReplyMarkup) SendAnimationOption {
 //
 // Use this method to send animation files (GIF or H.264/MPEG-4 AVC video without sound).
 // On success, the sent [Message] is returned.
-// Bots can currently send animation files of up to 50 MB in size, this limit may be changed in the future.
+// Bots can currently send animation files of up to 50 MB in size; this limit may be changed in the future.
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendAnimation(ctx context.Context, params *SendAnimationParams) (ret *Message, err error) {
@@ -11203,7 +11204,7 @@ type SendAudioParams struct {
 	// The thumbnail should be in JPEG format and less than 200 kB in size.
 	// A thumbnail's width and height should not exceed 320.
 	// Ignored if the file is not uploaded using multipart/form-data.
-	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+	// Thumbnails can't be reused and can only be uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -11378,7 +11379,7 @@ func WithSendAudioTitle(value string) SendAudioOption {
 // The thumbnail should be in JPEG format and less than 200 kB in size.
 // A thumbnail's width and height should not exceed 320.
 // Ignored if the file is not uploaded using multipart/form-data.
-// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+// Thumbnails can't be reused and can only be uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 // [More information on Sending Files »]
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -11467,7 +11468,7 @@ func WithSendAudioReplyMarkup(value *ReplyMarkup) SendAudioOption {
 // Use this method to send audio files, if you want Telegram clients to display them in the music player.
 // Your audio must be in the .MP3 or .M4A format.
 // On success, the sent [Message] is returned.
-// Bots can currently send audio files of up to 50 MB in size, this limit may be changed in the future.
+// Bots can currently send audio files of up to 50 MB in size; this limit may be changed in the future.
 // For sending voice messages, use the [sendVoice] method instead.
 //
 // [Message]: https://core.telegram.org/bots/api#message
@@ -12485,7 +12486,7 @@ type SendDocumentParams struct {
 	// The thumbnail should be in JPEG format and less than 200 kB in size.
 	// A thumbnail's width and height should not exceed 320.
 	// Ignored if the file is not uploaded using multipart/form-data.
-	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+	// Thumbnails can't be reused and can only be uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -12618,7 +12619,7 @@ func WithSendDocumentDocument(value InputFile) SendDocumentOption {
 // The thumbnail should be in JPEG format and less than 200 kB in size.
 // A thumbnail's width and height should not exceed 320.
 // Ignored if the file is not uploaded using multipart/form-data.
-// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+// Thumbnails can't be reused and can only be uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 // [More information on Sending Files »]
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -12745,7 +12746,7 @@ func WithSendDocumentReplyMarkup(value *ReplyMarkup) SendDocumentOption {
 //
 // Use this method to send general files.
 // On success, the sent [Message] is returned.
-// Bots can currently send files of any type of up to 50 MB in size, this limit may be changed in the future.
+// Bots can currently send files of any type of up to 50 MB in size; this limit may be changed in the future.
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SendDocument(ctx context.Context, params *SendDocumentParams) (ret *Message, err error) {
@@ -13276,7 +13277,7 @@ type SendInvoiceParams struct {
 	Description string `json:"description"`
 
 	// Bot-defined invoice payload, 1-128 bytes.
-	// This will not be displayed to the user, use it for your internal processes.
+	// This will not be displayed to the user; use it for your internal processes.
 	Payload string `json:"payload"`
 
 	// Payment provider token, obtained via [@BotFather].
@@ -13302,7 +13303,7 @@ type SendInvoiceParams struct {
 
 	// The maximum accepted amount for tips in the smallest units of the currency (integer, not float/double).
 	// For example, for a maximum tip of US$ 1.45 pass max_tip_amount = 145.
-	// See the exp parameter in [currencies.json], it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
+	// See the exp parameter in [currencies.json]; it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
 	// Defaults to 0.
 	// Not supported for payments in [Telegram Stars].
 	//
@@ -13312,7 +13313,7 @@ type SendInvoiceParams struct {
 
 	// A JSON-serialized Array of suggested amounts of tips in the smallest units of the currency (integer, not float/double).
 	// At most 4 suggested tip amounts can be specified.
-	// The suggested tip amounts must be positive, passed in a strictly increased order and must not exceed max_tip_amount.
+	// The suggested tip amounts must be positive, passed in a strictly increasing order and must not exceed max_tip_amount.
 	SuggestedTipAmounts []int64 `json:"suggested_tip_amounts,omitempty"`
 
 	// Unique deep-linking parameter.
@@ -13321,7 +13322,7 @@ type SendInvoiceParams struct {
 	StartParameter string `json:"start_parameter,omitempty"`
 
 	// JSON-serialized data about the invoice, which will be shared with the payment provider.
-	// A detailed description of required fields should be provided by the payment provider.
+	// A detailed description of the required fields should be provided by the payment provider.
 	ProviderData string `json:"provider_data,omitempty"`
 
 	// URL of the product photo for the invoice.
@@ -13476,7 +13477,7 @@ func WithSendInvoiceDescription(value string) SendInvoiceOption {
 // WithSendInvoicePayload sets the Payload field.
 //
 // Bot-defined invoice payload, 1-128 bytes.
-// This will not be displayed to the user, use it for your internal processes.
+// This will not be displayed to the user; use it for your internal processes.
 func WithSendInvoicePayload(value string) SendInvoiceOption {
 	return fieldOption(value, func(params *SendInvoiceParams) *string {
 		return &params.Payload
@@ -13526,7 +13527,7 @@ func WithSendInvoicePrices(value []LabeledPrice) SendInvoiceOption {
 //
 // The maximum accepted amount for tips in the smallest units of the currency (integer, not float/double).
 // For example, for a maximum tip of US$ 1.45 pass max_tip_amount = 145.
-// See the exp parameter in [currencies.json], it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
+// See the exp parameter in [currencies.json]; it shows the number of digits past the decimal point for each currency (2 for the majority of currencies).
 // Defaults to 0.
 // Not supported for payments in [Telegram Stars].
 //
@@ -13542,7 +13543,7 @@ func WithSendInvoiceMaxTipAmount(value int64) SendInvoiceOption {
 //
 // A JSON-serialized Array of suggested amounts of tips in the smallest units of the currency (integer, not float/double).
 // At most 4 suggested tip amounts can be specified.
-// The suggested tip amounts must be positive, passed in a strictly increased order and must not exceed max_tip_amount.
+// The suggested tip amounts must be positive, passed in a strictly increasing order and must not exceed max_tip_amount.
 func WithSendInvoiceSuggestedTipAmounts(value []int64) SendInvoiceOption {
 	return fieldOption(value, func(params *SendInvoiceParams) *[]int64 {
 		return &params.SuggestedTipAmounts
@@ -13563,7 +13564,7 @@ func WithSendInvoiceStartParameter(value string) SendInvoiceOption {
 // WithSendInvoiceProviderData sets the ProviderData field.
 //
 // JSON-serialized data about the invoice, which will be shared with the payment provider.
-// A detailed description of required fields should be provided by the payment provider.
+// A detailed description of the required fields should be provided by the payment provider.
 func WithSendInvoiceProviderData(value string) SendInvoiceOption {
 	return fieldOption(value, func(params *SendInvoiceParams) *string {
 		return &params.ProviderData
@@ -13815,17 +13816,17 @@ type SendLivePhotoParams struct {
 	LivePhoto InputFile `json:"live_photo"`
 
 	// The static photo to send.
-	// Pass a file_id as String to send a photo that exists on the Telegram servers (recommended) or upload a new video using multipart/form-data.
+	// Pass a file_id as String to send a photo that exists on the Telegram servers (recommended) or upload a new photo using multipart/form-data.
 	// [More information on Sending Files »].
 	// Sending live photos by a URL is currently unsupported.
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
 	Photo InputFile `json:"photo"`
 
-	// Video caption (may also be used when resending videos by file_id), 0-1024 characters after entities parsing
+	// Live photo caption (may also be used when resending live photos by file_id), 0-1024 characters after entities parsing
 	Caption string `json:"caption,omitempty"`
 
-	// Mode for parsing entities in the video caption.
+	// Mode for parsing entities in the live photo caption.
 	// See [formatting options] for more details.
 	//
 	// [formatting options]: https://core.telegram.org/bots/api#formatting-options
@@ -13837,7 +13838,7 @@ type SendLivePhotoParams struct {
 	// Pass True if the caption must be shown above the message media
 	ShowCaptionAboveMedia bool `json:"show_caption_above_media,omitempty"`
 
-	// Pass True if the video needs to be covered with a spoiler animation
+	// Pass True if the live photo needs to be covered with a spoiler animation
 	HasSpoiler bool `json:"has_spoiler,omitempty"`
 
 	// Sends the message [silently].
@@ -13951,7 +13952,7 @@ func WithSendLivePhotoLivePhoto(value InputFile) SendLivePhotoOption {
 // WithSendLivePhotoPhoto sets the Photo field.
 //
 // The static photo to send.
-// Pass a file_id as String to send a photo that exists on the Telegram servers (recommended) or upload a new video using multipart/form-data.
+// Pass a file_id as String to send a photo that exists on the Telegram servers (recommended) or upload a new photo using multipart/form-data.
 // [More information on Sending Files »].
 // Sending live photos by a URL is currently unsupported.
 //
@@ -13964,7 +13965,7 @@ func WithSendLivePhotoPhoto(value InputFile) SendLivePhotoOption {
 
 // WithSendLivePhotoCaption sets the Caption field.
 //
-// Video caption (may also be used when resending videos by file_id), 0-1024 characters after entities parsing
+// Live photo caption (may also be used when resending live photos by file_id), 0-1024 characters after entities parsing
 func WithSendLivePhotoCaption(value string) SendLivePhotoOption {
 	return fieldOption(value, func(params *SendLivePhotoParams) *string {
 		return &params.Caption
@@ -13973,7 +13974,7 @@ func WithSendLivePhotoCaption(value string) SendLivePhotoOption {
 
 // WithSendLivePhotoParseMode sets the ParseMode field.
 //
-// Mode for parsing entities in the video caption.
+// Mode for parsing entities in the live photo caption.
 // See [formatting options] for more details.
 //
 // [formatting options]: https://core.telegram.org/bots/api#formatting-options
@@ -14003,7 +14004,7 @@ func WithSendLivePhotoShowCaptionAboveMedia(value bool) SendLivePhotoOption {
 
 // WithSendLivePhotoHasSpoiler sets the HasSpoiler field.
 //
-// Pass True if the video needs to be covered with a spoiler animation
+// Pass True if the live photo needs to be covered with a spoiler animation
 func WithSendLivePhotoHasSpoiler(value bool) SendLivePhotoOption {
 	return fieldOption(value, func(params *SendLivePhotoParams) *bool {
 		return &params.HasSpoiler
@@ -14547,7 +14548,7 @@ func WithSendLocationReplyMarkup(value *ReplyMarkup) SendLocationOption {
 
 // SendLocation calls the sendLocation Telegram Bot API method.
 //
-// Use this method to send point on the map.
+// Use this method to send a point on the map.
 // On success, the sent [Message] is returned.
 //
 // [Message]: https://core.telegram.org/bots/api#message
@@ -14720,7 +14721,7 @@ func WithSendMediaGroupReplyParameters(value *ReplyParameters) SendMediaGroupOpt
 // SendMediaGroup calls the sendMediaGroup Telegram Bot API method.
 //
 // Use this method to send a group of photos, live photos, videos, documents or audios as an album.
-// Documents and audio files can be only grouped in an album with messages of the same type.
+// Documents and audio files can only be grouped in an album with messages of the same type.
 // On success, an Array of [Message] objects that were sent is returned.
 //
 // [Message]: https://core.telegram.org/bots/api#message
@@ -15340,7 +15341,7 @@ type SendPaidMediaParams struct {
 	Media []InputPaidMedia `json:"media"`
 
 	// Bot-defined paid media payload, 0-128 bytes.
-	// This will not be displayed to the user, use it for your internal processes.
+	// This will not be displayed to the user; use it for your internal processes.
 	Payload string `json:"payload,omitempty"`
 
 	// Media caption, 0-1024 characters after entities parsing
@@ -15462,7 +15463,7 @@ func WithSendPaidMediaMedia(value []InputPaidMedia) SendPaidMediaOption {
 // WithSendPaidMediaPayload sets the Payload field.
 //
 // Bot-defined paid media payload, 0-128 bytes.
-// This will not be displayed to the user, use it for your internal processes.
+// This will not be displayed to the user; use it for your internal processes.
 func WithSendPaidMediaPayload(value string) SendPaidMediaOption {
 	return fieldOption(value, func(params *SendPaidMediaParams) *string {
 		return &params.Payload
@@ -16289,7 +16290,7 @@ type SendPollParams struct {
 	// Pass True if the poll allows multiple answers, defaults to False
 	AllowsMultipleAnswers bool `json:"allows_multiple_answers,omitempty"`
 
-	// Pass True if the poll allows to change chosen answer options, defaults to False for quizzes and to True for regular polls
+	// Pass True if the poll allows changing the chosen answer options, defaults to False for quizzes and to True for regular polls
 	AllowsRevoting Optional[bool] `json:"allows_revoting,omitzero"`
 
 	// Pass True if the poll options must be shown in random order
@@ -16500,7 +16501,7 @@ func WithSendPollAllowsMultipleAnswers(value bool) SendPollOption {
 
 // WithSendPollAllowsRevoting sets the AllowsRevoting field.
 //
-// Pass True if the poll allows to change chosen answer options, defaults to False for quizzes and to True for regular polls
+// Pass True if the poll allows changing the chosen answer options, defaults to False for quizzes and to True for regular polls
 func WithSendPollAllowsRevoting(value bool) SendPollOption {
 	return fieldOption(Some(value), func(params *SendPollParams) *Optional[bool] {
 		return &params.AllowsRevoting
@@ -17215,7 +17216,7 @@ func (c *Client) SendPoll(ctx context.Context, params *SendPollParams) (ret *Mes
 // SendRichMessageParams contains parameters for Client.SendRichMessage.
 type SendRichMessageParams struct {
 	// Unique identifier of the business connection on behalf of which the message will be sent.
-	// Bot can send rich messages on behalf of a business account only if the corresponding user can send rich messages.
+	// The bot can send rich messages on behalf of a business account only if the corresponding user can send rich messages.
 	BusinessConnectionID string `json:"business_connection_id,omitempty"`
 
 	// Unique identifier for the target chat or username of the target bot, supergroup, or channel in the format @username; required unless the message is sent as an ephemeral reply to a callback query
@@ -17284,7 +17285,7 @@ func (r *SendRichMessageParams) ChatTarget() ChatID {
 // WithSendRichMessageBusinessConnectionID sets the BusinessConnectionID field.
 //
 // Unique identifier of the business connection on behalf of which the message will be sent.
-// Bot can send rich messages on behalf of a business account only if the corresponding user can send rich messages.
+// The bot can send rich messages on behalf of a business account only if the corresponding user can send rich messages.
 func WithSendRichMessageBusinessConnectionID(value string) SendRichMessageOption {
 	return fieldOption(value, func(params *SendRichMessageParams) *string {
 		return &params.BusinessConnectionID
@@ -17447,7 +17448,7 @@ type SendRichMessageDraftParams struct {
 	DraftID int64 `json:"draft_id"`
 
 	// The partial message to be streamed.
-	// Direct upload of new files and explicit upload of files by a URL isn't supported.
+	// Direct upload of new files and explicit upload of files by a URL aren't supported.
 	RichMessage InputRichMessage `json:"rich_message"`
 
 	// Pass True to show the user a button to stop further drafts.
@@ -17509,7 +17510,7 @@ func WithSendRichMessageDraftDraftID(value int64) SendRichMessageDraftOption {
 // WithSendRichMessageDraftRichMessage sets the RichMessage field.
 //
 // The partial message to be streamed.
-// Direct upload of new files and explicit upload of files by a URL isn't supported.
+// Direct upload of new files and explicit upload of files by a URL aren't supported.
 func WithSendRichMessageDraftRichMessage(value InputRichMessage) SendRichMessageDraftOption {
 	return fieldOption(value, func(params *SendRichMessageDraftParams) *InputRichMessage {
 		return &params.RichMessage
@@ -17776,7 +17777,7 @@ func WithSendSharedWidgetReplyMarkup(value *ReplyMarkup) SendSharedWidgetOption 
 
 // SendSharedWidget calls the sendSharedWidget Telegram Bot API method.
 //
-// Use this method to send again a shared widget created by the bot.
+// Use this method to resend a shared widget created by the bot.
 // Currently, in the production environment, widgets can be sent only to private chats, and sent widgets automatically have protected content and therefore can't be forwarded.
 // On success, the sent [Message] is returned.
 //
@@ -18515,7 +18516,7 @@ type SendVideoParams struct {
 	// The thumbnail should be in JPEG format and less than 200 kB in size.
 	// A thumbnail's width and height should not exceed 320.
 	// Ignored if the file is not uploaded using multipart/form-data.
-	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+	// Thumbnails can't be reused and can only be uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -18691,7 +18692,7 @@ func WithSendVideoHeight(value int64) SendVideoOption {
 // The thumbnail should be in JPEG format and less than 200 kB in size.
 // A thumbnail's width and height should not exceed 320.
 // Ignored if the file is not uploaded using multipart/form-data.
-// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+// Thumbnails can't be reused and can only be uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 // [More information on Sending Files »]
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -18856,9 +18857,9 @@ func WithSendVideoReplyMarkup(value *ReplyMarkup) SendVideoOption {
 
 // SendVideo calls the sendVideo Telegram Bot API method.
 //
-// Use this method to send video files, Telegram clients support MPEG4 videos (other formats may be sent as [Document]).
+// Use this method to send video files; Telegram clients support MPEG4 videos (other formats may be sent as [Document]).
 // On success, the sent [Message] is returned.
-// Bots can currently send video files of up to 50 MB in size, this limit may be changed in the future.
+// Bots can currently send video files of up to 50 MB in size; this limit may be changed in the future.
 //
 // [Document]: https://core.telegram.org/bots/api#document
 // [Message]: https://core.telegram.org/bots/api#message
@@ -19139,7 +19140,7 @@ type SendVideoNoteParams struct {
 	// The thumbnail should be in JPEG format and less than 200 kB in size.
 	// A thumbnail's width and height should not exceed 320.
 	// Ignored if the file is not uploaded using multipart/form-data.
-	// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+	// Thumbnails can't be reused and can only be uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 	// [More information on Sending Files »]
 	//
 	// [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -19277,7 +19278,7 @@ func WithSendVideoNoteLength(value int64) SendVideoNoteOption {
 // The thumbnail should be in JPEG format and less than 200 kB in size.
 // A thumbnail's width and height should not exceed 320.
 // Ignored if the file is not uploaded using multipart/form-data.
-// Thumbnails can't be reused and can be only uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
+// Thumbnails can't be reused and can only be uploaded as a new file, so you can pass “attach://<file_attach_name>” if the thumbnail was uploaded using multipart/form-data under <file_attach_name>.
 // [More information on Sending Files »]
 //
 // [More information on Sending Files »]: https://core.telegram.org/bots/api#sending-files
@@ -19363,7 +19364,7 @@ func WithSendVideoNoteReplyMarkup(value *ReplyMarkup) SendVideoNoteOption {
 
 // SendVideoNote calls the sendVideoNote Telegram Bot API method.
 //
-// Use this method to send a rounded square MPEG4 video of up to 1 minute long.
+// Use this method to send a rounded square MPEG4 video up to 1 minute long.
 // On success, the sent [Message] is returned.
 //
 // [Message]: https://core.telegram.org/bots/api#message
@@ -19793,7 +19794,7 @@ func WithSendVoiceReplyMarkup(value *ReplyMarkup) SendVoiceOption {
 // Use this method to send audio files, if you want Telegram clients to display the file as a playable voice message.
 // For this to work, your audio must be in an .OGG file encoded with OPUS, or in .MP3 format, or in .M4A format (other formats may be sent as [Audio] or [Document]).
 // On success, the sent [Message] is returned.
-// Bots can currently send voice messages of up to 50 MB in size, this limit may be changed in the future.
+// Bots can currently send voice messages of up to 50 MB in size; this limit may be changed in the future.
 //
 // [Audio]: https://core.telegram.org/bots/api#audio
 // [Document]: https://core.telegram.org/bots/api#document
@@ -20319,7 +20320,7 @@ func WithSetBusinessAccountBioBio(value string) SetBusinessAccountBioOption {
 // SetBusinessAccountBio calls the setBusinessAccountBio Telegram Bot API method.
 //
 // Changes the bio of a managed business account.
-// Requires the can_change_bio business bot right.
+// Requires the can_edit_bio business bot right.
 // Returns True on success.
 func (c *Client) SetBusinessAccountBio(ctx context.Context, params *SetBusinessAccountBioParams) (ret bool, err error) {
 	buffer := acquireBuffer()
@@ -20459,7 +20460,7 @@ func WithSetBusinessAccountNameLastName(value string) SetBusinessAccountNameOpti
 // SetBusinessAccountName calls the setBusinessAccountName Telegram Bot API method.
 //
 // Changes the first and last name of a managed business account.
-// Requires the can_change_name business bot right.
+// Requires the can_edit_name business bot right.
 // Returns True on success.
 func (c *Client) SetBusinessAccountName(ctx context.Context, params *SetBusinessAccountNameParams) (ret bool, err error) {
 	buffer := acquireBuffer()
@@ -20631,7 +20632,7 @@ func WithSetBusinessAccountUsernameUsername(value string) SetBusinessAccountUser
 // SetBusinessAccountUsername calls the setBusinessAccountUsername Telegram Bot API method.
 //
 // Changes the username of a managed business account.
-// Requires the can_change_username business bot right.
+// Requires the can_edit_username business bot right.
 // Returns True on success.
 func (c *Client) SetBusinessAccountUsername(ctx context.Context, params *SetBusinessAccountUsernameParams) (ret bool, err error) {
 	buffer := acquireBuffer()
@@ -20990,7 +20991,7 @@ func WithSetChatPermissionsUseIndependentChatPermissions(value bool) SetChatPerm
 // SetChatPermissions calls the setChatPermissions Telegram Bot API method.
 //
 // Use this method to set default chat permissions for all members.
-// The bot must be an administrator in the group or a supergroup for this to work and must have the can_restrict_members administrator rights.
+// The bot must be an administrator in the group or a supergroup for this to work and must have the can_restrict_members administrator right.
 // Returns True on success.
 func (c *Client) SetChatPermissions(ctx context.Context, params *SetChatPermissionsParams) (ret bool, err error) {
 	buffer := acquireBuffer()
@@ -21389,8 +21390,8 @@ func WithSetGameScoreInlineMessageID(value string) SetGameScoreOption {
 // SetGameScore calls the setGameScore Telegram Bot API method.
 //
 // Use this method to set the score of the specified user in a game message.
-// On success, if the message is not an inline message, the [Message] is returned, otherwise True is returned.
-// Returns an error, if the new score is not greater than the user's current score in the chat and force is False.
+// On success, if the message is not an inline message, the [Message] is returned; otherwise, True is returned.
+// Returns an error if the new score is not greater than the user's current score in the chat and force is False.
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) SetGameScore(ctx context.Context, params *SetGameScoreParams) (ret *Message, err error) {
@@ -21916,6 +21917,246 @@ func (c *Client) SetMyProfilePhoto(ctx context.Context, params *SetMyProfilePhot
 	return ret, err
 }
 
+// SetMySettingsParams contains parameters for Client.SetMySettings.
+type SetMySettingsParams struct {
+	// Pass True to enable [inline mode] for the bot or False to disable it
+	//
+	// [inline mode]: https://core.telegram.org/bots/api#inline-mode
+	SupportsInlineQueries Optional[bool] `json:"supports_inline_queries,omitzero"`
+
+	// New placeholder for inline queries, which is shown in the input field after the bot's username.
+	// Pass an empty string to use the default placeholder.
+	InlineQueryPlaceholder Optional[string] `json:"inline_query_placeholder,omitzero"`
+
+	// Pass True to request the location of the user with every inline query to the bot or False to stop requesting it
+	NeedsInlineQueryLocation Optional[bool] `json:"needs_inline_query_location,omitzero"`
+
+	// Denominator of the share of [chosen inline results] received by the bot; the bot receives 1 out of inline_feedback_share_denominator chosen results.
+	// Must be one of 1, 10, 100, or 1000.
+	// Pass 0 to stop receiving chosen inline results.
+	//
+	// [chosen inline results]: https://core.telegram.org/bots/api#choseninlineresult
+	InlineFeedbackShareDenominator Optional[int64] `json:"inline_feedback_share_denominator,omitzero"`
+
+	// Pass True to allow adding the bot to groups or False to disallow it
+	CanJoinGroups Optional[bool] `json:"can_join_groups,omitzero"`
+
+	// Pass True to disable [privacy mode] for the bot or False to enable it
+	//
+	// [privacy mode]: https://core.telegram.org/bots/features#privacy-mode
+	CanReadAllGroupMessages Optional[bool] `json:"can_read_all_group_messages,omitzero"`
+
+	// Pass True to allow connecting the bot to user accounts to manage them or False to disallow it
+	CanConnectToBusiness Optional[bool] `json:"can_connect_to_business,omitzero"`
+
+	// Pass True to allow creating other bots that will be controlled by the bot or False to disallow it
+	CanManageBots Optional[bool] `json:"can_manage_bots,omitzero"`
+
+	// Pass True to allow guest queries to the bot from chats it isn't a member of or False to disallow them
+	SupportsGuestQueries Optional[bool] `json:"supports_guest_queries,omitzero"`
+
+	// Pass True to allow assigning the bot to process join request queries or False to disallow it
+	SupportsJoinRequestQueries Optional[bool] `json:"supports_join_request_queries,omitzero"`
+
+	// Pass True to enable forum topic mode in private chats with the bot or False to disable it
+	HasTopicsEnabled Optional[bool] `json:"has_topics_enabled,omitzero"`
+
+	// Pass True to allow users to create and delete topics in private chats with the bot or False to disallow it
+	AllowsUsersToCreateTopics Optional[bool] `json:"allows_users_to_create_topics,omitzero"`
+
+	// Pass True to show topics in private chats with the bot in a sidebar or False to stop showing them in a sidebar
+	HasTopicSidebar Optional[bool] `json:"has_topic_sidebar,omitzero"`
+
+	// Pass True to allow the bot to communicate with other bots in groups, private chats, and through business accounts or False to disallow it
+	CanCommunicateWithBots Optional[bool] `json:"can_communicate_with_bots,omitzero"`
+
+	// Mode in which the bot receives [callback queries] from buttons in messages sent by the bot.
+	// Must be one of “default” (the field message is always used and contains an [InaccessibleMessage] if the message is inaccessible to the bot), “auto” (the field inline_message_id is used instead of the field message if the message is inaccessible to the bot; the field message can still contain an inaccessible message if the message has just been deleted), or “inline” (the field inline_message_id is always used instead of the field message).
+	//
+	// [callback queries]: https://core.telegram.org/bots/api#callbackquery
+	// [InaccessibleMessage]: https://core.telegram.org/bots/api#inaccessiblemessage
+	CallbackQueryMode string `json:"callback_query_mode,omitempty"`
+}
+
+// SetMySettingsOption configures SetMySettingsParams.
+type SetMySettingsOption = Option[SetMySettingsParams]
+
+// Option applies opts to r in order.
+func (r *SetMySettingsParams) Option(opts ...SetMySettingsOption) {
+	for _, opt := range opts {
+		opt(r)
+	}
+}
+
+// WithSetMySettingsSupportsInlineQueries sets the SupportsInlineQueries field.
+//
+// Pass True to enable [inline mode] for the bot or False to disable it
+//
+// [inline mode]: https://core.telegram.org/bots/api#inline-mode
+func WithSetMySettingsSupportsInlineQueries(value bool) SetMySettingsOption {
+	return fieldOption(Some(value), func(params *SetMySettingsParams) *Optional[bool] {
+		return &params.SupportsInlineQueries
+	})
+}
+
+// WithSetMySettingsInlineQueryPlaceholder sets the InlineQueryPlaceholder field.
+//
+// New placeholder for inline queries, which is shown in the input field after the bot's username.
+// Pass an empty string to use the default placeholder.
+func WithSetMySettingsInlineQueryPlaceholder(value string) SetMySettingsOption {
+	return fieldOption(Some(value), func(params *SetMySettingsParams) *Optional[string] {
+		return &params.InlineQueryPlaceholder
+	})
+}
+
+// WithSetMySettingsNeedsInlineQueryLocation sets the NeedsInlineQueryLocation field.
+//
+// Pass True to request the location of the user with every inline query to the bot or False to stop requesting it
+func WithSetMySettingsNeedsInlineQueryLocation(value bool) SetMySettingsOption {
+	return fieldOption(Some(value), func(params *SetMySettingsParams) *Optional[bool] {
+		return &params.NeedsInlineQueryLocation
+	})
+}
+
+// WithSetMySettingsInlineFeedbackShareDenominator sets the InlineFeedbackShareDenominator field.
+//
+// Denominator of the share of [chosen inline results] received by the bot; the bot receives 1 out of inline_feedback_share_denominator chosen results.
+// Must be one of 1, 10, 100, or 1000.
+// Pass 0 to stop receiving chosen inline results.
+//
+// [chosen inline results]: https://core.telegram.org/bots/api#choseninlineresult
+func WithSetMySettingsInlineFeedbackShareDenominator(value int64) SetMySettingsOption {
+	return fieldOption(Some(value), func(params *SetMySettingsParams) *Optional[int64] {
+		return &params.InlineFeedbackShareDenominator
+	})
+}
+
+// WithSetMySettingsCanJoinGroups sets the CanJoinGroups field.
+//
+// Pass True to allow adding the bot to groups or False to disallow it
+func WithSetMySettingsCanJoinGroups(value bool) SetMySettingsOption {
+	return fieldOption(Some(value), func(params *SetMySettingsParams) *Optional[bool] {
+		return &params.CanJoinGroups
+	})
+}
+
+// WithSetMySettingsCanReadAllGroupMessages sets the CanReadAllGroupMessages field.
+//
+// Pass True to disable [privacy mode] for the bot or False to enable it
+//
+// [privacy mode]: https://core.telegram.org/bots/features#privacy-mode
+func WithSetMySettingsCanReadAllGroupMessages(value bool) SetMySettingsOption {
+	return fieldOption(Some(value), func(params *SetMySettingsParams) *Optional[bool] {
+		return &params.CanReadAllGroupMessages
+	})
+}
+
+// WithSetMySettingsCanConnectToBusiness sets the CanConnectToBusiness field.
+//
+// Pass True to allow connecting the bot to user accounts to manage them or False to disallow it
+func WithSetMySettingsCanConnectToBusiness(value bool) SetMySettingsOption {
+	return fieldOption(Some(value), func(params *SetMySettingsParams) *Optional[bool] {
+		return &params.CanConnectToBusiness
+	})
+}
+
+// WithSetMySettingsCanManageBots sets the CanManageBots field.
+//
+// Pass True to allow creating other bots that will be controlled by the bot or False to disallow it
+func WithSetMySettingsCanManageBots(value bool) SetMySettingsOption {
+	return fieldOption(Some(value), func(params *SetMySettingsParams) *Optional[bool] {
+		return &params.CanManageBots
+	})
+}
+
+// WithSetMySettingsSupportsGuestQueries sets the SupportsGuestQueries field.
+//
+// Pass True to allow guest queries to the bot from chats it isn't a member of or False to disallow them
+func WithSetMySettingsSupportsGuestQueries(value bool) SetMySettingsOption {
+	return fieldOption(Some(value), func(params *SetMySettingsParams) *Optional[bool] {
+		return &params.SupportsGuestQueries
+	})
+}
+
+// WithSetMySettingsSupportsJoinRequestQueries sets the SupportsJoinRequestQueries field.
+//
+// Pass True to allow assigning the bot to process join request queries or False to disallow it
+func WithSetMySettingsSupportsJoinRequestQueries(value bool) SetMySettingsOption {
+	return fieldOption(Some(value), func(params *SetMySettingsParams) *Optional[bool] {
+		return &params.SupportsJoinRequestQueries
+	})
+}
+
+// WithSetMySettingsHasTopicsEnabled sets the HasTopicsEnabled field.
+//
+// Pass True to enable forum topic mode in private chats with the bot or False to disable it
+func WithSetMySettingsHasTopicsEnabled(value bool) SetMySettingsOption {
+	return fieldOption(Some(value), func(params *SetMySettingsParams) *Optional[bool] {
+		return &params.HasTopicsEnabled
+	})
+}
+
+// WithSetMySettingsAllowsUsersToCreateTopics sets the AllowsUsersToCreateTopics field.
+//
+// Pass True to allow users to create and delete topics in private chats with the bot or False to disallow it
+func WithSetMySettingsAllowsUsersToCreateTopics(value bool) SetMySettingsOption {
+	return fieldOption(Some(value), func(params *SetMySettingsParams) *Optional[bool] {
+		return &params.AllowsUsersToCreateTopics
+	})
+}
+
+// WithSetMySettingsHasTopicSidebar sets the HasTopicSidebar field.
+//
+// Pass True to show topics in private chats with the bot in a sidebar or False to stop showing them in a sidebar
+func WithSetMySettingsHasTopicSidebar(value bool) SetMySettingsOption {
+	return fieldOption(Some(value), func(params *SetMySettingsParams) *Optional[bool] {
+		return &params.HasTopicSidebar
+	})
+}
+
+// WithSetMySettingsCanCommunicateWithBots sets the CanCommunicateWithBots field.
+//
+// Pass True to allow the bot to communicate with other bots in groups, private chats, and through business accounts or False to disallow it
+func WithSetMySettingsCanCommunicateWithBots(value bool) SetMySettingsOption {
+	return fieldOption(Some(value), func(params *SetMySettingsParams) *Optional[bool] {
+		return &params.CanCommunicateWithBots
+	})
+}
+
+// WithSetMySettingsCallbackQueryMode sets the CallbackQueryMode field.
+//
+// Mode in which the bot receives [callback queries] from buttons in messages sent by the bot.
+// Must be one of “default” (the field message is always used and contains an [InaccessibleMessage] if the message is inaccessible to the bot), “auto” (the field inline_message_id is used instead of the field message if the message is inaccessible to the bot; the field message can still contain an inaccessible message if the message has just been deleted), or “inline” (the field inline_message_id is always used instead of the field message).
+//
+// [callback queries]: https://core.telegram.org/bots/api#callbackquery
+// [InaccessibleMessage]: https://core.telegram.org/bots/api#inaccessiblemessage
+func WithSetMySettingsCallbackQueryMode(value string) SetMySettingsOption {
+	return fieldOption(value, func(params *SetMySettingsParams) *string {
+		return &params.CallbackQueryMode
+	})
+}
+
+// SetMySettings calls the setMySettings Telegram Bot API method.
+//
+// Use this method to change the settings of the bot.
+// Settings that aren't specified remain unchanged.
+// Returns True on success.
+func (c *Client) SetMySettings(ctx context.Context, params *SetMySettingsParams) (ret bool, err error) {
+	buffer := acquireBuffer()
+	defer releaseBuffer(buffer)
+
+	if err = json.NewEncoder(buffer).Encode(params); err != nil {
+		return
+	}
+
+	reader := bytes.NewReader(buffer.B)
+	contentType := contentTypeJSON
+
+	ret, err = call[bool](ctx, c, "setMySettings", params, reader, contentType, c.cfg.timeout)
+
+	return ret, err
+}
+
 // SetMyShortDescriptionParams contains parameters for Client.SetMyShortDescription.
 type SetMyShortDescriptionParams struct {
 	// New short description for the bot; 0-120 characters.
@@ -22016,7 +22257,7 @@ func WithSetPassportDataErrorsErrors(value []PassportElementError) SetPassportDa
 
 // SetPassportDataErrors calls the setPassportDataErrors Telegram Bot API method.
 //
-// Informs a user that some of the Telegram Passport elements they provided contains errors.
+// Informs a user that some of the Telegram Passport elements they provided contain errors.
 // The user will not be able to re-submit their Passport to you until the errors are fixed (the contents of the field for which you returned the error must change).
 // Returns True on success.
 // Use this if the data submitted by the user doesn't satisfy the standards your service requires for any reason.
@@ -22101,7 +22342,7 @@ type SetStickerKeywordsParams struct {
 	// File identifier of the sticker
 	Sticker string `json:"sticker"`
 
-	// A JSON-serialized list of 0-20 search keywords for the sticker with total length of up to 64 characters
+	// A JSON-serialized list of 0-20 search keywords for the sticker with a total length of up to 64 characters
 	Keywords []string `json:"keywords,omitempty"`
 }
 
@@ -22126,7 +22367,7 @@ func WithSetStickerKeywordsSticker(value string) SetStickerKeywordsOption {
 
 // WithSetStickerKeywordsKeywords sets the Keywords field.
 //
-// A JSON-serialized list of 0-20 search keywords for the sticker with total length of up to 64 characters
+// A JSON-serialized list of 0-20 search keywords for the sticker with a total length of up to 64 characters
 func WithSetStickerKeywordsKeywords(value []string) SetStickerKeywordsOption {
 	return fieldOption(value, func(params *SetStickerKeywordsParams) *[]string {
 		return &params.Keywords
@@ -22561,7 +22802,7 @@ type SetWebhookParams struct {
 	// See [Update] for a complete list of available update types.
 	// Specify an empty list to receive all update types except chat_member, message_reaction, and message_reaction_count (default).
 	// If not specified, the previous setting will be used.
-	// Please note that this parameter doesn't affect updates created before the call to the setWebhook, so unwanted updates may be received for a short period of time.
+	// Please note that this parameter doesn't affect updates created before the call to setWebhook, so unwanted updates may be received for a short period of time.
 	//
 	// [Update]: https://core.telegram.org/bots/api#update
 	AllowedUpdates []string `json:"allowed_updates,omitempty"`
@@ -22634,7 +22875,7 @@ func WithSetWebhookMaxConnections(value int64) SetWebhookOption {
 // See [Update] for a complete list of available update types.
 // Specify an empty list to receive all update types except chat_member, message_reaction, and message_reaction_count (default).
 // If not specified, the previous setting will be used.
-// Please note that this parameter doesn't affect updates created before the call to the setWebhook, so unwanted updates may be received for a short period of time.
+// Please note that this parameter doesn't affect updates created before the call to setWebhook, so unwanted updates may be received for a short period of time.
 //
 // [Update]: https://core.telegram.org/bots/api#update
 func WithSetWebhookAllowedUpdates(value []string) SetWebhookOption {
@@ -22667,7 +22908,7 @@ func WithSetWebhookSecretToken(value string) SetWebhookOption {
 //
 // Use this method to specify a URL and receive incoming updates via an outgoing webhook.
 // Whenever there is an update for the bot, we will send an HTTPS POST request to the specified URL, containing a JSON-serialized [Update].
-// In case of an unsuccessful request (a request with response [HTTP status code] different from 2XY), we will repeat the request and give up after a reasonable amount of attempts.
+// In case of an unsuccessful request (a request with response [HTTP status code] different from 2XY), we will repeat the request and give up after a reasonable number of attempts.
 // Returns True on success.
 // If you'd like to make sure that the webhook was set by you, you can specify secret data in the parameter secret_token.
 // If specified, the request will contain a header “X-Telegram-Bot-Api-Secret-Token” with the secret token as content.
@@ -22844,7 +23085,7 @@ func WithStopMessageLiveLocationReplyMarkup(value *InlineKeyboardMarkup) StopMes
 // StopMessageLiveLocation calls the stopMessageLiveLocation Telegram Bot API method.
 //
 // Use this method to stop updating a live location message before live_period expires.
-// On success, if the message is not an inline message, the edited [Message] is returned, otherwise True is returned.
+// On success, if the message is not an inline message, the edited [Message] is returned; otherwise, True is returned.
 //
 // [Message]: https://core.telegram.org/bots/api#message
 func (c *Client) StopMessageLiveLocation(ctx context.Context, params *StopMessageLiveLocationParams) (ret *Message, err error) {
@@ -23018,11 +23259,11 @@ type TransferGiftParams struct {
 	// Unique identifier of the business connection
 	BusinessConnectionID string `json:"business_connection_id"`
 
-	// Unique identifier of the regular gift that should be transferred
+	// Unique identifier of the unique gift that should be transferred
 	OwnedGiftID string `json:"owned_gift_id"`
 
 	// Unique identifier of the chat which will own the gift.
-	// The chat must be active in the last 24 hours.
+	// The chat must have been active in the last 24 hours.
 	NewOwnerChatID int64 `json:"new_owner_chat_id"`
 
 	// The amount of Telegram Stars that will be paid for the transfer from the business account balance.
@@ -23051,7 +23292,7 @@ func WithTransferGiftBusinessConnectionID(value string) TransferGiftOption {
 
 // WithTransferGiftOwnedGiftID sets the OwnedGiftID field.
 //
-// Unique identifier of the regular gift that should be transferred
+// Unique identifier of the unique gift that should be transferred
 func WithTransferGiftOwnedGiftID(value string) TransferGiftOption {
 	return fieldOption(value, func(params *TransferGiftParams) *string {
 		return &params.OwnedGiftID
@@ -23061,7 +23302,7 @@ func WithTransferGiftOwnedGiftID(value string) TransferGiftOption {
 // WithTransferGiftNewOwnerChatID sets the NewOwnerChatID field.
 //
 // Unique identifier of the chat which will own the gift.
-// The chat must be active in the last 24 hours.
+// The chat must have been active in the last 24 hours.
 func WithTransferGiftNewOwnerChatID(value int64) TransferGiftOption {
 	return fieldOption(value, func(params *TransferGiftParams) *int64 {
 		return &params.NewOwnerChatID
@@ -23082,7 +23323,7 @@ func WithTransferGiftStarCount(value int64) TransferGiftOption {
 //
 // Transfers an owned unique gift to another user.
 // Requires the can_transfer_and_upgrade_gifts business bot right.
-// Requires can_transfer_stars business bot right if the transfer is paid.
+// Requires the can_transfer_stars business bot right if the transfer is paid.
 // Returns True on success.
 func (c *Client) TransferGift(ctx context.Context, params *TransferGiftParams) (ret bool, err error) {
 	buffer := acquireBuffer()
@@ -23275,7 +23516,7 @@ func WithUnhideGeneralForumTopicChatID(value ChatID) UnhideGeneralForumTopicOpti
 // UnhideGeneralForumTopic calls the unhideGeneralForumTopic Telegram Bot API method.
 //
 // Use this method to unhide the 'General' topic in a forum supergroup chat.
-// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator rights.
+// The bot must be an administrator in the chat for this to work and must have the can_manage_topics administrator right.
 // Returns True on success.
 func (c *Client) UnhideGeneralForumTopic(ctx context.Context, params *UnhideGeneralForumTopicParams) (ret bool, err error) {
 	buffer := acquireBuffer()
@@ -23551,7 +23792,7 @@ type UpgradeGiftParams struct {
 	KeepOriginalDetails bool `json:"keep_original_details,omitempty"`
 
 	// The amount of Telegram Stars that will be paid for the upgrade from the business account balance.
-	// If gift.prepaid_upgrade_star_count > 0, then pass 0, otherwise, the can_transfer_stars business bot right is required and gift.upgrade_star_count must be passed.
+	// If gift.prepaid_upgrade_star_count > 0, then pass 0; otherwise, the can_transfer_stars business bot right is required and gift.upgrade_star_count must be passed.
 	StarCount int64 `json:"star_count,omitempty"`
 }
 
@@ -23595,7 +23836,7 @@ func WithUpgradeGiftKeepOriginalDetails(value bool) UpgradeGiftOption {
 // WithUpgradeGiftStarCount sets the StarCount field.
 //
 // The amount of Telegram Stars that will be paid for the upgrade from the business account balance.
-// If gift.prepaid_upgrade_star_count > 0, then pass 0, otherwise, the can_transfer_stars business bot right is required and gift.upgrade_star_count must be passed.
+// If gift.prepaid_upgrade_star_count > 0, then pass 0; otherwise, the can_transfer_stars business bot right is required and gift.upgrade_star_count must be passed.
 func WithUpgradeGiftStarCount(value int64) UpgradeGiftOption {
 	return fieldOption(value, func(params *UpgradeGiftParams) *int64 {
 		return &params.StarCount
