@@ -1,6 +1,7 @@
 package gogram_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/darxnet/gogram"
@@ -10,7 +11,7 @@ func TestInlineKeyboardBuilder(t *testing.T) {
 	t.Parallel()
 
 	rows := gogram.NewInlineKeyboardBuilder().
-		Text("Yes", "c 1").Text("No", "c 0").Row().
+		Callback("Yes", "c 1").Callback("No", "c 0").Row().
 		Row(). // empty row is skipped
 		URL("Docs", "https://example.com").
 		WebApp("App", "https://app.example.com").
@@ -27,7 +28,7 @@ func TestInlineKeyboardBuilder(t *testing.T) {
 	}
 
 	var zero gogram.InlineKeyboardBuilder
-	if m := zero.Text("a", "b").ReplyMarkup(); m.InlineKeyboardMarkup == nil || len(m.InlineKeyboard) != 1 {
+	if m := zero.Callback("a", "b").ReplyMarkup(); m.InlineKeyboardMarkup == nil || len(m.InlineKeyboard) != 1 {
 		t.Fatalf("zero value builder: %+v", m)
 	}
 }
@@ -45,5 +46,42 @@ func TestInlineKeyboardAliases(t *testing.T) {
 
 	if len(markup.InlineKeyboard) != 2 || len(markup.InlineKeyboard[1]) != 2 {
 		t.Fatalf("markup = %+v", markup)
+	}
+}
+
+func TestInlineKeyboardBuilder_AddColumnsRowsKeyboards(t *testing.T) {
+	t.Parallel()
+
+	a := gogram.InlineKeyboardButton{Text: "a", CallbackData: "a"}
+	b := gogram.InlineKeyboardButton{Text: "b", CallbackData: "b"}
+	c := gogram.InlineKeyboardButton{Text: "c", CallbackData: "c"}
+
+	rows := gogram.NewInlineKeyboardBuilder().
+		Add(a). // current row is finished by AddColumns
+		AddColumns(b, c).
+		AddRows(gogram.InlineKeyboardRow{a, b}, nil, gogram.InlineKeyboardRow{c}).
+		Add(c).
+		AddKeyboards(gogram.InlineKeyboard{{a}}, nil, gogram.InlineKeyboard{{}, {b, c}}).
+		Rows()
+
+	want := []string{"a", "b", "c", "ab", "c", "c", "a", "bc"}
+	if len(rows) != len(want) {
+		t.Fatalf("len(rows) = %d, want %d: %+v", len(rows), len(want), rows)
+	}
+
+	for i, row := range rows {
+		var got strings.Builder
+		for _, btn := range row {
+			got.WriteString(btn.CallbackData)
+		}
+
+		if got.String() != want[i] {
+			t.Fatalf("row %d = %q, want %q", i, got.String(), want[i])
+		}
+	}
+
+	var empty gogram.InlineKeyboardBuilder
+	if got := empty.AddColumns().AddRows().AddKeyboards().Rows(); len(got) != 0 {
+		t.Fatalf("empty builder rows = %+v", got)
 	}
 }

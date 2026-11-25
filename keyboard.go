@@ -10,7 +10,7 @@ type InlineKeyboard = []InlineKeyboardRow
 // InlineKeyboardBuilder builds an [InlineKeyboardMarkup] row by row:
 //
 //	markup := gogram.NewInlineKeyboardBuilder().
-//		Text("Yes", "confirm 1").Text("No", "confirm 0").Row().
+//		Callback("Yes", "confirm 1").Callback("No", "confirm 0").Row().
 //		URL("Docs", "https://example.com").
 //		Markup()
 //
@@ -32,8 +32,8 @@ func (b *InlineKeyboardBuilder) Add(buttons ...InlineKeyboardButton) *InlineKeyb
 	return b
 }
 
-// Text appends a callback button; see [Callback] for typed callback data.
-func (b *InlineKeyboardBuilder) Text(text, callbackData string) *InlineKeyboardBuilder {
+// Callback appends a callback button; see [Callback] for typed callback data.
+func (b *InlineKeyboardBuilder) Callback(text, callbackData string) *InlineKeyboardBuilder {
 	return b.Add(InlineKeyboardButton{Text: text, CallbackData: callbackData})
 }
 
@@ -51,6 +51,41 @@ func (b *InlineKeyboardBuilder) WebApp(text, url string) *InlineKeyboardBuilder 
 // into the current chat's input field.
 func (b *InlineKeyboardBuilder) SwitchInline(text, query string) *InlineKeyboardBuilder {
 	return b.Add(InlineKeyboardButton{Text: text, SwitchInlineQueryCurrentChat: query})
+}
+
+// AddColumns finishes the current row and adds each button as a row of its
+// own, so the buttons form a single column.
+func (b *InlineKeyboardBuilder) AddColumns(buttons ...InlineKeyboardButton) *InlineKeyboardBuilder {
+	b.Row()
+
+	for i := range buttons {
+		b.rows = append(b.rows, InlineKeyboardRow{buttons[i]})
+	}
+
+	return b
+}
+
+// AddRows finishes the current row and appends rows. Empty rows are skipped.
+func (b *InlineKeyboardBuilder) AddRows(rows ...InlineKeyboardRow) *InlineKeyboardBuilder {
+	b.Row()
+
+	for _, row := range rows {
+		if len(row) != 0 {
+			b.rows = append(b.rows, row)
+		}
+	}
+
+	return b
+}
+
+// AddKeyboards finishes the current row and appends the rows of each
+// keyboard in order. Empty rows are skipped.
+func (b *InlineKeyboardBuilder) AddKeyboards(keyboards ...InlineKeyboard) *InlineKeyboardBuilder {
+	for _, kb := range keyboards {
+		b.AddRows(kb...)
+	}
+
+	return b.Row()
 }
 
 // Row finishes the current row. An empty row is skipped.
