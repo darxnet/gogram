@@ -103,7 +103,7 @@ case s.User != nil:
 }
 ```
 
-Chat ids are `gogram.ChatID{ID: 7}` or `gogram.Username("channel")`; methods
+Chat ids are `gogram.ID(7)` or `gogram.Username("channel")`; methods
 without a generated wrapper go through `client.Call(ctx, "method", params, &result)`
 or `gogram.Call[*gogram.Message](ctx, client, "method", params)`.
 
@@ -307,7 +307,7 @@ file, _ := client.GetFile(ctx, &gogram.GetFileParams{FileID: id})
 err := client.DownloadFile(ctx, file, "/tmp/photo.jpg")
 
 _, err = client.SendDocument(ctx, &gogram.SendDocumentParams{
-	ChatID:   gogram.ChatID{ID: 7},
+	ChatID:   gogram.ID(7),
 	Document: gogram.FromDisk("/data/report.pdf"), // streamed, never buffered; reopened on retry
 })
 ```

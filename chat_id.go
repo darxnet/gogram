@@ -9,7 +9,7 @@ import (
 // @username of a public channel or supergroup. It marshals to a JSON
 // number or string, as the Bot API expects ("Integer or String").
 //
-//	gogram.ChatID{ID: 123}
+//	gogram.ID(123)
 //	gogram.Username("telegram")
 type ChatID struct {
 	ID       int64
@@ -19,6 +19,11 @@ type ChatID struct {
 // ErrInvalidChatID is returned when a chat_id JSON value is neither a
 // number nor a string.
 var ErrInvalidChatID = errors.New("gogram: invalid chat_id")
+
+// ID returns the ChatID of a chat by its numeric id.
+func ID(id int64) ChatID {
+	return ChatID{ID: id}
+}
 
 // Username returns the ChatID of a public chat by username, with or
 // without the leading "@".

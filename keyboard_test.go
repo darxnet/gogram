@@ -31,3 +31,19 @@ func TestInlineKeyboardBuilder(t *testing.T) {
 		t.Fatalf("zero value builder: %+v", m)
 	}
 }
+
+func TestInlineKeyboardAliases(t *testing.T) {
+	t.Parallel()
+
+	kb := gogram.InlineKeyboard{
+		gogram.InlineKeyboardRow{{Text: "a", CallbackData: "a"}},
+		{{Text: "b", CallbackData: "b"}, {Text: "c", CallbackData: "c"}},
+	}
+
+	// The aliases are the field type itself, so no conversion is needed either way.
+	markup := gogram.InlineKeyboardMarkup{InlineKeyboard: kb}
+
+	if len(markup.InlineKeyboard) != 2 || len(markup.InlineKeyboard[1]) != 2 {
+		t.Fatalf("markup = %+v", markup)
+	}
+}
