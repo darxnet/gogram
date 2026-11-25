@@ -1,5 +1,12 @@
 package gogram
 
+// InlineKeyboardRow is a row of inline keyboard buttons.
+type InlineKeyboardRow = []InlineKeyboardButton
+
+// InlineKeyboard is an inline keyboard: rows of buttons, the type of
+// [InlineKeyboardMarkup].InlineKeyboard.
+type InlineKeyboard = []InlineKeyboardRow
+
 // InlineKeyboardBuilder builds an [InlineKeyboardMarkup] row by row:
 //
 //	markup := gogram.NewInlineKeyboardBuilder().

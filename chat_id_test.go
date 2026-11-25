@@ -15,7 +15,7 @@ func TestChatID_JSON(t *testing.T) {
 		in   gogram.ChatID
 		json string
 	}{
-		{gogram.ChatID{ID: 7}, `7`},
+		{gogram.ID(7), `7`},
 		{gogram.ChatID{ID: -1001}, `-1001`},
 		{gogram.Username("@telegram"), `"@telegram"`},
 		{gogram.Username("telegram"), `"@telegram"`},
@@ -43,7 +43,7 @@ func TestChatID_JSON(t *testing.T) {
 		t.Fatal("bool must be rejected")
 	}
 
-	if gogram.Username("x").String() != "@x" || (gogram.ChatID{ID: 5}).String() != "5" {
+	if gogram.Username("x").String() != "@x" || gogram.ID(5).String() != "5" {
 		t.Fatal("String() mismatch")
 	}
 }
