@@ -192,3 +192,20 @@ func TestInlineKeyboardBuilder_LoginURLChosenChat(t *testing.T) {
 		t.Fatalf("chosen = %+v", chosen)
 	}
 }
+
+func TestInlineKeyboardBuilder_StyleShortcuts(t *testing.T) {
+	t.Parallel()
+
+	rows := gogram.NewInlineKeyboardBuilder().
+		Callback("d", "d").StyleDanger().
+		Callback("s", "s").StyleSuccess().
+		Callback("p", "p").StylePrimary().
+		Rows()
+
+	want := []string{gogram.ButtonStyleDanger, gogram.ButtonStyleSuccess, gogram.ButtonStylePrimary}
+	for i, btn := range rows[0] {
+		if btn.Style != want[i] {
+			t.Fatalf("button %d style = %q, want %q", i, btn.Style, want[i])
+		}
+	}
+}

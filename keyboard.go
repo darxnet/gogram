@@ -116,6 +116,24 @@ func (b *InlineKeyboardBuilder) Style(style string) *InlineKeyboardBuilder {
 	return b
 }
 
+// StyleDanger makes the last added button red. It panics when no button
+// has been added.
+func (b *InlineKeyboardBuilder) StyleDanger() *InlineKeyboardBuilder {
+	return b.Style(ButtonStyleDanger)
+}
+
+// StyleSuccess makes the last added button green. It panics when no button
+// has been added.
+func (b *InlineKeyboardBuilder) StyleSuccess() *InlineKeyboardBuilder {
+	return b.Style(ButtonStyleSuccess)
+}
+
+// StylePrimary makes the last added button blue. It panics when no button
+// has been added.
+func (b *InlineKeyboardBuilder) StylePrimary() *InlineKeyboardBuilder {
+	return b.Style(ButtonStylePrimary)
+}
+
 // Icon sets the custom emoji shown before the text of the last added
 // button. It panics when no button has been added.
 func (b *InlineKeyboardBuilder) Icon(customEmojiID string) *InlineKeyboardBuilder {
