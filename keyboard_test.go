@@ -15,7 +15,7 @@ func TestInlineKeyboardBuilder(t *testing.T) {
 		Row(). // empty row is skipped
 		URL("Docs", "https://example.com").
 		WebApp("App", "https://app.example.com").
-		SwitchInline("Share", "q").
+		SwitchInlineCurrent("Share", "q").
 		Rows()
 
 	if len(rows) != 2 || len(rows[0]) != 2 || len(rows[1]) != 3 {
@@ -84,4 +84,70 @@ func TestInlineKeyboardBuilder_AddColumnRowsKeyboards(t *testing.T) {
 	if got := empty.AddColumn().AddRows().AddKeyboards().Rows(); len(got) != 0 {
 		t.Fatalf("empty builder rows = %+v", got)
 	}
+}
+
+func TestInlineKeyboardBuilder_ButtonKinds(t *testing.T) {
+	t.Parallel()
+
+	rows := gogram.NewInlineKeyboardBuilder().
+		Pay("Pay 100 ⭐").Row().
+		Game("Play").
+		SwitchInlineChat("Share", "q").
+		CopyText("Copy", "code").
+		Disabled("1/5").
+		Rows()
+
+	if len(rows) != 2 || len(rows[1]) != 4 {
+		t.Fatalf("rows = %+v", rows)
+	}
+
+	if !rows[0][0].Pay || rows[0][0].Text != "Pay 100 ⭐" {
+		t.Fatalf("pay = %+v", rows[0][0])
+	}
+
+	game, chat, copyText, disabled := rows[1][0], rows[1][1], rows[1][2], rows[1][3]
+	if game.CallbackGame == nil || chat.SwitchInlineQuery != "q" ||
+		copyText.CopyText == nil || copyText.CopyText.Text != "code" || disabled.Disabled == nil {
+		t.Fatalf("rows[1] = %+v", rows[1])
+	}
+}
+
+func TestInlineKeyboardBuilder_StyleIcon(t *testing.T) {
+	t.Parallel()
+
+	kb := gogram.InlineKeyboard{{{Text: "a", CallbackData: "a"}}}
+
+	rows := gogram.NewInlineKeyboardBuilder().
+		Callback("x", "x").Style(gogram.ButtonStyleDanger).Icon("123").
+		Callback("y", "y").Row().Style(gogram.ButtonStyleSuccess). // after Row: last button of the last row
+		AddKeyboards(kb).Style(gogram.ButtonStylePrimary).
+		Rows()
+
+	if x := rows[0][0]; x.Style != gogram.ButtonStyleDanger || x.IconCustomEmojiID != "123" {
+		t.Fatalf("x = %+v", x)
+	}
+
+	if y := rows[0][1]; y.Style != gogram.ButtonStyleSuccess || y.IconCustomEmojiID != "" {
+		t.Fatalf("y = %+v", y)
+	}
+
+	if rows[1][0].Style != gogram.ButtonStylePrimary {
+		t.Fatalf("added row = %+v", rows[1][0])
+	}
+
+	if kb[0][0].Style != "" {
+		t.Fatalf("caller's keyboard modified: %+v", kb[0][0])
+	}
+}
+
+func TestInlineKeyboardBuilder_StyleWithoutButtonPanics(t *testing.T) {
+	t.Parallel()
+
+	defer func() {
+		if recover() == nil {
+			t.Fatal("Style on an empty builder must panic")
+		}
+	}()
+
+	gogram.NewInlineKeyboardBuilder().Style(gogram.ButtonStyleDanger)
 }

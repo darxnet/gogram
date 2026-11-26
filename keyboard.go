@@ -1,5 +1,7 @@
 package gogram
 
+import "slices"
+
 // InlineKeyboardRow is a row of inline keyboard buttons.
 type InlineKeyboardRow = []InlineKeyboardButton
 
@@ -47,10 +49,76 @@ func (b *InlineKeyboardBuilder) WebApp(text, url string) *InlineKeyboardBuilder 
 	return b.Add(InlineKeyboardButton{Text: text, WebApp: &WebAppInfo{URL: url}})
 }
 
-// SwitchInline appends a button that inserts the bot's username and query
-// into the current chat's input field.
-func (b *InlineKeyboardBuilder) SwitchInline(text, query string) *InlineKeyboardBuilder {
+// SwitchInlineCurrent appends a button that inserts the bot's username and
+// query into the current chat's input field.
+func (b *InlineKeyboardBuilder) SwitchInlineCurrent(text, query string) *InlineKeyboardBuilder {
 	return b.Add(InlineKeyboardButton{Text: text, SwitchInlineQueryCurrentChat: query})
+}
+
+// SwitchInlineChat appends a button that prompts the user to pick a chat,
+// opens it and inserts the bot's username and query into the input field.
+func (b *InlineKeyboardBuilder) SwitchInlineChat(text, query string) *InlineKeyboardBuilder {
+	return b.Add(InlineKeyboardButton{Text: text, SwitchInlineQuery: query})
+}
+
+// CopyText appends a button that copies clipboard to the clipboard.
+func (b *InlineKeyboardBuilder) CopyText(text, clipboard string) *InlineKeyboardBuilder {
+	return b.Add(InlineKeyboardButton{Text: text, CopyText: &CopyTextButton{Text: clipboard}})
+}
+
+// Pay appends a Pay button. "⭐" and "XTR" in text are shown as a Telegram
+// Star icon. The amount comes from the invoice, not from the button.
+// Telegram accepts it only in invoice messages, as the first button of the
+// first row.
+func (b *InlineKeyboardBuilder) Pay(text string) *InlineKeyboardBuilder {
+	return b.Add(InlineKeyboardButton{Text: text, Pay: true})
+}
+
+// Game appends a button that launches the game of a game message.
+// Telegram accepts it only as the first button of the first row.
+func (b *InlineKeyboardBuilder) Game(text string) *InlineKeyboardBuilder {
+	return b.Add(InlineKeyboardButton{Text: text, CallbackGame: &CallbackGame{}})
+}
+
+// Disabled appends a button that does nothing when pressed: a label such
+// as a page counter or a placeholder cell.
+func (b *InlineKeyboardBuilder) Disabled(text string) *InlineKeyboardBuilder {
+	return b.Add(InlineKeyboardButton{Text: text, Disabled: &DisabledButton{}})
+}
+
+// Button styles for [InlineKeyboardBuilder.Style].
+const (
+	ButtonStyleDanger  = "danger"  // red
+	ButtonStyleSuccess = "success" // green
+	ButtonStylePrimary = "primary" // blue
+)
+
+// Style sets the style of the last added button, one of the ButtonStyle
+// constants. It panics when no button has been added.
+func (b *InlineKeyboardBuilder) Style(style string) *InlineKeyboardBuilder {
+	b.last("Style").Style = style
+	return b
+}
+
+// Icon sets the custom emoji shown before the text of the last added
+// button. It panics when no button has been added.
+func (b *InlineKeyboardBuilder) Icon(customEmojiID string) *InlineKeyboardBuilder {
+	b.last("Icon").IconCustomEmojiID = customEmojiID
+	return b
+}
+
+// last returns the last added button.
+func (b *InlineKeyboardBuilder) last(method string) *InlineKeyboardButton {
+	if n := len(b.row); n != 0 {
+		return &b.row[n-1]
+	}
+
+	if n := len(b.rows); n != 0 {
+		row := b.rows[n-1]
+		return &row[len(row)-1]
+	}
+
+	panic("gogram: InlineKeyboardBuilder." + method + " called before any button was added")
 }
 
 // AddColumn finishes the current row and adds each button as a row of its
@@ -65,13 +133,15 @@ func (b *InlineKeyboardBuilder) AddColumn(buttons ...InlineKeyboardButton) *Inli
 	return b
 }
 
-// AddRows finishes the current row and appends rows. Empty rows are skipped.
+// AddRows finishes the current row and appends copies of rows, so later
+// changes through the builder (Style, Icon) do not touch the caller's
+// slices. Empty rows are skipped.
 func (b *InlineKeyboardBuilder) AddRows(rows ...InlineKeyboardRow) *InlineKeyboardBuilder {
 	b.Row()
 
 	for _, row := range rows {
 		if len(row) != 0 {
-			b.rows = append(b.rows, row)
+			b.rows = append(b.rows, slices.Clone(row))
 		}
 	}
 
