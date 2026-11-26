@@ -173,3 +173,22 @@ func TestInlineKeyboardBuilder_EmptySwitchInlineQuery(t *testing.T) {
 		t.Fatalf("json = %s, want %s", b, want)
 	}
 }
+
+func TestInlineKeyboardBuilder_LoginURLChosenChat(t *testing.T) {
+	t.Parallel()
+
+	rows := gogram.NewInlineKeyboardBuilder().
+		LoginURL("Log in", gogram.LoginUrl{URL: "https://example.com/auth", RequestWriteAccess: true}).
+		SwitchInlineChosenChat("Share", gogram.SwitchInlineQueryChosenChat{Query: "q", AllowGroupChats: true}).
+		Rows()
+
+	login, chosen := rows[0][0], rows[0][1]
+	if login.LoginUrl == nil || login.LoginUrl.URL != "https://example.com/auth" || !login.LoginUrl.RequestWriteAccess {
+		t.Fatalf("login = %+v", login)
+	}
+
+	if chosen.SwitchInlineQueryChosenChat == nil || chosen.SwitchInlineQueryChosenChat.Query != "q" ||
+		!chosen.SwitchInlineQueryChosenChat.AllowGroupChats {
+		t.Fatalf("chosen = %+v", chosen)
+	}
+}

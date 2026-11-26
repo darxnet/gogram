@@ -61,6 +61,22 @@ func (b *InlineKeyboardBuilder) SwitchInlineChat(text, query string) *InlineKeyb
 	return b.Add(InlineKeyboardButton{Text: text, SwitchInlineQuery: Some(query)})
 }
 
+// SwitchInlineChosenChat appends a button that prompts the user to pick a
+// chat of the types allowed by chosen, opens it and inserts the bot's
+// username and chosen.Query into the input field.
+func (b *InlineKeyboardBuilder) SwitchInlineChosenChat(
+	text string,
+	chosen SwitchInlineQueryChosenChat,
+) *InlineKeyboardBuilder {
+	return b.Add(InlineKeyboardButton{Text: text, SwitchInlineQueryChosenChat: &chosen})
+}
+
+// LoginURL appends a button that authorizes the user on login.URL, a
+// replacement for the Telegram Login Widget.
+func (b *InlineKeyboardBuilder) LoginURL(text string, login LoginUrl) *InlineKeyboardBuilder {
+	return b.Add(InlineKeyboardButton{Text: text, LoginUrl: &login})
+}
+
 // CopyText appends a button that copies clipboard to the clipboard.
 func (b *InlineKeyboardBuilder) CopyText(text, clipboard string) *InlineKeyboardBuilder {
 	return b.Add(InlineKeyboardButton{Text: text, CopyText: &CopyTextButton{Text: clipboard}})
