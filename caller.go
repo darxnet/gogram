@@ -160,6 +160,10 @@ func (h httpCaller) roundTrip(ctx context.Context, req Request, result any) erro
 		return c.redact(err)
 	}
 
+	if body, ok := req.Body.(*multipartBody); ok {
+		httpReq.GetBody = body.getBody
+	}
+
 	if req.ContentType == contentTypeJSON {
 		httpReq.Header["Content-Type"] = headerJSON
 	} else {

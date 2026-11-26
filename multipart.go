@@ -96,6 +96,20 @@ func (b *multipartBody) Rewind() error {
 	return nil
 }
 
+// getBody implements [http.Request.GetBody], so transports that retry on
+// their own can restart the upload. It fails with [ErrBodyNotRewindable]
+// once an [InputFile.File] reader was consumed. The returned body does not
+// stop the writer on Close, like the body of the first attempt: Rewind and
+// Close of the request do that.
+func (b *multipartBody) getBody() (io.ReadCloser, error) {
+	err := b.Rewind()
+	if err != nil {
+		return nil, err
+	}
+
+	return io.NopCloser(b), nil
+}
+
 // Close stops the writer goroutine of an unfinished attempt.
 func (b *multipartBody) Close() error {
 	b.mu.Lock()
