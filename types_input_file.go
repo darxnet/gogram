@@ -36,6 +36,7 @@ var (
 )
 
 // FromDisk uploads the file at path; the file name is its base name.
+// Each attempt opens the file again, so a retry resends it in full.
 func FromDisk(path string) InputFile {
 	return InputFile{
 		FileName: filepath.Base(path),
@@ -48,6 +49,8 @@ func FromDisk(path string) InputFile {
 // FromURL streams the file at url through the bot, for URLs Telegram
 // cannot fetch itself (private networks, signed links). client may be nil
 // for http.DefaultClient. For public URLs prefer InputFile{FileURL: url}.
+// Each attempt fetches url again: a retry downloads the file once more,
+// and a signed link must stay valid until the call ends.
 func FromURL(url, name string, client *http.Client) InputFile {
 	if client == nil {
 		client = http.DefaultClient
@@ -81,8 +84,9 @@ func FromOpener(name string, open func(ctx context.Context) (io.ReadCloser, erro
 	return InputFile{FileName: name, Open: open}
 }
 
-// FromReader uploads r once; a failed request is not retried. Use it for
-// data that only exists in a stream, see FromOpener otherwise.
+// FromReader uploads r. Once r is read it cannot be sent again, so a
+// request that fails after that is not retried. Use it for data that only
+// exists in a stream, see FromOpener otherwise.
 func FromReader(name string, r io.Reader) InputFile {
 	return InputFile{FileName: name, File: r}
 }

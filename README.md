@@ -274,8 +274,12 @@ client, err := gogram.NewClient(token,
 )
 ```
 
-Transient errors (429 with `retry_after`, 5xx, empty or `EOF` bodies) are
-retried up to five times when the request body can be rewound. A
+Transient errors (429 with `retry_after`, 5xx, empty or `EOF` bodies, and
+network errors before the request was written in full, such as a refused
+connection or a failed TLS handshake) are retried up to five times when the
+request body can be rewound. A network error after the request was sent is
+returned as is: Telegram may have executed the call, and a retry could send
+a message twice. A
 `Transformer` is a `func(next Caller) Caller`; tracing, metrics or a mock
 fit the same shape. `WithCaller` replaces the transport altogether.
 
