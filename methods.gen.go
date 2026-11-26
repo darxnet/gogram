@@ -12261,9 +12261,9 @@ type SendDiceParams struct {
 	DirectMessagesTopicID int64 `json:"direct_messages_topic_id,omitempty"`
 
 	// Emoji on which the dice throw animation is based.
-	// Currently, must be one of “”, “”, “”, “”, “”, or “”.
-	// Dice can have values 1-6 for “”, “” and “”, values 1-5 for “” and “”, and values 1-64 for “”.
-	// Defaults to “”.
+	// Currently, must be one of “🎲”, “🎯”, “🏀”, “⚽”, “🎳”, or “🎰”.
+	// Dice can have values 1-6 for “🎲”, “🎯” and “🎳”, values 1-5 for “🏀” and “⚽”, and values 1-64 for “🎰”.
+	// Defaults to “🎲”.
 	Emoji string `json:"emoji,omitempty"`
 
 	// Sends the message [silently].
@@ -12353,9 +12353,9 @@ func WithSendDiceDirectMessagesTopicID(value int64) SendDiceOption {
 // WithSendDiceEmoji sets the Emoji field.
 //
 // Emoji on which the dice throw animation is based.
-// Currently, must be one of “”, “”, “”, “”, “”, or “”.
-// Dice can have values 1-6 for “”, “” and “”, values 1-5 for “” and “”, and values 1-64 for “”.
-// Defaults to “”.
+// Currently, must be one of “🎲”, “🎯”, “🏀”, “⚽”, “🎳”, or “🎰”.
+// Dice can have values 1-6 for “🎲”, “🎯” and “🎳”, values 1-5 for “🏀” and “⚽”, and values 1-64 for “🎰”.
+// Defaults to “🎲”.
 func WithSendDiceEmoji(value string) SendDiceOption {
 	return fieldOption(value, func(params *SendDiceParams) *string {
 		return &params.Emoji

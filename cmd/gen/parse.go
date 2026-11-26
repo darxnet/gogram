@@ -109,6 +109,12 @@ func parseDescriptionTextLinks(node *html.Node) (text, links []byte) {
 		return text, nil
 	}
 
+	// The docs render emoji as <img class="emoji" alt="⭐">.
+	if node.Type == html.ElementNode && node.Data == "img" {
+		text = append(text, findAttr(node, "alt")...)
+		return text, nil
+	}
+
 	if node.Type == html.ElementNode && node.Data == "a" {
 		href := findAttr(node, "href")
 

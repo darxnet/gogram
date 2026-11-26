@@ -2464,7 +2464,7 @@ type Dice struct {
 	// Emoji on which the dice throw animation is based
 	Emoji string `json:"emoji"`
 
-	// Value of the dice, 1-6 for “”, “” and “” base emoji, 1-5 for “” and “” base emoji, 1-64 for “” base emoji
+	// Value of the dice, 1-6 for “🎲”, “🎯” and “🎳” base emoji, 1-5 for “🏀” and “⚽” base emoji, 1-64 for “🎰” base emoji
 	Value int64 `json:"value"`
 }
 
@@ -3385,7 +3385,7 @@ type InlineKeyboardButton struct {
 
 	// Optional.
 	// Specify True to send a [Pay button].
-	// Substrings “” and “XTR” in the button's text will be replaced with a Telegram Star icon.
+	// Substrings “⭐” and “XTR” in the button's text will be replaced with a Telegram Star icon.
 	//
 	// NOTE: This type of button must always be the first button in the first row and can only be used in invoice messages.
 	//
@@ -9894,7 +9894,7 @@ type ReactionTypeEmoji struct {
 	Type string `json:"type"`
 
 	// Reaction emoji.
-	// Currently, it can be one of "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "".
+	// Currently, it can be one of "❤", "👍", "👎", "🔥", "🥰", "👏", "😁", "🤔", "🤯", "😱", "🤬", "😢", "🎉", "🤩", "🤮", "💩", "🙏", "👌", "🕊", "🤡", "🥱", "🥴", "😍", "🐳", "❤‍🔥", "🌚", "🌭", "💯", "🤣", "⚡", "🍌", "🏆", "💔", "🤨", "😐", "🍓", "🍾", "💋", "🖕", "😈", "😴", "😭", "🤓", "👻", "👨‍💻", "👀", "🎃", "🙈", "😇", "😨", "🤝", "✍", "🤗", "🫡", "🎅", "🎄", "☃", "💅", "🤪", "🗿", "🆒", "💘", "🙉", "🦄", "😘", "💊", "🙊", "😎", "👾", "🤷‍♂", "🤷", "🤷‍♀", "😡".
 	Emoji string `json:"emoji"`
 }
 
