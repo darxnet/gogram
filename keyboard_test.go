@@ -1,6 +1,7 @@
 package gogram_test
 
 import (
+	"encoding/json"
 	"strings"
 	"testing"
 
@@ -23,7 +24,7 @@ func TestInlineKeyboardBuilder(t *testing.T) {
 	}
 
 	if rows[0][1].CallbackData != "c 0" || rows[1][0].URL == "" || rows[1][1].WebApp == nil ||
-		rows[1][2].SwitchInlineQueryCurrentChat != "q" {
+		rows[1][2].SwitchInlineQueryCurrentChat != gogram.Some("q") {
 		t.Fatalf("rows = %+v", rows)
 	}
 
@@ -106,7 +107,7 @@ func TestInlineKeyboardBuilder_ButtonKinds(t *testing.T) {
 	}
 
 	game, chat, copyText, disabled := rows[1][0], rows[1][1], rows[1][2], rows[1][3]
-	if game.CallbackGame == nil || chat.SwitchInlineQuery != "q" ||
+	if game.CallbackGame == nil || chat.SwitchInlineQuery != gogram.Some("q") ||
 		copyText.CopyText == nil || copyText.CopyText.Text != "code" || disabled.Disabled == nil {
 		t.Fatalf("rows[1] = %+v", rows[1])
 	}
@@ -150,4 +151,25 @@ func TestInlineKeyboardBuilder_StyleWithoutButtonPanics(t *testing.T) {
 	}()
 
 	gogram.NewInlineKeyboardBuilder().Style(gogram.ButtonStyleDanger)
+}
+
+func TestInlineKeyboardBuilder_EmptySwitchInlineQuery(t *testing.T) {
+	t.Parallel()
+
+	// An empty query is valid and must still be sent: it inserts only the
+	// bot's username. Without it the button would be a bare text button.
+	rows := gogram.NewInlineKeyboardBuilder().
+		SwitchInlineCurrent("Search", "").
+		SwitchInlineChat("Share", "").
+		Rows()
+
+	b, err := json.Marshal(rows)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	const want = `[[{"text":"Search","switch_inline_query_current_chat":""},{"text":"Share","switch_inline_query":""}]]`
+	if string(b) != want {
+		t.Fatalf("json = %s, want %s", b, want)
+	}
 }

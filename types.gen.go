@@ -3358,7 +3358,7 @@ type InlineKeyboardButton struct {
 	// If set, pressing the button will prompt the user to select one of their chats, open that chat and insert the bot's username and the specified inline query in the input field.
 	// May be empty, in which case just the bot's username will be inserted.
 	// Not supported for messages sent in channel direct messages chats and on behalf of a business account.
-	SwitchInlineQuery string `json:"switch_inline_query,omitempty"`
+	SwitchInlineQuery Optional[string] `json:"switch_inline_query,omitzero"`
 
 	// Optional.
 	// If set, pressing the button will insert the bot's username and the specified inline query in the current chat's input field.
@@ -3366,7 +3366,7 @@ type InlineKeyboardButton struct {
 	//
 	// This offers a quick way for the user to open your bot in inline mode in the same chat - good for selecting something from multiple options.
 	// Not supported in channels and for messages sent in channel direct messages chats and on behalf of a business account.
-	SwitchInlineQueryCurrentChat string `json:"switch_inline_query_current_chat,omitempty"`
+	SwitchInlineQueryCurrentChat Optional[string] `json:"switch_inline_query_current_chat,omitzero"`
 
 	// Optional.
 	// If set, pressing the button will prompt the user to select one of their chats of the specified type, open that chat and insert the bot's username and the specified inline query in the input field.
@@ -11074,13 +11074,13 @@ type RichMessageButton struct {
 	// If set, pressing the button will prompt the user to select one of their chats, open that chat and insert the bot's username and the specified inline query in the input field.
 	// May be empty, in which case just the bot's username will be inserted.
 	// Not supported for messages sent in channel direct messages chats and on behalf of a business account.
-	SwitchInlineQuery string `json:"switch_inline_query,omitempty"`
+	SwitchInlineQuery Optional[string] `json:"switch_inline_query,omitzero"`
 
 	// Optional.
 	// If set, pressing the button will insert the bot's username and the specified inline query in the current chat's input field.
 	// May be empty, in which case only the bot's username will be inserted.
 	// Not supported in channels and for messages sent in channel direct messages chats and on behalf of a business account.
-	SwitchInlineQueryCurrentChat string `json:"switch_inline_query_current_chat,omitempty"`
+	SwitchInlineQueryCurrentChat Optional[string] `json:"switch_inline_query_current_chat,omitzero"`
 
 	// Optional.
 	// If set, pressing the button will prompt the user to select one of their chats of the specified type, open that chat and insert the bot's username and the specified inline query in the input field.

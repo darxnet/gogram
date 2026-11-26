@@ -49,6 +49,12 @@ var optionalFields = []string{
 	"KeyboardButtonRequestChat.chat_is_forum",     // unset: no restriction
 	"KeyboardButtonRequestChat.chat_has_username", // unset: no restriction
 
+	// An empty query is valid: it inserts only the bot's username.
+	"InlineKeyboardButton.switch_inline_query",
+	"InlineKeyboardButton.switch_inline_query_current_chat",
+	"RichMessageButton.switch_inline_query",
+	"RichMessageButton.switch_inline_query_current_chat",
+
 	// setMySettings: an omitted field keeps the current setting.
 	"setMySettings.supports_inline_queries",
 	"setMySettings.inline_query_placeholder", // "" restores the default placeholder

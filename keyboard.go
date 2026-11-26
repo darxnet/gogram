@@ -52,13 +52,13 @@ func (b *InlineKeyboardBuilder) WebApp(text, url string) *InlineKeyboardBuilder 
 // SwitchInlineCurrent appends a button that inserts the bot's username and
 // query into the current chat's input field.
 func (b *InlineKeyboardBuilder) SwitchInlineCurrent(text, query string) *InlineKeyboardBuilder {
-	return b.Add(InlineKeyboardButton{Text: text, SwitchInlineQueryCurrentChat: query})
+	return b.Add(InlineKeyboardButton{Text: text, SwitchInlineQueryCurrentChat: Some(query)})
 }
 
 // SwitchInlineChat appends a button that prompts the user to pick a chat,
 // opens it and inserts the bot's username and query into the input field.
 func (b *InlineKeyboardBuilder) SwitchInlineChat(text, query string) *InlineKeyboardBuilder {
-	return b.Add(InlineKeyboardButton{Text: text, SwitchInlineQuery: query})
+	return b.Add(InlineKeyboardButton{Text: text, SwitchInlineQuery: Some(query)})
 }
 
 // CopyText appends a button that copies clipboard to the clipboard.
