@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptrace"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -80,7 +81,9 @@ var headerJSON = []string{contentTypeJSON}
 
 // httpCaller is the base [Caller]: one HTTP round trip per attempt, with
 // retries of transient errors up to retryLimit times when the body can be
-// rewound.
+// rewound. A transport error is transient only while the request has not
+// been written in full: Telegram has not seen the call, so a retry cannot
+// send a message twice.
 type httpCaller struct {
 	client *Client
 }
@@ -91,6 +94,26 @@ func (h httpCaller) Call(ctx context.Context, req Request, result any) error {
 		err := h.roundTrip(ctx, req, result)
 		if err == nil {
 			return nil
+		}
+
+		var unsent *unsentError
+		if errors.As(err, &unsent) {
+			// The caller sees the transport error itself, never the marker.
+			err = unsent.err
+
+			if attempt >= retryLimit || ctx.Err() != nil {
+				return err
+			}
+
+			if rewindErr := rewind(req.Body); rewindErr != nil {
+				return errors.Join(err, rewindErr)
+			}
+
+			if sleepErr := sleep(ctx, defaultTimeoutOnError); sleepErr != nil {
+				return sleepErr
+			}
+
+			continue
 		}
 
 		// Both transport-level errors (empty body, HTML 5xx) and API errors
@@ -114,7 +137,17 @@ func (h httpCaller) Call(ctx context.Context, req Request, result any) error {
 func (h httpCaller) roundTrip(ctx context.Context, req Request, result any) error {
 	c := h.client
 
-	ctx = httptrace.WithClientTrace(ctx, c.trace)
+	// One trace per attempt: GotConn of the client plus WroteRequest, which
+	// tells a transport error before Telegram got the call from one after.
+	at := &attemptTrace{}
+	at.trace.GotConn = c.trace.GotConn
+	at.trace.WroteRequest = func(info httptrace.WroteRequestInfo) {
+		if info.Err == nil {
+			at.wrote.Store(true)
+		}
+	}
+
+	ctx = httptrace.WithClientTrace(ctx, &at.trace)
 
 	if req.Timeout > 0 {
 		var cancel context.CancelFunc
@@ -135,6 +168,10 @@ func (h httpCaller) roundTrip(ctx context.Context, req Request, result any) erro
 
 	resp, err := c.do(httpReq)
 	if err != nil {
+		if !at.wrote.Load() && !bodyFailed(req.Body) {
+			return &unsentError{err: err}
+		}
+
 		return err
 	}
 	defer resp.Body.Close() //nolint:errcheck
@@ -174,6 +211,32 @@ func (h httpCaller) roundTrip(ctx context.Context, req Request, result any) erro
 	}
 
 	return nil
+}
+
+// attemptTrace keeps the trace and its flag in one allocation.
+type attemptTrace struct {
+	trace httptrace.ClientTrace
+	wrote atomic.Bool
+}
+
+// unsentError marks a transport error that happened before the request was
+// written in full, so retrying it cannot repeat the call. httpCaller.Call
+// unwraps it; callers never see it.
+type unsentError struct {
+	err error
+}
+
+func (e *unsentError) Error() string { return e.err.Error() }
+
+func (e *unsentError) Unwrap() error { return e.err }
+
+// bodyFailed reports whether the transport error comes from producing the
+// body itself (InputFile.Open failed, a reader broke): a local failure that
+// a retry would only repeat.
+func bodyFailed(body io.Reader) bool {
+	b, ok := body.(*multipartBody)
+
+	return ok && b.Err() != nil
 }
 
 // rewinder is a body that can start over for a retry, see multipartBody.

@@ -3,6 +3,7 @@ package gogram_test
 import (
 	"errors"
 	"net/http"
+	"net/http/httptrace"
 	"net/url"
 	"strings"
 	"testing"
@@ -12,10 +13,16 @@ import (
 
 var errNetwork = errors.New("connection refused")
 
-// failingTransport fails every request the way a network error does.
+// failingTransport fails every request the way a network error does, after
+// the request was written: such an error is not retried, so the test does
+// not wait for retries.
 type failingTransport struct{}
 
-func (failingTransport) RoundTrip(*http.Request) (*http.Response, error) {
+func (failingTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	if trace := httptrace.ContextClientTrace(req.Context()); trace != nil && trace.WroteRequest != nil {
+		trace.WroteRequest(httptrace.WroteRequestInfo{})
+	}
+
 	return nil, errNetwork
 }
 
