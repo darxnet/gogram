@@ -49,7 +49,7 @@ func TestInlineKeyboardAliases(t *testing.T) {
 	}
 }
 
-func TestInlineKeyboardBuilder_AddColumnsRowsKeyboards(t *testing.T) {
+func TestInlineKeyboardBuilder_AddColumnRowsKeyboards(t *testing.T) {
 	t.Parallel()
 
 	a := gogram.InlineKeyboardButton{Text: "a", CallbackData: "a"}
@@ -57,8 +57,8 @@ func TestInlineKeyboardBuilder_AddColumnsRowsKeyboards(t *testing.T) {
 	c := gogram.InlineKeyboardButton{Text: "c", CallbackData: "c"}
 
 	rows := gogram.NewInlineKeyboardBuilder().
-		Add(a). // current row is finished by AddColumns
-		AddColumns(b, c).
+		Add(a). // current row is finished by AddColumn
+		AddColumn(b, c).
 		AddRows(gogram.InlineKeyboardRow{a, b}, nil, gogram.InlineKeyboardRow{c}).
 		Add(c).
 		AddKeyboards(gogram.InlineKeyboard{{a}}, nil, gogram.InlineKeyboard{{}, {b, c}}).
@@ -81,7 +81,7 @@ func TestInlineKeyboardBuilder_AddColumnsRowsKeyboards(t *testing.T) {
 	}
 
 	var empty gogram.InlineKeyboardBuilder
-	if got := empty.AddColumns().AddRows().AddKeyboards().Rows(); len(got) != 0 {
+	if got := empty.AddColumn().AddRows().AddKeyboards().Rows(); len(got) != 0 {
 		t.Fatalf("empty builder rows = %+v", got)
 	}
 }

@@ -53,9 +53,9 @@ func (b *InlineKeyboardBuilder) SwitchInline(text, query string) *InlineKeyboard
 	return b.Add(InlineKeyboardButton{Text: text, SwitchInlineQueryCurrentChat: query})
 }
 
-// AddColumns finishes the current row and adds each button as a row of its
+// AddColumn finishes the current row and adds each button as a row of its
 // own, so the buttons form a single column.
-func (b *InlineKeyboardBuilder) AddColumns(buttons ...InlineKeyboardButton) *InlineKeyboardBuilder {
+func (b *InlineKeyboardBuilder) AddColumn(buttons ...InlineKeyboardButton) *InlineKeyboardBuilder {
 	b.Row()
 
 	for i := range buttons {
@@ -88,7 +88,8 @@ func (b *InlineKeyboardBuilder) AddKeyboards(keyboards ...InlineKeyboard) *Inlin
 	return b.Row()
 }
 
-// Row finishes the current row. An empty row is skipped.
+// Row starts a new row: buttons added next go to it. Calling Row on an
+// empty row does nothing, so no empty rows are produced.
 func (b *InlineKeyboardBuilder) Row() *InlineKeyboardBuilder {
 	if len(b.row) != 0 {
 		b.rows = append(b.rows, b.row)
