@@ -680,6 +680,51 @@ func TestClient_Call_RetriesNonJSONBody(t *testing.T) {
 	}
 }
 
+// TestClient_Call_FrozenMethodInvalid validates that a frozen bot's error is
+// returned at once (no retry) and matches both ErrBadRequest and its sentinel.
+func TestClient_Call_FrozenMethodInvalid(t *testing.T) {
+	t.Parallel()
+
+	var requestCount atomic.Int32
+
+	client, err := gogram.NewClient(testToken, gogram.WithHTTPClient(&http.Client{
+		Transport: roundTripperFunc(func(req *http.Request) (*http.Response, error) {
+			requestCount.Add(1)
+
+			return &http.Response{
+				StatusCode: http.StatusBadRequest,
+				Status:     http.StatusText(http.StatusBadRequest),
+				Body: io.NopCloser(strings.NewReader(
+					`{"ok":false,"error_code":400,"description":"Bad Request: FROZEN_METHOD_INVALID"}`,
+				)),
+				Header:  http.Header{},
+				Request: req,
+			}, nil
+		}),
+	}))
+	if err != nil {
+		t.Fatalf("NewClient: %v", err)
+	}
+
+	_, err = client.GetMyName(t.Context(), &gogram.GetMyNameParams{})
+
+	if !errors.Is(err, gogram.ErrBadRequestFrozenMethodInvalid) {
+		t.Fatalf("err = %v, want ErrBadRequestFrozenMethodInvalid", err)
+	}
+
+	if !errors.Is(err, gogram.ErrBadRequest) {
+		t.Fatalf("err = %v, want it to match ErrBadRequest", err)
+	}
+
+	if got := err.Error(); got != "Bad Request: FROZEN_METHOD_INVALID" {
+		t.Fatalf("err.Error() = %q", got)
+	}
+
+	if n := requestCount.Load(); n != 1 {
+		t.Fatalf("requests = %d, want 1", n)
+	}
+}
+
 // TestClient_Start_DeletesStaleWebhook validates that polling recovers from a
 // webhook left by a previous deployment: getUpdates conflicts, the client
 // deletes the webhook and polls again without reporting an error.

@@ -194,6 +194,7 @@ const (
 	errTextParticipantIDInvalid = "Bad Request: PARTICIPANT_ID_INVALID"
 	errTextChatNotFound         = "Bad Request: chat not found"
 	errTextFileMustBeNonEmpty   = "Bad Request: file must be non-empty"
+	errTextFrozenMethodInvalid  = "Bad Request: FROZEN_METHOD_INVALID"
 	errTextBotBlockedByUser     = "Forbidden: bot was blocked by the user"
 	errTextBanned               = "Contact https://t.me/BotSupport for assistance"
 	errTextConflictWithBot      = "Conflict: terminated by other getUpdates request; make sure that only one bot instance is running"
@@ -213,6 +214,10 @@ var (
 	ErrBadRequestChatNotFound = NewError(http.StatusBadRequest, errTextChatNotFound)
 	// ErrBadRequestFileMustBeNonEmpty indicates that an uploaded file is empty.
 	ErrBadRequestFileMustBeNonEmpty = NewError(http.StatusBadRequest, errTextFileMustBeNonEmpty)
+	// ErrBadRequestFrozenMethodInvalid indicates that Telegram froze the bot
+	// (usually its owner's account) and allows only a few methods; others fail
+	// until the freeze is lifted, so retrying does not help.
+	ErrBadRequestFrozenMethodInvalid = NewError(http.StatusBadRequest, errTextFrozenMethodInvalid)
 )
 
 func genErrorBadRequest(description string) error {
@@ -231,6 +236,9 @@ func genErrorBadRequest(description string) error {
 
 	case errTextFileMustBeNonEmpty:
 		return ErrBadRequestFileMustBeNonEmpty
+
+	case errTextFrozenMethodInvalid:
+		return ErrBadRequestFrozenMethodInvalid
 
 	default:
 		return nil
