@@ -143,3 +143,112 @@ func TestFromBytesAndDisk(t *testing.T) {
 		t.Fatalf("FromDisk = %+v", d)
 	}
 }
+
+var (
+	errNoGetBody    = errors.New("request has no GetBody")
+	errProxyDropped = errors.New("proxy dropped the connection")
+)
+
+// replayingClient mimics a transport that retries on its own: each
+// attempt takes a fresh body from GetBody, and the first one fails after
+// sending the form.
+func replayingClient(t *testing.T, uploads *[]string) *http.Client {
+	t.Helper()
+
+	return &http.Client{Transport: roundTripperFunc(func(req *http.Request) (*http.Response, error) {
+		if req.GetBody == nil {
+			return nil, errNoGetBody
+		}
+
+		_, params, err := mime.ParseMediaType(req.Header.Get("Content-Type"))
+		if err != nil {
+			return nil, err
+		}
+
+		var errs []error
+
+		for attempt := range 2 {
+			body, err := req.GetBody()
+			if err != nil {
+				return nil, errors.Join(append(errs, err)...)
+			}
+
+			if attempt == 0 {
+				// The whole form went out, so the file was opened and read.
+				_, _ = io.Copy(io.Discard, body)
+				errs = append(errs, errProxyDropped)
+
+				continue
+			}
+
+			form, err := multipart.NewReader(body, params["boundary"]).ReadForm(1 << 20)
+			if err != nil {
+				return nil, err
+			}
+
+			f, err := form.File["document"][0].Open()
+			if err != nil {
+				return nil, err
+			}
+
+			content, _ := io.ReadAll(f)
+			_ = f.Close()
+
+			*uploads = append(*uploads, string(content))
+		}
+
+		resp := testResponse{OK: true, Result: []byte(`{"message_id":1,"date":1,"chat":{"id":7,"type":"private"}}`)}
+
+		return jsonHTTPResponse(t, &resp), nil
+	})}
+}
+
+func TestMultipart_GetBodyReplaysOpener(t *testing.T) {
+	t.Parallel()
+
+	var (
+		uploads []string
+		opens   atomic.Int32
+	)
+
+	client, err := gogram.NewClient(testToken, gogram.WithHTTPClient(replayingClient(t, &uploads)))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	doc := gogram.FromOpener("a.txt", func(context.Context) (io.ReadCloser, error) {
+		opens.Add(1)
+		return io.NopCloser(strings.NewReader("payload")), nil
+	})
+
+	msg, err := client.SendDocument(t.Context(), &gogram.SendDocumentParams{ChatID: gogram.ChatID{ID: 7}, Document: doc})
+	if err != nil || msg == nil || msg.MessageID != 1 {
+		t.Fatalf("SendDocument = %+v, %v", msg, err)
+	}
+
+	if opens.Load() != 2 || len(uploads) != 1 || uploads[0] != "payload" {
+		t.Fatalf("opens = %d, uploads = %q; want two opens and one complete upload", opens.Load(), uploads)
+	}
+}
+
+func TestMultipart_GetBodyRefusesConsumedReader(t *testing.T) {
+	t.Parallel()
+
+	var uploads []string
+
+	client, err := gogram.NewClient(testToken, gogram.WithHTTPClient(replayingClient(t, &uploads)))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	doc := gogram.FromReader("a.txt", strings.NewReader("once"))
+
+	_, err = client.SendDocument(t.Context(), &gogram.SendDocumentParams{ChatID: gogram.ChatID{ID: 7}, Document: doc})
+	if !errors.Is(err, gogram.ErrBodyNotRewindable) {
+		t.Fatalf("err = %v, want ErrBodyNotRewindable", err)
+	}
+
+	if len(uploads) != 0 {
+		t.Fatalf("uploads = %q, want none", uploads)
+	}
+}
