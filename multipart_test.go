@@ -252,3 +252,74 @@ func TestMultipart_GetBodyRefusesConsumedReader(t *testing.T) {
 		t.Fatalf("uploads = %q, want none", uploads)
 	}
 }
+
+// TestMultipart_StaleAttemptCannotStealRetry covers a transport that keeps
+// reading the body of an abandoned attempt, as the net/http write loop can
+// after a deadline: those reads must not consume the retry's stream, or the
+// retry reaches Telegram without its first fields ("chat_id is empty").
+func TestMultipart_StaleAttemptCannotStealRetry(t *testing.T) {
+	t.Parallel()
+
+	var (
+		calls atomic.Int32
+		stale io.Reader
+		form  *multipart.Form
+	)
+
+	hc := &http.Client{Transport: roundTripperFunc(func(req *http.Request) (*http.Response, error) {
+		if calls.Add(1) == 1 {
+			// The first attempt sends a little, then the server gives up on it.
+			stale = req.Body
+			_, _ = req.Body.Read(make([]byte, 16))
+
+			resp := testResponse{OK: false, ErrorCode: http.StatusTooManyRequests, Description: "retry",
+				Parameters: &gogram.ResponseParameters{RetryAfter: 1}}
+
+			return jsonHTTPResponse(t, &resp), nil
+		}
+
+		// The abandoned attempt reads once more while the retry starts, and
+		// its late Close must not stop the retry either.
+		if n, err := stale.Read(make([]byte, 64)); n != 0 || err == nil {
+			t.Errorf("stale Read = %d, %v; want an error", n, err)
+		}
+
+		if c, ok := stale.(io.Closer); ok {
+			_ = c.Close()
+		}
+
+		_, params, err := mime.ParseMediaType(req.Header.Get("Content-Type"))
+		if err != nil {
+			return nil, err
+		}
+
+		form, err = multipart.NewReader(req.Body, params["boundary"]).ReadForm(1 << 20)
+		if err != nil {
+			return nil, err
+		}
+
+		resp := testResponse{OK: true, Result: []byte(`{"message_id":1,"date":1,"chat":{"id":7,"type":"private"}}`)}
+
+		return jsonHTTPResponse(t, &resp), nil
+	})}
+
+	client, err := gogram.NewClient(testToken, gogram.WithHTTPClient(hc))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	doc := gogram.FromBytes("a.txt", []byte("payload"))
+
+	_, err = client.SendDocument(t.Context(), &gogram.SendDocumentParams{ChatID: gogram.ChatID{ID: 7}, Document: doc})
+	if err != nil {
+		t.Fatalf("SendDocument: %v", err)
+	}
+
+	if got := form.Value["chat_id"]; len(got) != 1 || got[0] != "7" {
+		t.Fatalf("retry chat_id = %q, want [7]", got)
+	}
+
+	if len(form.File["document"]) != 1 {
+		t.Fatalf("retry has no document")
+	}
+}
