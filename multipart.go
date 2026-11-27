@@ -23,6 +23,12 @@ var errBodyRewound = errors.New("gogram: multipart body rewound")
 // transport reads it, so an upload is never buffered in memory. Rewind
 // starts the body over for a retry; it fails when an [InputFile.File]
 // reader was already consumed, see [InputFile.Open].
+//
+// Each HTTP attempt reads its own pipe, see open. An HTTP transport may
+// keep reading a request body after the round trip ended (its write loop
+// races the deadline); with one shared reader such a late Read would start
+// the stream of the retry and swallow its first bytes, and the retry would
+// reach the server without its first fields.
 type multipartBody struct {
 	ctx      context.Context //nolint:containedctx // the request context, for InputFile.Open per attempt
 	write    func(ctx context.Context, w *multipart.Writer, b *multipartBody) error
@@ -51,7 +57,9 @@ func (b *multipartBody) ContentType() string {
 	return "multipart/form-data; boundary=" + b.boundary
 }
 
-// Read implements io.Reader, starting the writer goroutine on first use.
+// Read implements io.Reader for callers that read [Request.Body] directly,
+// starting the writer goroutine on first use. HTTP attempts read the pipe
+// from open instead.
 func (b *multipartBody) Read(p []byte) (int, error) {
 	b.mu.Lock()
 	if b.pr == nil {
@@ -61,6 +69,19 @@ func (b *multipartBody) Read(p []byte) (int, error) {
 	b.mu.Unlock()
 
 	return pr.Read(p)
+}
+
+// open starts the stream of a new HTTP attempt and returns its own pipe.
+// Once the body is rewound or closed, reads of that pipe fail and its
+// Close does not touch a later attempt.
+func (b *multipartBody) open() io.ReadCloser {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+
+	b.finish(errBodyRewound)
+	b.start()
+
+	return b.pr
 }
 
 func (b *multipartBody) start() {
@@ -98,16 +119,15 @@ func (b *multipartBody) Rewind() error {
 
 // getBody implements [http.Request.GetBody], so transports that retry on
 // their own can restart the upload. It fails with [ErrBodyNotRewindable]
-// once an [InputFile.File] reader was consumed. The returned body does not
-// stop the writer on Close, like the body of the first attempt: Rewind and
-// Close of the request do that.
+// once an [InputFile.File] reader was consumed. The returned body is the
+// pipe of a new attempt, so the abandoned one can no longer read the stream.
 func (b *multipartBody) getBody() (io.ReadCloser, error) {
 	err := b.Rewind()
 	if err != nil {
 		return nil, err
 	}
 
-	return io.NopCloser(b), nil
+	return b.open(), nil
 }
 
 // Close stops the writer goroutine of an unfinished attempt.

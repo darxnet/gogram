@@ -155,13 +155,20 @@ func (h httpCaller) roundTrip(ctx context.Context, req Request, result any) erro
 		defer cancel()
 	}
 
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, c.cfg.linkPrefix+req.Method, req.Body)
+	body := req.Body
+
+	mb, isMultipart := body.(*multipartBody)
+	if isMultipart {
+		body = mb.open()
+	}
+
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, c.cfg.linkPrefix+req.Method, body)
 	if err != nil {
 		return c.redact(err)
 	}
 
-	if body, ok := req.Body.(*multipartBody); ok {
-		httpReq.GetBody = body.getBody
+	if isMultipart {
+		httpReq.GetBody = mb.getBody
 	}
 
 	if req.ContentType == contentTypeJSON {
